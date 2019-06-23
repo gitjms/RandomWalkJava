@@ -11,14 +11,28 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.geometry.Insets;
+import javafx.scene.control.TextArea;
+import javafx.scene.effect.BlendMode;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.util.Pair;
 
 public class Data {
-
+    
     public String[] vars;
-
+    final int textwidth = 600;
+    final int textheight = 450;
+    
     public Data() {
-        this.vars = new String[]{"0","0.0","0","0","-","-"};
+    }
+    
+    public Data(String[] vars) {
+        this.vars = vars;
     }
 
     public void setVars(String[] vars) {
@@ -26,30 +40,40 @@ public class Data {
     }
 
     public void setVar(Integer i, String var) {
-        vars[i]=var;
+        this.vars[i]=var;
     }
 
     public String[] getVars() {
-        return vars;
+        return this.vars;
     }
 
     public String getVar(Integer i) {
-        return vars[i];
+        return this.vars[i];
     }
 
-    public static void createData(String[] vars) {
-
+    public TextArea createData(String path) {
+        TextArea textArea = new TextArea();
+        textArea.setMinWidth(this.textwidth);
+        textArea.setMaxWidth(this.textwidth);
+        textArea.setMinHeight(this.textheight);
+        textArea.setMaxHeight(this.textheight);
+        textArea.setFont(Font.font("Verdana",FontWeight.BOLD, 15));
+        textArea.setBorder(null);
+        textArea.setEditable(false);
+        textArea.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        textArea.setBlendMode(BlendMode.DIFFERENCE);
+        String teksti = "";
+        
         try {
-            String fileLocation = "C:\\DATA\\";
-            
-            String[] command = {"cmd","/c","walk.exe",vars[0],vars[1],vars[2],vars[3],vars[4],vars[5]};
+            String[] command = {"cmd","/c","walk.exe",
+                this.vars[0],this.vars[1],this.vars[2],
+                this.vars[3],this.vars[4],this.vars[5]};
             
             Runtime runtime = Runtime.getRuntime();
             // print the state of the program
-            System.out.println(" Random Walk calculations begin");
-
-            Process process = runtime.exec(command, null, new File(fileLocation));
-
+            System.out.println(" Random Walk calculation begins");
+            Process process = runtime.exec(command, null, new File(path));
+            
             int exitVal;
             try (BufferedReader input = new BufferedReader(new InputStreamReader(
                 process.getInputStream()))) {
@@ -57,34 +81,39 @@ public class Data {
                     StreamGobbler(process.getErrorStream(), "ERROR");
                 errorGobbler.start();
                 String line = null;
-                while ((line = input.readLine()) != null)
-                {
+                
+                while ((line = input.readLine()) != null){
                     System.out.println(line);
-                }   exitVal = process.waitFor();
-                if (exitVal == 0)
-                    System.out.println(" Calculations ended with no errors");
-                else {
-                    System.out.println(" Calculations ended with error code " + exitVal);
+                    if (teksti.isEmpty())
+                        teksti = line;
+                    else
+                        teksti = teksti + "\n" + line;
+                }
+                exitVal = process.waitFor();
+                if (exitVal == 0) {
+                    System.out.println(" Calculation ended with no errors");
+                } else {
+                    System.out.println(" Calculation ended with error code " + exitVal);
                     runtime.exit(exitVal);
                 }
             }
             
-            runtime.addShutdownHook(new Message());
+            //runtime.addShutdownHook(new Message());
 
         } catch (IOException | InterruptedException e) {
             System.out.println(e.getMessage());
         }
-        //Nappi.class.cast("execute").setToggle(false);
+        textArea.setText(teksti);System.out.println(teksti);
+        return textArea;
     }
 
-    public static Pair<String,List<Pair<Double,Double>>> readData(){
+    public static Pair<String,List<Pair<Double,Double>>> readData(String path){
     
         List<Pair<Double,Double>> data = new ArrayList<>();
         boolean first = false;
         String header = "";
 
-        try (Scanner sc = new Scanner(new File("C:\\DATA\\rms_2D.xy"))) {
-
+        try (Scanner sc = new Scanner(new File(path + "\\rms_2D.xy"))) {
             while (sc.hasNextLine()) {
                 if (!first) {
                     header = sc.nextLine();
