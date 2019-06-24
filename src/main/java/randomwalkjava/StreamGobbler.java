@@ -6,21 +6,37 @@ public class StreamGobbler extends Thread {
 
     InputStream is;
     String type;
+    OutputStream os;
     
     StreamGobbler(InputStream is, String type) {
         this.is = is;
         this.type = type;
+        this.os = null;
     }
-    
+
+    StreamGobbler(InputStream is, String type, OutputStream redirect) {
+        this.is = is;
+        this.type = type;
+        this.os = redirect;
+    }
+
     @Override
     public void run() {
         try {
+            PrintWriter pw = null;
+            if (os != null)
+                pw = new PrintWriter(os);
+
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(isr);
             String line=null;
             while ( (line = br.readLine()) != null){
-                System.out.println(type + ">" + line);
+                if (pw != null)
+                    pw.println(line);
+                System.out.println(type + line);
             }
+            if (pw != null)
+                pw.flush();
         } catch (IOException ioe) {
             System.out.println(ioe.getMessage());
         }
