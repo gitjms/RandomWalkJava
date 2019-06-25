@@ -41,19 +41,23 @@ public class Data {
         return this.vars[i];
     }
 
-    public String createData(File folderPath) {
+    public String createData(File folderPath, boolean save) {
         String teksti = "";
-        
+        String[] command = null;
+
         try {
-            String[] command = {"cmd","/c","walk.exe",
-                this.vars[0],this.vars[1],this.vars[2],
-                this.vars[3],this.vars[4],this.vars[5]};
+            command = new String[]{"cmd","/c","walk.exe",
+                this.vars[0],this.vars[1],this.vars[2],this.vars[3],
+                this.vars[4],this.vars[5],this.vars[6],this.vars[7]};
 
             FileOutputStream fos = new FileOutputStream(command[0]);
             Runtime runtime = Runtime.getRuntime();
 
-            // print the state of the program
-            System.out.println(" Fortran execution begins");
+            if (save == true){
+                // print the state of the program
+                System.out.println(" Fortran execution begins...");
+                teksti = teksti + "\n" + " Fortran execution begins...";
+            }
             Process process = runtime.exec(command, null, folderPath);
             
             int exitVal;
@@ -61,7 +65,7 @@ public class Data {
                 process.getInputStream()))) {
 
                 StreamGobbler errorGobbler = new StreamGobbler(
-                    process.getErrorStream(), "ERROR");
+                    process.getErrorStream(), "ERROR ");
                 errorGobbler.start();
                 String line = null;
 
@@ -79,9 +83,13 @@ public class Data {
 
                 exitVal = process.waitFor();
                 if (exitVal == 0) {
-                    System.out.println(" Fortran execution ended with no errors");
-                } else {
-                    System.out.println(" Fortran execution ended with error code " + exitVal);
+                    if (save == true){
+                        System.out.println(" Fortran execution ended with no errors");
+                        teksti = teksti + "\n" + " Fortran execution ended with no errors";
+                    } else {
+                        System.out.println(" Fortran execution ended with error code " + exitVal);
+                        teksti = teksti + "\n" + " Fortran execution ended with error code " + exitVal;
+                    }
                     runtime.exit(exitVal);
                 }
                 fos.flush();

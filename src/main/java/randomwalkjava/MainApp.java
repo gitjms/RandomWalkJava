@@ -13,12 +13,10 @@ import java.nio.file.Files;
 import java.util.List;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
-import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.DropShadow;
@@ -29,25 +27,31 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 import org.knowm.xchart.QuickChart;
-import org.knowm.xchart.SwingWrapper;
+import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.XYChart;
 import org.knowm.xchart.XYChartBuilder;
-import org.knowm.xchart.XYSeries.XYSeriesRenderStyle;
+import org.knowm.xchart.XYSeries;
 import org.knowm.xchart.style.Styler.ChartTheme;
 
 public class MainApp extends Application {
 
-    final int stageWidth = 940;
-    final int stageHeight = 600;
+    // FIGURE
     final int chartWidth = 860;
     final int chartHeight = 605;
+    // STAGE
+    final int stageWidth = 940;
+    final int stageHeight = 600;
+    // COMPONENTS
     final int buttonWidth = 150;
     final int textwidth = 740;
     final int textheight = 510;
@@ -92,29 +96,32 @@ public class MainApp extends Application {
         GridPane asettelu = new GridPane();
         asettelu.setMaxWidth(paneWidth);
         asettelu.setVgap(5);
-        asettelu.setHgap(0);
-        asettelu.setPadding(new Insets(5, 5, 0, 0));
+        asettelu.setHgap(10);
+        asettelu.setPadding(new Insets(0, 0, 0, 0));
 
         ////////////////////////////////////////////////////
         // FIRST VIEW LABELS AND BUTTONS
-        Label rmsCalc = new Label("Calculate R_rms");
-        Label randomWalk = new Label("Random Walk");
         Button nappiScene1 = new Button("R_RMS vs SQRT(N)");
         Button nappiScene2 = new Button("RANDOM WALK");
-        nappiScene1.setMinWidth(paneWidth);
-        nappiScene1.setMaxWidth(paneWidth);
-        nappiScene2.setMinWidth(paneWidth);
-        nappiScene2.setMaxWidth(paneWidth);
-
-        GridPane.setHalignment(rmsCalc, HPos.LEFT);
-        asettelu.add(rmsCalc, 0, 0);
+        Button nappiHelp = new Button("HELP");
+        Button nappiNoHelp = new Button("HELP");
+        Button nappiMenuHelp = new Button("HELP");
+        nappiScene1.setMinWidth(buttonWidth);
+        nappiScene1.setMaxWidth(buttonWidth);
+        nappiScene2.setMinWidth(buttonWidth);
+        nappiScene2.setMaxWidth(buttonWidth);
+        nappiHelp.setMinWidth(buttonWidth);
+        nappiHelp.setMaxWidth(buttonWidth);
+        nappiNoHelp.setMinWidth(buttonWidth);
+        nappiNoHelp.setMaxWidth(buttonWidth);
+        nappiMenuHelp.setMinWidth(buttonWidth);
+        nappiMenuHelp.setMaxWidth(buttonWidth);
 
         GridPane.setHalignment(nappiScene1, HPos.LEFT);
-        asettelu.add(nappiScene1, 0, 1, 2, 1);
+        asettelu.add(nappiScene1, 0, 0, 2, 1);
         nappiScene1.setBackground(new Background(
             new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        nappiScene1.setId("scene1");
         nappiScene1.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
                 nappiScene1.setEffect(shadow);
@@ -124,16 +131,15 @@ public class MainApp extends Application {
                 nappiScene1.setEffect(null);
         });
 
-
-        GridPane.setHalignment(randomWalk, HPos.LEFT);
-        asettelu.add(randomWalk, 0, 3);
+        final Pane empty1 = new Pane();
+        GridPane.setHalignment(empty1, HPos.LEFT);
+        asettelu.add(empty1, 0, 1, 2, 1);
 
         GridPane.setHalignment(nappiScene2, HPos.LEFT);
-        asettelu.add(nappiScene2, 0, 4, 2, 1);
+        asettelu.add(nappiScene2, 0, 2, 2, 1);
         nappiScene2.setBackground(new Background(
             new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        nappiScene2.setId("scene2");
         nappiScene2.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
                 nappiScene2.setEffect(shadow);
@@ -143,9 +149,36 @@ public class MainApp extends Application {
                 nappiScene2.setEffect(null);
         });
 
+        final Pane empty2 = new Pane();
+        GridPane.setHalignment(empty2, HPos.LEFT);
+        asettelu.add(empty2, 0, 3, 2, 1);
+
+        GridPane.setHalignment(nappiHelp, HPos.LEFT);
+        asettelu.add(nappiMenuHelp, 0, 4, 2, 1);
+        nappiMenuHelp.setBackground(new Background(
+            new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        nappiMenuHelp.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                nappiMenuHelp.setEffect(shadow);
+        });
+        nappiMenuHelp.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                nappiMenuHelp.setEffect(null);
+        });
+
+        BorderPane asetteluMenu = new BorderPane();
+        HBox isovalikkoMenu = new HBox();
+        isovalikkoMenu.setPadding(new Insets(0, 0, 0, 0));
+        isovalikkoMenu.setSpacing(10);
+        VBox valikkoMenu = new VBox();
+        valikkoMenu.setPadding(new Insets(10, 10, 10, 10));
+        valikkoMenu.setSpacing(10);
+
         ////////////////////////////////////////////////////
         // OTHER VIEWS
-        NappiInput napitjamuut = new NappiInput();
+        SceneCalculation getCalcScene = new SceneCalculation();
+        SceneNoCalculation getNoCalcScene = new SceneNoCalculation();
 
         BorderPane asetteluCalc = new BorderPane();
         BorderPane asetteluNoCalc = new BorderPane();
@@ -160,19 +193,19 @@ public class MainApp extends Application {
 
         VBox valikkoCalc = new VBox();
         valikkoCalc.setPadding(new Insets(10, 10, 10, 10));
-        valikkoCalc.setSpacing(10);
+        valikkoCalc.setSpacing(20);
 
         VBox valikkoNoCalc = new VBox();
         valikkoNoCalc.setPadding(new Insets(10, 10, 10, 10));
-        valikkoNoCalc.setSpacing(10);
+        valikkoNoCalc.setSpacing(20);
 
         ////////////////////////////////////////////////////
         // TEXT AREA CALC
         TextArea textAreaCalc = new TextArea();
-        textAreaCalc.setMinWidth(this.textwidth);
-        textAreaCalc.setMaxWidth(this.textwidth);
-        textAreaCalc.setMinHeight(this.textheight);
-        textAreaCalc.setMaxHeight(this.textheight);
+        textAreaCalc.setMinWidth(textwidth);
+        textAreaCalc.setMaxWidth(textwidth);
+        textAreaCalc.setMinHeight(textheight);
+        textAreaCalc.setMaxHeight(textheight);
         textAreaCalc.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
         textAreaCalc.setBorder(null);
         textAreaCalc.setEditable(false);
@@ -184,10 +217,10 @@ public class MainApp extends Application {
         ////////////////////////////////////////////////////
         // TEXT AREA NO CALC
         TextArea textAreaNoCalc = new TextArea();
-        textAreaNoCalc.setMinWidth(this.textwidth);
-        textAreaNoCalc.setMaxWidth(this.textwidth);
-        textAreaNoCalc.setMinHeight(this.textheight);
-        textAreaNoCalc.setMaxHeight(this.textheight);
+        textAreaNoCalc.setMinWidth(textwidth);
+        textAreaNoCalc.setMaxWidth(textwidth);
+        textAreaNoCalc.setMinHeight(textheight);
+        textAreaNoCalc.setMaxHeight(textheight);
         textAreaNoCalc.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
         textAreaNoCalc.setBorder(null);
         textAreaNoCalc.setEditable(false);
@@ -197,10 +230,39 @@ public class MainApp extends Application {
         textAreaNoCalc.setBlendMode(BlendMode.DIFFERENCE);
 
         ////////////////////////////////////////////////////
+        // TEXT AREA MENU
+        TextArea textAreaMenu = new TextArea(welcomeText());
+        textAreaMenu.setMinWidth(textwidth);
+        textAreaMenu.setMaxWidth(textwidth);
+        textAreaMenu.setMinHeight(textheight);
+        textAreaMenu.setMaxHeight(textheight);
+        textAreaMenu.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
+        textAreaMenu.setBorder(null);
+        textAreaMenu.setEditable(false);
+        textAreaMenu.setBackground(
+            new Background(new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        textAreaMenu.setBlendMode(BlendMode.DIFFERENCE);
+
+        ////////////////////////////////////////////////////
+        // FIRST VIEW BUTTON: HELP
+        nappiMenuHelp.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                nappiMenuHelp.setEffect(shadow);
+        });
+        nappiMenuHelp.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                nappiMenuHelp.setEffect(null);
+        });
+        nappiMenuHelp.setOnAction(event -> {
+            textAreaMenu.setText(helpTextMenu());
+        });
+
+        ////////////////////////////////////////////////////
         // OTHER VIEWS BUTTON: EXECUTE CALC
         Button executeNappiCalc = new Button("EXECUTE");
-        executeNappiCalc.setMinWidth(this.buttonWidth);
-        executeNappiCalc.setMaxWidth(this.buttonWidth);
+        executeNappiCalc.setMinWidth(buttonWidth);
+        executeNappiCalc.setMaxWidth(buttonWidth);
         executeNappiCalc.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
                 executeNappiCalc.setEffect(shadow);
@@ -209,24 +271,36 @@ public class MainApp extends Application {
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
                 executeNappiCalc.setEffect(null);
         });
-
-        Button goBackNappiCalc = new Button("GO BACK");
-        goBackNappiCalc.setMinWidth(this.buttonWidth);
-        goBackNappiCalc.setMaxWidth(this.buttonWidth);
-        goBackNappiCalc.addEventHandler(
+        // OTHER VIEWS BUTTON: CALC MENU
+        Button menuNappiCalc = new Button("BACK TO MENU");
+        menuNappiCalc.setMinWidth(buttonWidth);
+        menuNappiCalc.setMaxWidth(buttonWidth);
+        menuNappiCalc.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                goBackNappiCalc.setEffect(shadow);
+                menuNappiCalc.setEffect(shadow);
         });
-        goBackNappiCalc.addEventHandler(
+        menuNappiCalc.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                goBackNappiCalc.setEffect(null);
+                menuNappiCalc.setEffect(null);
+        });
+        // OTHER VIEWS BUTTON: CALC HELP
+        nappiHelp.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                nappiHelp.setEffect(shadow);
+        });
+        nappiHelp.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                nappiHelp.setEffect(null);
+        });
+        nappiHelp.setOnAction(event -> {
+            textAreaCalc.setText(helpTextCalc());
         });
 
         ////////////////////////////////////////////////////
         // OTHER VIEWS BUTTON: EXECUTE NO CALC
         Button executeNappiNoCalc = new Button("EXECUTE");
-        executeNappiNoCalc.setMinWidth(this.buttonWidth);
-        executeNappiNoCalc.setMaxWidth(this.buttonWidth);
+        executeNappiNoCalc.setMinWidth(buttonWidth);
+        executeNappiNoCalc.setMaxWidth(buttonWidth);
         executeNappiNoCalc.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
                 executeNappiNoCalc.setEffect(shadow);
@@ -235,55 +309,113 @@ public class MainApp extends Application {
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
                 executeNappiNoCalc.setEffect(null);
         });
-
-        Button goBackNappiNoCalc = new Button("GO BACK");
-        goBackNappiNoCalc.setMinWidth(this.buttonWidth);
-        goBackNappiNoCalc.setMaxWidth(this.buttonWidth);
-        goBackNappiNoCalc.addEventHandler(
+        // OTHER VIEWS BUTTON: NO CALC MENU
+        Button menuNappiNoCalc = new Button("BACK TO MENU");
+        menuNappiNoCalc.setMinWidth(buttonWidth);
+        menuNappiNoCalc.setMaxWidth(buttonWidth);
+        menuNappiNoCalc.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                goBackNappiNoCalc.setEffect(shadow);
+                menuNappiNoCalc.setEffect(shadow);
         });
-        goBackNappiNoCalc.addEventHandler(
+        menuNappiNoCalc.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                goBackNappiNoCalc.setEffect(null);
+                menuNappiNoCalc.setEffect(null);
+        });
+        // OTHER VIEWS BUTTON: NO CALC HELP
+        nappiNoHelp.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                nappiNoHelp.setEffect(shadow);
+        });
+        nappiNoHelp.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                nappiNoHelp.setEffect(null);
+        });
+        nappiNoHelp.setOnAction(event -> {
+            textAreaNoCalc.setText(helpTextNoCalc());
         });
 
         ////////////////////////////////////////////////////
+        // SET FIRST VIEW BORDERPANE
+        valikkoMenu.getChildren().addAll(
+            asettelu,
+            nappiMenuHelp);
+        isovalikkoMenu.getChildren().addAll(
+            valikkoMenu,
+            textAreaMenu);
+        asetteluMenu.setCenter(isovalikkoMenu);
+
+        ////////////////////////////////////////////////////
         // SET OTHER VIEWS BORDERPANES
-        valikkoCalc.getChildren().addAll(napitjamuut.getSceneCalc(),executeNappiCalc,goBackNappiCalc);
-        isovalikkoCalc.getChildren().addAll(valikkoCalc,textAreaCalc);
+        valikkoCalc.getChildren().addAll(
+            menuNappiCalc,
+            getCalcScene.getSceneCalc(),
+            executeNappiCalc,
+            nappiHelp);
+        isovalikkoCalc.getChildren().addAll(
+            valikkoCalc,
+            textAreaCalc);
         asetteluCalc.setCenter(isovalikkoCalc);
 
-        valikkoNoCalc.getChildren().addAll(napitjamuut.getSceneNoCalc(),executeNappiNoCalc,goBackNappiNoCalc);
-        isovalikkoNoCalc.getChildren().addAll(valikkoNoCalc,textAreaNoCalc);
+        valikkoNoCalc.getChildren().addAll(
+            menuNappiNoCalc,
+            getNoCalcScene.getSceneNoCalc(),
+            executeNappiNoCalc,
+            nappiNoHelp);
+        isovalikkoNoCalc.getChildren().addAll(
+            valikkoNoCalc,
+            textAreaNoCalc);
         asetteluNoCalc.setCenter(isovalikkoNoCalc);
 
         ////////////////////////////////////////////////////
         // SET SCENES
-        Scene firstScene = new Scene(asettelu,stageWidth,stageHeight);
+        Scene firstScene = new Scene(asetteluMenu,stageWidth,stageHeight);
         firstScene.getStylesheets().add("/styles/Styles.css");
 
         Scene calcScene = new Scene(asetteluCalc,stageWidth,stageHeight);
         calcScene.getStylesheets().add("/styles/Styles.css");
         nappiScene1.setOnAction(event -> {
-            stage.setTitle("Random Walk - R_rms calculation");
+            stage.setTitle("R_rms calculation");
+            if (!textAreaMenu.getText().equals(helpTextMenu()))
+                textAreaCalc.setText(textAreaMenu.getText());
+            else
+                textAreaCalc.setText("");
             stage.setScene(calcScene);
+            
         });
-        goBackNappiCalc.setOnAction(event -> {
+        menuNappiCalc.setOnAction(event -> {
             stage.setTitle("Random Walk");
+            if (!textAreaCalc.getText().equals(helpTextCalc()))
+                textAreaMenu.setText(textAreaCalc.getText());
+            else
+                textAreaMenu.setText("");
             stage.setScene(firstScene);
         });
 
         Scene noCalcScene = new Scene(asetteluNoCalc,stageWidth,stageHeight);
         noCalcScene.getStylesheets().add("/styles/Styles.css");
         nappiScene2.setOnAction(event -> {
-            stage.setTitle("Random Walk - something else");
+            stage.setTitle("Random Walk simulation");
+            if (!textAreaMenu.getText().equals(helpTextMenu()))
+                textAreaNoCalc.setText(textAreaMenu.getText());
+            else
+                textAreaNoCalc.setText("");
             stage.setScene(noCalcScene);
         });
-        goBackNappiNoCalc.setOnAction(event -> {
+        menuNappiNoCalc.setOnAction(event -> {
             stage.setTitle("Random Walk");
+            if (!textAreaNoCalc.getText().equals(helpTextNoCalc()))
+                textAreaMenu.setText(textAreaNoCalc.getText());
+            else
+                textAreaMenu.setText("");
             stage.setScene(firstScene);
         });
+
+        XYChart calcChart = new XYChartBuilder()
+            .width(chartWidth).height(chartHeight)
+            .theme(ChartTheme.Matlab).build();
+
+        XChartPanel chartPanel = new XChartPanel(calcChart);
+        JFrame frame = new JFrame();
 
         ////////////////////////////////////////////////////
         // EXECUTE CALC
@@ -297,50 +429,65 @@ public class MainApp extends Application {
                             Color.RED,CornerRadii.EMPTY,Insets.EMPTY)));
                 executeNappiCalc.setTextFill(Color.ANTIQUEWHITE);
 
-                this.vars = napitjamuut.getVars();
+                this.vars = getCalcScene.getVars();
                 Data data = new Data(this.vars);
+                this.vars[0] = "0";// amount
+                //this.vars[1] = size, from user
+                //this.vars[2] = steps, from user
+                this.vars[3] = "0";// skip
+                //this.vars[4] = dimension, from user
+                this.vars[5] = "-";// avoid (n/a: only one particle at a time)
+                this.vars[6] = "-";// save (n/a: save is default)
+                this.vars[7] = "-";// xgraph (n/a: normal save is default)
 
                 /////////////////////////
                 // CREATEDATA          //
                 /////////////////////////
-                textAreaCalc.setText(data.createData(folder));
+                textAreaCalc.setText(data.createData(folder, true));
 
-                if (this.vars[0].equals("0")) {
-                    // GET DATA FROM READDATA()
-                    Pair<String,List<Pair<Double,Double>>> dataPair = Data.readData(dataFile);
+                // GET DATA FROM READDATA()
+                Pair<String,List<Pair<Double,Double>>> dataPair
+                    = Data.readData(dataFile);
 
-                    String header = dataPair.getKey();
-                    List<Pair<Double,Double>> datapari = dataPair.getValue();
-                    int runs = datapari.size();
+                String header = dataPair.getKey();
+                List<Pair<Double,Double>> datapari = dataPair.getValue();
+                int runs = datapari.size();
 
-                    // FORMAT DATA TO BE COMPATIBLE WITH XCHART
-                    double[] xDataToChart = new double[datapari.size()];
-                    for (int i=0;i<runs;i++)
-                        xDataToChart[i] = datapari.get(i).getValue();
-                    double[] yDataToChart = new double[datapari.size()];
-                    for (int i=0;i<runs;i++)
-                        yDataToChart[i] = datapari.get(i).getKey();
+                // FORMAT DATA TO BE COMPATIBLE WITH CHART
+                double[] xDataToChart = new double[datapari.size()];
+                for (int i=0;i<runs;i++)
+                    xDataToChart[i] = datapari.get(i).getValue();
+                double[] yDataToChart = new double[datapari.size()];
+                for (int i=0;i<runs;i++)
+                    yDataToChart[i] = datapari.get(i).getKey();
 
-                    // CREATE CHART
-                    XYChart chart = new XYChartBuilder()
-                        .width(chartWidth).height(chartHeight)
-                        .title("R_rms vs sqrt(N), "+runs+" runs")
-                        .xAxisTitle("sqrt(N)").yAxisTitle("R_rms")
-                        .theme(ChartTheme.Matlab).build();;
-                    chart.addSeries(header,xDataToChart,yDataToChart);
-                    chart.getStyler().setLegendVisible(false);
-                    chart.getStyler()
-                        .setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
-                    chart.getStyler().setXAxisDecimalPattern("0.0");
-                    chart.getStyler().setYAxisDecimalPattern("0.0");
-                    chart.getStyler().setMarkerSize(0);
-
-                    // SHOW CHART
-                    new SwingWrapper(chart).displayChart()
-                        .setBounds(screenWidth/2-chartWidth,
+                if ( frame.isVisible() == false ){
+                    calcChart.removeSeries(header);
+                    frame.dispose();
+                    calcChart.setTitle("R_rms vs sqrt(N), "+runs+" runs");
+                    calcChart.setXAxisTitle("sqrt(N)");
+                    calcChart.setYAxisTitle("R_rms");
+                    calcChart.addSeries(header,xDataToChart,yDataToChart);
+                    calcChart.getStyler().setLegendVisible(false);
+                    calcChart.getStyler()
+                        .setDefaultSeriesRenderStyle(XYSeries.XYSeriesRenderStyle.Line);
+                    calcChart.getStyler().setXAxisDecimalPattern("0.0");
+                    calcChart.getStyler().setYAxisDecimalPattern("0.0");
+                    calcChart.getStyler().setMarkerSize(0);
+                    frame.setTitle("Random Walk");
+                    frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                    frame.setBounds(screenWidth/2-chartWidth,
                             (screenHeight-stageHeight)/2,
                             chartWidth, chartHeight);
-                 }
+                    chartPanel.getChart();
+                    frame.add(chartPanel);
+                    frame.pack();
+                    frame.setVisible(true);
+                } else {
+                    calcChart.setTitle("R_rms vs sqrt(N), "+runs+" runs");
+                    calcChart.updateXYSeries(header, xDataToChart, yDataToChart, null);
+                    chartPanel.repaint();
+                }
 
                 executeNappiCalc.setText("EXECUTE");
                 executeNappiCalc.setBackground(
@@ -363,23 +510,32 @@ public class MainApp extends Application {
                             Color.RED,CornerRadii.EMPTY,Insets.EMPTY)));
                 executeNappiNoCalc.setTextFill(Color.ANTIQUEWHITE);
 
-                this.vars = napitjamuut.getVars();
+                this.vars = getNoCalcScene.getVars();
                 Data data = new Data(this.vars);
+                //this.vars[0] = amount, from user
+                //this.vars[1] = size, from user
+                //this.vars[2] = steps, from user
+                //this.vars[3] = skip, from user
+                //this.vars[4] = dimension, from user
+                //this.vars[5] = avoid, from user
+                //this.vars[6] = save or real time, from user
+                //this.vars[7] = xgraph or normal save, from user
 
                 /////////////////////////
                 // CREATEDATA          //
                 /////////////////////////
-                textAreaNoCalc.setText(data.createData(folder));
-// TODO
-/*                if (this.vars[0].equals("0")) {
+                if (this.vars[6].trim().equals("s")) {
+                    textAreaNoCalc.setText(data.createData(folder, true));
+
                     // GET DATA FROM READDATA()
-                    Pair<String,List<Pair<Double,Double>>> dataPair = Data.readData(dataFile);
+                    Pair<String,List<Pair<Double,Double>>> dataPair
+                        = Data.readData(dataFile);
 
                     String header = dataPair.getKey();
                     List<Pair<Double,Double>> datapari = dataPair.getValue();
                     int runs = datapari.size();
 
-                    // FORMAT DATA TO BE COMPATIBLE WITH XCHART
+                    // FORMAT DATA TO BE COMPATIBLE WITH CHART
                     double[] xDataToChart = new double[datapari.size()];
                     for (int i=0;i<runs;i++)
                         xDataToChart[i] = datapari.get(i).getValue();
@@ -387,27 +543,37 @@ public class MainApp extends Application {
                     for (int i=0;i<runs;i++)
                         yDataToChart[i] = datapari.get(i).getKey();
 
-                    // CREATE CHART
-                    XYChart chart = new XYChartBuilder()
-                        .width(chartWidth).height(chartHeight)
-                        .title("R_rms vs sqrt(N), "+runs+" runs")
-                        .xAxisTitle("sqrt(N)").yAxisTitle("R_rms")
-                        .theme(ChartTheme.Matlab).build();;
-                    chart.addSeries(header,xDataToChart,yDataToChart);
-                    chart.getStyler().setLegendVisible(false);
-                    chart.getStyler()
-                        .setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
-                    chart.getStyler().setXAxisDecimalPattern("0.0");
-                    chart.getStyler().setYAxisDecimalPattern("0.0");
-                    chart.getStyler().setMarkerSize(0);
+                    if ( frame.isVisible() == false ){
+                        calcChart.removeSeries(header);
+                        frame.dispose();
+                        calcChart.setTitle("Random Walk Simulation, "+runs+" runs");
+                        calcChart.addSeries(header,xDataToChart,yDataToChart);
+                        calcChart.getStyler().setLegendVisible(false);
+                        calcChart.getStyler()
+                            .setDefaultSeriesRenderStyle(XYSeries.XYSeriesRenderStyle.Line);
+                        calcChart.getStyler().setXAxisDecimalPattern("0.0");
+                        calcChart.getStyler().setYAxisDecimalPattern("0.0");
+                        calcChart.getStyler().setMarkerSize(0);
+                        frame.setTitle("Random Walk");
+                        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                        frame.setBounds(screenWidth/2-chartWidth,
+                                (screenHeight-stageHeight)/2,
+                                chartWidth, chartHeight);
+                        chartPanel.getChart();
+                        frame.add(chartPanel);
+                        frame.pack();
+                        frame.setVisible(true);
+                    } else {
+                        calcChart.setTitle("Random Walk Simulation, "+runs+" runs");
+                        calcChart.updateXYSeries(header, xDataToChart, yDataToChart, null);
+                        chartPanel.repaint();
+                    }
+                } else if (this.vars[6].trim().equals("-")){
+                    textAreaNoCalc.setText(data.createData(folder, false));
 
-                    // SHOW CHART
-                    new SwingWrapper(chart).displayChart()
-                        .setBounds(screenWidth/2-chartWidth,
-                            (screenHeight-stageHeight)/2,
-                            chartWidth, chartHeight);
-                 }*/
-//
+                    // GET REAL TIME DATA FROM SOMEWHERE AND PLOT IT
+                }
+
                 executeNappiNoCalc.setText("EXECUTE");
                 executeNappiNoCalc.setBackground(
                     new Background(
@@ -515,6 +681,70 @@ public class MainApp extends Application {
         }
         
         return true;
+    }
+
+    public String helpTextMenu() {
+        String text = " Button ''RRMS vs SQRT(N)'' shows a control panel with which you can\n"
+                    + " calculate root mean square distances (R_rms) of random walk particles.\n\n"
+                    + " Program plots R_rms versus square root of steps the particles take.\n\n"
+                    + " Every run will save the data in a file replacing the previous one.\n\n"
+                    + " ----------------------------------------------------------------------\n\n"
+                    + " Button ''RANDOM WALK'' shows a control panel with which you can plot\n"
+                    + " different random walk simulations.\n\n"
+                    + " You can choose to save the data or to only plot without saving.";
+    
+        return text;
+    }
+
+    public String helpTextCalc() {
+        String text = " ''Diameter'' is a positive real number on the interval ]0.0, 1.0[.\n\n"
+                    + " ''Steps'' is a positive integer. It means the cumulative random steps\n"
+                    + " the particles take while moving.\n\n"
+                    + " ''Skip'' is a positive integer meaning jumping in the iteration steps.\n\n"
+                    + " ''Dimension'' is either 1, 2, or 3. One means moving along x-axis, two\n"
+                    + " means moving on a plane of x and y axes, and three means a moving in\n"
+                    + " a cube of x, y, and z axes.\n\n"
+                    + " Only skip may be zero.\n\n"
+                    + " ----------------------------------------------------------------------\n\n"
+                    + " Program plots R_rms versus square root of steps the particles take.\n\n"
+                    + " Every run will save the data in a file replacing the previous one.";
+    
+        return text;
+    }
+
+    public String helpTextNoCalc() {
+        String text = " Button ''RRMS vs SQRT(N)'' shows a control panel with which you can\n"
+                    + " calculate root mean square distances (R_rms) of random walk particles.\n\n"
+                    + " Program plots R_rms versus square root of steps the particles take.\n\n"
+                    + " Every run will save the data in a file replacing the previous one.\n\n"
+                    + " ----------------------------------------------------------------------\n\n"
+                    + " Button ''RANDOM WALK'' shows a control panel with which you can plot\n"
+                    + " different random walk simulations.\n\n"
+                    + " You can choose to save the data or to only plot without saving.";
+    
+        return text;
+    }
+
+    public String welcomeText() {
+        String text = "       /////       ///       //    // ///        /////       //   //\n" 
+                    + "      ///  //     ////      ///   // //////    ///    //    ///  ///\n"
+                    + "     ///    //   /////     ////  // ///   // ///      //   //// ////\n"
+                    + "    ///   //    /// //    ///// // ///    /////       //  //////////\n"
+                    + "   //////      ///  //   /// //// ///     ////        // /// //// //\n"
+                    + "  ///   //    ////////  ///  /// ///     /////       // ///  ///  //\n"
+                    + " ///     //  ///    // ///   // ///    //  ///     //  ///   //   //\n"
+                    + "///     /// ///     /////    / ///////       //////   ///         //\n"
+                    + "\n"
+                    + "             ///           // ///       ///       ///   //\n"
+                    + "             ///          // ////      ///       ///   //\n"
+                    + "             ///         // /////     ///       ///  //\n"
+                    + "             ///   //   // /// //    ///       /////\n"
+                    + "             ///  ///  // ///  //   ///       /////\n"
+                    + "             /// //// // ////////  ///       ///  //\n"
+                    + "             ///// //// ///    // ///       ///    //\n"
+                    + "             ////  /// ///     /////////// ///     ///";
+    
+        return text;
     }
 
     public static void main(String[] args) {
