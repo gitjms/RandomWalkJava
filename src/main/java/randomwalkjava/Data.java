@@ -41,12 +41,12 @@ public class Data {
         return this.vars[i];
     }
 
-    public String createData(File folderPath, boolean save) {
+    public String createData(File folderPath, String executable, boolean save) {
         String teksti = "";
         String[] command = null;
 
         try {
-            command = new String[]{"cmd","/c","walk.exe",
+            command = new String[]{"cmd","/c",executable,
                 this.vars[0],this.vars[1],this.vars[2],this.vars[3],
                 this.vars[4],this.vars[5],this.vars[6],this.vars[7]};
 
@@ -56,7 +56,6 @@ public class Data {
             if (save == true){
                 // print the state of the program
                 System.out.println(" Fortran execution begins...");
-                teksti = teksti + "\n" + " Fortran execution begins...";
             }
             Process process = runtime.exec(command, null, folderPath);
             
@@ -85,12 +84,10 @@ public class Data {
                 if (exitVal == 0) {
                     if (save == true){
                         System.out.println(" Fortran execution ended with no errors");
-                        teksti = teksti + "\n" + " Fortran execution ended with no errors";
                     } else {
                         System.out.println(" Fortran execution ended with error code " + exitVal);
-                        teksti = teksti + "\n" + " Fortran execution ended with error code " + exitVal;
+                        runtime.exit(exitVal);
                     }
-                    runtime.exit(exitVal);
                 }
                 fos.flush();
                 fos.close();
@@ -105,7 +102,7 @@ public class Data {
         return teksti;
     }
 
-    public static Pair<String,List<Pair<Double,Double>>> readData(File filePath){
+    public static Pair<String,List<Pair<Double,Double>>> readDataCalc(File filePath){
     
         List<Pair<Double,Double>> data = new ArrayList<>();
         boolean first = false;
@@ -130,5 +127,77 @@ public class Data {
         }
         
         return new Pair(header,data);
+    }
+
+    public static Pair<String,List<Double>> readDataNoCalcX(File filePath){
+    
+        List<Double> dataList = new ArrayList<>();
+        boolean first = false;
+        String header = "";
+
+        try (Scanner sc = new Scanner(filePath)) {
+            while (sc.hasNextLine()) {
+                if (!first) {
+                    header = sc.nextLine();
+                    first = true;
+                } else {
+                    String data = sc.nextLine();
+                    dataList.add(Double.valueOf(data.trim()));
+                }
+            }
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return new Pair(header,dataList);
+    }
+
+    public static Pair<String,List<Double>> readDataNoCalcY(File filePath){
+    
+        List<Double> dataList = new ArrayList<>();
+        boolean first = false;
+        String header = "";
+
+        try (Scanner sc = new Scanner(filePath)) {
+            while (sc.hasNextLine()) {
+                if (!first) {
+                    header = sc.nextLine();
+                    first = true;
+                } else {
+                    String data = sc.nextLine();
+                    dataList.add(Double.valueOf(data.trim()));
+                }
+            }
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return new Pair(header,dataList);
+    }
+
+    public static Pair<String,List<Double>> readDataNoCalcZ(File filePath){
+    
+        List<Double> dataList = new ArrayList<>();
+        boolean first = false;
+        String header = "";
+
+        try (Scanner sc = new Scanner(filePath)) {
+            while (sc.hasNextLine()) {
+                if (!first) {
+                    header = sc.nextLine();
+                    first = true;
+                } else {
+                    String data = sc.nextLine();
+                    dataList.add(Double.valueOf(data.trim()));
+                }
+            }
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return new Pair(header,dataList);
     }
 }

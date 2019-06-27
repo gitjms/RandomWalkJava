@@ -13,6 +13,7 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 public class SceneNoCalculation extends Data {
@@ -32,7 +33,7 @@ public class SceneNoCalculation extends Data {
         this.nappiAvoid = new Button("AVOID");
         this.nappiSave = new Button("SAVE");
         this.nappiXgraph = new Button("XGRAPH");
-        this.vars = new String[]{"","","","","","","",""};
+        this.vars = new String[]{"","","","0","","-","s","-"};
     }
 
     public static boolean isNumDouble(String str) {
@@ -60,6 +61,9 @@ public class SceneNoCalculation extends Data {
         asettelu.setVgap(5);
         asettelu.setHgap(10);
         asettelu.setPadding(new Insets(0, 0, 0, 0));
+        VBox valikko = new VBox();
+        valikko.setPadding(new Insets(20, 10, 0, 0));
+        valikko.setSpacing(10);
         
         DropShadow shadow = new DropShadow();
 
@@ -71,6 +75,8 @@ public class SceneNoCalculation extends Data {
                 if (fieldNumParticles.getText().trim().equals("0")){
                     fieldNumParticles.setText("1");
                     this.vars[0] = "1";
+                } else {
+                    this.vars[0] = fieldNumParticles.getText().trim();
                 }
             }
         });
@@ -94,11 +100,7 @@ public class SceneNoCalculation extends Data {
         fieldNumDimensions.setOnKeyReleased(e -> {
             this.vars[4] = fieldNumDimensions.getText().trim();
         });
-        
-        Label setAvoid = new Label("self-avoid or cross:");
-        Label setSave = new Label("save or real time:");
-        Label setXgraph = new Label("XGraph or normal:");
-        
+
         // ...THEIR PLACEMENTS
         GridPane.setHalignment(setNumParticles, HPos.LEFT);
         asettelu.add(setNumParticles, 0, 0);
@@ -127,14 +129,10 @@ public class SceneNoCalculation extends Data {
         fieldNumDimensions.setMinWidth(compwidth);
         fieldNumDimensions.setMaxWidth(compwidth);
         asettelu.add(fieldNumDimensions, 0, 7);
-        
+
         // BUTTON: AVOID
-        GridPane.setHalignment(setAvoid, HPos.LEFT);
-        asettelu.add(setAvoid, 0, 8);
         this.nappiAvoid.setMinWidth(compwidth);
         this.nappiAvoid.setMaxWidth(compwidth);
-        GridPane.setHalignment(this.nappiAvoid, HPos.LEFT);
-        asettelu.add(this.nappiAvoid, 0, 9, 2, 1);
         this.nappiAvoid.setBackground(new Background(
             new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
@@ -167,12 +165,8 @@ public class SceneNoCalculation extends Data {
         });
 
         // BUTTON: SAVE / REAL TIME
-        GridPane.setHalignment(setSave, HPos.LEFT);
-        asettelu.add(setSave, 0, 9);
         this.nappiSave.setMinWidth(compwidth);
         this.nappiSave.setMaxWidth(compwidth);
-        GridPane.setHalignment(this.nappiSave, HPos.LEFT);
-        asettelu.add(this.nappiSave, 0, 10, 2, 1);
         this.nappiSave.setBackground(new Background(
             new BackgroundFill(
                 Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
@@ -194,6 +188,7 @@ public class SceneNoCalculation extends Data {
                         new BackgroundFill(
                             Color.DARKORANGE,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[6] = "-";
+                this.nappiXgraph.setDisable(true);
             } else if (this.nappiSave.getText().equals("REAL TIME")){
                 // BUTTON PRESSED FROM REAL TIME TO SAVE
                 this.nappiSave.setText("SAVE");
@@ -201,16 +196,13 @@ public class SceneNoCalculation extends Data {
                     new Background(new BackgroundFill(
                         Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[6] = "s";
+                this.nappiXgraph.setDisable(false);
             }
         });
 
         // BUTTON: XGRAPH
-        GridPane.setHalignment(setXgraph, HPos.LEFT);
-        asettelu.add(setXgraph, 0, 11);
         this.nappiXgraph.setMinWidth(compwidth);
         this.nappiXgraph.setMaxWidth(compwidth);
-        GridPane.setHalignment(this.nappiXgraph, HPos.LEFT);
-        asettelu.add(this.nappiXgraph, 0, 12, 2, 1);
         this.nappiXgraph.setBackground(new Background(
             new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
@@ -243,9 +235,14 @@ public class SceneNoCalculation extends Data {
             }
         });
 
+        valikko.getChildren().addAll(
+            this.nappiAvoid, this.nappiSave, this.nappiXgraph);
+        GridPane.setHalignment(valikko, HPos.LEFT);
+        asettelu.add(valikko, 0, 8, 2, 1);
+
         final Pane empty = new Pane();
         GridPane.setHalignment(empty, HPos.CENTER);
-        asettelu.add(empty, 0, 13, 2, 1);
+        asettelu.add(empty, 0, 9, 2, 1);
 
         return asettelu;
     }
