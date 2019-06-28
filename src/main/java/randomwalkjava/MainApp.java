@@ -16,6 +16,7 @@ import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
@@ -48,7 +49,7 @@ import org.knowm.xchart.style.Styler.ChartTheme;
 
 public class MainApp extends Application {
 
-    // FIGURE
+    // IMAGE
     final int chartWidth = 860;
     final int chartHeight = 605;
     // STAGE
@@ -61,9 +62,12 @@ public class MainApp extends Application {
     final int paneWidth = 200;
     final int screenWidth = Screen.getMainScreen().getWidth();
     final int screenHeight = Screen.getMainScreen().getHeight();
+    // FILES AND FOLDERS
     final String path = "C:\\DATA";
     final String fexec = "walk.exe";
-    final String pyexec = "python plot3d.py";
+    final String pyexec2d = "python plot2d.py";
+    final String pyexec3d = "python plot3d.py";
+    // DATA
     public String[] vars;
 
     @Override
@@ -107,15 +111,14 @@ public class MainApp extends Application {
         // FIRST VIEW LABELS AND BUTTONS
         Button nappiScene1 = new Button("R_RMS vs SQRT(N)");
         Button nappiScene2 = new Button("RANDOM WALK");
-        Button nappiHelp = new Button("HELP");
+        
         Button nappiNoHelp = new Button("HELP");
         Button nappiMenuHelp = new Button("HELP");
         nappiScene1.setMinWidth(buttonWidth);
         nappiScene1.setMaxWidth(buttonWidth);
         nappiScene2.setMinWidth(buttonWidth);
         nappiScene2.setMaxWidth(buttonWidth);
-        nappiHelp.setMinWidth(buttonWidth);
-        nappiHelp.setMaxWidth(buttonWidth);
+        
         nappiNoHelp.setMinWidth(buttonWidth);
         nappiNoHelp.setMaxWidth(buttonWidth);
         nappiMenuHelp.setMinWidth(buttonWidth);
@@ -159,17 +162,19 @@ public class MainApp extends Application {
         GridPane.setHalignment(empty2, HPos.LEFT);
         asettelu.add(empty2, 0, 3, 2, 1);
 
-        GridPane.setHalignment(nappiHelp, HPos.LEFT);
+        
         asettelu.add(nappiMenuHelp, 0, 4, 2, 1);
         nappiMenuHelp.setBackground(new Background(
             new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         nappiMenuHelp.setVisible(true);
 
+        // OTHER STUFF
         BorderPane asetteluMenu = new BorderPane();
         HBox isovalikkoMenu = new HBox();
         isovalikkoMenu.setPadding(new Insets(0, 0, 0, 0));
         isovalikkoMenu.setSpacing(10);
+        
         VBox valikkoMenu = new VBox();
         valikkoMenu.setPadding(new Insets(10, 10, 10, 10));
         valikkoMenu.setSpacing(10);
@@ -293,18 +298,22 @@ public class MainApp extends Application {
         menuNappiCalc.setVisible(true);
 
         // OTHER VIEWS BUTTON: CALC HELP
-        nappiHelp.addEventHandler(
+        Button helpNappi = new Button("HELP");
+        helpNappi.setMinWidth(buttonWidth);
+        helpNappi.setMaxWidth(buttonWidth);
+        GridPane.setHalignment(helpNappi, HPos.LEFT);
+        helpNappi.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                nappiHelp.setEffect(shadow);
+                helpNappi.setEffect(shadow);
         });
-        nappiHelp.addEventHandler(
+        helpNappi.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                nappiHelp.setEffect(null);
+                helpNappi.setEffect(null);
         });
-        nappiHelp.setOnAction(event -> {
+        helpNappi.setOnAction(event -> {
             textAreaCalc.setText(helpTextCalc());
         });
-        nappiHelp.setVisible(true);
+        helpNappi.setVisible(true);
 
         ////////////////////////////////////////////////////
         // OTHER VIEWS BUTTON: EXECUTE NO CALC
@@ -371,7 +380,7 @@ public class MainApp extends Application {
             menuNappiCalc,
             getCalcScene.getSceneCalc(),
             executeNappiCalc,
-            nappiHelp);
+            helpNappi);
         isovalikkoCalc.getChildren().addAll(
             valikkoCalc,
             textAreaCalc);
@@ -394,40 +403,40 @@ public class MainApp extends Application {
 
         Scene calcScene = new Scene(asetteluCalc,stageWidth,stageHeight);
         calcScene.getStylesheets().add("/styles/Styles.css");
-        nappiScene1.setOnAction(event -> {
+
+        nappiScene1.setOnMouseClicked(event -> {
             stage.setTitle("R_rms calculation");
-            if (!textAreaMenu.getText().equals(helpTextMenu()))
-                textAreaCalc.setText(textAreaMenu.getText());
-            else
-                textAreaCalc.setText("");
+            /*if (textAreaMenu.getText().equals(helpTextMenu()))
+                textAreaCalc.setText("");*/
+            //textAreaCalc.setText(textAreaMenu.getText());
             stage.setScene(calcScene);
             
         });
-        menuNappiCalc.setOnAction(event -> {
+        menuNappiCalc.setOnMouseClicked(event -> {
             stage.setTitle("Random Walk");
-            if (!textAreaCalc.getText().equals(helpTextCalc()))
-                textAreaMenu.setText(textAreaCalc.getText());
-            else
+            if (textAreaCalc.getText().equals(helpTextCalc()))
                 textAreaMenu.setText("");
+            else
+                textAreaMenu.setText(textAreaCalc.getText());
             stage.setScene(firstScene);
         });
 
         Scene noCalcScene = new Scene(asetteluNoCalc,stageWidth,stageHeight);
         noCalcScene.getStylesheets().add("/styles/Styles.css");
-        nappiScene2.setOnAction(event -> {
+
+        nappiScene2.setOnMouseClicked(event -> {
             stage.setTitle("Random Walk simulation");
-            if (!textAreaMenu.getText().equals(helpTextMenu()))
-                textAreaNoCalc.setText(textAreaMenu.getText());
-            else
-                textAreaNoCalc.setText("");
+            /*if (textAreaMenu.getText().equals(helpTextMenu()))
+                textAreaNoCalc.setText("");*/
+            //textAreaNoCalc.setText(textAreaMenu.getText());
             stage.setScene(noCalcScene);
         });
         menuNappiNoCalc.setOnAction(event -> {
             stage.setTitle("Random Walk");
-            if (!textAreaNoCalc.getText().equals(helpTextNoCalc()))
-                textAreaMenu.setText(textAreaNoCalc.getText());
-            else
+            if (textAreaNoCalc.getText().equals(helpTextNoCalc()))
                 textAreaMenu.setText("");
+            else
+                textAreaMenu.setText(textAreaNoCalc.getText());
             stage.setScene(firstScene);
         });
 
@@ -437,6 +446,8 @@ public class MainApp extends Application {
 
         XChartPanel chartPanel = new XChartPanel(calcChart);
         JFrame frame = new JFrame();
+        
+        //SceneCalculation getCalcScene = new SceneCalculation();
         ////////////////////////////////////////////////////
         // EXECUTE CALC
         executeNappiCalc.setOnMouseClicked((MouseEvent event) -> {
@@ -522,20 +533,109 @@ public class MainApp extends Application {
             //this.vars[6] = save or real time, from user
             //this.vars[7] = xgraph or normal save, from user
 
+            String startData = "";
             String xDataPath = "";
+            String finalData = "";
             String yDataPath = "";
             String zDataPath = "";
-            BufferedImage image = null;
+            BufferedImage image2d = null;
+            BufferedImage image3d = null;
 
             /////////////////////////
             // CREATEDATA NO CALC  //
             /////////////////////////
+            // DATA SAVED -> READ DATA FIRST
             if (this.vars[6].equals("s")) {
                 textAreaNoCalc.setText(data.createData(folder, fexec, true));
+                int particles = Integer.valueOf(this.vars[0]);
+                int dimension = Integer.valueOf(this.vars[4]);
+                int steps = Integer.valueOf(this.vars[2]);
 
-                // GET DATA FROM READDATANOCALC...()
+                startData = path + "\\" + "start"
+                    + this.vars[4] + "D_"
+                    + this.vars[0] + ".xy";
+                finalData = path + "\\" + "final"
+                    + this.vars[4] + "D_"
+                    + this.vars[0] + ".xy";
+                xDataPath = path + "\\" + "x_path"
+                    + this.vars[4] + "D_"
+                    + this.vars[0] + ".xy";
+
+                // 2D DATA
+                if ( this.vars[4].equals("2") || this.vars[4].equals("3") ) {
+                    yDataPath = path + "\\" + "y_path"
+                    + this.vars[4] + "D_"
+                    + this.vars[0] + ".xy";
+                    if ( this.vars[4].equals("2") ) {
+                        PyDplot pyplot2d = new PyDplot();
+                        String[] files2d = new String[]{startData, finalData, xDataPath, yDataPath};
+                        textAreaNoCalc.setText(pyplot2d.createPlot(folder, files2d, dimension, pyexec2d));
+                        String imgFile2d = "jpyplot2D_N" + this.vars[0] + ".png";
+                        // GET IMAGE FROM PY3DPLOT.READPYPLOT()
+                        image2d = pyplot2d.readPyPlot(new File(path + "\\" + imgFile2d));
+                    }
+                }
+
+                // 3D DATA
+                if ( this.vars[4].equals("3") ) {
+                    zDataPath = path + "\\" + "z_path"
+                    + this.vars[4] + "D_"
+                    + this.vars[0] + ".xy";
+                    PyDplot pyplot3d = new PyDplot();
+                    String[] files3d = new String[]{xDataPath, yDataPath, zDataPath};
+                    textAreaNoCalc.setText(pyplot3d.createPlot(folder, files3d, dimension, pyexec3d));
+                    String imgFile3d = "jpyplot3D_N" + this.vars[0] + ".png";
+                    // GET IMAGE FROM PY3DPLOT.READPYPLOT()
+                    image3d = pyplot3d.readPyPlot(new File(path + "\\" + imgFile3d));
+                }
+
+                // PLOT 2D
+                if ( this.vars[4].trim().equals("2")) {
+                    frame.getContentPane().removeAll();
+                    frame.setTitle("Random Walk Path Tracing");
+                    frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                    JLabel titleLabel = new JLabel("N="+this.vars[0]+", "+steps+" steps");
+                    java.awt.Font labelFont = titleLabel.getFont();
+                    int newFontSize = (int)(labelFont.getSize() * 1.5);
+                    titleLabel.setFont(new java.awt.Font(labelFont.getName(), java.awt.Font.PLAIN, newFontSize));
+                    titleLabel.setBounds(chartWidth/2-150,0,chartWidth/2+150,newFontSize);
+                    ImageIcon figIcn = new ImageIcon(image2d);
+                    JLabel figLabel = new JLabel(figIcn);
+                    frame.add(titleLabel);
+                    frame.add(figLabel);
+                    frame.repaint();
+                    frame.setBounds(20, (screenHeight-chartHeight)/2-60, chartWidth, chartHeight);
+                    frame.pack();
+                    frame.setVisible(true);
+                // PLOT 3D
+                } else if ( this.vars[4].trim().equals("3")) {
+                    frame.getContentPane().removeAll();
+                    frame.setTitle("Random Walk Path Tracing");
+                    frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                    JLabel titleLabel = new JLabel("N="+this.vars[0]+", "+steps+" steps");
+                    java.awt.Font labelFont = titleLabel.getFont();
+                    int newFontSize = (int)(labelFont.getSize() * 1.5);
+                    titleLabel.setFont(new java.awt.Font(labelFont.getName(), java.awt.Font.PLAIN, newFontSize));
+                    titleLabel.setBounds(chartWidth/2-150,0,chartWidth/2+150,newFontSize);
+                    ImageIcon figIcn = new ImageIcon(image3d);
+                    JLabel figLabel = new JLabel(figIcn);
+                    frame.add(titleLabel);
+                    frame.add(figLabel);
+                    frame.repaint();
+                    frame.setBounds(20, (screenHeight-chartHeight)/2-60, chartWidth, chartHeight);
+                    frame.pack();
+                    frame.setVisible(true);
+                }
+            // DATA NOT SAVED -> GET DATA FROM STREAM
+            } else if (this.vars[6].trim().equals("-")){
+                //textAreaNoCalc.setText(data.createData(folder, false));
+                    /*textAreaNoCalc.setText(data.createData(folder, fexec, true));
+                int particles = Integer.valueOf(this.vars[0]);
+                int dimension = Integer.valueOf(this.vars[4]);
+
+                // GET DATA FROM DATA.READDATANOCALC...()
                 String header = "";
-                Pair<String,List<Double>> dataPairX;
+                Pair<String,List<Double[]>> dataPairX;
                 File xDataFile = new File(
                     path + "\\" + "x_path"
                     + this.vars[4] + "D_"
@@ -543,77 +643,39 @@ public class MainApp extends Application {
                 xDataPath = path + "\\" + "x_path"
                     + this.vars[4] + "D_"
                     + this.vars[0] + ".xy";
-                dataPairX = Data.readDataNoCalcX(xDataFile);
+                dataPairX = Data.readDataNoCalc(xDataFile, particles);
                 if (this.vars[4].equals("1") ){
                     header = dataPairX.getKey();
                 } else if ( this.vars[4].equals("2") || this.vars[4].equals("3") ){
                     header = dataPairX.getKey().substring(2, 15);
                 }
-                List<Double> xdata = dataPairX.getValue();
+                List<Double[]> xdata = dataPairX.getValue();
                 int runs = xdata.size();
+                double[][] xDataToChart = new double[runs][particles];
+                double[][] yDataToChart = new double[runs][particles];
+                double[][] zDataToChart = new double[runs][particles];
 
                 // FORMAT DATA TO BE COMPATIBLE WITH CHART
-                double[] xDataToChart = new double[runs];
-                double[] yDataToChart = new double[runs];
-                double[] zDataToChart = new double[runs];
-                for (int i=0;i<runs;i++)
-                    xDataToChart[i] = xdata.get(i);
-                    
-                if (this.vars[4].equals("2") || this.vars[4].equals("3") ) {
-                    Pair<String,List<Double>> dataPairY;
-                    File yDataFile = new File(
-                    path + "\\" + "y_path"
-                    + this.vars[4] + "D_"
-                    + this.vars[0] + ".xy");
-                    yDataPath = path + "\\" + "y_path"
-                    + this.vars[4] + "D_"
-                    + this.vars[0] + ".xy";
-                    dataPairY = Data.readDataNoCalcY(yDataFile);
-                    if ( this.vars[4].equals("2") ){
-                        header += dataPairY.getKey().substring(7, dataPairY.getKey().length());
-                    } else if ( this.vars[4].equals("3") ){
-                        header += dataPairY.getKey().substring(7, 15);
+                for (int i = 0; i < particles; i++) {
+                    for (int j = 0; j < runs; j++) {
+                        xDataToChart[j][i] = xdata.get(j)[i];
                     }
-                    List<Double> ydata = dataPairY.getValue();
-                    yDataToChart = new double[runs];
-                    for (int i=0;i<runs;i++)
-                        yDataToChart[i] = ydata.get(i);
                 }
-
-                if ( this.vars[4].equals("3") ) {
-                    Pair<String,List<Double>> dataPairZ;
-                    File zDataFile = new File(
-                    path + "\\" + "z_path"
-                    + this.vars[4] + "D_"
-                    + this.vars[0] + ".xy");
-                    zDataPath = path + "\\" + "z_path"
-                    + this.vars[4] + "D_"
-                    + this.vars[0] + ".xy";
-                    dataPairZ = Data.readDataNoCalcZ(zDataFile);
-                    header += dataPairZ.getKey().substring(15, dataPairZ.getKey().length());
-                    List<Double> zdata = dataPairZ.getValue();
-                    zDataToChart = new double[runs];
-                    for (int i=0;i<runs;i++)
-                        zDataToChart[i] = zdata.get(i);
-                    
-                    Py3dplot pyplot = new Py3dplot();
-                    String[] files = new String[]{xDataPath, yDataPath, zDataPath};
-                    textAreaNoCalc.setText(pyplot.createPlot(folder, files, pyexec));
-                    String imgFile = "jpyplot_N" + this.vars[0] + ".png";
-                    image = pyplot.readPyPlot(new File(path + "\\" + imgFile));
-                }
-
-                if ( this.vars[4].trim().equals("2")) {
-                    calcChart.removeSeries(header);
+                    calcChart.getSeriesMap().clear();//.removeSeries(header);
                     chartPanel.removeAll();
                     frame.getContentPane().removeAll();
                     frame.setTitle("Random Walk - Path Tracing");
                     frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-                    frame.setBounds(screenWidth/2-chartWidth,
-                            (screenHeight-stageHeight)/2,
+                    frame.setBounds(10,
+                            (screenHeight-chartHeight)/2,
                             chartWidth, chartHeight);
                     calcChart.setTitle("Random Walk, N="+this.vars[0]+", "+runs+" runs");
-                    calcChart.addSeries(header,xDataToChart,yDataToChart);
+                    for (int i = 0; i < particles; i++) {
+                        calcChart.addSeries(
+                            String.valueOf(
+                                header+", amount="+particles+", "+dimension+"D"+i),
+                            xDataToChart[i],yDataToChart[i]);
+                    }
                     calcChart.getStyler().setLegendVisible(false);
                     calcChart.getStyler()
                         .setDefaultSeriesRenderStyle(XYSeries.XYSeriesRenderStyle.Line);
@@ -624,27 +686,7 @@ public class MainApp extends Application {
                     frame.add(chartPanel);
                     frame.repaint();
                     frame.pack();
-                    frame.setVisible(true);
-                } else if ( this.vars[4].trim().equals("3")) {
-                    frame.getContentPane().removeAll();
-                    frame.setTitle("Random Walk Path Tracing");
-                    frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-                    JLabel titleLabel = new JLabel("Random Walk, N="+this.vars[0]+", "+runs+" runs");
-                    java.awt.Font labelFont = titleLabel.getFont();
-                    int newFontSize = (int)(labelFont.getSize() * 2);
-                    titleLabel.setFont(new java.awt.Font(labelFont.getName(), java.awt.Font.PLAIN, newFontSize));
-                    titleLabel.setBounds(chartWidth/2-150,10,chartWidth/2+150,newFontSize);
-                    ImageIcon figIcn = new ImageIcon(image);
-                    JLabel figLabel = new JLabel(figIcn);
-                    frame.add(titleLabel);
-                    frame.add(figLabel);
-                    frame.repaint();
-                    frame.setBounds(20, (screenHeight-chartHeight)/2-60, chartWidth, chartHeight);
-                    frame.pack();
-                    frame.setVisible(true);
-                }
-            } else if (this.vars[6].trim().equals("-")){
-                //textAreaNoCalc.setText(data.createData(folder, false));
+                    frame.setVisible(true);*/
 
                 // GET REAL TIME DATA FROM SOMEWHERE AND PLOT IT
             }

@@ -4,7 +4,6 @@ package randomwalkjava;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,18 +11,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
-public class Py3dplot {
+public class PyDplot {
 
-    public Py3dplot() {
+    public PyDplot() {
     }
 
-    public String createPlot(File folderPath, String[] files, String executable) {
+    public String createPlot(File folderPath, String[] files, int dim, String executable) {
         String teksti = "";
         String[] command = null;
 
         try {
-            command = new String[]{"cmd","/c",executable,
-                files[0], files[1], files[2]};
+            if ( dim == 2 )
+                command = new String[]{"cmd","/c", executable,
+                    files[0], files[1], files[2], files[3]};
+            else if ( dim == 3 )
+                command = new String[]{"cmd","/c", executable,
+                    files[0], files[1], files[2]};
 
             FileOutputStream fos = new FileOutputStream(command[0]);
             Runtime runtime = Runtime.getRuntime();
@@ -81,11 +84,9 @@ public class Py3dplot {
             System.out.println(filePath);
             image = ImageIO.read(filePath);
         } catch (IOException ex) {
-            Logger.getLogger(Py3dplot.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PyDplot.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return image;
     }
-
 }
-

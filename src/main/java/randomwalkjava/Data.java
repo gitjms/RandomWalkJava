@@ -129,33 +129,11 @@ public class Data {
         return new Pair(header,data);
     }
 
-    public static Pair<String,List<Double>> readDataNoCalcX(File filePath){
+    public static Pair<String,List<Double[]>> readDataNoCalc(File filePath, Integer particles){
     
-        List<Double> dataList = new ArrayList<>();
-        boolean first = false;
-        String header = "";
-
-        try (Scanner sc = new Scanner(filePath)) {
-            while (sc.hasNextLine()) {
-                if (!first) {
-                    header = sc.nextLine();
-                    first = true;
-                } else {
-                    String data = sc.nextLine();
-                    dataList.add(Double.valueOf(data.trim()));
-                }
-            }
-
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        Double[] values = new Double[particles];
+        List<Double[]> dataList = new ArrayList<>();
         
-        return new Pair(header,dataList);
-    }
-
-    public static Pair<String,List<Double>> readDataNoCalcY(File filePath){
-    
-        List<Double> dataList = new ArrayList<>();
         boolean first = false;
         String header = "";
 
@@ -166,31 +144,10 @@ public class Data {
                     first = true;
                 } else {
                     String data = sc.nextLine();
-                    dataList.add(Double.valueOf(data.trim()));
-                }
-            }
-
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        return new Pair(header,dataList);
-    }
-
-    public static Pair<String,List<Double>> readDataNoCalcZ(File filePath){
-    
-        List<Double> dataList = new ArrayList<>();
-        boolean first = false;
-        String header = "";
-
-        try (Scanner sc = new Scanner(filePath)) {
-            while (sc.hasNextLine()) {
-                if (!first) {
-                    header = sc.nextLine();
-                    first = true;
-                } else {
-                    String data = sc.nextLine();
-                    dataList.add(Double.valueOf(data.trim()));
+                    String[] osat = data.trim().split("(\\s+)");
+                    for ( int i = 0; i < osat.length; i++)
+                        values[i] = Double.valueOf(osat[i]);
+                    dataList.add(values);
                 }
             }
 
