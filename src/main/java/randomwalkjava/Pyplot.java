@@ -11,20 +11,23 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
-public class PyDplot {
+public class Pyplot {
 
-    public PyDplot() {
+    public Pyplot() {
     }
 
-    public String createPlot(File folderPath, String[] files, int dim, String executable) {
+    public String createPlot(File folderPath, String[] files, int dim, String executable, boolean rms) {
         String teksti = "";
         String[] command = null;
 
         try {
-            if ( dim == 2 )
+            if ( dim == 1 || rms == true )
                 command = new String[]{"cmd","/c", executable,
-                    files[0], files[1], files[2], files[3]};
-            else if ( dim == 3 )
+                    files[0]};
+            if ( dim == 2 && rms == false )
+                command = new String[]{"cmd","/c", executable,
+                    files[0], files[1]};
+            else if ( dim == 3 && rms == false )
                 command = new String[]{"cmd","/c", executable,
                     files[0], files[1], files[2]};
 
@@ -84,7 +87,7 @@ public class PyDplot {
             System.out.println(filePath);
             image = ImageIO.read(filePath);
         } catch (IOException ex) {
-            Logger.getLogger(PyDplot.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Pyplot.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return image;

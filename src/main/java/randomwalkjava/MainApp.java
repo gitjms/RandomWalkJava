@@ -65,6 +65,7 @@ public class MainApp extends Application {
     // FILES AND FOLDERS
     final String path = "C:\\DATA";
     final String fexec = "walk.exe";
+    final String pyexec1d = "python plot1d.py";
     final String pyexec2d = "python plot2d.py";
     final String pyexec3d = "python plot3d.py";
     // DATA
@@ -447,75 +448,14 @@ public class MainApp extends Application {
         XChartPanel chartPanel = new XChartPanel(calcChart);
         JFrame frame = new JFrame();
         
-        //SceneCalculation getCalcScene = new SceneCalculation();
+        Execution ex = new Execution();
         ////////////////////////////////////////////////////
         // EXECUTE CALC
         executeNappiCalc.setOnMouseClicked((MouseEvent event) -> {
             // BUTTON PRESSED ON
             this.vars = getCalcScene.getVars();
             Data data = new Data(this.vars);
-            //this.vars[0] = "0" amount
-            //this.vars[1] = size, from user
-            //this.vars[2] = steps, from user
-            //this.vars[3] = skip, from user
-            //this.vars[4] = dimension, from user
-            //this.vars[5] = "-" avoid (n/a: only one particle at a time)
-            //this.vars[6] = "s" save (n/a: save is default)
-            //this.vars[7] = "-" xgraph (n/a: normal save is default)
-
-            /////////////////////////
-            // CREATEDATA CALC     //
-            /////////////////////////
-            textAreaCalc.setText(data.createData(folder, this.fexec, true));
-
-            String calcData = "";
-            if (this.vars[4].trim().equals("1") ){
-                calcData = "rms_1D.xy";
-            } else if (this.vars[4].trim().equals("2") ){
-                calcData = "rms_2D.xy";
-            } else if (this.vars[4].trim().equals("3") ){
-                calcData = "rms_3D.xy";
-            }
-            File calcDataFile = new File(path + "\\" + calcData);
-
-            // GET DATA FROM READDATA()
-            Pair<String,List<Pair<Double,Double>>> dataPair
-                = Data.readDataCalc(calcDataFile);
-            String header = dataPair.getKey();
-            List<Pair<Double,Double>> datapari = dataPair.getValue();
-            int runs = datapari.size();
-
-            // FORMAT DATA TO BE COMPATIBLE WITH CHART
-            double[] xDataToChart = new double[datapari.size()];
-            for (int i=0;i<runs;i++)
-                xDataToChart[i] = datapari.get(i).getKey();
-            double[] yDataToChart = new double[datapari.size()];
-            for (int i=0;i<runs;i++)
-                yDataToChart[i] = datapari.get(i).getValue();
-
-            calcChart.removeSeries(header);
-            chartPanel.removeAll();
-            frame.getContentPane().removeAll();
-            frame.setTitle("Random Walk - R_rms Calculation");
-            frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-            frame.setBounds(screenWidth/2-chartWidth,
-                    (screenHeight-stageHeight)/2,
-                    chartWidth, chartHeight);
-            calcChart.setTitle("R_rms vs sqrt(N), "+this.vars[4] + "D, " + runs + " runs/steps");
-            calcChart.setXAxisTitle("sqrt(N)");
-            calcChart.setYAxisTitle("R_rms");
-            calcChart.addSeries(header,xDataToChart,yDataToChart);
-            calcChart.getStyler().setLegendVisible(false);
-            calcChart.getStyler()
-                .setDefaultSeriesRenderStyle(XYSeries.XYSeriesRenderStyle.Line);
-            calcChart.getStyler().setXAxisDecimalPattern("0.0");
-            calcChart.getStyler().setYAxisDecimalPattern("0.0");
-            calcChart.getStyler().setMarkerSize(0);
-            chartPanel.getChart();
-            frame.add(chartPanel);
-            frame.repaint();
-            frame.pack();
-            frame.setVisible(true);
+            ex.executeRms(folder, textAreaNoCalc, frame, data, vars);
         });
 
         ////////////////////////////////////////////////////
@@ -524,109 +464,14 @@ public class MainApp extends Application {
             // BUTTON PRESSED ON
             this.vars = getNoCalcScene.getVars();
             Data data = new Data(this.vars);
-            //this.vars[0] = amount, from user
-            //this.vars[1] = size, from user
-            //this.vars[2] = steps, from user
-            //this.vars[3] = skip, from user
-            //this.vars[4] = dimension, from user
-            //this.vars[5] = avoid, from user
-            //this.vars[6] = save or real time, from user
-            //this.vars[7] = xgraph or normal save, from user
-
-            String startData = "";
-            String xDataPath = "";
-            String finalData = "";
-            String yDataPath = "";
-            String zDataPath = "";
-            BufferedImage image2d = null;
-            BufferedImage image3d = null;
 
             /////////////////////////
             // CREATEDATA NO CALC  //
             /////////////////////////
             // DATA SAVED -> READ DATA FIRST
             if (this.vars[6].equals("s")) {
-                textAreaNoCalc.setText(data.createData(folder, fexec, true));
-                int particles = Integer.valueOf(this.vars[0]);
-                int dimension = Integer.valueOf(this.vars[4]);
-                int steps = Integer.valueOf(this.vars[2]);
-
-                startData = path + "\\" + "start"
-                    + this.vars[4] + "D_"
-                    + this.vars[0] + ".xy";
-                finalData = path + "\\" + "final"
-                    + this.vars[4] + "D_"
-                    + this.vars[0] + ".xy";
-                xDataPath = path + "\\" + "x_path"
-                    + this.vars[4] + "D_"
-                    + this.vars[0] + ".xy";
-
-                // 2D DATA
-                if ( this.vars[4].equals("2") || this.vars[4].equals("3") ) {
-                    yDataPath = path + "\\" + "y_path"
-                    + this.vars[4] + "D_"
-                    + this.vars[0] + ".xy";
-                    if ( this.vars[4].equals("2") ) {
-                        PyDplot pyplot2d = new PyDplot();
-                        String[] files2d = new String[]{startData, finalData, xDataPath, yDataPath};
-                        textAreaNoCalc.setText(pyplot2d.createPlot(folder, files2d, dimension, pyexec2d));
-                        String imgFile2d = "jpyplot2D_N" + this.vars[0] + ".png";
-                        // GET IMAGE FROM PY3DPLOT.READPYPLOT()
-                        image2d = pyplot2d.readPyPlot(new File(path + "\\" + imgFile2d));
-                    }
-                }
-
-                // 3D DATA
-                if ( this.vars[4].equals("3") ) {
-                    zDataPath = path + "\\" + "z_path"
-                    + this.vars[4] + "D_"
-                    + this.vars[0] + ".xy";
-                    PyDplot pyplot3d = new PyDplot();
-                    String[] files3d = new String[]{xDataPath, yDataPath, zDataPath};
-                    textAreaNoCalc.setText(pyplot3d.createPlot(folder, files3d, dimension, pyexec3d));
-                    String imgFile3d = "jpyplot3D_N" + this.vars[0] + ".png";
-                    // GET IMAGE FROM PY3DPLOT.READPYPLOT()
-                    image3d = pyplot3d.readPyPlot(new File(path + "\\" + imgFile3d));
-                }
-
-                // PLOT 2D
-                if ( this.vars[4].trim().equals("2")) {
-                    frame.getContentPane().removeAll();
-                    frame.setTitle("Random Walk Path Tracing");
-                    frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-                    JLabel titleLabel = new JLabel("N="+this.vars[0]+", "+steps+" steps");
-                    java.awt.Font labelFont = titleLabel.getFont();
-                    int newFontSize = (int)(labelFont.getSize() * 1.5);
-                    titleLabel.setFont(new java.awt.Font(labelFont.getName(), java.awt.Font.PLAIN, newFontSize));
-                    titleLabel.setBounds(chartWidth/2-150,0,chartWidth/2+150,newFontSize);
-                    ImageIcon figIcn = new ImageIcon(image2d);
-                    JLabel figLabel = new JLabel(figIcn);
-                    frame.add(titleLabel);
-                    frame.add(figLabel);
-                    frame.repaint();
-                    frame.setBounds(20, (screenHeight-chartHeight)/2-60, chartWidth, chartHeight);
-                    frame.pack();
-                    frame.setVisible(true);
-                // PLOT 3D
-                } else if ( this.vars[4].trim().equals("3")) {
-                    frame.getContentPane().removeAll();
-                    frame.setTitle("Random Walk Path Tracing");
-                    frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-                    JLabel titleLabel = new JLabel("N="+this.vars[0]+", "+steps+" steps");
-                    java.awt.Font labelFont = titleLabel.getFont();
-                    int newFontSize = (int)(labelFont.getSize() * 1.5);
-                    titleLabel.setFont(new java.awt.Font(labelFont.getName(), java.awt.Font.PLAIN, newFontSize));
-                    titleLabel.setBounds(chartWidth/2-150,0,chartWidth/2+150,newFontSize);
-                    ImageIcon figIcn = new ImageIcon(image3d);
-                    JLabel figLabel = new JLabel(figIcn);
-                    frame.add(titleLabel);
-                    frame.add(figLabel);
-                    frame.repaint();
-                    frame.setBounds(20, (screenHeight-chartHeight)/2-60, chartWidth, chartHeight);
-                    frame.pack();
-                    frame.setVisible(true);
-                }
-            // DATA NOT SAVED -> GET DATA FROM STREAM
+                ex.executeTrace(folder, textAreaNoCalc, frame, data, vars);
+            // GET REAL TIME DATA FROM SOMEWHERE AND PLOT IT*/
             } else if (this.vars[6].trim().equals("-")){
                 //textAreaNoCalc.setText(data.createData(folder, false));
                     /*textAreaNoCalc.setText(data.createData(folder, fexec, true));
@@ -686,9 +531,7 @@ public class MainApp extends Application {
                     frame.add(chartPanel);
                     frame.repaint();
                     frame.pack();
-                    frame.setVisible(true);*/
-
-                // GET REAL TIME DATA FROM SOMEWHERE AND PLOT IT
+                    frame.setVisible(true);
             }
         });
 
