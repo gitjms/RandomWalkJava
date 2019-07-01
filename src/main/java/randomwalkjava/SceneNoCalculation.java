@@ -22,7 +22,6 @@ public class SceneNoCalculation extends Data {
     final int paneWidth = 200;
     public Button nappiAvoid;
     public Button nappiSave;
-    public Button nappiXgraph;
 
     @Override
     public String[] getVars() {
@@ -32,8 +31,7 @@ public class SceneNoCalculation extends Data {
     public SceneNoCalculation() {
         this.nappiAvoid = new Button("AVOID");
         this.nappiSave = new Button("SAVE");
-        this.nappiXgraph = new Button("XGRAPH");
-        this.vars = new String[]{"","","","0","","-","s","-"};
+        this.vars = new String[]{"","","","","-","s"};
     }
 
     public static boolean isNumDouble(String str) {
@@ -68,67 +66,65 @@ public class SceneNoCalculation extends Data {
         DropShadow shadow = new DropShadow();
 
         // COMPONENTS...
-        Label setNumParticles = new Label("number of particles:");
-        TextField fieldNumParticles = new TextField("");
-        fieldNumParticles.setOnKeyReleased(e -> {
-            if (isNumInteger(fieldNumParticles.getText().trim())){
-                if (fieldNumParticles.getText().trim().equals("0")){
-                    fieldNumParticles.setText("1");
+        Label labNumParticles = new Label("number of particles:");
+        TextField setNumParticles = new TextField("");
+        setNumParticles.setOnKeyReleased(e -> {
+            if (isNumInteger(setNumParticles.getText().trim())){
+                if (setNumParticles.getText().trim().equals("0")){
+                    setNumParticles.setText("1");
                     this.vars[0] = "1";
                 } else {
-                    this.vars[0] = fieldNumParticles.getText().trim();
+                    this.vars[0] = setNumParticles.getText().trim();
                 }
             }
         });
 
-        Label setSizeParticles = new Label("diameter of particle:");
-        TextField fieldSizeParticles = new TextField("");
-        fieldSizeParticles.setOnKeyReleased(e -> {
-            this.vars[1] = fieldSizeParticles.getText().trim();
-        });
-        
-        Label setNumSteps = new Label("number of steps:");
-        TextField fieldNumSteps = new TextField("");
-        fieldNumSteps.setOnKeyReleased(e -> {
-            this.vars[2] = fieldNumSteps.getText().trim();
+        Label labSizeParticles = new Label("diameter of particle:");
+        TextField setSizeParticles = new TextField("");
+        setSizeParticles.setOnKeyReleased(e -> {
+            this.vars[1] = setSizeParticles.getText().trim();
         });
 
-        // this.vars[3] = "0" (skip) => no skip
+        Label labNumSteps = new Label("number of steps:");
+        TextField setNumSteps = new TextField("");
+        setNumSteps.setOnKeyReleased(e -> {
+            this.vars[2] = setNumSteps.getText().trim();
+        });
 
-        Label setNumDimensions = new Label("dimensions:");
-        TextField fieldNumDimensions = new TextField("");
-        fieldNumDimensions.setOnKeyReleased(e -> {
-            this.vars[4] = fieldNumDimensions.getText().trim();
+        Label labNumDimensions = new Label("dimensions:");
+        TextField setNumDimensions = new TextField("");
+        setNumDimensions.setOnKeyReleased(e -> {
+            this.vars[3] = setNumDimensions.getText().trim();
         });
 
         // ...THEIR PLACEMENTS
-        GridPane.setHalignment(setNumParticles, HPos.LEFT);
-        asettelu.add(setNumParticles, 0, 0);
-        GridPane.setHalignment(fieldNumParticles, HPos.CENTER);
-        fieldNumParticles.setMinWidth(compwidth);
-        fieldNumParticles.setMaxWidth(compwidth);
-        asettelu.add(fieldNumParticles, 0, 1);
+        GridPane.setHalignment(labNumParticles, HPos.LEFT);
+        asettelu.add(labNumParticles, 0, 0);
+        GridPane.setHalignment(setNumParticles, HPos.CENTER);
+        setNumParticles.setMinWidth(compwidth);
+        setNumParticles.setMaxWidth(compwidth);
+        asettelu.add(setNumParticles, 0, 1);
         
-        GridPane.setHalignment(setSizeParticles, HPos.LEFT);
-        asettelu.add(setSizeParticles, 0, 2);
-        GridPane.setHalignment(fieldSizeParticles, HPos.CENTER);
-        fieldSizeParticles.setMinWidth(compwidth);
-        fieldSizeParticles.setMaxWidth(compwidth);
-        asettelu.add(fieldSizeParticles, 0, 3);
+        GridPane.setHalignment(labSizeParticles, HPos.LEFT);
+        asettelu.add(labSizeParticles, 0, 2);
+        GridPane.setHalignment(setSizeParticles, HPos.CENTER);
+        setSizeParticles.setMinWidth(compwidth);
+        setSizeParticles.setMaxWidth(compwidth);
+        asettelu.add(setSizeParticles, 0, 3);
+
+        GridPane.setHalignment(labNumSteps, HPos.LEFT);
+        asettelu.add(labNumSteps, 0, 4);
+        GridPane.setHalignment(setNumSteps, HPos.CENTER);
+        setNumSteps.setMinWidth(compwidth);
+        setNumSteps.setMaxWidth(compwidth);
+        asettelu.add(setNumSteps, 0, 5);
         
-        GridPane.setHalignment(setNumSteps, HPos.LEFT);
-        asettelu.add(setNumSteps, 0, 4);
-        GridPane.setHalignment(fieldNumSteps, HPos.CENTER);
-        fieldNumSteps.setMinWidth(compwidth);
-        fieldNumSteps.setMaxWidth(compwidth);
-        asettelu.add(fieldNumSteps, 0, 5);
-        
-        GridPane.setHalignment(setNumDimensions, HPos.LEFT);
-        asettelu.add(setNumDimensions, 0, 6);
-        GridPane.setHalignment(fieldNumDimensions, HPos.CENTER);
-        fieldNumDimensions.setMinWidth(compwidth);
-        fieldNumDimensions.setMaxWidth(compwidth);
-        asettelu.add(fieldNumDimensions, 0, 7);
+        GridPane.setHalignment(labNumDimensions, HPos.LEFT);
+        asettelu.add(labNumDimensions, 0, 6);
+        GridPane.setHalignment(setNumDimensions, HPos.CENTER);
+        setNumDimensions.setMinWidth(compwidth);
+        setNumDimensions.setMaxWidth(compwidth);
+        asettelu.add(setNumDimensions, 0, 7);
 
         // BUTTON: AVOID
         this.nappiAvoid.setMinWidth(compwidth);
@@ -188,7 +184,6 @@ public class SceneNoCalculation extends Data {
                         new BackgroundFill(
                             Color.DARKORANGE,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[6] = "-";
-                this.nappiXgraph.setDisable(true);
             } else if (this.nappiSave.getText().equals("REAL TIME")){
                 // BUTTON PRESSED FROM REAL TIME TO SAVE
                 this.nappiSave.setText("SAVE");
@@ -196,53 +191,20 @@ public class SceneNoCalculation extends Data {
                     new Background(new BackgroundFill(
                         Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[6] = "s";
-                this.nappiXgraph.setDisable(false);
-            }
-        });
-
-        // BUTTON: XGRAPH
-        this.nappiXgraph.setMinWidth(compwidth);
-        this.nappiXgraph.setMaxWidth(compwidth);
-        this.nappiXgraph.setBackground(new Background(
-            new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.nappiXgraph.setId("xgraph");
-        this.nappiXgraph.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                this.nappiXgraph.setEffect(shadow);
-        });
-        this.nappiXgraph.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                this.nappiXgraph.setEffect(null);
-        });
-        this.nappiXgraph.setOnMouseClicked((MouseEvent event) -> {
-            if (this.nappiXgraph.getText().equals("XGRAPH")){
-                // BUTTON PRESSED ON
-                this.nappiXgraph.setText("XGRAPH ON");
-                this.nappiXgraph.setBackground(
-                    new Background(
-                        new BackgroundFill(
-                            Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[7] = "x";
-            } else if(this.nappiXgraph.getText().equals("XGRAPH ON")){
-                // BUTTON PRESSED OFF
-                this.nappiXgraph.setText("XGRAPH");
-                this.nappiXgraph.setBackground(
-                    new Background(
-                        new BackgroundFill(
-                            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[7] = "-";
             }
         });
 
         valikko.getChildren().addAll(
-            this.nappiAvoid, this.nappiSave, this.nappiXgraph);
+            this.nappiAvoid, this.nappiSave);
         GridPane.setHalignment(valikko, HPos.LEFT);
         asettelu.add(valikko, 0, 8, 2, 1);
 
-        final Pane empty = new Pane();
-        GridPane.setHalignment(empty, HPos.CENTER);
-        asettelu.add(empty, 0, 9, 2, 1);
+        final Pane empty1 = new Pane();
+        GridPane.setHalignment(empty1, HPos.CENTER);
+        asettelu.add(empty1, 0, 9, 2, 1);
+        final Pane empty2 = new Pane();
+        GridPane.setHalignment(empty2, HPos.CENTER);
+        asettelu.add(empty2, 0, 10, 2, 1);
 
         return asettelu;
     }

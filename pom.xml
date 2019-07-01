@@ -39,16 +39,6 @@
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
 
-        <repository>
-            <id>jzy3d-snapshots</id>
-            <name>Jzy3d Snapshots</name>
-            <url>http://maven.jzy3d.org/snapshots</url>
-        </repository>
-        <repository>
-            <id>jzy3d-releases</id>
-            <name>Jzy3d Snapshots</name>
-            <url>http://maven.jzy3d.org/releases</url>
-        </repository>
     </repositories>
 
     <build>
@@ -68,6 +58,10 @@
                             <excludeScope>system</excludeScope>
                             <excludeGroupIds>junit,org.mockito,org.hamcrest</excludeGroupIds>
                             <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>
                 </executions>
@@ -85,7 +79,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${java.home}/../bin/javafxpackager</executable>
+                            <executable>${java.home}/../bin/javapackager</executable>
                             <arguments>
                                 <argument>-createjar</argument>
                                 <argument>-nocss2bin</argument>

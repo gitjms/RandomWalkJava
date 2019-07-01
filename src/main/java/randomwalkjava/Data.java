@@ -47,8 +47,8 @@ public class Data {
 
         try {
             command = new String[]{"cmd","/c",executable,
-                this.vars[0],this.vars[1],this.vars[2],this.vars[3],
-                this.vars[4],this.vars[5],this.vars[6],this.vars[7]};
+                this.vars[0], this.vars[1], this.vars[2],
+                this.vars[3], this.vars[4], this.vars[5]};
 
             FileOutputStream fos = new FileOutputStream(command[0]);
             Runtime runtime = Runtime.getRuntime();
@@ -86,14 +86,13 @@ public class Data {
                         System.out.println(" Fortran execution ended with no errors");
                     } else {
                         System.out.println(" Fortran execution ended with error code " + exitVal);
+                        runtime.addShutdownHook(new Message());
                         runtime.exit(exitVal);
                     }
                 }
                 fos.flush();
                 fos.close();
             }
-            
-            //runtime.addShutdownHook(new Message());
 
         } catch (IOException | InterruptedException e) {
             System.out.println(e.getMessage());

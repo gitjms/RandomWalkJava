@@ -1,7 +1,6 @@
 package randomwalkjava;
 
 import com.sun.glass.ui.Screen;
-import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -11,12 +10,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.util.List;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
@@ -35,16 +32,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import javafx.util.Pair;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.WindowConstants;
 import org.knowm.xchart.QuickChart;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.XYChart;
 import org.knowm.xchart.XYChartBuilder;
-import org.knowm.xchart.XYSeries;
 import org.knowm.xchart.style.Styler.ChartTheme;
 
 public class MainApp extends Application {
@@ -54,20 +46,14 @@ public class MainApp extends Application {
     final int chartHeight = 605;
     // STAGE
     final int stageWidth = 940;
-    final int stageHeight = 600;
+    final int stageHeight = 580;
     // COMPONENTS
     final int buttonWidth = 150;
     final int textwidth = 740;
-    final int textheight = 510;
+    final int textheight = 520;
     final int paneWidth = 200;
     final int screenWidth = Screen.getMainScreen().getWidth();
     final int screenHeight = Screen.getMainScreen().getHeight();
-    // FILES AND FOLDERS
-    final String path = "C:\\DATA";
-    final String fexec = "walk.exe";
-    final String pyexec1d = "python plot1d.py";
-    final String pyexec2d = "python plot2d.py";
-    final String pyexec3d = "python plot3d.py";
     // DATA
     public String[] vars;
 
@@ -75,17 +61,61 @@ public class MainApp extends Application {
     public void start(Stage stage) throws Exception {
         ////////////////////////////////////////////////////
         // FILE AND FOLDER CHECK
-        File folder = new File(path);
-        File sourceFile = new File(path + "\\" + fexec);
+        String datapath = "C:\\DATA";
+        String sourcepath = System.getProperty("user.dir") + "\\src\\main\\resources\\lib\\";
+        String fexec = "walk.exe";
+        String pyexecrms = "plotrms.py";
+        String pyexec1d = "plot1d.py";
+        String pyexec2d = "plot2d.py";
+        String pyexec3d = "plot3d.py";
+        File datafolder = new File(datapath);
+        File sourceFile = new File(datapath + "\\" + fexec);
         boolean sourceFound = false;
-        if (Files.notExists(folder.toPath())){
-            sourceFound = createFolder(path, true);
+        if (Files.notExists(datafolder.toPath())){
+            sourceFound = createFolder(sourcepath, datapath, fexec, true);
             if (sourceFound == false)
                 this.stop();
-        } else if (Files.notExists(sourceFile.toPath()))
-            sourceFound = createFolder(path, false);
+            sourceFound = createFolder(sourcepath, datapath, pyexecrms, false);
             if (sourceFound == false)
                 this.stop();
+            sourceFound = createFolder(sourcepath, datapath, pyexec1d, false);
+            if (sourceFound == false)
+                this.stop();
+            sourceFound = createFolder(sourcepath, datapath, pyexec2d, false);
+            if (sourceFound == false)
+                this.stop();
+            sourceFound = createFolder(sourcepath, datapath, pyexec3d, false);
+            if (sourceFound == false)
+                this.stop();
+        } else if (Files.notExists(sourceFile.toPath())) {
+            sourceFound = createFolder(sourcepath, datapath, fexec, false);
+            if (sourceFound == false)
+                this.stop();
+            sourceFile = new File(datapath + "\\" + pyexecrms);
+            if (Files.notExists(sourceFile.toPath())) {
+                sourceFound = createFolder(sourcepath, datapath, pyexecrms, false);
+                if (sourceFound == false)
+                    this.stop();
+            }
+            sourceFile = new File(datapath + "\\" + pyexec1d);
+            if (Files.notExists(sourceFile.toPath())) {
+                sourceFound = createFolder(sourcepath, datapath, pyexec1d, false);
+                if (sourceFound == false)
+                    this.stop();
+            }
+            sourceFile = new File(datapath + "\\" + pyexec2d);
+            if (Files.notExists(sourceFile.toPath())) {
+                sourceFound = createFolder(sourcepath, datapath, pyexec2d, false);
+                if (sourceFound == false)
+                    this.stop();
+            }
+            sourceFile = new File(datapath + "\\" + pyexec3d);
+            if (Files.notExists(sourceFile.toPath())) {
+                sourceFound = createFolder(sourcepath, datapath, pyexec3d, false);
+                if (sourceFound == false)
+                    this.stop();
+            }
+        }
 
         ////////////////////////////////////////////////////
         // CREATE STAGE
@@ -163,7 +193,6 @@ public class MainApp extends Application {
         GridPane.setHalignment(empty2, HPos.LEFT);
         asettelu.add(empty2, 0, 3, 2, 1);
 
-        
         asettelu.add(nappiMenuHelp, 0, 4, 2, 1);
         nappiMenuHelp.setBackground(new Background(
             new BackgroundFill(
@@ -407,16 +436,13 @@ public class MainApp extends Application {
 
         nappiScene1.setOnMouseClicked(event -> {
             stage.setTitle("R_rms calculation");
-            /*if (textAreaMenu.getText().equals(helpTextMenu()))
-                textAreaCalc.setText("");*/
-            //textAreaCalc.setText(textAreaMenu.getText());
             stage.setScene(calcScene);
             
         });
         menuNappiCalc.setOnMouseClicked(event -> {
             stage.setTitle("Random Walk");
             if (textAreaCalc.getText().equals(helpTextCalc()))
-                textAreaMenu.setText("");
+                textAreaMenu.setText(welcomeText());
             else
                 textAreaMenu.setText(textAreaCalc.getText());
             stage.setScene(firstScene);
@@ -427,15 +453,12 @@ public class MainApp extends Application {
 
         nappiScene2.setOnMouseClicked(event -> {
             stage.setTitle("Random Walk simulation");
-            /*if (textAreaMenu.getText().equals(helpTextMenu()))
-                textAreaNoCalc.setText("");*/
-            //textAreaNoCalc.setText(textAreaMenu.getText());
             stage.setScene(noCalcScene);
         });
         menuNappiNoCalc.setOnAction(event -> {
             stage.setTitle("Random Walk");
             if (textAreaNoCalc.getText().equals(helpTextNoCalc()))
-                textAreaMenu.setText("");
+                textAreaMenu.setText(welcomeText());
             else
                 textAreaMenu.setText(textAreaNoCalc.getText());
             stage.setScene(firstScene);
@@ -455,7 +478,7 @@ public class MainApp extends Application {
             // BUTTON PRESSED ON
             this.vars = getCalcScene.getVars();
             Data data = new Data(this.vars);
-            ex.executeRms(folder, textAreaNoCalc, frame, data, vars);
+            ex.executeRms(datafolder, textAreaNoCalc, frame, data, vars);
         });
 
         ////////////////////////////////////////////////////
@@ -469,10 +492,10 @@ public class MainApp extends Application {
             // CREATEDATA NO CALC  //
             /////////////////////////
             // DATA SAVED -> READ DATA FIRST
-            if (this.vars[6].equals("s")) {
-                ex.executeTrace(folder, textAreaNoCalc, frame, data, vars);
+            if (this.vars[5].equals("s")) {
+                ex.executeTrace(datafolder, textAreaNoCalc, frame, data, vars);
             // GET REAL TIME DATA FROM SOMEWHERE AND PLOT IT*/
-            } else if (this.vars[6].trim().equals("-")){
+            } else if (this.vars[5].trim().equals("-")){
                 //textAreaNoCalc.setText(data.createData(folder, false));
                     /*textAreaNoCalc.setText(data.createData(folder, fexec, true));
                 int particles = Integer.valueOf(this.vars[0]);
@@ -531,7 +554,7 @@ public class MainApp extends Application {
                     frame.add(chartPanel);
                     frame.repaint();
                     frame.pack();
-                    frame.setVisible(true);
+                    frame.setVisible(true);*/
             }
         });
 
@@ -589,24 +612,25 @@ public class MainApp extends Application {
         stage.show();
     }
 
-    public boolean createFolder(String path, boolean createAll){
-        if (createAll == true) {
-            File dataFile = new File(path);
+    public boolean createFolder(String source, String destination, String executable, boolean createDir){
+        if (createDir == true) {
+            File dataFile = new File(destination);
             try {
-                System.out.println("creating directory: " + path);
+                System.out.println("creating directory: " + destination);
                 dataFile.mkdir();
             } catch (SecurityException se) {
                 System.out.println("Could not create a new directory\n"+se.getMessage());
             }
         }
 
-        File sourceFile = new File(System.getProperty("user.dir") + "\\src\\main\\resources\\lib\\walk.exe");
-        if (Files.notExists(sourceFile.toPath())) {
-            System.out.println("Fortran source file not found");
+        File sourceDir = new File(source);
+        if (Files.notExists(sourceDir.toPath())) {
+            System.out.println("Source file " + executable + " not found from " + source);
             return false;
         }
 
-        File destinationFile = new File(path+"\\walk.exe");
+        File sourceFile = new File(source + "\\" + executable);
+        File destinationFile = new File(destination + "\\" + executable);
         InputStream fin = null;
         OutputStream fout = null;
         //sourceFile.deleteOnExit();
@@ -622,7 +646,7 @@ public class MainApp extends Application {
             }
             System.out.println("Copying finished.");
         } catch (IOException e) {
-            System.out.println("Resource file not copied into new folder\n"+e.getMessage());
+            System.out.println("Resource file " + sourceFile + " not copied into new folder\n"+e.getMessage());
         } finally {
             try {
                 fin.close();
@@ -679,8 +703,7 @@ public class MainApp extends Application {
                     + " - Save toggle changes mode between realtime (no save) and save mode.\n"
                     + "   Real time doesn't save the data, but shows the path trace in real\n"
                     + "   time. Save mode saves the data, and you can plot the trace paths\n"
-                    + "   by yourself.\n"
-                    + " - Xgraph saves the data in XGraph format. Default is normal save.";
+                    + "   by yourself.";
     
         return text;
     }

@@ -64,13 +64,12 @@ public class Pyplot {
                     System.out.println(" Python execution ended with no errors");
                 } else {
                     System.out.println(" Python execution ended with error code " + exitVal);
+                    runtime.addShutdownHook(new Message());
                     runtime.exit(exitVal);
                 }
                 fos.flush();
                 fos.close();
             }
-            
-            //runtime.addShutdownHook(new Message());
 
         } catch (IOException | InterruptedException e) {
             System.out.println(e.getMessage());
@@ -82,9 +81,8 @@ public class Pyplot {
     public BufferedImage readPyPlot(File filePath){
     
         BufferedImage image = null;
-
+        System.out.println(filePath);
         try {
-            System.out.println(filePath);
             image = ImageIO.read(filePath);
         } catch (IOException ex) {
             Logger.getLogger(Pyplot.class.getName()).log(Level.SEVERE, null, ex);
