@@ -19,7 +19,7 @@ public class SceneCalculation extends Data {
     }
  
     public SceneCalculation() {
-        this.vars = new String[]{"0","","","","-","s"};
+        this.vars = new String[]{"0","0.0","0","0","-","s"};
     }
 
     public static boolean isNumDouble(String str) {

@@ -20,8 +20,7 @@ public class SceneNoCalculation extends Data {
     
     final int compwidth = 150;
     final int paneWidth = 200;
-    public Button nappiAvoid;
-    public Button nappiSave;
+    private Button nappiAvoid;
 
     @Override
     public String[] getVars() {
@@ -30,8 +29,7 @@ public class SceneNoCalculation extends Data {
  
     public SceneNoCalculation() {
         this.nappiAvoid = new Button("AVOID");
-        this.nappiSave = new Button("SAVE");
-        this.vars = new String[]{"","","","","-","s"};
+        this.vars = new String[]{"0","0.0","0","0","-","s"};
     }
 
     public static boolean isNumDouble(String str) {
@@ -149,59 +147,25 @@ public class SceneNoCalculation extends Data {
                     new Background(
                         new BackgroundFill(
                             Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[5] = "a";
+                this.vars[4] = "a";
             } else if (this.nappiAvoid.getText().equals("AVOID ON")){
                 // BUTTON PRESSED OFF
                 this.nappiAvoid.setText("AVOID");
                 this.nappiAvoid.setBackground(
                     new Background(new BackgroundFill(
                         Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[5] = "-";
+                this.vars[4] = "-";
             }
         });
 
-        // BUTTON: SAVE / REAL TIME
-        this.nappiSave.setMinWidth(compwidth);
-        this.nappiSave.setMaxWidth(compwidth);
-        this.nappiSave.setBackground(new Background(
-            new BackgroundFill(
-                Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.nappiSave.setId("save");
-        this.nappiSave.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                this.nappiSave.setEffect(shadow);
-        });
-        this.nappiSave.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                this.nappiSave.setEffect(null);
-        });
-        this.nappiSave.setOnMouseClicked((MouseEvent event) -> {
-            if (this.nappiSave.getText().equals("SAVE")){
-                // BUTTON PRESSED FROM SAVE TO REAL TIME
-                this.nappiSave.setText("REAL TIME");
-                this.nappiSave.setBackground(
-                    new Background(
-                        new BackgroundFill(
-                            Color.DARKORANGE,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[6] = "-";
-            } else if (this.nappiSave.getText().equals("REAL TIME")){
-                // BUTTON PRESSED FROM REAL TIME TO SAVE
-                this.nappiSave.setText("SAVE");
-                this.nappiSave.setBackground(
-                    new Background(new BackgroundFill(
-                        Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[6] = "s";
-            }
-        });
-
-        valikko.getChildren().addAll(
-            this.nappiAvoid, this.nappiSave);
+        valikko.getChildren().add(this.nappiAvoid);
         GridPane.setHalignment(valikko, HPos.LEFT);
         asettelu.add(valikko, 0, 8, 2, 1);
 
         final Pane empty1 = new Pane();
         GridPane.setHalignment(empty1, HPos.CENTER);
         asettelu.add(empty1, 0, 9, 2, 1);
+
         final Pane empty2 = new Pane();
         GridPane.setHalignment(empty2, HPos.CENTER);
         asettelu.add(empty2, 0, 10, 2, 1);

@@ -1,6 +1,7 @@
 
 package randomwalkjava;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,6 +13,8 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.text.Font;
 import javafx.util.Pair;
 
 public class Data {
@@ -77,18 +80,19 @@ public class Data {
                     if (teksti.isEmpty())
                         teksti = line;
                     else
-                        teksti = teksti + "\n" + line;
+                        teksti = teksti + line + "\n";
                 }
 
                 exitVal = process.waitFor();
                 if (exitVal == 0) {
-                    if (save == true){
+                    if (save == true)
                         System.out.println(" Fortran execution ended with no errors");
-                    } else {
+                } else {
+                    if (save == true) {
                         System.out.println(" Fortran execution ended with error code " + exitVal);
                         runtime.addShutdownHook(new Message());
-                        runtime.exit(exitVal);
                     }
+                    runtime.exit(exitVal);
                 }
                 fos.flush();
                 fos.close();
