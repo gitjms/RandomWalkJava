@@ -23,12 +23,9 @@ public class Execution {
     }
 
     public void executeTrace(File folder, TextArea textArea, JFrame frame, Data data, String[] vars ) {
-        // vars[0] = particles, from user
-        // vars[1] = size, from user
-        // vars[2] = steps, from user
-        // vars[3] = dimension, from user
-        // vars[4] = avoid, from user
-        // vars[5] = save or real time, from user
+        // vars from user:
+        // vars[0] = particles, vars[1] = size, vars[2] = steps
+        // vars[3] = dimension, vars[4] = avoid, vars[5] = save
         String pyexec1d = "python plot1d.py";
         String pyexec2d = "python plot2d.py";
         String pyexec3d = "python plot3d.py";
@@ -107,12 +104,9 @@ public class Execution {
     }
 
     public void executeRms(File folder, TextArea textArea, JFrame frame, Data data, String[] vars ) {
-        // vars[0] = particles, from user
-        // vars[1] = size, from user
-        // vars[2] = steps, from user
-        // vars[3] = dimension, from user
-        // vars[4] = avoid, from user
-        // vars[5] = save or real time, from user
+        // vars from user:
+        // vars[0] = particles, vars[1] = size, vars[2] = steps
+        // vars[3] = dimension, vars[4] = avoid, vars[5] = save
         String pyexecrms = "python plotrms.py";
         String rmsDataPath = "";
         BufferedImage imagerms = null;

@@ -1,7 +1,6 @@
 
 package randomwalkjava;
 
-import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,8 +12,6 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.text.Font;
 import javafx.util.Pair;
 
 public class Data {

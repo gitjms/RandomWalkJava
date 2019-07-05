@@ -5,10 +5,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.canvas.GraphicsContext;
+//import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -21,6 +27,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import org.knowm.xchart.XYChart;
+import org.knowm.xchart.SwingWrapper;
+import org.knowm.xchart.style.colors.XChartSeriesColors;
 
 public class SceneAnim extends Data {
     
@@ -70,12 +79,12 @@ public class SceneAnim extends Data {
         }
     }
 
-    public void refresh(File folderPath, String executable, GraphicsContext piirturi, double scalefactor) {
+    public void refresh(File folderPath, String executable, GraphicsContext piirturi, double scalefactor, FXPlot chart){//SwingPlot swingPlot) {
         int width = 800;
         int height = 800;
 
-        double centerX = width/2;
-        double centerY = height/2;
+        double centerX = piirturi.getCanvas().getWidth()/2;
+        double centerY = piirturi.getCanvas().getHeight()/2;
         //double centerY = height/2;
 
         int num_part = Integer.valueOf(this.vars[0]);
@@ -85,15 +94,21 @@ public class SceneAnim extends Data {
         double[] muistiX = new double[num_part];
         double[] muistiY = new double[num_part];
 
-        double[][][] values = new double[dim][num_steps][num_part];
+        double[][] values = new double[2][num_part];
         String[] command = null;
+
+        double[][] swingData = new double[2][num_steps];
+        double[] xAxis = new double[num_steps];
+        IntStream.range(0, 1).forEach(val-> xAxis[val] = (double) val);
 
         try {
             command = new String[]{"cmd","/c",executable,
                 this.vars[0], this.vars[1], this.vars[2],
                 this.vars[3], this.vars[4], this.vars[5]};
 
-            FileOutputStream fos = new FileOutputStream(command[0]);
+            // FOR DEBUGGING
+            //FileOutputStream fos = new FileOutputStream(command[0]);
+
             Runtime runtime = Runtime.getRuntime();
 
             Process process = runtime.exec(command, null, folderPath);
@@ -102,79 +117,150 @@ public class SceneAnim extends Data {
             try (BufferedReader input = new BufferedReader(new InputStreamReader(
                 process.getInputStream()))) {
 
-                //StreamGobbler errorGobbler = new StreamGobbler(
-                //    process.getErrorStream(), "ERROR ");
-                //errorGobbler.start();
                 String line = null;
 
-                StreamGobbler outputGobbler = new StreamGobbler(
+                // FOR DEBUGGING
+                /*StreamGobbler outputGobbler = new StreamGobbler(
                     process.getInputStream(), "", fos);
-                outputGobbler.start();
+                outputGobbler.start();*/
 
                 int i = 0;
-                
-                if (dim == 1)
+                int j = 0;
+                int m = 0;
+                if (dim == 1) {
                     while ((line = input.readLine()) != null){
-                        values[0][i][1] = Double.valueOf(line.split("(\\s+)")[0].trim()) + centerX;
-                        i++;
-                    }
-                else if (dim == 2) {
-                    while (i < num_steps) {
-                        line = input.readLine();
-                        if (line == null || line.trim().startsWith("S"))
+                        if (line.trim().startsWith("S"))
                             break;
-                        int j = 0;
-                        while (j < num_part) {
-                        if ( Double.valueOf(this.vars[2]) < 1000.0 ) {
-                            values[0][i][j] = Double.valueOf(line.split("(\\s+)")[0].trim())
+                        if (!line.trim().split("(\\s+)")[0].trim().equals("+")) {
+                            m = 0;
+                        if ( Double.valueOf(this.vars[2]) < 100.0 ) {
+                            values[0][i] = Double.valueOf(line.trim())
+                                + scalefactor * ( Math.log10(Double.valueOf(this.vars[2])) + 0.0 )
+                                + 1.0 / scalefactor * Math.sqrt(num_steps);
+                            values[1][i] = centerY + Math.pow(scalefactor,Math.log10(Double.valueOf(this.vars[2]))/2.0);
+                        } else if ( Double.valueOf(this.vars[2]) < 1000.0 ) {
+                            values[0][i] = Double.valueOf(line.trim())
+                                + scalefactor * ( Math.log10(Double.valueOf(this.vars[2])) - 0.5 )
+                                + 1.0 / scalefactor * Math.sqrt(num_steps);
+                            values[1][i] = centerY + Math.pow(scalefactor,Math.log10(Double.valueOf(this.vars[2]))/2.0);
+                        } else if ( Double.valueOf(this.vars[2]) < 10000.0 ) {
+                            values[0][i] = Double.valueOf(line.trim())
+                                + scalefactor * ( Math.log10(Double.valueOf(this.vars[2])) + 9.0 )
+                                + 1.0 / scalefactor * Math.sqrt(num_steps);
+                            values[1][i] = centerY + Math.pow(scalefactor,Math.log10(Double.valueOf(this.vars[2]))/2.0);
+                        } else if ( Double.valueOf(this.vars[2]) < 100000.0 ) {
+                            values[0][i] = Double.valueOf(line.trim())
+                                + scalefactor * ( Math.log10(Double.valueOf(this.vars[2])) + 30.0 )
+                                + 1.0 / scalefactor * Math.sqrt(num_steps);
+                            values[1][i] = centerY + Math.pow(scalefactor,Math.log10(Double.valueOf(this.vars[2]))/2.0);
+                        } else if ( Double.valueOf(this.vars[2]) < 1000000.0 ) {
+                            values[0][i] = Double.valueOf(line.trim())
+                                + scalefactor * ( Math.log10(Double.valueOf(this.vars[2])) + 100.0 )
+                                + 1.0 / scalefactor * Math.sqrt(num_steps);
+                            values[1][i] = centerY + Math.pow(scalefactor,Math.log10(Double.valueOf(this.vars[2]))/2.0);
+                        } else {
+                            values[0][i] = Double.valueOf(line.trim())
+                                + Math.pow(scalefactor,Math.log10(Double.valueOf(this.vars[2]))/2.0) * Math.sqrt(num_steps);
+                            values[1][i] = centerY + Math.pow(scalefactor,Math.log10(Double.valueOf(this.vars[2]))/2.0);
+                        }
+
+                        if ( j > 0){
+                            for (int k = 0; k < num_part; k++){
+                                piirturi.strokeLine(muistiX[k], muistiY[k], values[0][k], values[1][k]);
+                            }
+                        }
+                        muistiX[i] = values[0][i];
+                        muistiY[i] = values[1][i];
+
+                        i++;
+
+                        if ( i == num_part ){
+                            i = 0;
+                            j++;
+                        }
+
+                        if ( j == num_steps ) {
+                            i = 0;
+                            j = 0;
+                        }
+
+                        } else {
+                            swingData[0][j] = Double.valueOf(line.split("(\\s+)")[1].trim());
+                            //IntStream.range(0, swingData.length).forEach(val-> swingData[0][val] = (double) val);
+                            swingData[1][j] = Double.valueOf(line.split("(\\s+)")[2].trim());
+                            
+                            //IntStream.range(0, num_steps).forEach(val-> swingData[1][val] = val);
+                            Thread.sleep(100);
+                            chart.updateData(xAxis, swingData[1]);
+                            
+                            //m++;
+                            i = 0;
+                            j = 0;
+                        }
+                    }
+                } else if (dim == 2) {
+                    while ((line = input.readLine()) != null){
+                        if (line.trim().startsWith("S"))
+                                break;
+                         if ( Double.valueOf(this.vars[2]) < 1000.0 ) {
+                            String[] valStr = line.split("(\\s+)");
+                            values[0][i] = Double.valueOf(valStr[0].trim())
                                 + scalefactor * ( Math.log10(Double.valueOf(this.vars[2])) + 1.0 )
                                 + 1.0 / scalefactor * Math.sqrt(num_steps);
-                            values[1][i][j] = Double.valueOf(line.split("(\\s+)")[1].trim())
+                            values[1][i] = Double.valueOf(valStr[1].trim())
                                 + scalefactor * ( Math.log10(Double.valueOf(this.vars[2])) + 1.0 )
                                 + 1.0 / scalefactor * Math.sqrt(num_steps);
                         } else if ( Double.valueOf(this.vars[2]) < 10000.0 ) {
-                            values[0][i][j] = Double.valueOf(line.split("(\\s+)")[0].trim())
+                            String[] valStr = line.split("(\\s+)");
+                            values[0][i] = Double.valueOf(valStr[0].trim())
                                 + scalefactor * ( Math.log10(Double.valueOf(this.vars[2])) + 7.0 )
                                 + 1.0 / scalefactor * Math.sqrt(num_steps);
-                            values[1][i][j] = Double.valueOf(line.split("(\\s+)")[1].trim())
+                            values[1][i] = Double.valueOf(valStr[1].trim())
                                 + scalefactor * ( Math.log10(Double.valueOf(this.vars[2])) + 7.0 )
                                 + 1.0 / scalefactor * Math.sqrt(num_steps);
                         } else if ( Double.valueOf(this.vars[2]) < 100000.0 ) {
-                            values[0][i][j] = Double.valueOf(line.split("(\\s+)")[0].trim())
+                            String[] valStr = line.split("(\\s+)");
+                            values[0][i] = Double.valueOf(valStr[0].trim())
                                 + scalefactor * ( Math.log10(Double.valueOf(this.vars[2])) + 50.0 )
                                 + 1.0 / scalefactor * Math.sqrt(num_steps);
-                            values[1][i][j] = Double.valueOf(line.split("(\\s+)")[1].trim())
+                            values[1][i] = Double.valueOf(valStr[1].trim())
                                 + scalefactor * ( Math.log10(Double.valueOf(this.vars[2])) + 50.0 )
                                 + 1.0 / scalefactor * Math.sqrt(num_steps);
                         } else if ( Double.valueOf(this.vars[2]) < 1000000.0 ) {
-                            values[0][i][j] = Double.valueOf(line.split("(\\s+)")[0].trim())
+                            String[] valStr = line.split("(\\s+)");
+                            values[0][i] = Double.valueOf(valStr[0].trim())
                                 + scalefactor * ( Math.log10(Double.valueOf(this.vars[2])) + 100.0 )
                                 + 1.0 / scalefactor * Math.sqrt(num_steps);
-                            values[1][i][j] = Double.valueOf(line.split("(\\s+)")[1].trim())
+                            values[1][i] = Double.valueOf(valStr[1].trim())
                                 + scalefactor * ( Math.log10(Double.valueOf(this.vars[2])) + 100.0 )
                                 + 1.0 / scalefactor * Math.sqrt(num_steps);
                         } else {
-                            values[0][i][j] = Double.valueOf(line.split("(\\s+)")[0].trim())
+                            String[] valStr = line.split("(\\s+)");
+                            values[0][i] = Double.valueOf(valStr[0].trim())
                                 + Math.pow(scalefactor,Math.log10(Double.valueOf(this.vars[2]))/2.0) * Math.sqrt(num_steps);
-                            values[1][i][j] = Double.valueOf(line.split("(\\s+)")[1].trim())
+                            values[1][i] = Double.valueOf(valStr[1].trim())
                                 + Math.pow(scalefactor,Math.log10(Double.valueOf(this.vars[2]))/2.0) * Math.sqrt(num_steps);
                         }
 
-                        muistiX[j] = values[0][i][j];
-                        muistiY[j] = values[1][i][j];
-                        
-                        j++;
-                       
+                        if ( j > 0){
+                            for (int k = 0; k < num_part; k++){
+                                piirturi.strokeLine(muistiX[k], muistiY[k], values[0][k], values[1][k]);
+                            }
                         }
-                        
-                        if (i > 0) {
-                            for (int k = 0; k < num_part; k++)
-                                for (int s = 0; s < num_steps; s++)
-                                    piirturi.strokeLine(muistiX[k], muistiY[k], values[0][s][k], values[1][s][k]);
-                        }
-                        //piirturi.strokeLine(muistiX, muistiY, values[0][i], values[1][i]);
-                        //piirturi.stroke();
+                        muistiX[i] = values[0][i];
+                        muistiY[i] = values[1][i];
+
                         i++;
+
+                        if ( i == num_part ){
+                            i = 0;
+                            j++;
+                        }
+
+                        if ( j == num_steps ) {
+                            i = 0;
+                            j = 0;
+                        }
                         /*if (i%1000 == 0) {
                             piirturi.setFill(javafx.scene.paint.Color.BLACK);
                             piirturi.strokeRect(0, 0, width, height);
@@ -183,27 +269,31 @@ public class SceneAnim extends Data {
                             i = 0;
                         }*/
                     }
-                } else if (dim == 3)
+                    
+                } else if (dim == 3) {
                     while ((line = input.readLine()) != null){
-                        String[] parts = line.trim().split("\t");
-                        values[0][i][1] = Double.valueOf(line.split("(\\s+)")[0].trim()) + centerX;
-                        values[1][i][1] = Double.valueOf(line.split("(\\s+)")[1].trim()) + centerY;
-                        values[2][i][1] = Double.valueOf(line.split("(\\s+)")[2].trim());// + centerZ;
+                        /*String[] parts = line.trim().split("\t");
+                        values[0][i] = Double.valueOf(line.split("(\\s+)")[0].trim()) + centerX;
+                        values[1][i] = Double.valueOf(line.split("(\\s+)")[1].trim()) + centerY;
+                        values[2][i] = Double.valueOf(line.split("(\\s+)")[2].trim());// + centerZ;*/
                         i++;
                     }
+                }
 
                 exitVal = process.waitFor();
                 if (exitVal != 0) {
                     runtime.exit(exitVal);
                 }
-                fos.flush();
-                fos.close();
+                // FOR DEBUGGING
+                //fos.flush();
+                //fos.close();
             }
 
         } catch (IOException | InterruptedException e) {
             //System.out.println(e.getMessage());
         }
-        stop();
+        // FOR ONE ROUND OPERATION
+        //stop();
     }
 
     // RANDOM WALK ANIMATION
