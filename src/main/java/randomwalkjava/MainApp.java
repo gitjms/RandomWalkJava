@@ -9,8 +9,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
@@ -37,15 +38,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javax.swing.JFrame;
-import javax.swing.WindowConstants;
-import org.knowm.xchart.SwingWrapper;
-import org.knowm.xchart.XChartPanel;
-import org.knowm.xchart.XYChart;
-import org.knowm.xchart.XYChartBuilder;
-import org.knowm.xchart.XYSeries;
-import org.knowm.xchart.style.Styler.ChartTheme;
-import org.knowm.xchart.style.markers.Marker;
-import org.knowm.xchart.style.markers.SeriesMarkers;
 
 public class MainApp extends Application {
 
@@ -67,8 +59,14 @@ public class MainApp extends Application {
     // DATA
     public String[] vars;
     public double scalefactor = 1.0;
+    public double globalpha = 1.0;
+    public double linewidth = 1.0;
     public boolean isscaled = false;
     public boolean onoff = false;
+
+    private double rms_data = 0.0;
+    private long runs = 1;
+    private List<Double> rms_runs;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -667,7 +665,7 @@ public class MainApp extends Application {
 
         ////////////////////////////////////////////////////
         // CREATE AN INSTANCE FOR REAL TIME PLOTTING
-        FXPlot fxplot = new FXPlot();
+        FXPlot fxplot = new FXPlot(screenHeight);
 
         ////////////////////////////////////////////////////
         // ANIMATION TIMER FOR REAL TIME RANDOM WALK
@@ -715,58 +713,28 @@ public class MainApp extends Application {
                 dim = Integer.valueOf(vars[3]);
 
                 if ( dim == 1 ) {
-                    if ( Double.valueOf(vars[2]) < 100.0 ) {
-                        scalefactor = 16.0 - 0.0 * Math.log10(Double.valueOf(vars[2]));
-                        piirturi.setLineWidth((30.0 - Math.log10(Double.valueOf(vars[2]))) / 55.0);
-                        piirturi.setGlobalAlpha((10.0 - Math.log10(Double.valueOf(vars[2]))) / 15.0);
-                    } else if ( Double.valueOf(vars[2]) < 1000.0 ) {
-                        scalefactor = 14.0 - 1.0 * Math.log10(Double.valueOf(vars[2]));
-                        piirturi.setLineWidth((20.0 - Math.log10(Double.valueOf(vars[2]))) / 40.0);
-                        piirturi.setGlobalAlpha((10.0 - Math.log10(Double.valueOf(vars[2]))) / 20.0);
-                    } else if ( Double.valueOf(vars[2]) < 10000.0 ) {
-                        scalefactor = 12.0 - 2.0 * Math.log10(Double.valueOf(vars[2]));
-                        piirturi.setLineWidth((10.0 - Math.log10(Double.valueOf(vars[2]))) / 25.0);
-                        piirturi.setGlobalAlpha((10.0 - Math.log10(Double.valueOf(vars[2]))) / 30.0);
-                    } else if ( Double.valueOf(vars[2]) < 100000.0 ) {
-                        scalefactor = 10.0 - 2.0 * Math.log10(Double.valueOf(vars[2]));
-                        piirturi.setLineWidth((10.0 - Math.log10(Double.valueOf(vars[2])))/10.0);
-                        piirturi.setGlobalAlpha((10.0 - Math.log10(Double.valueOf(vars[2])))/40.0);
-                    } else {
-                        scalefactor = 1.0 - 1.0 / (15.0 - 2.0 * Math.log10(Double.valueOf(vars[2])));
-                        piirturi.setLineWidth((10.0 - Math.log10(Double.valueOf(vars[2])))/20.0);
-                        piirturi.setGlobalAlpha((10.0 - Math.log10(Double.valueOf(vars[2])))/10.0);
-                    }
+                    scalefactor = Math.sqrt(animwidth
+                                / Math.sqrt(Double.valueOf(vars[2])))
+                                - Math.sqrt(Math.log10(Double.valueOf(vars[2])));
+                    linewidth = (Math.log10(Double.valueOf(vars[2])) + 1.0)
+                                / Math.sqrt(Double.valueOf(vars[2]));
                     piirturi.scale(scalefactor, 1.0);
                     isscaled = true;
                 } else if ( dim > 1 ) {
-                    if ( Double.valueOf(vars[2]) < 100.0 ) {
-                        scalefactor = 14.0 - 0.0 * Math.log10(Double.valueOf(vars[2]));
-                        piirturi.setLineWidth((10.0 - Math.log10(Double.valueOf(vars[2]))) / 55.0);
-                        piirturi.setGlobalAlpha((10.0 - Math.log10(Double.valueOf(vars[2]))) / 15.0);
-                    } else if ( Double.valueOf(vars[2]) < 1000.0 ) {
-                        scalefactor = 13.0 - 1.0 * Math.log10(Double.valueOf(vars[2]));
-                        piirturi.setLineWidth((10.0 - Math.log10(Double.valueOf(vars[2]))) / 40.0);
-                        piirturi.setGlobalAlpha((10.0 - Math.log10(Double.valueOf(vars[2]))) / 20.0);
-                    } else if ( Double.valueOf(vars[2]) < 10000.0 ) {
-                        scalefactor = 12.0 - 2.0 * Math.log10(Double.valueOf(vars[2]));
-                        piirturi.setLineWidth((10.0 - Math.log10(Double.valueOf(vars[2]))) / 25.0);
-                        piirturi.setGlobalAlpha((10.0 - Math.log10(Double.valueOf(vars[2]))) / 30.0);
-                    } else if ( Double.valueOf(vars[2]) < 100000.0 ) {
-                        scalefactor = 10.5 - 2.0 * Math.log10(Double.valueOf(vars[2]));
-                        piirturi.setLineWidth((10.0 - Math.log10(Double.valueOf(vars[2])))/10.0);
-                        piirturi.setGlobalAlpha((10.0 - Math.log10(Double.valueOf(vars[2])))/40.0);
-                    } else {
-                        scalefactor = 1.0 - 1.0 / (15.0 - 2.0 * Math.log10(Double.valueOf(vars[2])));
-                        piirturi.setLineWidth((10.0 - Math.log10(Double.valueOf(vars[2])))/20.0);
-                        piirturi.setGlobalAlpha((10.0 - Math.log10(Double.valueOf(vars[2])))/10.0);
-                    }
+                    scalefactor = Math.sqrt(animwidth
+                            / Math.sqrt(Double.valueOf(vars[2])))
+                            - Math.sqrt(Math.log10(Double.valueOf(vars[2])));
+                    linewidth = Math.pow(Math.log10(Double.valueOf(vars[2])),2.0)
+                            / (Math.sqrt(2.0 * scalefactor * Double.valueOf(vars[2])));
                     piirturi.scale(scalefactor, scalefactor);
                     isscaled = true;
                 }
+                fxplot.setMinY(Math.sqrt(Double.valueOf(vars[2])) - 10.0);
+                fxplot.setMaxY(Math.sqrt(Double.valueOf(vars[2])) + 10.0);
+                //double[] yData = new double[]{Math.sqrt(Double.valueOf(vars[2]))};
+                //fxplot.getCalcChart().addSeries("sqrt(n)", yData);
 
-                fxplot.setMinY(Math.sqrt(Double.valueOf(vars[2]))-10.0);
-                fxplot.setMaxY(Math.sqrt(Double.valueOf(vars[2]))+10.0);
-                getAnimScene.refresh(datafolder, fexec, piirturi, scalefactor, fxplot);
+                getAnimScene.refresh(datafolder, fexec, piirturi, scalefactor, linewidth, fxplot, rms_data, runs, (ArrayList) rms_runs);
 
                 // älä muuta tätä
                 prevTime = currentNanoTime;
@@ -784,6 +752,9 @@ public class MainApp extends Application {
             } else {
                 // FOR ONE ROUND OPERATION
                 // COMMENT OUT NEXT LINE
+                rms_data = 0.0;
+                runs = 0;
+                rms_runs = new ArrayList();
                 getAnimScene.start();
                 runAnim.setText("STOP");
             }
