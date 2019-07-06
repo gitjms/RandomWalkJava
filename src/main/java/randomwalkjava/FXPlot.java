@@ -2,6 +2,9 @@
 package randomwalkjava;
 
 import java.awt.Color;
+import java.awt.BasicStroke; 
+import static java.awt.BasicStroke.CAP_SQUARE;
+import static java.awt.BasicStroke.JOIN_MITER;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 import org.knowm.xchart.XChartPanel;
@@ -44,6 +47,10 @@ public class FXPlot extends SceneAnim {
         this.calcChart.getStyler().setXAxisTitleVisible(xtitvis);
     }
 
+    private void setYaxtitle(boolean ytitvis) {
+        this.calcChart.getStyler().setYAxisTitleVisible(ytitvis);
+    }
+
     private void setLegendVis(boolean legvis) {
         this.calcChart.getStyler().setLegendVisible(legvis);
     }
@@ -84,30 +91,50 @@ public class FXPlot extends SceneAnim {
             .theme(ChartTheme.Matlab).build();
         this.setBounds(screenheight);
         this.chartPanel = new XChartPanel(calcChart);
-        this.setXaxtitle(false);
-        this.setLegendVis(false);
+        this.setXaxtitle(true);
+        this.setYaxtitle(true);
+        this.calcChart.setXAxisTitle("walks");
+        this.calcChart.setYAxisTitle("R_rms");
+        this.setLegendVis(true);
         this.setMarkSize(0);
-        this.setxDec("0.0");
+        this.setxDec("0");
         this.setyDec("0.0");
+        this.calcChart.getStyler().setAxisTickLabelsFont(new java.awt.Font(null,0,15));
         this.setStyle(XYSeriesRenderStyle.Line);
-        this.setTitle("R_rms vs. sqrt(N)");
-        this.setFrameTitle("Real Time \\R_rms");
+        this.setTitle("R_rms and sqrt(N) vs. walks");
+        this.calcChart.getStyler().setChartTitleFont(new java.awt.Font(null,0,20));
+        this.calcChart.getStyler().setAxisTitleFont(new java.awt.Font(null,0,18));
+        this.calcChart.getStyler().setLegendFont(new java.awt.Font(null,0,18));
+        this.calcChart.getStyler().setChartTitlePadding(15);
+        this.setFrameTitle("Real Time R_rms");
         this.setChartVis(false);
     }
 
-    public void setData(double[] x, double[] y) {
-        this.calcChart.addSeries(String.valueOf("RMS"), x, y);
+    public void setData(String name1, String name2, double[] x, double[] y) {
+        this.calcChart.getSeriesMap().clear();
+        this.chartPanel.removeAll();
+        this.frame.getContentPane().removeAll();
+        BasicStroke[] BasicStroke = new BasicStroke[]{
+                new BasicStroke( 1.5f, CAP_SQUARE,
+				JOIN_MITER, 10.0f, new float[]{5, 5}, 2.0f ),
+                new BasicStroke( 1.5f, CAP_SQUARE,
+				JOIN_MITER, 10.0f, null, 0.0f )
+        };
+        
+        this.calcChart.addSeries(String.valueOf(name1), x, y)
+            .setLineStyle(BasicStroke[0]).setLineColor(Color.blue);
+        this.calcChart.addSeries(String.valueOf(name2), x, y)
+            .setLineStyle(BasicStroke[1]).setLineColor(Color.red);
+
+        this.calcChart.getStyler().setAntiAlias(true);
         this.chartPanel.getChart();
         this.frame.add(chartPanel);
         this.frame.repaint();
         this.frame.pack();
     }
 
-    public void updateData(double[] x, double[] y) {
-        this.calcChart.getSeriesMap().clear();
-        this.chartPanel.removeAll();
-        this.frame.getContentPane().removeAll();
-        this.calcChart.addSeries(String.valueOf("RMS"), x, y);
+    public void updateData(String name, double[] x, double[] y) {
+        this.calcChart.updateXYSeries(name, x, y, null);
         this.chartPanel.getChart();
         this.frame.add(chartPanel);
         this.frame.repaint();

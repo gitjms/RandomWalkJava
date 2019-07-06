@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -64,9 +65,8 @@ public class MainApp extends Application {
     public boolean isscaled = false;
     public boolean onoff = false;
 
-    private double rms_data = 0.0;
-    private long runs = 1;
-    private List<Double> rms_runs;
+    private boolean newdata = false;
+    public double[] rms_runs;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -713,7 +713,7 @@ public class MainApp extends Application {
                 dim = Integer.valueOf(vars[3]);
 
                 if ( dim == 1 ) {
-                    scalefactor = Math.sqrt(animwidth
+                    scalefactor = Math.sqrt((animwidth+200)
                                 / Math.sqrt(Double.valueOf(vars[2])))
                                 - Math.sqrt(Math.log10(Double.valueOf(vars[2])));
                     linewidth = (Math.log10(Double.valueOf(vars[2])) + 1.0)
@@ -721,7 +721,7 @@ public class MainApp extends Application {
                     piirturi.scale(scalefactor, 1.0);
                     isscaled = true;
                 } else if ( dim > 1 ) {
-                    scalefactor = Math.sqrt(animwidth
+                    scalefactor = Math.sqrt((animwidth+200)
                             / Math.sqrt(Double.valueOf(vars[2])))
                             - Math.sqrt(Math.log10(Double.valueOf(vars[2])));
                     linewidth = Math.pow(Math.log10(Double.valueOf(vars[2])),2.0)
@@ -729,12 +729,9 @@ public class MainApp extends Application {
                     piirturi.scale(scalefactor, scalefactor);
                     isscaled = true;
                 }
-                fxplot.setMinY(Math.sqrt(Double.valueOf(vars[2])) - 10.0);
-                fxplot.setMaxY(Math.sqrt(Double.valueOf(vars[2])) + 10.0);
-                //double[] yData = new double[]{Math.sqrt(Double.valueOf(vars[2]))};
-                //fxplot.getCalcChart().addSeries("sqrt(n)", yData);
 
-                getAnimScene.refresh(datafolder, fexec, piirturi, scalefactor, linewidth, fxplot, rms_data, runs, (ArrayList) rms_runs);
+                getAnimScene.refresh(datafolder, fexec, piirturi, scalefactor, linewidth, fxplot, rms_runs, newdata);
+                newdata = false;
 
                 // älä muuta tätä
                 prevTime = currentNanoTime;
@@ -752,9 +749,10 @@ public class MainApp extends Application {
             } else {
                 // FOR ONE ROUND OPERATION
                 // COMMENT OUT NEXT LINE
-                rms_data = 0.0;
-                runs = 0;
-                rms_runs = new ArrayList();
+                this.newdata = true;
+                this.rms_runs = new double[10];
+                Arrays.fill(this.rms_runs, 0.0);
+                fxplot.setData("sqrt(N)", "R_rms", rms_runs, rms_runs);
                 getAnimScene.start();
                 runAnim.setText("STOP");
             }
