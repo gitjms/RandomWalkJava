@@ -1,6 +1,7 @@
 package randomwalkjava;
 
 import com.sun.glass.ui.Screen;
+import javafx.scene.image.Image;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -10,9 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
@@ -73,15 +72,15 @@ public class MainApp extends Application {
 
         ////////////////////////////////////////////////////
         // FILE AND FOLDER CHECK
-        String datapath = "C:\\DATA";
-        String sourcepath = System.getProperty("user.dir") + "\\src\\main\\resources\\lib\\";
+        String datapath = "C:/DATA";
+        String sourcepath = "lib/";
         String fexec = "walk.exe";
         String pyexecrms = "plotrms.py";
         String pyexec1d = "plot1d.py";
         String pyexec2d = "plot2d.py";
         String pyexec3d = "plot3d.py";
         File datafolder = new File(datapath);
-        File sourceFile = new File(datapath + "\\" + fexec);
+        File sourceFile = new File(datapath + "/" + fexec);
         boolean sourceFound = false;
         if (Files.notExists(datafolder.toPath())){
             sourceFound = createFolder(sourcepath, datapath, fexec, true);
@@ -103,25 +102,25 @@ public class MainApp extends Application {
             sourceFound = createFolder(sourcepath, datapath, fexec, false);
             if (sourceFound == false)
                 this.stop();
-            sourceFile = new File(datapath + "\\" + pyexecrms);
+            sourceFile = new File(datapath + "/" + pyexecrms);
             if (Files.notExists(sourceFile.toPath())) {
                 sourceFound = createFolder(sourcepath, datapath, pyexecrms, false);
                 if (sourceFound == false)
                     this.stop();
             }
-            sourceFile = new File(datapath + "\\" + pyexec1d);
+            sourceFile = new File(datapath + "/" + pyexec1d);
             if (Files.notExists(sourceFile.toPath())) {
                 sourceFound = createFolder(sourcepath, datapath, pyexec1d, false);
                 if (sourceFound == false)
                     this.stop();
             }
-            sourceFile = new File(datapath + "\\" + pyexec2d);
+            sourceFile = new File(datapath + "/" + pyexec2d);
             if (Files.notExists(sourceFile.toPath())) {
                 sourceFound = createFolder(sourcepath, datapath, pyexec2d, false);
                 if (sourceFound == false)
                     this.stop();
             }
-            sourceFile = new File(datapath + "\\" + pyexec3d);
+            sourceFile = new File(datapath + "/" + pyexec3d);
             if (Files.notExists(sourceFile.toPath())) {
                 sourceFound = createFolder(sourcepath, datapath, pyexec3d, false);
                 if (sourceFound == false)
@@ -805,6 +804,8 @@ public class MainApp extends Application {
         });
 
         stage.setScene(firstScene);
+        Image img = new Image("icon.png");
+        stage.getIcons().add(img);
 
         stage.show();
     }
@@ -826,8 +827,8 @@ public class MainApp extends Application {
             return false;
         }
 
-        File sourceFile = new File(source + "\\" + executable);
-        File destinationFile = new File(destination + "\\" + executable);
+        File sourceFile = new File(source + "/" + executable);
+        File destinationFile = new File(destination + "/" + executable);
         InputStream fin = null;
         OutputStream fout = null;
         //sourceFile.deleteOnExit();

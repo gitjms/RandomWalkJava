@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.BasicStroke; 
 import static java.awt.BasicStroke.CAP_SQUARE;
 import static java.awt.BasicStroke.JOIN_MITER;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 import org.knowm.xchart.XChartPanel;
@@ -107,6 +108,8 @@ public class FXPlot extends SceneAnim {
         this.calcChart.getStyler().setLegendFont(new java.awt.Font(null,0,18));
         this.calcChart.getStyler().setChartTitlePadding(15);
         this.setFrameTitle("Real Time R_rms");
+        ImageIcon icon = new ImageIcon("src/main/resources/images/icon.png");
+        this.frame.setIconImage(icon.getImage());
         this.setChartVis(false);
     }
 
