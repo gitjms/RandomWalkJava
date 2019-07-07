@@ -35,7 +35,15 @@ public class SceneAnim extends Data {
     }
  
     public SceneAnim() {
-        this.vars = new String[]{"0","0.0","0","0","-","-"};
+        this.vars = new String[]{
+            "0",    // particles
+            "0.0",  // seze
+            "0",    // steps
+            "0",    // dimension
+            "f",    // fixed
+            "-",    // lattice
+            "-",    // avoid
+            "-"};   // save
         this.running = false;
         this.runs = 1;
         this.rms_data = 0.0;
@@ -87,8 +95,8 @@ public class SceneAnim extends Data {
         double centerY = height/2;
 
         int num_part = Integer.valueOf(this.vars[0]);
-        int dim = Integer.valueOf(this.vars[3]);
         int num_steps = Integer.valueOf(this.vars[2]) + 1;
+        int dim = Integer.valueOf(this.vars[3]);
 
         double[] muistiX = new double[num_part];
         double[] muistiY = new double[num_part];
@@ -116,8 +124,8 @@ public class SceneAnim extends Data {
 
         try {
             command = new String[]{"cmd","/c",executable,
-                this.vars[0], this.vars[1], this.vars[2],
-                this.vars[3], this.vars[4], this.vars[5]};
+                this.vars[0], this.vars[1], this.vars[2], this.vars[3],
+                this.vars[4], this.vars[5], this.vars[6], this.vars[7]};
 
             // FOR DEBUGGING
             //FileOutputStream fos = new FileOutputStream(command[0]);

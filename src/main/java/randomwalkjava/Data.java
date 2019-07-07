@@ -41,15 +41,27 @@ public class Data {
         return this.vars[i];
     }
 
-    public String createData(File folderPath, String executable, boolean save) {
+    public Pair< Boolean, String > createData(File folderPath, String executable, boolean save) {
         String teksti = "";
         String[] command = null;
-
+        boolean ok = true;
+        String msg = "";
+        // vars from user:
+        // vars[0] = particles,
+        // vars[1] = size,
+        // vars[2] = steps,
+        // vars[3] = dimension,
+        // vars[4] = fixed,
+        // vars[5] = lattice,
+        // vars[6] = avoid,
+        // vars[7] = save
         try {
             command = new String[]{"cmd","/c",executable,
-                this.vars[0], this.vars[1], this.vars[2],
-                this.vars[3], this.vars[4], this.vars[5]};
-
+                this.vars[0], this.vars[1], this.vars[2], this.vars[3],
+                this.vars[4], this.vars[5], this.vars[6], this.vars[7]};
+            System.out.println("part: "+this.vars[0]+"\tsize: "+this.vars[1]+
+                "\tstep: "+this.vars[2]+"\tdim: "+this.vars[3]+"\tfix: "+this.vars[4]+
+                "\tlat: "+this.vars[5]+"\tavo: "+this.vars[6]+"\tsav: "+this.vars[7]);
             FileOutputStream fos = new FileOutputStream(command[0]);
             Runtime runtime = Runtime.getRuntime();
 
@@ -82,27 +94,35 @@ public class Data {
 
                 exitVal = process.waitFor();
                 if (exitVal == 0) {
-                    if (save == true)
-                        System.out.println(" Fortran execution ended with no errors");
+                    if (save == true) {
+                        msg = " Fortran execution ended with no errors";
+                        System.out.println(msg);
+                    }
                 } else {
                     if (save == true) {
-                        System.out.println(" Fortran execution ended with error code " + exitVal);
+                        msg = " Fortran execution ended with error code " + exitVal;
+                        System.out.println(msg);
                         runtime.addShutdownHook(new Message());
                     }
                     runtime.exit(exitVal);
                 }
                 fos.flush();
                 fos.close();
+            } catch (InterruptedException e) {
+                ok = false;
+                teksti = teksti + "\n" + msg + "\n" + e.getMessage();
             }
 
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             System.out.println(e.getMessage());
+            ok = false;
+            teksti = teksti + "\n" + e.getMessage();
         }
 
-        return teksti;
+        return new Pair(ok,teksti);
     }
 
-    public static Pair<String,List<Pair<Double,Double>>> readDataCalc(File filePath){
+    public static Pair< String, List< Pair< Double, Double > > > readDataCalc(File filePath){
     
         List<Pair<Double,Double>> data = new ArrayList<>();
         boolean first = false;

@@ -5,6 +5,7 @@ import com.sun.glass.ui.Screen;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javafx.scene.control.TextArea;
+import javafx.util.Pair;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -15,32 +16,50 @@ public class Execution {
     final int chartWidth = 860;
     final int chartHeight = 605;
     final int screenHeight = Screen.getMainScreen().getHeight();
-    final String path = "C:/DATA";
-    final String sourcepath = "lib/";
-    final String fexec = sourcepath + "walk.exe";
+    final String path = "C:\\DATA";
+    final String fexec = "walk.exe";
     
     public Execution() {
     }
 
     public void executeTrace(File folder, TextArea textArea, JFrame frame, Data data, String[] vars ) {
         // vars from user:
-        // vars[0] = particles, vars[1] = size, vars[2] = steps
-        // vars[3] = dimension, vars[4] = avoid, vars[5] = save
+        // vars[0] = particles,
+        // vars[1] = size,
+        // vars[2] = steps,
+        // vars[3] = dimension,
+        // vars[4] = fixed,
+        // vars[5] = lattice,
+        // vars[6] = avoid,
+        // vars[7] = save
         String pyexec1d = "python plot1d.py";
         String pyexec2d = "python plot2d.py";
         String pyexec3d = "python plot3d.py";
         String xDataPath = "";
         String yDataPath = "";
         String zDataPath = "";
+        String titletext = "";
         BufferedImage image = null;
 
-        textArea.setText(data.createData(folder, fexec, true));
+        Pair<Boolean, String> result = data.createData(folder, fexec, true);
+        textArea.setText(result.getValue());
+        if (result.getKey() == false)
+            return;
 
         int particles = Integer.valueOf(vars[0]);
         int steps = Integer.valueOf(vars[2]);
         int dimension = Integer.valueOf(vars[3]);
 
-        xDataPath = path + "/" + "x_path"
+        if ( vars[4].equals("f") && vars[5].equals("l") )
+            titletext = "Fixed source lattice particles, ";
+        else if ( vars[4].equals("f") && vars[5].equals("-") )
+            titletext = "Fixed source free particles, ";
+        else if ( vars[4].equals("-") && vars[5].equals("l") )
+            titletext = "Spread out lattice particles, ";
+        else if ( vars[4].equals("-") && vars[5].equals("-") )
+            titletext = "Spread out free particles, ";
+
+        xDataPath = path + "\\" + "x_path"
             + dimension + "D_"
             + particles + "N_"
             + steps + "S.xy";
@@ -58,7 +77,7 @@ public class Execution {
 
         // 2D DATA
         if ( dimension == 2 || dimension == 3 ) {
-            yDataPath = path + "/" + "y_path"
+            yDataPath = path + "\\" + "y_path"
                 + dimension + "D_"
                 + particles + "N_"
                 + steps + "S.xy";
@@ -73,7 +92,7 @@ public class Execution {
                 
         // 3D DATA
         if ( dimension == 3 ) {
-            zDataPath = path + "/" + "z_path"
+            zDataPath = path + "\\" + "z_path"
                 + dimension + "D_"
                 + particles + "N_"
                 + steps + "S.xy";
@@ -87,11 +106,11 @@ public class Execution {
         frame.getContentPane().removeAll();
         frame.setTitle("Random Walk - Path Tracing");
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        JLabel titleLabel = new JLabel("N=" + particles + ", " + steps + " steps");
+        JLabel titleLabel = new JLabel(titletext + "N=" + particles + ", " + steps + " steps");
         java.awt.Font labelFont = titleLabel.getFont();
         int newFontSize = (int)(labelFont.getSize() * 1.5);
         titleLabel.setFont(new java.awt.Font(labelFont.getName(), java.awt.Font.PLAIN, newFontSize));
-        titleLabel.setBounds(chartWidth/2-50,0,chartWidth/2+150,newFontSize);
+        titleLabel.setBounds(chartWidth/2-150,0,chartWidth/2+150,newFontSize);
         // PLOT
         ImageIcon figIcn = new ImageIcon(image);
         JLabel figLabel = new JLabel(figIcn);
@@ -104,19 +123,38 @@ public class Execution {
     }
 
     public void executeRms(File folder, TextArea textArea, JFrame frame, Data data, String[] vars ) {
-        // vars from user:
-        // vars[0] = particles, vars[1] = size, vars[2] = steps
-        // vars[3] = dimension, vars[4] = avoid, vars[5] = save
+        // vars[0] = particles,
+        // vars[1] = size,
+        // vars[2] = steps,
+        // vars[3] = dimension,
+        // vars[4] = fixed,
+        // vars[5] = lattice,
+        // vars[6] = avoid,
+        // vars[7] = save
         String pyexecrms = "python plotrms.py";
         String rmsDataPath = "";
+        String titletext = "";
         BufferedImage imagerms = null;
 
-        textArea.setText(data.createData(folder, fexec, true));
+        Pair<Boolean, String> result = data.createData(folder, fexec, true);
+        textArea.setText(result.getValue());
+        if (result.getKey() == false)
+            return;
+
         int steps = Integer.valueOf(vars[2]);
         int dimension = Integer.valueOf(vars[3]);
+
+        if ( vars[4].equals("f") && vars[5].equals("l") )
+            titletext = "Fixed source lattice particles, ";
+        else if ( vars[4].equals("f") && vars[5].equals("-") )
+            titletext = "Fixed source free particles, ";
+        else if ( vars[4].equals("-") && vars[5].equals("l") )
+            titletext = "Spread out lattice particles, ";
+        else if ( vars[4].equals("-") && vars[5].equals("-") )
+            titletext = "Spread out free particles, ";
                 
         rmsDataPath = path
-            + "/" + "rms_"
+            + "\\" + "rms_"
             + dimension + "D_"
             + steps + "S.xy";
 
@@ -130,13 +168,11 @@ public class Execution {
         frame.getContentPane().removeAll();
         frame.setTitle("Random Walk - R_rms Calculation");
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        JLabel titleLabel = new JLabel(
-            dimension + "D, " + 
-            steps + " steps");
+        JLabel titleLabel = new JLabel(titletext + dimension + "D, " + steps + " steps");
         java.awt.Font labelFont = titleLabel.getFont();
         int newFontSize = (int)(labelFont.getSize() * 1.5);
         titleLabel.setFont(new java.awt.Font(labelFont.getName(), java.awt.Font.PLAIN, newFontSize));
-        titleLabel.setBounds(chartWidth/2-50,0,chartWidth/2+150,newFontSize);
+        titleLabel.setBounds(chartWidth/2-150,0,chartWidth/2+150,newFontSize);
 
         ImageIcon figIcn = new ImageIcon(imagerms);
         JLabel figLabel = new JLabel(figIcn);

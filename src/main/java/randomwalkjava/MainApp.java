@@ -46,11 +46,11 @@ public class MainApp extends Application {
     final int chartHeight = 605;
     // STAGE
     final int stageWidth = 940;
-    final int stageHeight = 580;
+    final int stageHeight = 600;
     // COMPONENTS
     final int buttonWidth = 150;
     final int textwidth = 740;
-    final int textheight = 520;
+    final int textheight = 540;
     final int animwidth = 900;
     final int animheight = 900;
     final int paneWidth = 200;
@@ -72,15 +72,15 @@ public class MainApp extends Application {
 
         ////////////////////////////////////////////////////
         // FILE AND FOLDER CHECK
-        String datapath = "C:/DATA";
-        String sourcepath = "lib/";
+        String datapath = "C:\\DATA";
+        String sourcepath = "lib\\";
         String fexec = "walk.exe";
         String pyexecrms = "plotrms.py";
         String pyexec1d = "plot1d.py";
         String pyexec2d = "plot2d.py";
         String pyexec3d = "plot3d.py";
         File datafolder = new File(datapath);
-        File sourceFile = new File(datapath + "/" + fexec);
+        File sourceFile = new File(datapath + "\\" + fexec);
         boolean sourceFound = false;
         if (Files.notExists(datafolder.toPath())){
             sourceFound = createFolder(sourcepath, datapath, fexec, true);
@@ -102,25 +102,25 @@ public class MainApp extends Application {
             sourceFound = createFolder(sourcepath, datapath, fexec, false);
             if (sourceFound == false)
                 this.stop();
-            sourceFile = new File(datapath + "/" + pyexecrms);
+            sourceFile = new File(datapath + "\\" + pyexecrms);
             if (Files.notExists(sourceFile.toPath())) {
                 sourceFound = createFolder(sourcepath, datapath, pyexecrms, false);
                 if (sourceFound == false)
                     this.stop();
             }
-            sourceFile = new File(datapath + "/" + pyexec1d);
+            sourceFile = new File(datapath + "\\" + pyexec1d);
             if (Files.notExists(sourceFile.toPath())) {
                 sourceFound = createFolder(sourcepath, datapath, pyexec1d, false);
                 if (sourceFound == false)
                     this.stop();
             }
-            sourceFile = new File(datapath + "/" + pyexec2d);
+            sourceFile = new File(datapath + "\\" + pyexec2d);
             if (Files.notExists(sourceFile.toPath())) {
                 sourceFound = createFolder(sourcepath, datapath, pyexec2d, false);
                 if (sourceFound == false)
                     this.stop();
             }
-            sourceFile = new File(datapath + "/" + pyexec3d);
+            sourceFile = new File(datapath + "\\" + pyexec3d);
             if (Files.notExists(sourceFile.toPath())) {
                 sourceFound = createFolder(sourcepath, datapath, pyexec3d, false);
                 if (sourceFound == false)
@@ -578,7 +578,9 @@ public class MainApp extends Application {
         Scene noCalcScene = new Scene(asetteluNoCalc,stageWidth,stageHeight);
         noCalcScene.getStylesheets().add("/styles/Styles.css");
 
-        Scene animScene = new Scene(asetteluAnim,stageWidth+(animwidth-textwidth),stageHeight+(animheight-textheight));
+        Scene animScene = new Scene(asetteluAnim,
+            stageWidth + (animwidth-textwidth),
+            stageHeight + (animheight-textheight));
         animScene.getStylesheets().add("/styles/Styles.css");
 
         ////////////////////////////////////////////////////
@@ -627,6 +629,8 @@ public class MainApp extends Application {
             stage.setTitle("Random Walk");
             if (textAreaAnim.getText().equals(helpTextAnim()))
                 textAreaMenu.setText(welcomeText());
+            else
+                textAreaMenu.clear();
             stage.setX(screenWidth/2);
             stage.setY((screenHeight-stageHeight)/2);
             stage.setResizable(true);
@@ -670,7 +674,7 @@ public class MainApp extends Application {
         // ANIMATION TIMER FOR REAL TIME RANDOM WALK
         new AnimationTimer() {
             // päivitetään animaatiota noin 100 millisekunnin välein
-            private long sleepNanoseconds = 100 * 1000000;
+            private final long sleepNanoseconds = 100 * 1000000;
             private long prevTime = 0;
             private int dim;
 
@@ -804,7 +808,7 @@ public class MainApp extends Application {
         });
 
         stage.setScene(firstScene);
-        Image img = new Image("icon.png");
+        Image img = new Image("images/icon.png");
         stage.getIcons().add(img);
 
         stage.show();
@@ -827,8 +831,8 @@ public class MainApp extends Application {
             return false;
         }
 
-        File sourceFile = new File(source + "/" + executable);
-        File destinationFile = new File(destination + "/" + executable);
+        File sourceFile = new File(source + "\\" + executable);
+        File destinationFile = new File(destination + "\\" + executable);
         InputStream fin = null;
         OutputStream fout = null;
         //sourceFile.deleteOnExit();
@@ -931,18 +935,19 @@ public class MainApp extends Application {
                     + "      ///    //   /////     ////  // ///   // ///      //   //// ////\n"
                     + "     ///   //    /// //    ///// // ///    /////       //  //////////\n"
                     + "    //////      ///  //   /// //// ///     ////        // /// //// //\n"
-                    + "   ///   //    ////////  ///  /// ///     /////       // ///  ///  //\n"
-                    + "  ///     //  ///    // ///   // ///    //  ///     //  ///   //   //\n"
-                    + " ///     /// ///     /////    / ///////       //////   ///         //\n"
-                    + "\n\n"
-                    + "               ///           // ///       ///       ///   //\n"
-                    + "               ///          // ////      ///       ///   //\n"
-                    + "               ///         // /////     ///       ///  //\n"
-                    + "               ///   //   // /// //    ///       /////\n"
-                    + "               ///  ///  // ///  //   ///       /////\n"
-                    + "               /// //// // ////////  ///       ///  //\n"
-                    + "               ///// //// ///    // ///       ///    //\n"
-                    + "               ////  /// ///     /////////// ///     ///";
+                    + "   ///   //    // ----------------------------------  // ///  ///  //\n"
+                    + "  ///     //  // |                                  | / ///   //   //\n"
+                    + " ///     /// /// |           Jari Sunnari           |  ///         //\n"
+                    + "                 |       Kandidaatintutkielma       |                \n"
+                    + "                 |                                  |                \n"
+                    + "       ////      |               2019               |    ////  ////  \n"
+                    + "       ////      |                                  |   ////  ////   \n"
+                    + "       ////       ----------------------------------   //// ////     \n"
+                    + "       ////          ////  ////  ////      ////       ///////        \n"
+                    + "       ////  ////   ////  ////   ////     ////       ////////        \n"
+                    + "       //// ////// ////  ////////////    ////       ////   ////      \n"
+                    + "       /////// ///////  ////     ////   ////       ////    ////      \n"
+                    + "       //////  //////  ////      ////  /////////  ////     /////       ";
     
         return text;
     }
