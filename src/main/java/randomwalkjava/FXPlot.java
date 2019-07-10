@@ -14,7 +14,7 @@ import org.knowm.xchart.XYChartBuilder;
 import org.knowm.xchart.XYSeries.XYSeriesRenderStyle;
 import org.knowm.xchart.style.Styler.ChartTheme;
 
-public class FXPlot extends SceneAnim {
+public class FXPlot extends SceneAnimation {
 
     final int width = 800;
     final int height = 600;
@@ -90,7 +90,7 @@ public class FXPlot extends SceneAnim {
         this.frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.calcChart = new XYChartBuilder()
             .theme(ChartTheme.Matlab).build();
-        this.setBounds(screenheight);
+        this.frame.setBounds(0, (screenheight-height)/2, width, height);
         this.chartPanel = new XChartPanel(calcChart);
         this.setXaxtitle(true);
         this.setYaxtitle(true);

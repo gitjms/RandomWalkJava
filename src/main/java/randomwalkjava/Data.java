@@ -48,20 +48,25 @@ public class Data {
         String msg = "";
         // vars from user:
         // vars[0] = particles,
-        // vars[1] = size,
-        // vars[2] = steps,
-        // vars[3] = dimension,
-        // vars[4] = fixed,
-        // vars[5] = lattice,
-        // vars[6] = avoid,
-        // vars[7] = save
+        // vars[1] = diameter,
+        // vars[2] = charge,
+        // vars[3] = steps,
+        // vars[4] = dimension,
+        // vars[5] = temperature,
+        // vars[6] = fixed,
+        // vars[7] = lattice,
+        // vars[8] = avoid,
+        // vars[9] = save
         try {
             command = new String[]{"cmd","/c",executable,
                 this.vars[0], this.vars[1], this.vars[2], this.vars[3],
-                this.vars[4], this.vars[5], this.vars[6], this.vars[7]};
-            System.out.println("part: "+this.vars[0]+"\tsize: "+this.vars[1]+
-                "\tstep: "+this.vars[2]+"\tdim: "+this.vars[3]+"\tfix: "+this.vars[4]+
-                "\tlat: "+this.vars[5]+"\tavo: "+this.vars[6]+"\tsav: "+this.vars[7]);
+                this.vars[4], this.vars[5], this.vars[6], this.vars[7],
+                this.vars[8], this.vars[9]};
+            System.out.println("part: "+this.vars[0]+"\tdiam: "+this.vars[1]+
+                "\tchar: "+this.vars[2]+"\tstep: "+this.vars[3]+
+                "\tdim: "+this.vars[4]+"\ttemp: "+this.vars[5]+
+                "\tfix: "+this.vars[6]+"\tlatt: "+this.vars[7]+
+                "\tavo: "+this.vars[8]+"\tsave: "+this.vars[9]);
             FileOutputStream fos = new FileOutputStream(command[0]);
             Runtime runtime = Runtime.getRuntime();
 
@@ -149,7 +154,7 @@ public class Data {
         return new Pair(header,data);
     }
 
-    public static Pair<String,List<Double[]>> readDataNoCalc(File filePath, Integer particles){
+    public static Pair<String,List<Double[]>> readDataSim(File filePath, Integer particles){
     
         Double[] values = new Double[particles];
         List<Double[]> dataList = new ArrayList<>();

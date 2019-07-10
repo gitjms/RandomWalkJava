@@ -22,16 +22,19 @@ public class Execution {
     public Execution() {
     }
 
-    public void executeTrace(File folder, TextArea textArea, JFrame frame, Data data, String[] vars ) {
+    public void executeSim(File folder, TextArea textArea, JFrame frame, Data data, String[] vars ) {
+        // FROM SCENENOCALCULATION
         // vars from user:
         // vars[0] = particles,
-        // vars[1] = size,
-        // vars[2] = steps,
-        // vars[3] = dimension,
-        // vars[4] = fixed,
-        // vars[5] = lattice,
-        // vars[6] = avoid,
-        // vars[7] = save
+        // vars[1] = diameter,
+        // vars[2] = charge,
+        // vars[3] = steps,
+        // vars[4] = dimension,
+        // vars[5] = temperature,
+        // vars[6] = fixed,
+        // vars[7] = lattice,
+        // vars[8] = avoid,
+        // vars[9] = save           n/a
         String pyexec1d = "python plot1d.py";
         String pyexec2d = "python plot2d.py";
         String pyexec3d = "python plot3d.py";
@@ -47,17 +50,25 @@ public class Execution {
             return;
 
         int particles = Integer.valueOf(vars[0]);
-        int steps = Integer.valueOf(vars[2]);
-        int dimension = Integer.valueOf(vars[3]);
+        int steps = Integer.valueOf(vars[3]);
+        int dimension = Integer.valueOf(vars[4]);
 
-        if ( vars[4].equals("f") && vars[5].equals("l") )
-            titletext = "Fixed source lattice particles, ";
-        else if ( vars[4].equals("f") && vars[5].equals("-") )
-            titletext = "Fixed source free particles, ";
-        else if ( vars[4].equals("-") && vars[5].equals("l") )
-            titletext = "Spread out lattice particles, ";
-        else if ( vars[4].equals("-") && vars[5].equals("-") )
-            titletext = "Spread out free particles, ";
+        if ( vars[6].equals("f") && vars[7].equals("l") && vars[8].equals("a") )
+            titletext = "Fixed source lattice particles, avoid, ";
+        else if ( vars[6].equals("f") && vars[7].equals("l") && vars[8].equals("-") )
+            titletext = "Fixed source lattice particles, no avoid, ";
+        else if ( vars[6].equals("f") && vars[7].equals("-") && vars[8].equals("a") )
+            titletext = "Fixed source free particles, avoid, ";
+        else if ( vars[6].equals("f") && vars[7].equals("-") && vars[8].equals("-") )
+            titletext = "Fixed source free particles, no avoid, ";
+        else if ( vars[6].equals("-") && vars[7].equals("l") && vars[8].equals("a") )
+            titletext = "Spread out lattice particles, avoid, ";
+        else if ( vars[6].equals("-") && vars[7].equals("l") && vars[8].equals("-") )
+            titletext = "Spread out lattice particles, no avoid, ";
+        else if ( vars[6].equals("-") && vars[7].equals("-") && vars[8].equals("a") )
+            titletext = "Spread out free particles, avoid, ";
+        else if ( vars[6].equals("-") && vars[7].equals("-") && vars[8].equals("-") )
+            titletext = "Spread out free particles, no avoid, ";
 
         xDataPath = path + "\\" + "x_path"
             + dimension + "D_"
@@ -110,7 +121,7 @@ public class Execution {
         java.awt.Font labelFont = titleLabel.getFont();
         int newFontSize = (int)(labelFont.getSize() * 1.5);
         titleLabel.setFont(new java.awt.Font(labelFont.getName(), java.awt.Font.PLAIN, newFontSize));
-        titleLabel.setBounds(chartWidth/2-150,0,chartWidth/2+150,newFontSize);
+        titleLabel.setBounds(chartWidth/2-200,0,chartWidth/2+150,newFontSize);
         // PLOT
         ImageIcon figIcn = new ImageIcon(image);
         JLabel figLabel = new JLabel(figIcn);
@@ -123,14 +134,18 @@ public class Execution {
     }
 
     public void executeRms(File folder, TextArea textArea, JFrame frame, Data data, String[] vars ) {
-        // vars[0] = particles,
-        // vars[1] = size,
-        // vars[2] = steps,
-        // vars[3] = dimension,
-        // vars[4] = fixed,
-        // vars[5] = lattice,
-        // vars[6] = avoid,
-        // vars[7] = save
+        // FROM SCENECALCULATION
+        // vars from user:
+        // vars[0] = particles,     n/a
+        // vars[1] = diameter,
+        // vars[2] = charge,        n/a
+        // vars[3] = steps,
+        // vars[4] = dimension,
+        // vars[5] = temperature,   n/a
+        // vars[6] = fixed,         n/a
+        // vars[7] = lattice,
+        // vars[8] = avoid,         n/a
+        // vars[9] = save           n/a
         String pyexecrms = "python plotrms.py";
         String rmsDataPath = "";
         String titletext = "";
@@ -138,19 +153,20 @@ public class Execution {
 
         Pair<Boolean, String> result = data.createData(folder, fexec, true);
         textArea.setText(result.getValue());
+
         if (result.getKey() == false)
             return;
 
-        int steps = Integer.valueOf(vars[2]);
-        int dimension = Integer.valueOf(vars[3]);
+        int steps = Integer.valueOf(vars[3]);
+        int dimension = Integer.valueOf(vars[4]);
 
-        if ( vars[4].equals("f") && vars[5].equals("l") )
+        if ( vars[6].equals("f") && vars[7].equals("l") )
             titletext = "Fixed source lattice particles, ";
-        else if ( vars[4].equals("f") && vars[5].equals("-") )
+        else if ( vars[6].equals("f") && vars[7].equals("-") )
             titletext = "Fixed source free particles, ";
-        else if ( vars[4].equals("-") && vars[5].equals("l") )
+        else if ( vars[6].equals("-") && vars[7].equals("l") )
             titletext = "Spread out lattice particles, ";
-        else if ( vars[4].equals("-") && vars[5].equals("-") )
+        else if ( vars[6].equals("-") && vars[7].equals("-") )
             titletext = "Spread out free particles, ";
                 
         rmsDataPath = path

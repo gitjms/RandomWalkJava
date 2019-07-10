@@ -16,32 +16,34 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
-public class SceneNoCalculation extends Data {
+public class SceneSimulation extends Data {
     
     final int compwidth = 150;
     final int paneWidth = 200;
-    private final Button nappiAvoid;
     private final Button nappiFixed;
     private final Button nappiLattice;
+    private final Button nappiAvoid;
 
     @Override
     public String[] getVars() {
         return this.vars;
     }
  
-    public SceneNoCalculation() {
+    public SceneSimulation() {
         this.nappiFixed = new Button("FIXED");
         this.nappiLattice = new Button("FREE");
         this.nappiAvoid = new Button("AVOID OFF");
         this.vars = new String[]{
-            "0",    // particles
-            "0.0",  // size
-            "0",    // steps
-            "0",    // dimension
-            "f",    // fixed(/spread)
-            "-",    // (lattice/)free
-            "-",    // avoid on/off
-            "s"};   // save     n/a
+            "0",    // vars[0] particles        USER
+            "0.0",  // vars[1] diameter         USER
+            "0",    // vars[2] charge           USER
+            "0",    // vars[3] steps            USER
+            "0",    // vars[4] dimension        USER
+            "0",    // vars[5] temperature      n/a
+            "f",    // vars[6] fixed(/spread)   USER
+            "-",    // vars[7] (lattice/)free   USER
+            "a",    // vars[8] avoid on(/off)   USER
+            "s"};   // vars[9] save (on)        n/a
     }
 
     public static boolean isNumDouble(String str) {
@@ -63,7 +65,7 @@ public class SceneNoCalculation extends Data {
     }
 
     // RANDOM WALK SIMULATION
-    public Parent getSceneNoCalc(){
+    public Parent getSceneSim(){
         GridPane asettelu = new GridPane();
         asettelu.setMaxWidth(paneWidth);
         asettelu.setVgap(5);
@@ -92,20 +94,56 @@ public class SceneNoCalculation extends Data {
         Label labSizeParticles = new Label("diameter of particle:");
         TextField setSizeParticles = new TextField("");
         setSizeParticles.setOnKeyReleased(e -> {
-            this.vars[1] = setSizeParticles.getText().trim();
+            if ( this.vars[2].equals("0") || this.vars[8].equals("-") ) {
+                if (isNumInteger(setSizeParticles.getText().trim())){
+                    if (!setSizeParticles.getText().trim().equals("0.1")){
+                        setSizeParticles.setText("0.1");
+                        this.vars[1] = "0.1";
+                    }
+                }
+            } else
+                this.vars[1] = setSizeParticles.getText().trim();
+        });
+
+        Label labCharge = new Label("charge of particles:");
+        TextField setCharge = new TextField("");
+        setCharge.setOnKeyReleased(e -> {
+            if (isNumInteger(setCharge.getText().trim())){
+                if (setCharge.getText().trim().equals("0")){
+                    setSizeParticles.setText("0.1");
+                    this.vars[1] = "0.1";
+                    this.nappiAvoid.setText("AVOID OFF");
+                    this.nappiAvoid.setBackground(
+                        new Background(new BackgroundFill(
+                            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+                    this.vars[1] = "0.1";   // diameter
+                    this.vars[2] = "0";     // charge
+                    this.vars[8] = "-";     // avoid
+                } else {
+                    this.vars[2] = setCharge.getText().trim();
+                    this.nappiAvoid.setText("AVOID ON");
+                    this.nappiAvoid.setBackground(
+                        new Background(
+                            new BackgroundFill(
+                                Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
+                    this.vars[8] = "a";
+                }
+            }
         });
 
         Label labNumSteps = new Label("number of steps:");
         TextField setNumSteps = new TextField("");
         setNumSteps.setOnKeyReleased(e -> {
-            this.vars[2] = setNumSteps.getText().trim();
+            this.vars[3] = setNumSteps.getText().trim();
         });
 
         Label labNumDimensions = new Label("dimensions:");
         TextField setNumDimensions = new TextField("");
         setNumDimensions.setOnKeyReleased(e -> {
-            this.vars[3] = setNumDimensions.getText().trim();
+            this.vars[4] = setNumDimensions.getText().trim();
         });
+
+        // this.vars[5] = "0" temperature      n/a
 
         // ...THEIR PLACEMENTS
         GridPane.setHalignment(labNumParticles, HPos.LEFT);
@@ -122,19 +160,26 @@ public class SceneNoCalculation extends Data {
         setSizeParticles.setMaxWidth(compwidth);
         asettelu.add(setSizeParticles, 0, 3);
 
+        GridPane.setHalignment(labCharge, HPos.LEFT);
+        asettelu.add(labCharge, 0, 4);
+        GridPane.setHalignment(setCharge, HPos.CENTER);
+        setCharge.setMinWidth(compwidth);
+        setCharge.setMaxWidth(compwidth);
+        asettelu.add(setCharge, 0, 5);
+
         GridPane.setHalignment(labNumSteps, HPos.LEFT);
-        asettelu.add(labNumSteps, 0, 4);
+        asettelu.add(labNumSteps, 0, 6);
         GridPane.setHalignment(setNumSteps, HPos.CENTER);
         setNumSteps.setMinWidth(compwidth);
         setNumSteps.setMaxWidth(compwidth);
-        asettelu.add(setNumSteps, 0, 5);
+        asettelu.add(setNumSteps, 0, 7);
         
         GridPane.setHalignment(labNumDimensions, HPos.LEFT);
-        asettelu.add(labNumDimensions, 0, 6);
+        asettelu.add(labNumDimensions, 0, 8);
         GridPane.setHalignment(setNumDimensions, HPos.CENTER);
         setNumDimensions.setMinWidth(compwidth);
         setNumDimensions.setMaxWidth(compwidth);
-        asettelu.add(setNumDimensions, 0, 7);
+        asettelu.add(setNumDimensions, 0, 9);
 
         // BUTTON: FIXED
         this.nappiFixed.setMinWidth(compwidth);
@@ -159,17 +204,16 @@ public class SceneNoCalculation extends Data {
                     new Background(
                         new BackgroundFill(
                             Color.ORANGE,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[4] = "f";
+                this.vars[6] = "f";
             } else if (this.nappiFixed.getText().equals("FIXED")){
                 // BUTTON PRESSED OFF
                 this.nappiFixed.setText("SPREAD");
                 this.nappiFixed.setBackground(
                     new Background(new BackgroundFill(
                         Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[4] = "-";
+                this.vars[6] = "-";
             }
         });
-
         valikko.getChildren().add(this.nappiFixed);
 
         // BUTTON: LATTICE
@@ -195,17 +239,16 @@ public class SceneNoCalculation extends Data {
                     new Background(
                         new BackgroundFill(
                             Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[5] = "-";
+                this.vars[7] = "-";
             } else if (this.nappiLattice.getText().equals("FREE")){
                 // BUTTON PRESSED OFF
                 this.nappiLattice.setText("LATTICE");
                 this.nappiLattice.setBackground(
                     new Background(new BackgroundFill(
                         Color.ORANGE,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[5] = "l";
+                this.vars[7] = "l";
             }
         });
-
         valikko.getChildren().add(this.nappiLattice);
 
         // BUTTON: AVOID
@@ -213,7 +256,7 @@ public class SceneNoCalculation extends Data {
         this.nappiAvoid.setMaxWidth(compwidth);
         this.nappiAvoid.setBackground(new Background(
             new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+                Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
         this.nappiAvoid.setId("avoid");
         this.nappiAvoid.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
@@ -231,27 +274,33 @@ public class SceneNoCalculation extends Data {
                     new Background(
                         new BackgroundFill(
                             Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[6] = "a";
+                this.vars[2] = setSizeParticles.getText().trim();
+                setSizeParticles.clear();
+                setCharge.clear();
+                this.vars[8] = "a";
             } else if (this.nappiAvoid.getText().equals("AVOID ON")){
                 // BUTTON PRESSED OFF
                 this.nappiAvoid.setText("AVOID OFF");
                 this.nappiAvoid.setBackground(
                     new Background(new BackgroundFill(
                         Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[6] = "-";
+                setCharge.setText("0");
+                setSizeParticles.setText("0.1");
+                this.vars[1] = "0.1";   // diameter
+                this.vars[2] = "0";     // charge
+                this.vars[8] = "-";     // avoid
             }
         });
-
         valikko.getChildren().add(this.nappiAvoid);
 
-        // this.vars[7] = "-" (save)    n/a
+        // this.vars[9] = "s" save on
 
         GridPane.setHalignment(valikko, HPos.LEFT);
-        asettelu.add(valikko, 0, 8, 2, 1);
+        asettelu.add(valikko, 0, 10, 2, 1);
 
         final Pane empty = new Pane();
         GridPane.setHalignment(empty, HPos.CENTER);
-        asettelu.add(empty, 0, 9, 2, 1);
+        asettelu.add(empty, 0, 11, 2, 1);
 
        return asettelu;
     }

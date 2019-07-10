@@ -20,7 +20,6 @@ public class SceneCalculation extends Data {
 
     final int compwidth = 150;
     final int paneWidth = 200;
-    private final Button nappiFixed;
     private final Button nappiLattice;
 
     @Override
@@ -29,17 +28,18 @@ public class SceneCalculation extends Data {
     }
  
     public SceneCalculation() {
-        this.nappiFixed = new Button("FIXED");
         this.nappiLattice = new Button("FREE");
         this.vars = new String[]{
-            "0",    // particles
-            "0.0",  // size
-            "0",    // steps
-            "0",    // dimension
-            "f",    // fixed(/spread)
-            "-",    // (lattice/)free
-            "-",    // avoid on/off
-            "s"};   // save
+            "0",    // vars[0] particles        n/a
+            "0.1",  // vars[1] diameter         n/a
+            "0",    // vars[2] charge           n/a
+            "0",    // vars[3] steps            USER
+            "0",    // vars[4] dimension        USER
+            "0",    // vars[5] temperature      n/a
+            "f",    // vars[6] fixed(/spread)   n/a
+            "-",    // vars[7] (lattice/)free   USER
+            "-",    // vars[8] avoid (on/)off   n/a
+            "s"};   // vars[9] save (on)        n/a
     }
 
     public static boolean isNumDouble(String str) {
@@ -75,87 +75,39 @@ public class SceneCalculation extends Data {
 
         // COMPONENTS...
         // this.vars[0] = "0" (amount of particles)
+        // this.vars[1] = "0.1" (diameter of particl)
+        // this.vars[2] = "0" (charge of particles)
 
-        Label labSizeParticles = new Label("diameter of particle:");
-        TextField setSizeParticles = new TextField("");
-        setSizeParticles.setOnKeyReleased(e -> {
-            this.vars[1] = setSizeParticles.getText().trim();
-        });
-        
         Label labNumSteps = new Label("number of steps:");
         TextField setNumSteps = new TextField("");
         setNumSteps.setOnKeyReleased(e -> {
-            this.vars[2] = setNumSteps.getText().trim();
+            this.vars[3] = setNumSteps.getText().trim();
         });
 
         Label labNumDimensions = new Label("dimensions:");
         TextField setNumDimensions = new TextField("");
         setNumDimensions.setOnKeyReleased(e -> {
-            this.vars[3] = setNumDimensions.getText().trim();
+            this.vars[4] = setNumDimensions.getText().trim();
         });
 
-        // this.vars[4] = "f" (fixed)
-        // this.vars[5] = "-" (lattice)
-        // this.vars[6] = "-" (avoid)   n/a
-        // this.vars[7] = "-" (save)    n/a
-        
-        // ...THEIR PLACEMENTS
-        GridPane.setHalignment(labSizeParticles, HPos.LEFT);
-        asettelu.add(labSizeParticles, 0, 0);
-        GridPane.setHalignment(setSizeParticles, HPos.CENTER);
-        setSizeParticles.setMinWidth(compwidth);
-        setSizeParticles.setMaxWidth(compwidth);
-        asettelu.add(setSizeParticles, 0, 1);
+        // this.vars[5] = "0" temperature
 
+        // ...THEIR PLACEMENTS
         GridPane.setHalignment(labNumSteps, HPos.LEFT);
-        asettelu.add(labNumSteps, 0, 2);
+        asettelu.add(labNumSteps, 0, 0);
         GridPane.setHalignment(setNumSteps, HPos.CENTER);
         setNumSteps.setMinWidth(compwidth);
         setNumSteps.setMaxWidth(compwidth);
-        asettelu.add(setNumSteps, 0, 3);
+        asettelu.add(setNumSteps, 0, 1);
         
         GridPane.setHalignment(labNumDimensions, HPos.LEFT);
-        asettelu.add(labNumDimensions, 0, 4);
+        asettelu.add(labNumDimensions, 0, 2);
         GridPane.setHalignment(setNumDimensions, HPos.CENTER);
         setNumDimensions.setMinWidth(compwidth);
         setNumDimensions.setMaxWidth(compwidth);
-        asettelu.add(setNumDimensions, 0, 5);
+        asettelu.add(setNumDimensions, 0, 3);
 
-        // BUTTON: FIXED
-        this.nappiFixed.setMinWidth(compwidth);
-        this.nappiFixed.setMaxWidth(compwidth);
-        this.nappiFixed.setBackground(new Background(
-            new BackgroundFill(
-                Color.ORANGE,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.nappiFixed.setId("fixed");
-        this.nappiFixed.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                this.nappiFixed.setEffect(shadow);
-        });
-        this.nappiFixed.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                this.nappiFixed.setEffect(null);
-        });
-        this.nappiFixed.setOnMouseClicked((MouseEvent event) -> {
-            if (this.nappiFixed.getText().equals("SPREAD")){
-                // BUTTON PRESSED ON
-                this.nappiFixed.setText("FIXED");
-                this.nappiFixed.setBackground(
-                    new Background(
-                        new BackgroundFill(
-                            Color.ORANGE,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[4] = "f";
-            } else if (this.nappiFixed.getText().equals("FIXED")){
-                // BUTTON PRESSED OFF
-                this.nappiFixed.setText("SPREAD");
-                this.nappiFixed.setBackground(
-                    new Background(new BackgroundFill(
-                        Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[4] = "-";
-            }
-        });
-
-        valikko.getChildren().add(this.nappiFixed);
+        // this.vars[6] = "f" fixed(/spread)
 
         // BUTTON: LATTICE
         this.nappiLattice.setMinWidth(compwidth);
@@ -180,29 +132,31 @@ public class SceneCalculation extends Data {
                     new Background(
                         new BackgroundFill(
                             Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[5] = "-";
+                this.vars[7] = "-";
             } else if (this.nappiLattice.getText().equals("FREE")){
                 // BUTTON PRESSED OFF
                 this.nappiLattice.setText("LATTICE");
                 this.nappiLattice.setBackground(
                     new Background(new BackgroundFill(
                         Color.ORANGE,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[5] = "l";
+                this.vars[7] = "l";
             }
         });
-
         valikko.getChildren().add(this.nappiLattice);
 
+        // this.vars[8] = "-" avoid off
+        // this.vars[9] = "s" save on
+
         GridPane.setHalignment(valikko, HPos.LEFT);
-        asettelu.add(valikko, 0, 6, 2, 1);
+        asettelu.add(valikko, 0, 4, 2, 1);
 
         final Pane empty1 = new Pane();
         GridPane.setHalignment(empty1, HPos.CENTER);
-        asettelu.add(empty1, 0, 7, 2, 1);
+        asettelu.add(empty1, 0, 5, 2, 1);
 
         final Pane empty2 = new Pane();
         GridPane.setHalignment(empty2, HPos.CENTER);
-        asettelu.add(empty2, 0, 8, 2, 1);
+        asettelu.add(empty2, 0, 6, 2, 1);
 
         return asettelu;
     }

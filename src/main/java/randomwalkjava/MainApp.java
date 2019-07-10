@@ -46,13 +46,15 @@ public class MainApp extends Application {
     final int chartHeight = 605;
     // STAGE
     final int stageWidth = 940;
-    final int stageHeight = 600;
+    final int stageHeight = 660;
     // COMPONENTS
     final int buttonWidth = 150;
     final int textwidth = 740;
-    final int textheight = 540;
+    final int textheight = 600;
     final int animwidth = 900;
     final int animheight = 900;
+    final int simheight = 610;
+    final int mmcheight = 630;
     final int paneWidth = 200;
     final int screenWidth = Screen.getMainScreen().getWidth();
     final int screenHeight = Screen.getMainScreen().getHeight();
@@ -152,12 +154,15 @@ public class MainApp extends Application {
         Button nappiScene1 = new Button("R_RMS vs SQRT(N)");
         Button nappiScene2 = new Button("RANDOM WALK");
         Button nappiScene3 = new Button("REAL TIME WALK");
+        Button nappiScene4 = new Button("MMC");
         nappiScene1.setMinWidth(buttonWidth);
         nappiScene1.setMaxWidth(buttonWidth);
         nappiScene2.setMinWidth(buttonWidth);
         nappiScene2.setMaxWidth(buttonWidth);
         nappiScene3.setMinWidth(buttonWidth);
         nappiScene3.setMaxWidth(buttonWidth);
+        nappiScene4.setMinWidth(buttonWidth);
+        nappiScene4.setMaxWidth(buttonWidth);
 
         Button nappiMenuHelp = new Button("HELP");
         nappiMenuHelp.setMinWidth(buttonWidth);
@@ -212,7 +217,7 @@ public class MainApp extends Application {
         });
         nappiScene3.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                nappiScene2.setEffect(null);
+                nappiScene3.setEffect(null);
         });
         nappiScene3.setVisible(true);
 
@@ -220,7 +225,26 @@ public class MainApp extends Application {
         GridPane.setHalignment(empty3, HPos.LEFT);
         asettelu.add(empty3, 0, 5, 2, 1);
 
-        asettelu.add(nappiMenuHelp, 0, 6, 2, 1);
+        GridPane.setHalignment(nappiScene4, HPos.LEFT);
+        asettelu.add(nappiScene4, 0, 6, 2, 1);
+        nappiScene4.setBackground(new Background(
+            new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        nappiScene4.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                nappiScene4.setEffect(shadow);
+        });
+        nappiScene4.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                nappiScene4.setEffect(null);
+        });
+        nappiScene4.setVisible(true);
+
+        final Pane empty4 = new Pane();
+        GridPane.setHalignment(empty4, HPos.LEFT);
+        asettelu.add(empty4, 0, 7, 2, 1);
+
+        asettelu.add(nappiMenuHelp, 0, 8, 2, 1);
         nappiMenuHelp.setBackground(new Background(
             new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
@@ -238,39 +262,51 @@ public class MainApp extends Application {
         ////////////////////////////////////////////////////
         // OTHER VIEWS
         SceneCalculation getCalcScene = new SceneCalculation();
-        SceneNoCalculation getNoCalcScene = new SceneNoCalculation();
-        SceneAnim getAnimScene = new SceneAnim();
+        SceneSimulation getSimScene = new SceneSimulation();
+        SceneAnimation getAnimScene = new SceneAnimation();
+        SceneMMC getMMCScene = new SceneMMC();
 
         BorderPane asetteluCalc = new BorderPane();
-        BorderPane asetteluNoCalc = new BorderPane();
+        BorderPane asetteluSim = new BorderPane();
         BorderPane asetteluAnim = new BorderPane();
+        BorderPane asetteluMMC = new BorderPane();
 
         HBox isovalikkoCalc = new HBox();
         isovalikkoCalc.setPadding(new Insets(0, 0, 0, 0));
         isovalikkoCalc.setSpacing(0);
         
-        HBox isovalikkoNoCalc = new HBox();
-        isovalikkoNoCalc.setPadding(new Insets(0, 0, 0, 0));
-        isovalikkoNoCalc.setSpacing(0);
+        HBox isovalikkoSim = new HBox();
+        isovalikkoSim.setPadding(new Insets(0, 0, 0, 0));
+        isovalikkoSim.setSpacing(0);
 
         HBox isovalikkoAnim = new HBox();
         isovalikkoAnim.setPadding(new Insets(0, 0, 0, 0));
         isovalikkoAnim.setSpacing(0);
 
+        HBox isovalikkoMMC = new HBox();
+        isovalikkoMMC.setPadding(new Insets(0, 0, 0, 0));
+        isovalikkoMMC.setSpacing(0);
+
         VBox valikkoCalc = new VBox();
         valikkoCalc.setPadding(new Insets(10, 10, 10, 10));
         valikkoCalc.setSpacing(20);
 
-        VBox valikkoNoCalc = new VBox();
-        valikkoNoCalc.setPadding(new Insets(10, 10, 10, 10));
-        valikkoNoCalc.setSpacing(20);
+        VBox valikkoSim = new VBox();
+        valikkoSim.setPadding(new Insets(10, 10, 10, 10));
+        valikkoSim.setSpacing(20);
 
         VBox valikkoAnim = new VBox();
         valikkoAnim.setPadding(new Insets(10, 10, 10, 10));
         valikkoAnim.setSpacing(20);
 
+        VBox valikkoMMC = new VBox();
+        valikkoMMC.setPadding(new Insets(10, 10, 10, 10));
+        valikkoMMC.setSpacing(20);
+
         ////////////////////////////////////////////////////
-        // TEXT AREA CALC
+        // TEXT AREAS
+        HelpText helpText = new HelpText();
+        // CALCULATION
         TextArea textAreaCalc = new TextArea();
         textAreaCalc.setMinWidth(textwidth);
         textAreaCalc.setMaxWidth(textwidth);
@@ -283,24 +319,20 @@ public class MainApp extends Application {
             new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         textAreaCalc.setBlendMode(BlendMode.DIFFERENCE);
-
-        ////////////////////////////////////////////////////
-        // TEXT AREA NO CALC
-        TextArea textAreaNoCalc = new TextArea();
-        textAreaNoCalc.setMinWidth(textwidth);
-        textAreaNoCalc.setMaxWidth(textwidth);
-        textAreaNoCalc.setMinHeight(textheight);
-        textAreaNoCalc.setMaxHeight(textheight);
-        textAreaNoCalc.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
-        textAreaNoCalc.setBorder(null);
-        textAreaNoCalc.setEditable(false);
-        textAreaNoCalc.setBackground(
+        // SIMULATION
+        TextArea textAreaSim = new TextArea();
+        textAreaSim.setMinWidth(textwidth);
+        textAreaSim.setMaxWidth(textwidth);
+        textAreaSim.setMinHeight(simheight);
+        textAreaSim.setMaxHeight(simheight);
+        textAreaSim.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
+        textAreaSim.setBorder(null);
+        textAreaSim.setEditable(false);
+        textAreaSim.setBackground(
             new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        textAreaNoCalc.setBlendMode(BlendMode.DIFFERENCE);
-
-        ////////////////////////////////////////////////////
-        // TEXT AREA ANIM
+        textAreaSim.setBlendMode(BlendMode.DIFFERENCE);
+        // ANIMATION
         TextArea textAreaAnim = new TextArea();
         textAreaAnim.setMinWidth(animwidth);
         textAreaAnim.setMaxWidth(animwidth);
@@ -313,10 +345,23 @@ public class MainApp extends Application {
             new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         textAreaAnim.setBlendMode(BlendMode.DIFFERENCE);
+        // MMC
+        TextArea textAreaMMC = new TextArea();
+        textAreaMMC.setMinWidth(textwidth);
+        textAreaMMC.setMaxWidth(textwidth);
+        textAreaMMC.setMinHeight(mmcheight);
+        textAreaMMC.setMaxHeight(mmcheight);
+        textAreaMMC.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
+        textAreaMMC.setBorder(null);
+        textAreaMMC.setEditable(false);
+        textAreaMMC.setBackground(
+            new Background(new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        textAreaMMC.setBlendMode(BlendMode.DIFFERENCE);
 
         ////////////////////////////////////////////////////
         // TEXT AREA MENU
-        TextArea textAreaMenu = new TextArea(welcomeText());
+        TextArea textAreaMenu = new TextArea(helpText.welcome());
         textAreaMenu.setMinWidth(textwidth);
         textAreaMenu.setMaxWidth(textwidth);
         textAreaMenu.setMinHeight(textheight);
@@ -330,7 +375,7 @@ public class MainApp extends Application {
         textAreaMenu.setBlendMode(BlendMode.DIFFERENCE);
         
         ////////////////////////////////////////////////////
-        // ANIM COMPONENTS
+        // ANIMATION COMPONENTS
         Canvas animAlusta = new Canvas(animwidth, animheight);
         animAlusta.setVisible(true);
 
@@ -356,11 +401,11 @@ public class MainApp extends Application {
                 nappiMenuHelp.setEffect(null);
         });
         nappiMenuHelp.setOnAction(event -> {
-            textAreaMenu.setText(helpTextMenu());
+            textAreaMenu.setText(helpText.menu());
         });
 
         ////////////////////////////////////////////////////
-        // OTHER VIEWS BUTTON: EXECUTE CALC
+        // OTHER VIEWS BUTTON: EXECUTE CALCULATION
         Button executeNappiCalc = new Button("EXECUTE");
         executeNappiCalc.setDefaultButton(true);
         executeNappiCalc.setMinWidth(buttonWidth);
@@ -380,7 +425,7 @@ public class MainApp extends Application {
         });
         executeNappiCalc.setVisible(true);
 
-        // OTHER VIEWS BUTTON: CALC MENU
+        // OTHER VIEWS BUTTON: CALCULATION MENU
         Button menuNappiCalc = new Button("BACK TO MENU");
         menuNappiCalc.setMinWidth(buttonWidth);
         menuNappiCalc.setMaxWidth(buttonWidth);
@@ -394,7 +439,7 @@ public class MainApp extends Application {
         });
         menuNappiCalc.setVisible(true);
 
-        // OTHER VIEWS BUTTON: CALC HELP
+        // OTHER VIEWS BUTTON: CALCULATION HELP
         Button helpNappiCalc = new Button("HELP");
         helpNappiCalc.setMinWidth(buttonWidth);
         helpNappiCalc.setMaxWidth(buttonWidth);
@@ -408,64 +453,64 @@ public class MainApp extends Application {
                 helpNappiCalc.setEffect(null);
         });
         helpNappiCalc.setOnAction(event -> {
-            textAreaCalc.setText(helpTextCalc());
+            textAreaCalc.setText(helpText.calculation());
         });
         helpNappiCalc.setVisible(true);
 
         ////////////////////////////////////////////////////
-        // OTHER VIEWS BUTTON: EXECUTE NO CALC
-        Button executeNappiNoCalc = new Button("EXECUTE");
-        executeNappiNoCalc.setDefaultButton(true);
-        executeNappiNoCalc.setMinWidth(buttonWidth);
-        executeNappiNoCalc.setMaxWidth(buttonWidth);
-        executeNappiNoCalc.setTextFill(Color.RED);
-        executeNappiNoCalc.setBackground(
+        // OTHER VIEWS BUTTON: EXECUTE SIMULATION
+        Button executeNappiSim = new Button("EXECUTE");
+        executeNappiSim.setDefaultButton(true);
+        executeNappiSim.setMinWidth(buttonWidth);
+        executeNappiSim.setMaxWidth(buttonWidth);
+        executeNappiSim.setTextFill(Color.RED);
+        executeNappiSim.setBackground(
                     new Background(
                         new BackgroundFill(
                             Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        executeNappiNoCalc.addEventHandler(
+        executeNappiSim.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                executeNappiNoCalc.setEffect(shadow);
+                executeNappiSim.setEffect(shadow);
         });
-        executeNappiNoCalc.addEventHandler(
+        executeNappiSim.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                executeNappiNoCalc.setEffect(null);
+                executeNappiSim.setEffect(null);
         });
-        executeNappiNoCalc.setVisible(true);
+        executeNappiSim.setVisible(true);
 
-        // OTHER VIEWS BUTTON: NO CALC MENU
-        Button menuNappiNoCalc = new Button("BACK TO MENU");
-        menuNappiNoCalc.setMinWidth(buttonWidth);
-        menuNappiNoCalc.setMaxWidth(buttonWidth);
-        menuNappiNoCalc.addEventHandler(
+        // OTHER VIEWS BUTTON: SIMULATION MENU
+        Button menuNappiSim = new Button("BACK TO MENU");
+        menuNappiSim.setMinWidth(buttonWidth);
+        menuNappiSim.setMaxWidth(buttonWidth);
+        menuNappiSim.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                menuNappiNoCalc.setEffect(shadow);
+                menuNappiSim.setEffect(shadow);
         });
-        menuNappiNoCalc.addEventHandler(
+        menuNappiSim.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                menuNappiNoCalc.setEffect(null);
+                menuNappiSim.setEffect(null);
         });
-        menuNappiNoCalc.setVisible(true);
+        menuNappiSim.setVisible(true);
 
-        // OTHER VIEWS BUTTON: NO CALC HELP
-        Button helpNappiNoCalc = new Button("HELP");
-        helpNappiNoCalc.setMinWidth(buttonWidth);
-        helpNappiNoCalc.setMaxWidth(buttonWidth);
-        helpNappiNoCalc.addEventHandler(
+        // OTHER VIEWS BUTTON: SIMULATION HELP
+        Button helpNappiSim = new Button("HELP");
+        helpNappiSim.setMinWidth(buttonWidth);
+        helpNappiSim.setMaxWidth(buttonWidth);
+        helpNappiSim.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                helpNappiNoCalc.setEffect(shadow);
+                helpNappiSim.setEffect(shadow);
         });
-        helpNappiNoCalc.addEventHandler(
+        helpNappiSim.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                helpNappiNoCalc.setEffect(null);
+                helpNappiSim.setEffect(null);
         });
-        helpNappiNoCalc.setOnAction(event -> {
-            textAreaNoCalc.setText(helpTextNoCalc());
+        helpNappiSim.setOnAction(event -> {
+            textAreaSim.setText(helpText.simulation());
         });
-        helpNappiNoCalc.setVisible(true);
+        helpNappiSim.setVisible(true);
 
         ////////////////////////////////////////////////////
-        // OTHER VIEWS BUTTON: RUN ANIM
+        // OTHER VIEWS BUTTON: RUN ANIMATION
         Button runAnim = new Button("RUN");
         runAnim.setDefaultButton(true);
         runAnim.setMinWidth(buttonWidth);
@@ -485,7 +530,7 @@ public class MainApp extends Application {
         });
         runAnim.setVisible(true);
 
-        // OTHER VIEWS BUTTON: ANIM MENU
+        // OTHER VIEWS BUTTON: ANIMATION MENU
         Button menuNappiAnim = new Button("BACK TO MENU");
         menuNappiAnim.setMinWidth(buttonWidth);
         menuNappiAnim.setMaxWidth(buttonWidth);
@@ -499,7 +544,7 @@ public class MainApp extends Application {
         });
         menuNappiAnim.setVisible(true);
 
-        // OTHER VIEWS BUTTON: ANIM HELP
+        // OTHER VIEWS BUTTON: ANIMATION HELP
         Button helpNappiAnim = new Button("HELP");
         helpNappiAnim.setMinWidth(buttonWidth);
         helpNappiAnim.setMaxWidth(buttonWidth);
@@ -517,9 +562,66 @@ public class MainApp extends Application {
                 isovalikkoAnim.getChildren().remove(pane);
                 isovalikkoAnim.getChildren().add(textAreaAnim);
             }
-            textAreaAnim.setText(helpTextAnim());
+            textAreaAnim.setText(helpText.animation());
         });
         helpNappiAnim.setVisible(true);
+
+        ////////////////////////////////////////////////////
+        // OTHER VIEWS BUTTON: EXECUTE MMC
+        Button runMMC = new Button("RUN");
+        runMMC.setDefaultButton(true);
+        runMMC.setMinWidth(buttonWidth);
+        runMMC.setMaxWidth(buttonWidth);
+        runMMC.setTextFill(Color.RED);
+                    runMMC.setBackground(
+                        new Background(
+                            new BackgroundFill(
+                                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        runMMC.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                runMMC.setEffect(shadow);
+        });
+        runMMC.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                runMMC.setEffect(null);
+        });
+        runMMC.setVisible(true);
+
+        // OTHER VIEWS BUTTON: MMC MENU
+        Button menuNappiMMC = new Button("BACK TO MENU");
+        menuNappiMMC.setMinWidth(buttonWidth);
+        menuNappiMMC.setMaxWidth(buttonWidth);
+        menuNappiMMC.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                menuNappiMMC.setEffect(shadow);
+        });
+        menuNappiMMC.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                menuNappiMMC.setEffect(null);
+        });
+        menuNappiMMC.setVisible(true);
+
+        // OTHER VIEWS BUTTON: MMC HELP
+        Button helpNappiMMC = new Button("HELP");
+        helpNappiMMC.setMinWidth(buttonWidth);
+        helpNappiMMC.setMaxWidth(buttonWidth);
+        GridPane.setHalignment(helpNappiMMC, HPos.LEFT);
+        helpNappiMMC.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                helpNappiMMC.setEffect(shadow);
+        });
+        helpNappiMMC.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                helpNappiMMC.setEffect(null);
+        });
+        helpNappiMMC.setOnAction(event -> {
+            if (isovalikkoMMC.getChildren().contains(pane)){
+                isovalikkoMMC.getChildren().remove(pane);
+                isovalikkoMMC.getChildren().add(textAreaMMC);
+            }
+            textAreaMMC.setText(helpText.mmc());
+        });
+        helpNappiMMC.setVisible(true);
 
         ////////////////////////////////////////////////////
         // SET FIRST VIEW BORDERPANE
@@ -532,7 +634,7 @@ public class MainApp extends Application {
         asetteluMenu.setCenter(isovalikkoMenu);
 
         ////////////////////////////////////////////////////
-        // SET CALC BORDERPANE
+        // SET CALCULATION BORDERPANE
         valikkoCalc.getChildren().addAll(
             menuNappiCalc,
             helpNappiCalc,
@@ -544,19 +646,19 @@ public class MainApp extends Application {
         asetteluCalc.setCenter(isovalikkoCalc);
 
         ////////////////////////////////////////////////////
-        // SET NO CALC BORDERPANE
-        valikkoNoCalc.getChildren().addAll(
-            menuNappiNoCalc,
-            helpNappiNoCalc,
-            getNoCalcScene.getSceneNoCalc(),
-            executeNappiNoCalc);
-        isovalikkoNoCalc.getChildren().addAll(
-            valikkoNoCalc,
-            textAreaNoCalc);
-        asetteluNoCalc.setCenter(isovalikkoNoCalc);
+        // SET SIMULATION BORDERPANE
+        valikkoSim.getChildren().addAll(
+            menuNappiSim,
+            helpNappiSim,
+            getSimScene.getSceneSim(),
+            executeNappiSim);
+        isovalikkoSim.getChildren().addAll(
+            valikkoSim,
+            textAreaSim);
+        asetteluSim.setCenter(isovalikkoSim);
 
         ////////////////////////////////////////////////////
-        // SET ANIM BORDERPANE
+        // SET ANIMATION BORDERPANE
         valikkoAnim.getChildren().addAll(
             menuNappiAnim,
             helpNappiAnim,
@@ -568,6 +670,18 @@ public class MainApp extends Application {
         asetteluAnim.setCenter(isovalikkoAnim);
 
         ////////////////////////////////////////////////////
+        // SET MMC BORDERPANE
+        valikkoMMC.getChildren().addAll(
+            menuNappiMMC,
+            helpNappiMMC,
+            getMMCScene.getSceneMMC(),
+            runMMC);
+        isovalikkoMMC.getChildren().addAll(
+            valikkoMMC,
+            textAreaMMC);
+        asetteluMMC.setCenter(isovalikkoMMC);
+
+        ////////////////////////////////////////////////////
         // SET SCENES
         Scene firstScene = new Scene(asetteluMenu,stageWidth,stageHeight);
         firstScene.getStylesheets().add("/styles/Styles.css");
@@ -575,16 +689,22 @@ public class MainApp extends Application {
         Scene calcScene = new Scene(asetteluCalc,stageWidth,stageHeight);
         calcScene.getStylesheets().add("/styles/Styles.css");
 
-        Scene noCalcScene = new Scene(asetteluNoCalc,stageWidth,stageHeight);
-        noCalcScene.getStylesheets().add("/styles/Styles.css");
+        Scene simScene = new Scene(asetteluSim,stageWidth,stageHeight + (simheight-textheight));
+        simScene.getStylesheets().add("/styles/Styles.css");
 
         Scene animScene = new Scene(asetteluAnim,
             stageWidth + (animwidth-textwidth),
             stageHeight + (animheight-textheight));
         animScene.getStylesheets().add("/styles/Styles.css");
 
+        Scene mmcScene = new Scene(asetteluMMC,
+            stageWidth + (animwidth-textwidth),
+            stageHeight + (animheight-textheight));
+        mmcScene.getStylesheets().add("/styles/Styles.css");
+
         ////////////////////////////////////////////////////
         // SET SCENE CHOICE BUTTONS' EFFECTS
+        // CALCULATION
         nappiScene1.setOnMouseClicked(event -> {
             stage.setTitle("R_rms calculation");
             stage.setScene(calcScene);
@@ -592,56 +712,80 @@ public class MainApp extends Application {
         });
         menuNappiCalc.setOnMouseClicked(event -> {
             stage.setTitle("Random Walk");
-            if (textAreaCalc.getText().equals(helpTextCalc()))
-                textAreaMenu.setText(welcomeText());
+            if (textAreaCalc.getText().equals(helpText.calculation()))
+                textAreaMenu.setText(helpText.welcome());
             else
                 textAreaMenu.setText(textAreaCalc.getText());
             stage.setScene(firstScene);
         });
-
+        // SIMULATION
         nappiScene2.setOnMouseClicked(event -> {
             stage.setTitle("Random Walk simulation");
-            stage.setScene(noCalcScene);
+            if ( stage.getHeight() == stageHeight ){
+                stage.setHeight(stageHeight+(simheight-textheight));
+                stage.setY((screenHeight-stageHeight)/2-(simheight-textheight)/2);
+            }
+            stage.setScene(simScene);
         });
-        menuNappiNoCalc.setOnAction(event -> {
+        menuNappiSim.setOnAction(event -> {
             stage.setTitle("Random Walk");
-            if (textAreaNoCalc.getText().equals(helpTextNoCalc()))
-                textAreaMenu.setText(welcomeText());
+            if (textAreaSim.getText().equals(helpText.simulation()))
+                textAreaMenu.setText(helpText.welcome());
             else
-                textAreaMenu.setText(textAreaNoCalc.getText());
+                textAreaMenu.setText(textAreaSim.getText());
+            stage.setY((screenHeight-stageHeight)/2);
+            stage.setHeight(stageHeight);
             stage.setScene(firstScene);
         });
-
+        // ANIMATION
         nappiScene3.setOnMouseClicked(event -> {
             stage.setTitle("Random Walk Animation");
             if ( stage.getWidth() == stageWidth ){
                 stage.setWidth(stageWidth+(animwidth-textwidth));
                 stage.setHeight(stageHeight+(animheight-textheight));
-                stage.setX(screenWidth/2-(animwidth-textwidth));
+                stage.setX(screenWidth/2-(animwidth-textwidth)+15);
                 stage.setY((screenHeight-stageHeight)/2-(animheight-textheight)/2-30);
-                stage.setResizable(true);
-                
-                stage.setResizable(false);
             }
             stage.setScene(animScene);
         });
         menuNappiAnim.setOnAction(event -> {
             stage.setTitle("Random Walk");
-            if (textAreaAnim.getText().equals(helpTextAnim()))
-                textAreaMenu.setText(welcomeText());
+            if (textAreaAnim.getText().equals(helpText.animation()))
+                textAreaMenu.setText(helpText.welcome());
             else
                 textAreaMenu.clear();
             stage.setX(screenWidth/2);
             stage.setY((screenHeight-stageHeight)/2);
-            stage.setResizable(true);
             stage.setWidth(stageWidth);
             stage.setHeight(stageHeight);
-            stage.setResizable(false);
+            stage.setScene(firstScene);
+        });
+        // MMC
+        nappiScene4.setOnMouseClicked(event -> {
+            stage.setTitle("MMC Random Walk");
+            if ( stage.getWidth() == stageWidth ){
+                stage.setWidth(stageWidth+(animwidth-textwidth));
+                stage.setHeight(stageHeight+(animheight-textheight));
+                stage.setX(screenWidth/2-(animwidth-textwidth)+15);
+                stage.setY((screenHeight-stageHeight)/2-(animheight-textheight)/2-30);
+            }
+            stage.setScene(mmcScene);
+        });
+        menuNappiMMC.setOnAction(event -> {
+            stage.setTitle("Random Walk");
+            if (textAreaMMC.getText().equals(helpText.mmc()))
+                textAreaMenu.setText(helpText.welcome());
+            else
+                textAreaMenu.setText(textAreaMMC.getText());
+            stage.setX(screenWidth/2);
+            stage.setY((screenHeight-stageHeight)/2);
+            stage.setWidth(stageWidth);
+            stage.setHeight(stageHeight);
             stage.setScene(firstScene);
         });
 
         ////////////////////////////////////////////////////
-        // CREATE A FRAME FOR CALC AND NO CALC PLOTS
+        // CREATE A FRAME FOR CALCULATION AND SIMULATION PLOTS
         JFrame frame = new JFrame();
 
         ////////////////////////////////////////////////////
@@ -649,21 +793,30 @@ public class MainApp extends Application {
         Execution ex = new Execution();
 
         ////////////////////////////////////////////////////
-        // EXECUTE BUTTON CALC
+        // EXECUTE BUTTON CALCULATION
         executeNappiCalc.setOnMouseClicked((MouseEvent event) -> {
             // BUTTON PRESSED ON
             this.vars = getCalcScene.getVars();
             Data data = new Data(this.vars);
-            ex.executeRms(datafolder, textAreaNoCalc, frame, data, vars);
+            ex.executeRms(datafolder, textAreaSim, frame, data, vars);
         });
 
         ////////////////////////////////////////////////////
-        // EXECUTE BUTTON NO CALC
-        executeNappiNoCalc.setOnMouseClicked((MouseEvent event) -> {
+        // EXECUTE BUTTON SIMULATION
+        executeNappiSim.setOnMouseClicked((MouseEvent event) -> {
             // BUTTON PRESSED ON
-            this.vars = getNoCalcScene.getVars();
+            this.vars = getSimScene.getVars();
             Data data = new Data(this.vars);
-            ex.executeTrace(datafolder, textAreaNoCalc, frame, data, vars);
+            ex.executeSim(datafolder, textAreaSim, frame, data, vars);
+        });
+
+        ////////////////////////////////////////////////////
+        // EXECUTE BUTTON MMC
+        runMMC.setOnMouseClicked((MouseEvent event) -> {
+            // BUTTON PRESSED ON
+            this.vars = getMMCScene.getVars();
+            Data data = new Data(this.vars);
+            //ex.executeMMC(datafolder, textAreaMMC, frame, data, vars);
         });
 
         ////////////////////////////////////////////////////
@@ -671,12 +824,13 @@ public class MainApp extends Application {
         FXPlot fxplot = new FXPlot(screenHeight);
 
         ////////////////////////////////////////////////////
-        // ANIMATION TIMER FOR REAL TIME RANDOM WALK
+        // ANIMATION TIMER FOR REAL TIME RANDOM WALK ANIMATION
         new AnimationTimer() {
             // päivitetään animaatiota noin 100 millisekunnin välein
             private final long sleepNanoseconds = 100 * 1000000;
             private long prevTime = 0;
             private int dim;
+            private double steps;
 
             @Override
             public void handle(long currentNanoTime) {
@@ -713,27 +867,43 @@ public class MainApp extends Application {
                 }
 
                 String[] vars = getAnimScene.getVars();
-                dim = Integer.valueOf(vars[3]);
+                // FROM SCENEANIMATION
+                // vars from user:
+                // vars[0] = particles,
+                // vars[1] = diameter,
+                // vars[2] = charge,        n/a
+                // vars[3] = steps,
+                // vars[4] = dimension,
+                // vars[5] = temperature,   n/a
+                // vars[6] = fixed,         n/a
+                // vars[7] = lattice,
+                // vars[8] = avoid,         n/a
+                // vars[9] = save           n/a
+                steps = Double.valueOf(vars[3]);
+                dim = Integer.valueOf(vars[4]);
 
                 if ( dim == 1 ) {
                     scalefactor = Math.sqrt((animwidth+200)
-                                / Math.sqrt(Double.valueOf(vars[2])))
-                                - Math.sqrt(Math.log10(Double.valueOf(vars[2])));
-                    linewidth = (Math.log10(Double.valueOf(vars[2])) + 1.0)
-                                / Math.sqrt(Double.valueOf(vars[2]));
+                                / Math.sqrt(steps))
+                                - Math.sqrt(Math.log10(steps));
+                    linewidth = (Math.log10(steps) + 1.0)
+                                / Math.sqrt(steps);
                     piirturi.scale(scalefactor, 1.0);
                     isscaled = true;
                 } else if ( dim > 1 ) {
                     scalefactor = Math.sqrt((animwidth+200)
-                            / Math.sqrt(Double.valueOf(vars[2])))
-                            - Math.sqrt(Math.log10(Double.valueOf(vars[2])));
-                    linewidth = Math.pow(Math.log10(Double.valueOf(vars[2])),2.0)
-                            / (Math.sqrt(2.0 * scalefactor * Double.valueOf(vars[2])));
+                            / Math.sqrt(steps))
+                            - Math.sqrt(Math.log10(steps));
+                    linewidth = Math.pow(Math.log10(steps),2.0)
+                            / (Math.sqrt(2.0 * scalefactor * steps));
                     piirturi.scale(scalefactor, scalefactor);
                     isscaled = true;
                 }
 
-                getAnimScene.refresh(datafolder, fexec, piirturi, scalefactor, linewidth, fxplot, rms_runs, newdata);
+                getAnimScene.refresh(
+                    datafolder, fexec, piirturi, scalefactor,
+                    linewidth, fxplot, rms_runs, newdata
+                );
                 newdata = false;
 
                 // älä muuta tätä
@@ -742,7 +912,7 @@ public class MainApp extends Application {
         }.start();
 
         ////////////////////////////////////////////////////
-        // RUN BUTTON ANIM
+        // RUN BUTTON ANIMATION
         runAnim.setOnMouseClicked((MouseEvent event) -> {
             if (getAnimScene.isRunning()) {
                 // FOR ONE ROUND OPERATION
@@ -759,52 +929,6 @@ public class MainApp extends Application {
                 getAnimScene.start();
                 runAnim.setText("STOP");
             }
-
-            // FOR ONE ROUND OPERATION
-            /*if ( isovalikkoAnim.getChildren().contains(textAreaAnim)) {
-                    textAreaAnim.clear();
-                    isovalikkoAnim.getChildren().remove(textAreaAnim);
-                    isovalikkoAnim.getChildren().add(pane);
-                }
-
-                piirturi.setGlobalAlpha(1.0);
-                piirturi.setFill(Color.BLACK);
-                piirturi.fillRect(0, 0, 1.0/scalefactor*animwidth, 1.0/scalefactor*animheight);
-                piirturi.fill();
-                piirturi.setStroke(Color.YELLOW);
-                if (isscaled) {
-                    piirturi.scale(1.0/scalefactor, 1.0/scalefactor);
-                    isscaled = false;
-                }
-
-                String[] vars = getAnimScene.getVars();
-
-                if ( Double.valueOf(vars[2]) < 100.0 ) {
-                    scalefactor = 14.0 - 0.0 * Math.log10(Double.valueOf(vars[2]));
-                    piirturi.setLineWidth((10.0 - Math.log10(Double.valueOf(vars[2]))) / 55.0);
-                    piirturi.setGlobalAlpha((10.0 - Math.log10(Double.valueOf(vars[2]))) / 15.0);
-                } else if ( Double.valueOf(vars[2]) < 1000.0 ) {
-                    scalefactor = 13.0 - 1.0 * Math.log10(Double.valueOf(vars[2]));
-                    piirturi.setLineWidth((10.0 - Math.log10(Double.valueOf(vars[2]))) / 40.0);
-                    piirturi.setGlobalAlpha((10.0 - Math.log10(Double.valueOf(vars[2]))) / 20.0);
-                } else if ( Double.valueOf(vars[2]) < 10000.0 ) {
-                    scalefactor = 12.0 - 2.0 * Math.log10(Double.valueOf(vars[2]));
-                    piirturi.setLineWidth((10.0 - Math.log10(Double.valueOf(vars[2]))) / 25.0);
-                    piirturi.setGlobalAlpha((10.0 - Math.log10(Double.valueOf(vars[2]))) / 30.0);
-                } else if ( Double.valueOf(vars[2]) < 100000.0 ) {
-                    scalefactor = 10.5 - 2.0 * Math.log10(Double.valueOf(vars[2]));
-                    piirturi.setLineWidth((10.0 - Math.log10(Double.valueOf(vars[2])))/10.0);
-                    piirturi.setGlobalAlpha((10.0 - Math.log10(Double.valueOf(vars[2])))/40.0);
-                } else {
-                    scalefactor = 1.0 - 1.0 / (15.0 - 2.0 * Math.log10(Double.valueOf(vars[2])));
-                    piirturi.setLineWidth((10.0 - Math.log10(Double.valueOf(vars[2])))/20.0);
-                    piirturi.setGlobalAlpha((10.0 - Math.log10(Double.valueOf(vars[2])))/10.0);
-                }
-                piirturi.scale(scalefactor, scalefactor);
-                isscaled = true;
-
-                getAnimScene.refresh(datafolder, fexec, piirturi, scalefactor);
-                runAnim.setText("RUN");*/
         });
 
         stage.setScene(firstScene);
@@ -859,97 +983,6 @@ public class MainApp extends Application {
         }
         
         return true;
-    }
-
-    public String helpTextMenu() {
-        String text = " Button 'RRMS vs SQRT(N)' shows a control panel with which you can\n"
-                    + " calculate root mean square distances (R_rms) of random walk particles.\n\n"
-                    + " Program plots 'R_rms' versus 'sqrt(steps)'.\n\n"
-                    + " Every run will save the data in a file replacing the previous one.\n\n"
-                    + " ----------------------------------------------------------------------\n\n"
-                    + " Button 'RANDOM WALK' shows a control panel with which you can plot\n"
-                    + " different random walk simulations.\n\n"
-                    + " You can choose to save the data or to only plot without saving.";
-    
-        return text;
-    }
-
-    public String helpTextCalc() {
-        String text = " Diameter is a positive real number on the interval ]0.0, 1.0[.\n\n"
-                    + " Steps is a positive integer. It means the cumulative random steps\n"
-                    + " the particles take while moving.\n\n"
-                    + " Skip is a positive integer meaning jumping in the iteration steps.\n"
-                    + " Iteration starts from skip, not from 1. No skip is 0 or 1.\n\n"
-                    + " Dimension is either 1, 2, or 3. One means moving along x-axis, two\n"
-                    + " means moving on a plane of x and y axes, three means moving in a\n"
-                    + " cube of x, y, and z axes.\n\n"
-                    + " --------------------------------------------------------------------\n\n"
-                    + " Program plots 'R_rms' versus 'sqrt(steps)'.\n\n"
-                    + " Every run will save the data in a file replacing the previous one.\n\n"
-                    + " You can save the image with 'Right-click + Save As...' or 'ctrl+S'.\n"
-                    + " Saving formats are: PNG, JPEG, BMP, GIF, SVG, EPS, and PDF.";
-    
-        return text;
-    }
-
-    public String helpTextNoCalc() {
-        String text = " Number of particles is a positive integer, at least 1.\n\n"
-                    + " Diameter is a positive real number on the interval ]0.0, 1.0[.\n\n"
-                    + " Steps is a positive integer. It means the cumulative random steps\n"
-                    + " the particles take while moving.\n\n"
-                    + " Dimension is either 1, 2, or 3. One means moving along x-axis, two\n"
-                    + " means moving on a plane of x and y axes, three means moving in a\n"
-                    + " cube of x, y, and z axes.\n\n"
-                    + " --------------------------------------------------------------------\n\n"
-                    + " - Avoid sets the particles to self avoiding mode.\n"
-                    + " - Save toggle changes mode between realtime (no save) and save mode.\n"
-                    + "   Real time doesn't save the data, but shows the path trace in real\n"
-                    + "   time. Save mode saves the data, and you can plot the trace paths\n"
-                    + "   by yourself.";
-    
-        return text;
-    }
-
-    public String helpTextAnim() {
-        String text = " Number of particles is a positive integer, at least 1.\n\n"
-                    + " Diameter is a positive real number on the interval ]0.0, 1.0[.\n\n"
-                    + " Steps is a positive integer. It means the cumulative random steps\n"
-                    + " the particles take while moving.\n\n"
-                    + " Dimension is either 1, 2, or 3. One means moving along x-axis, two\n"
-                    + " means moving on a plane of x and y axes, three means moving in a\n"
-                    + " cube of x, y, and z axes.\n\n"
-                    + " --------------------------------------------------------------------\n\n"
-                    + " - Avoid sets the particles to self avoiding mode.\n"
-                    + " - Save toggle changes mode between realtime (no save) and save mode.\n"
-                    + "   Real time doesn't save the data, but shows the path trace in real\n"
-                    + "   time. Save mode saves the data, and you can plot the trace paths\n"
-                    + "   by yourself.";
-    
-        return text;
-    }
-
-    public String welcomeText() {
-        String text = "\n"
-                    + "        /////       ///       //    // ///        /////       //   //\n" 
-                    + "       ///  //     ////      ///   // //////    ///    //    ///  ///\n"
-                    + "      ///    //   /////     ////  // ///   // ///      //   //// ////\n"
-                    + "     ///   //    /// //    ///// // ///    /////       //  //////////\n"
-                    + "    //////      ///  //   /// //// ///     ////        // /// //// //\n"
-                    + "   ///   //    // ----------------------------------  // ///  ///  //\n"
-                    + "  ///     //  // |                                  | / ///   //   //\n"
-                    + " ///     /// /// |           Jari Sunnari           |  ///         //\n"
-                    + "                 |       Kandidaatintutkielma       |                \n"
-                    + "                 |                                  |                \n"
-                    + "       ////      |               2019               |    ////  ////  \n"
-                    + "       ////      |                                  |   ////  ////   \n"
-                    + "       ////       ----------------------------------   //// ////     \n"
-                    + "       ////          ////  ////  ////      ////       ///////        \n"
-                    + "       ////  ////   ////  ////   ////     ////       ////////        \n"
-                    + "       //// ////// ////  ////////////    ////       ////   ////      \n"
-                    + "       /////// ///////  ////     ////   ////       ////    ////      \n"
-                    + "       //////  //////  ////      ////  /////////  ////     /////       ";
-    
-        return text;
     }
 
     public static void main(String[] args) {

@@ -19,7 +19,7 @@ import javafx.scene.paint.Color;
 /*
     TODO    3D plot
 */
-public class SceneAnim extends Data {
+public class SceneAnimation extends Data {
     
     final int compwidth = 150;
     final int paneWidth = 200;
@@ -34,16 +34,18 @@ public class SceneAnim extends Data {
         return this.vars;
     }
  
-    public SceneAnim() {
+    public SceneAnimation() {
         this.vars = new String[]{
-            "0",    // particles
-            "0.0",  // seze
-            "0",    // steps
-            "0",    // dimension
-            "f",    // fixed
-            "-",    // lattice
-            "-",    // avoid
-            "-"};   // save
+            "0",    // vars[0] particles        USER
+            "0.1",  // vars[1] diameter         n/a
+            "0",    // vars[2] charge           n/a
+            "0",    // vars[3] steps            USER
+            "0",    // vars[4] dimension        USER
+            "0",    // vars[5] temperature      n/a
+            "f",    // vars[6] fixed(/spread)   n/a
+            "-",    // vars[7] (lattice/)free   n/a
+            "-",    // vars[8] avoid (on/)off   n/a
+            "-"};   // vars[9] save (off)       n/a
         this.running = false;
         this.runs = 1;
         this.rms_data = 0.0;
@@ -95,8 +97,9 @@ public class SceneAnim extends Data {
         double centerY = height/2;
 
         int num_part = Integer.valueOf(this.vars[0]);
-        int num_steps = Integer.valueOf(this.vars[2]) + 1;
-        int dim = Integer.valueOf(this.vars[3]);
+        int num_steps = Integer.valueOf(this.vars[3]) + 1;
+        double steps = Double.valueOf(this.vars[3]);
+        int dim = Integer.valueOf(this.vars[4]);
 
         double[] muistiX = new double[num_part];
         double[] muistiY = new double[num_part];
@@ -114,7 +117,7 @@ public class SceneAnim extends Data {
         Arrays.fill(yAxis, 0.0);
 
         double[] y2Axis = new double[10];
-        Arrays.fill(y2Axis, Math.sqrt(Double.valueOf(this.vars[2])));
+        Arrays.fill(y2Axis, Math.sqrt(Double.valueOf(this.vars[3])));
 
         double[] sum = new double[num_steps];
         double sum_parts = 0.0;
@@ -125,7 +128,8 @@ public class SceneAnim extends Data {
         try {
             command = new String[]{"cmd","/c",executable,
                 this.vars[0], this.vars[1], this.vars[2], this.vars[3],
-                this.vars[4], this.vars[5], this.vars[6], this.vars[7]};
+                this.vars[4], this.vars[5], this.vars[6], this.vars[7],
+                this.vars[8], this.vars[9]};
 
             // FOR DEBUGGING
             //FileOutputStream fos = new FileOutputStream(command[0]);
@@ -177,16 +181,13 @@ public class SceneAnim extends Data {
                                 if (dim == 1) {
                                     piirturi.fillRect(
                                         values[0][i], centerY,
-                                        Math.sqrt(Double.valueOf(this.vars[2]))
-                                            / (4.0 * Math.log10(Double.valueOf(this.vars[2]))),
+                                        Math.sqrt(steps) / (4.0 * Math.log10(steps)),
                                         Math.sqrt(centerY/2.0));
                                 } else if (dim == 2) {
                                     piirturi.fillRect(
                                     values[0][i], values[1][i],
-                                    Math.sqrt(Double.valueOf(this.vars[2]))
-                                        / (3.0 * Math.log10(Double.valueOf(this.vars[2]))),
-                                    Math.sqrt(Double.valueOf(this.vars[2]))
-                                        / (3.0 * Math.log10(Double.valueOf(this.vars[2]))));
+                                    Math.sqrt(steps) / (3.0 * Math.log10(steps)),
+                                    Math.sqrt(steps) / (3.0 * Math.log10(steps)));
                                  }
                                 piirturi.setStroke(Color.YELLOW);
                             }
@@ -251,8 +252,8 @@ public class SceneAnim extends Data {
                                     this.greatest = rrms;
                                     this.smallest = this.greatest;
                                 }
-                                if ( rrms > Math.sqrt(Double.valueOf(this.vars[2])) ) {
-                                     this.greatest = Math.sqrt(Double.valueOf(this.vars[2]));
+                                if ( rrms > Math.sqrt(steps) ) {
+                                     this.greatest = Math.sqrt(steps);
                                      this.smallest = rrms;
                                 }
 
@@ -368,23 +369,26 @@ public class SceneAnim extends Data {
             }
         });
 
-        Label labSizeParticles = new Label("diameter of particle:");
-        TextField setSizeParticles = new TextField("");
-        setSizeParticles.setOnKeyReleased(e -> {
-            this.vars[1] = setSizeParticles.getText().trim();
-        });
+        // this.vars[1] = "0.1" (diameter of particl)
+        // this.vars[2] = "0" (charge of particles)
 
         Label labNumSteps = new Label("number of steps:");
         TextField setNumSteps = new TextField("");
         setNumSteps.setOnKeyReleased(e -> {
-            this.vars[2] = setNumSteps.getText().trim();
+            this.vars[3] = setNumSteps.getText().trim();
         });
 
         Label labNumDimensions = new Label("dimensions:");
         TextField setNumDimensions = new TextField("");
         setNumDimensions.setOnKeyReleased(e -> {
-            this.vars[3] = setNumDimensions.getText().trim();
+            this.vars[4] = setNumDimensions.getText().trim();
         });
+
+        // this.vars[5] = "0" temperature      n/a
+        // this.vars[6] = "f" fixed(/spread)   n/a
+        // this.vars[7] = "-" (lattice/)free   n/a
+        // this.vars[8] = "-" avoid (on/)off   n/a
+        // this.vars[9] = "-" save (off)       n/a
 
         // ...THEIR PLACEMENTS
         GridPane.setHalignment(labNumParticles, HPos.LEFT);
@@ -393,38 +397,31 @@ public class SceneAnim extends Data {
         setNumParticles.setMinWidth(compwidth);
         setNumParticles.setMaxWidth(compwidth);
         asettelu.add(setNumParticles, 0, 1);
-        
-        GridPane.setHalignment(labSizeParticles, HPos.LEFT);
-        asettelu.add(labSizeParticles, 0, 2);
-        GridPane.setHalignment(setSizeParticles, HPos.CENTER);
-        setSizeParticles.setMinWidth(compwidth);
-        setSizeParticles.setMaxWidth(compwidth);
-        asettelu.add(setSizeParticles, 0, 3);
 
         GridPane.setHalignment(labNumSteps, HPos.LEFT);
-        asettelu.add(labNumSteps, 0, 4);
+        asettelu.add(labNumSteps, 0, 2);
         GridPane.setHalignment(setNumSteps, HPos.CENTER);
         setNumSteps.setMinWidth(compwidth);
         setNumSteps.setMaxWidth(compwidth);
-        asettelu.add(setNumSteps, 0, 5);
+        asettelu.add(setNumSteps, 0, 3);
         
         GridPane.setHalignment(labNumDimensions, HPos.LEFT);
-        asettelu.add(labNumDimensions, 0, 6);
+        asettelu.add(labNumDimensions, 0, 4);
         GridPane.setHalignment(setNumDimensions, HPos.CENTER);
         setNumDimensions.setMinWidth(compwidth);
         setNumDimensions.setMaxWidth(compwidth);
-        asettelu.add(setNumDimensions, 0, 7);
+        asettelu.add(setNumDimensions, 0, 5);
 
         GridPane.setHalignment(valikko, HPos.LEFT);
-        asettelu.add(valikko, 0, 8, 2, 1);
+        asettelu.add(valikko, 0, 6, 2, 1);
 
         final Pane empty1 = new Pane();
         GridPane.setHalignment(empty1, HPos.CENTER);
-        asettelu.add(empty1, 0, 9, 2, 1);
+        asettelu.add(empty1, 0, 7, 2, 1);
 
         final Pane empty2 = new Pane();
         GridPane.setHalignment(empty2, HPos.CENTER);
-        asettelu.add(empty2, 0, 10, 2, 1);
+        asettelu.add(empty2, 0, 8, 2, 1);
 
         return asettelu;
     }
