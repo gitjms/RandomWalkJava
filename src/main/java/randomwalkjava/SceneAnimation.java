@@ -28,6 +28,8 @@ public class SceneAnimation extends Data {
     private double rms_data;
     private double smallest;
     private double greatest;
+    private double rrms_sum;
+    private double var_sum;
 
     @Override
     public String[] getVars() {
@@ -48,9 +50,10 @@ public class SceneAnimation extends Data {
             "-"};   // vars[9] save (off)       n/a
         this.running = false;
         this.runs = 1;
+        this.rrms_sum = 0.0;
         this.rms_data = 0.0;
         this.smallest = 0.0;
-        this.greatest = 0.0;
+        this.var_sum = 0.0;
     }
 
     public void start() {
@@ -85,7 +88,11 @@ public class SceneAnimation extends Data {
 
     public void refresh(File folderPath, String executable,
         GraphicsContext piirturi, double scalefactor, double linewidth,
-        FXPlot chart, double[] rms_runs, boolean newdata) {
+        FXPlot fxplot, double[] rms_runs, double[] rms_std, boolean newdata) {
+
+        int i = 0;
+        int j = 0;
+        int p = 0;
 
         if (newdata == true)
             this.runs = 1;
@@ -100,6 +107,7 @@ public class SceneAnimation extends Data {
         int num_steps = Integer.valueOf(this.vars[3]) + 1;
         double steps = Double.valueOf(this.vars[3]);
         int dim = Integer.valueOf(this.vars[4]);
+        this.greatest = Math.sqrt(steps);
 
         double[] muistiX = new double[num_part];
         double[] muistiY = new double[num_part];
@@ -117,12 +125,27 @@ public class SceneAnimation extends Data {
         Arrays.fill(yAxis, 0.0);
 
         double[] y2Axis = new double[10];
-        Arrays.fill(y2Axis, Math.sqrt(Double.valueOf(this.vars[3])));
+        Arrays.fill(y2Axis, Math.sqrt(steps));
+
+        double[] xnormAxis = new double[1000];
+        double mincount;
+        if ( Math.sqrt(steps) < 5.0 )
+            mincount = 0.0;
+        else
+            mincount = Math.sqrt(steps) - 5.0;
+        double maxcount = Math.sqrt(steps) + 5.0;
+        double skip = (maxcount-mincount)/100.0;
+        for (int x = 0; x < 1000; x++) {
+            xnormAxis[x] = mincount + (double) x/100.0 + skip;
+        }
+        double[] ynormAxis = new double[1000];
+        Arrays.fill(ynormAxis, 0.0);
 
         double[] sum = new double[num_steps];
         double sum_parts = 0.0;
 
-        chart.getFrame().setVisible(true);
+        fxplot.setFrameVis(true);
+
         piirturi.setLineWidth(linewidth);
 
         try {
@@ -149,9 +172,6 @@ public class SceneAnimation extends Data {
                     process.getInputStream(), "", fos);
                 outputGobbler.start();*/
 
-                int i = 0;
-                int j = 0;
-                int p = 0;
                 if ( dim < 3 ) {
                     while ((line = input.readLine()) != null){
                         if (line.trim().startsWith("S"))
@@ -220,6 +240,11 @@ public class SceneAnimation extends Data {
                                 continue;
                             }
 
+                            if ( this.runs == 1 ) {
+                                sum_parts = 0.0;
+                                this.rms_data = 0.0;
+                            }
+                                    
                             this.rms_data = this.rms_data + plotData[j];
                             sum[i] = this.rms_data;
                             j++;
@@ -236,6 +261,7 @@ public class SceneAnimation extends Data {
                                     sum_parts += sum[m];
 
                                 double rrms = Math.sqrt((sum_parts/num_part) / this.runs);
+                                this.rrms_sum += rrms;
 
                                 if ( this.runs < 11 ) {
                                     rms_runs[(int) this.runs - 1] = rrms;
@@ -253,17 +279,34 @@ public class SceneAnimation extends Data {
                                     this.smallest = this.greatest;
                                 }
                                 if ( rrms > Math.sqrt(steps) ) {
-                                     this.greatest = Math.sqrt(steps);
-                                     this.smallest = rrms;
+                                     this.greatest = rrms;
+                                     this.smallest = Math.sqrt(steps);
                                 }
 
                                 Thread.sleep(100);
-                                chart.setMinY( this.smallest * 0.8);
-                                chart.setMaxY( this.greatest * 1.2);
-                                chart.updateData("R_rms", xAxis, yAxis);
-                                chart.updateData("sqrt(N)", xAxis, y2Axis);
+                                fxplot.setMinY( this.smallest * 0.8 );
+                                fxplot.setMaxY( this.greatest * 1.2 );
+                                fxplot.updateWData("R_rms", xAxis, yAxis);
+                                fxplot.updateWData("sqrt(N)", xAxis, y2Axis);
+
+                                double diff2 = Math.pow(rrms - Math.sqrt(steps),2.0);
+                                this.var_sum += diff2;
+                                double sigma2 = Math.pow(rrms - this.rrms_sum/this.runs,2.0);
+                                
+                                double ynew = 0.0;
+                                double ymax = 1.0;
+
+                                for (int h = 0; h < 1000; h++) {
+                                    ynew = //1.0/(Math.sqrt(2.0*Math.PI*diff2)) *
+                                        Math.exp( -Math.pow( (xnormAxis[h]-rrms),2.0 ) / (2.0 * diff2));
+                                    if ( ynew > ymax ) {
+                                        ymax = ynew;
+                                    }
+                                    ynormAxis[h] = ynew;
+                                }
+                                fxplot.updateHData("norm", xnormAxis, ynormAxis, ymax);
                             }
-                        }
+                         }
                     }
                     this.runs++;
                 } else if (dim == 3) {

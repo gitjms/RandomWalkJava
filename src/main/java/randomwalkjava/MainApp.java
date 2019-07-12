@@ -68,6 +68,7 @@ public class MainApp extends Application {
 
     private boolean newdata = false;
     public double[] rms_runs;
+    public double[] rms_std;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -821,7 +822,7 @@ public class MainApp extends Application {
 
         ////////////////////////////////////////////////////
         // CREATE AN INSTANCE FOR REAL TIME PLOTTING
-        FXPlot fxplot = new FXPlot(screenHeight);
+        FXPlot fxplot = new FXPlot();
 
         ////////////////////////////////////////////////////
         // ANIMATION TIMER FOR REAL TIME RANDOM WALK ANIMATION
@@ -900,9 +901,10 @@ public class MainApp extends Application {
                     isscaled = true;
                 }
 
+                // DRAW ANIMATION
                 getAnimScene.refresh(
                     datafolder, fexec, piirturi, scalefactor,
-                    linewidth, fxplot, rms_runs, newdata
+                    linewidth, fxplot, rms_runs, rms_std, newdata
                 );
                 newdata = false;
 
@@ -924,8 +926,19 @@ public class MainApp extends Application {
                 // COMMENT OUT NEXT LINE
                 this.newdata = true;
                 this.rms_runs = new double[10];
+                this.rms_std = new double[10];
                 Arrays.fill(this.rms_runs, 0.0);
-                fxplot.setData("sqrt(N)", "R_rms", rms_runs, rms_runs);
+                String[] vars = getAnimScene.getVars();
+                double mean = Math.sqrt(Double.valueOf(vars[3]));
+                int mincount;
+                if ( (int) mean < 5 )
+                    mincount = 0;
+                else
+                    mincount = (int) mean - 5;
+                int maxcount = (int) mean + 5;
+                fxplot.setWData("sqrt(N)", "R_rms", rms_runs, rms_runs);
+                fxplot.setHData("mean","norm", rms_std, rms_std, mincount, maxcount, mean);
+        
                 getAnimScene.start();
                 runAnim.setText("STOP");
             }
