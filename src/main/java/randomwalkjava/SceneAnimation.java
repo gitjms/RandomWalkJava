@@ -25,11 +25,11 @@ public class SceneAnimation extends Data {
     final int paneWidth = 200;
     private boolean running;
     private long runs;
+    private double rms_sum;
     private double rms_data;
     private double smallest;
     private double greatest;
-    private double rrms_sum;
-    private double var_sum;
+    
 
     @Override
     public String[] getVars() {
@@ -50,10 +50,9 @@ public class SceneAnimation extends Data {
             "-"};   // vars[9] save (off)       n/a
         this.running = false;
         this.runs = 1;
-        this.rrms_sum = 0.0;
+        this.rms_sum = 0.0;
         this.rms_data = 0.0;
         this.smallest = 0.0;
-        this.var_sum = 0.0;
     }
 
     public void start() {
@@ -88,14 +87,17 @@ public class SceneAnimation extends Data {
 
     public void refresh(File folderPath, String executable,
         GraphicsContext piirturi, double scalefactor, double linewidth,
-        FXPlot fxplot, double[] rms_runs, double[] rms_std, boolean newdata) {
+        FXPlot fxplot, double[] rms_runs, double[] rms_norm, boolean newdata) {
 
         int i = 0;
         int j = 0;
         int p = 0;
 
-        if (newdata == true)
+        if (newdata == true) {
             this.runs = 1;
+            this.rms_sum = 0.0;
+            this.rms_data = 0.0;
+        }
 
         int width = 900;
         int height = 900;
@@ -107,12 +109,18 @@ public class SceneAnimation extends Data {
         int num_steps = Integer.valueOf(this.vars[3]) + 1;
         double steps = Double.valueOf(this.vars[3]);
         int dim = Integer.valueOf(this.vars[4]);
-        this.greatest = Math.sqrt(steps);
+        double expected = Math.sqrt(steps);
+        this.greatest = expected;
 
         double[] muistiX = new double[num_part];
         double[] muistiY = new double[num_part];
 
-        double[][] values = new double[2][num_part];
+        double[][] values;
+        if( dim < 3 )
+            values = new double[2][num_part];
+        else
+            values = new double[3][num_part];
+
         String[] command = null;
 
         double[] plotData = new double[num_steps];
@@ -125,15 +133,15 @@ public class SceneAnimation extends Data {
         Arrays.fill(yAxis, 0.0);
 
         double[] y2Axis = new double[10];
-        Arrays.fill(y2Axis, Math.sqrt(steps));
+        Arrays.fill(y2Axis, expected);
 
         double[] xnormAxis = new double[1000];
         double mincount;
-        if ( Math.sqrt(steps) < 5.0 )
+        if ( expected < 5.0 )
             mincount = 0.0;
         else
-            mincount = Math.sqrt(steps) - 5.0;
-        double maxcount = Math.sqrt(steps) + 5.0;
+            mincount = expected - 5.0;
+        double maxcount = expected + 5.0;
         double skip = (maxcount-mincount)/100.0;
         for (int x = 0; x < 1000; x++) {
             xnormAxis[x] = mincount + (double) x/100.0 + skip;
@@ -166,16 +174,18 @@ public class SceneAnimation extends Data {
                 process.getInputStream()))) {
 
                 String line = null;
+                boolean failed = false;
 
                 // FOR DEBUGGING
                 /*StreamGobbler outputGobbler = new StreamGobbler(
                     process.getInputStream(), "", fos);
                 outputGobbler.start();*/
 
-                if ( dim < 3 ) {
                     while ((line = input.readLine()) != null){
-                        if (line.trim().startsWith("S"))
+                        if (line.trim().startsWith("S")) {
+                            failed = true;
                             break;
+                        }
                         if (!line.substring(0,1).matches("([0-9]|-|\\+)"))
                             continue;
                         if (!line.trim().split("(\\s+)")[0].trim().equals("+")) {
@@ -194,32 +204,66 @@ public class SceneAnimation extends Data {
                                 } catch (NumberFormatException e) {
                                     continue;
                                 }
+                            } else if (dim == 3) {
+                                String[] valStr = line.split("(\\s+)");
+                                try {
+                                    values[0][i] = Double.parseDouble(valStr[0].trim()) + centerX/scalefactor;
+                                    values[1][i] = Double.parseDouble(valStr[1].trim()) + centerX/scalefactor;
+                                    values[2][i] = Double.parseDouble(valStr[2].trim()) + centerX/scalefactor;
+                                } catch (NumberFormatException e) {
+                                    continue;
+                                }
                             }
-
+                            // RED SOURCE DOT
                             if ( j == 0 && i == 0 ) {
                                 piirturi.setFill(Color.RED);
                                 if (dim == 1) {
                                     piirturi.fillRect(
                                         values[0][i], centerY,
-                                        Math.sqrt(steps) / (4.0 * Math.log10(steps)),
+                                        expected / 8.0,
                                         Math.sqrt(centerY/2.0));
                                 } else if (dim == 2) {
                                     piirturi.fillRect(
-                                    values[0][i], values[1][i],
-                                    Math.sqrt(steps) / (3.0 * Math.log10(steps)),
-                                    Math.sqrt(steps) / (3.0 * Math.log10(steps)));
-                                 }
+                                        values[0][i], values[1][i],
+                                        expected  / 8.0,
+                                        expected / 8.0);
+                                } else if (dim == 3) {
+                                    piirturi.fillRect(
+                                        values[0][i] + Math.cos(values[2][i]),
+                                        values[1][i] + Math.sin(values[2][i]),
+                                        expected  / 8.0,
+                                        expected / 8.0);
+                                }
                                 piirturi.setStroke(Color.YELLOW);
                             }
 
                             if ( j > 0){
                                 for (int k = 0; k < num_part; k++){
-                                    piirturi.strokeLine(
-                                        muistiX[k], muistiY[k], values[0][k], values[1][k]);
+                                    if ( dim < 3 ) {
+                                        piirturi.strokeLine(
+                                            muistiX[k], muistiY[k], values[0][k], values[1][k]);
+                                    } else {
+                                        linewidth = Math.sqrt(values[2][k])
+                                            * 1.0 / ( 4.0 * Math.log10(steps) * scalefactor );
+                                        piirturi.setLineWidth(linewidth);
+                                        piirturi.strokeLine(
+                                            muistiX[k], muistiY[k],
+                                            values[0][i]
+                                                + Math.cos(values[2][i]),
+                                            values[1][i]
+                                                + Math.sin(values[2][i]));
+                                    }
                                 }
                             }
-                            muistiX[i] = values[0][i];
-                            muistiY[i] = values[1][i];
+                            if ( dim < 3 ) {
+                                muistiX[i] = values[0][i];
+                                muistiY[i] = values[1][i];
+                            } else {
+                                muistiX[i] = values[0][i]
+                                    + Math.cos(values[2][i]);
+                                muistiY[i] = values[1][i]
+                                    + Math.sin(values[2][i]);
+                            }
 
                             i++;
 
@@ -261,7 +305,7 @@ public class SceneAnimation extends Data {
                                     sum_parts += sum[m];
 
                                 double rrms = Math.sqrt((sum_parts/num_part) / this.runs);
-                                this.rrms_sum += rrms;
+                                this.rms_sum += rrms;
 
                                 if ( this.runs < 11 ) {
                                     rms_runs[(int) this.runs - 1] = rrms;
@@ -278,9 +322,9 @@ public class SceneAnimation extends Data {
                                     this.greatest = rrms;
                                     this.smallest = this.greatest;
                                 }
-                                if ( rrms > Math.sqrt(steps) ) {
+                                if ( rrms > expected ) {
                                      this.greatest = rrms;
-                                     this.smallest = Math.sqrt(steps);
+                                     this.smallest = expected;
                                 }
 
                                 Thread.sleep(100);
@@ -289,88 +333,29 @@ public class SceneAnimation extends Data {
                                 fxplot.updateWData("R_rms", xAxis, yAxis);
                                 fxplot.updateWData("sqrt(N)", xAxis, y2Axis);
 
-                                double diff2 = Math.pow(rrms - Math.sqrt(steps),2.0);
-                                this.var_sum += diff2;
-                                double sigma2 = Math.pow(rrms - this.rrms_sum/this.runs,2.0);
-                                
-                                double ynew = 0.0;
-                                double ymax = 1.0;
+                                double sigma2 = Math.pow(rrms - this.rms_sum/this.runs,2.0);
+                                double ynorm = 0.0;
 
                                 for (int h = 0; h < 1000; h++) {
-                                    ynew = //1.0/(Math.sqrt(2.0*Math.PI*diff2)) *
-                                        Math.exp( -Math.pow( (xnormAxis[h]-rrms),2.0 ) / (2.0 * diff2));
-                                    if ( ynew > ymax ) {
+                                    ynorm = //1.0/(Math.sqrt(2.0*Math.PI*diff2)) *
+                                        Math.exp( - Math.pow( ( xnormAxis[h] - this.rms_sum/this.runs ), 2.0 ) / (2.0 * sigma2) );
+                                    if ( Math.pow( ( xnormAxis[h] - this.rms_sum/this.runs ), 2.0 ) / (2.0 * sigma2) > 2.0 &&
+                                        xnormAxis[h] > rrms - 0.0001 && xnormAxis[h] < rrms + 0.0001 )
+                                        ynorm = 1.0;
+                                    ynormAxis[h] = ynorm;
+                                    /*if ( ynew > ymax ) {
                                         ymax = ynew;
-                                    }
-                                    ynormAxis[h] = ynew;
+                                    }*/
                                 }
-                                fxplot.updateHData("norm", xnormAxis, ynormAxis, ymax);
+                                fxplot.updateHData("norm", xnormAxis, ynormAxis, expected);
                             }
                          }
                     }
-                    this.runs++;
-                } else if (dim == 3) {
-                    while ((line = input.readLine()) != null){
-                        if (line.trim().startsWith("S"))
-                                break;
-                        if (!line.trim().split("(\\s+)")[0].trim().equals("+")) {
-                            /*String[] valStr = line.split("(\\s+)");
-                            values[0][i] = Double.valueOf(valStr[0].trim()) + centerX/scalefactor;
-                            values[1][i] = Double.valueOf(valStr[1].trim()) + centerX/scalefactor;
-                            values[2][i] = Double.valueOf(valStr[2].trim()) + centerX/scalefactor;
+                    if ( failed == false )
+                        this.runs++;
+                    else
+                        failed = false;
 
-                            if ( runs == 0 && j == 0 && i == 0 ) {
-                                piirturi.setFill(Color.RED);
-                                piirturi.fillRect(
-                                    values[0][i], values[1][i],
-                                    Math.sqrt(Double.valueOf(this.vars[2]))
-                                        / (4.0 * Math.log10(Double.valueOf(this.vars[2]))),
-                                    Math.sqrt(Double.valueOf(this.vars[2]))
-                                        / (4.0 * Math.log10(Double.valueOf(this.vars[2]))));
-                                piirturi.setStroke(Color.YELLOW);
-                            }
-
-                            if ( j > 0){
-                                for (int k = 0; k < num_part; k++){
-                                    piirturi.strokeLine(muistiX[k], muistiY[k], values[0][k], values[1][k]);
-                                }
-                            }
-                            muistiX[i] = values[0][i];
-                            muistiY[i] = values[1][i];
-
-                            i++;
-
-                            if ( i == num_part ){
-                                i = 0;
-                                j++;
-                            }
-
-                            if ( j == num_steps ) {
-                                i = 0;
-                                j = 0;
-                            }*/
-                            /*if (i%1000 == 0) {
-                                piirturi.setFill(javafx.scene.paint.Color.BLACK);
-                                piirturi.strokeRect(0, 0, width, height);
-                                piirturi.setFill(javafx.scene.paint.Color.YELLOW);
-                                piirturi.strokeText("walks: "+i, centerX, 50, 200.0);
-                                i = 0;
-                            }*/
-                        } else {
-                            //plotData[j] = Double.valueOf(line.split("(\\s+)")[1].trim());
-                            //IntStream.range(0, swingData.length).forEach(val-> swingData[0][val] = (double) val);
-
-                            //Thread.sleep(100);
-                            //chart.updateData("RMS", xAxis, plotData[1]);
-                            
-                            //m++;
-                            i = 0;
-                            j = 0;
-                        }
-                        runs++;
-                    }
-                }
-                
                 exitVal = process.waitFor();
                 if (exitVal != 0) {
                     runtime.exit(exitVal);
@@ -378,7 +363,7 @@ public class SceneAnimation extends Data {
                 // FOR DEBUGGING
                 //fos.flush();
                 //fos.close();
-            }
+            } 
 
         } catch (IOException | InterruptedException e) {
             //System.out.println(e.getMessage());
@@ -409,7 +394,8 @@ public class SceneAnimation extends Data {
                 } else {
                     this.vars[0] = setNumParticles.getText().trim();
                 }
-            }
+            } else
+                this.vars[0] = "0";
         });
 
         // this.vars[1] = "0.1" (diameter of particl)
@@ -418,13 +404,19 @@ public class SceneAnimation extends Data {
         Label labNumSteps = new Label("number of steps:");
         TextField setNumSteps = new TextField("");
         setNumSteps.setOnKeyReleased(e -> {
-            this.vars[3] = setNumSteps.getText().trim();
+            if (isNumInteger(setNumSteps.getText().trim())){
+                this.vars[3] = setNumSteps.getText().trim();
+            } else
+                this.vars[3] = "0";
         });
 
         Label labNumDimensions = new Label("dimensions:");
         TextField setNumDimensions = new TextField("");
         setNumDimensions.setOnKeyReleased(e -> {
-            this.vars[4] = setNumDimensions.getText().trim();
+            if (isNumInteger(setNumDimensions.getText().trim())){
+                this.vars[4] = setNumDimensions.getText().trim();
+            } else
+                this.vars[4] = "0";
         });
 
         // this.vars[5] = "0" temperature      n/a

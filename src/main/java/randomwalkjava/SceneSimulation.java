@@ -88,7 +88,8 @@ public class SceneSimulation extends Data {
                 } else {
                     this.vars[0] = setNumParticles.getText().trim();
                 }
-            }
+            } else
+                this.vars[0] = "0";
         });
 
         Label labSizeParticles = new Label("diameter of particle:");
@@ -102,7 +103,10 @@ public class SceneSimulation extends Data {
                     }
                 }
             } else
-                this.vars[1] = setSizeParticles.getText().trim();
+                if (isNumInteger(setSizeParticles.getText().trim()))
+                    this.vars[1] = setSizeParticles.getText().trim();
+                else
+                    this.vars[1] = "0";
         });
 
         Label labCharge = new Label("charge of particles:");
@@ -128,19 +132,26 @@ public class SceneSimulation extends Data {
                                 Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
                     this.vars[8] = "a";
                 }
-            }
+            } else
+                this.vars[2] = "0";
         });
 
         Label labNumSteps = new Label("number of steps:");
         TextField setNumSteps = new TextField("");
         setNumSteps.setOnKeyReleased(e -> {
-            this.vars[3] = setNumSteps.getText().trim();
+            if (isNumInteger(setNumSteps.getText().trim())){
+                this.vars[3] = setNumSteps.getText().trim();
+            } else
+                this.vars[3] = "0";
         });
 
         Label labNumDimensions = new Label("dimensions:");
         TextField setNumDimensions = new TextField("");
         setNumDimensions.setOnKeyReleased(e -> {
-            this.vars[4] = setNumDimensions.getText().trim();
+            if (isNumInteger(setNumSteps.getText().trim())){
+                this.vars[4] = setNumDimensions.getText().trim();
+            } else
+                this.vars[4] = "0";
         });
 
         // this.vars[5] = "0" temperature      n/a

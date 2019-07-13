@@ -41,34 +41,29 @@ import javax.swing.JFrame;
 
 public class MainApp extends Application {
 
-    // IMAGE
-    final int chartWidth = 860;
-    final int chartHeight = 605;
     // STAGE
-    final int stageWidth = 940;
-    final int stageHeight = 660;
+    private final int stageWidth = 940;
+    private final int stageHeight = 660;
     // COMPONENTS
-    final int buttonWidth = 150;
-    final int textwidth = 740;
-    final int textheight = 600;
-    final int animwidth = 900;
-    final int animheight = 900;
-    final int simheight = 610;
-    final int mmcheight = 630;
-    final int paneWidth = 200;
-    final int screenWidth = Screen.getMainScreen().getWidth();
-    final int screenHeight = Screen.getMainScreen().getHeight();
+    private final int buttonWidth = 150;
+    private final int textwidth = 740;
+    private final int textheight = 600;
+    private final int animwidth = 900;
+    private final int animheight = 900;
+    private final int simheight = 610;
+    private final int mmcheight = 630;
+    private final int paneWidth = 200;
+    private final int screenWidth = Screen.getMainScreen().getWidth();
+    private final int screenHeight = Screen.getMainScreen().getHeight();
     // DATA
     public String[] vars;
-    public double scalefactor = 1.0;
-    public double globalpha = 1.0;
-    public double linewidth = 1.0;
-    public boolean isscaled = false;
-    public boolean onoff = false;
+    private double scalefactor = 1.0;
+    private double linewidth = 1.0;
+    private boolean isscaled = false;
 
     private boolean newdata = false;
-    public double[] rms_runs;
-    public double[] rms_std;
+    private double[] rms_runs;
+    private double[] rms_norm;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -134,18 +129,18 @@ public class MainApp extends Application {
         ////////////////////////////////////////////////////
         // CREATE STAGE
         stage.setTitle("Random Walk");
-        stage.setWidth(stageWidth);
-        stage.setHeight(stageHeight);
+        stage.setWidth(this.stageWidth);
+        stage.setHeight(this.stageHeight);
         stage.setResizable(false);
-        stage.setX(screenWidth/2);
-        stage.setY((screenHeight-stageHeight)/2);
+        stage.setX(this.screenWidth/2);
+        stage.setY((this.screenHeight-this.stageHeight)/2);
 
         DropShadow shadow = new DropShadow();
 
         ////////////////////////////////////////////////////
         // SET FIRST VIEW BORDERPANE
         GridPane asettelu = new GridPane();
-        asettelu.setMaxWidth(paneWidth);
+        asettelu.setMaxWidth(this.paneWidth);
         asettelu.setVgap(5);
         asettelu.setHgap(10);
         asettelu.setPadding(new Insets(0, 0, 0, 0));
@@ -156,18 +151,18 @@ public class MainApp extends Application {
         Button nappiScene2 = new Button("RANDOM WALK");
         Button nappiScene3 = new Button("REAL TIME WALK");
         Button nappiScene4 = new Button("MMC");
-        nappiScene1.setMinWidth(buttonWidth);
-        nappiScene1.setMaxWidth(buttonWidth);
-        nappiScene2.setMinWidth(buttonWidth);
-        nappiScene2.setMaxWidth(buttonWidth);
-        nappiScene3.setMinWidth(buttonWidth);
-        nappiScene3.setMaxWidth(buttonWidth);
-        nappiScene4.setMinWidth(buttonWidth);
-        nappiScene4.setMaxWidth(buttonWidth);
+        nappiScene1.setMinWidth(this.buttonWidth);
+        nappiScene1.setMaxWidth(this.buttonWidth);
+        nappiScene2.setMinWidth(this.buttonWidth);
+        nappiScene2.setMaxWidth(this.buttonWidth);
+        nappiScene3.setMinWidth(this.buttonWidth);
+        nappiScene3.setMaxWidth(this.buttonWidth);
+        nappiScene4.setMinWidth(this.buttonWidth);
+        nappiScene4.setMaxWidth(this.buttonWidth);
 
         Button nappiMenuHelp = new Button("HELP");
-        nappiMenuHelp.setMinWidth(buttonWidth);
-        nappiMenuHelp.setMaxWidth(buttonWidth);
+        nappiMenuHelp.setMinWidth(this.buttonWidth);
+        nappiMenuHelp.setMaxWidth(this.buttonWidth);
 
         GridPane.setHalignment(nappiScene1, HPos.LEFT);
         asettelu.add(nappiScene1, 0, 0, 2, 1);
@@ -309,10 +304,10 @@ public class MainApp extends Application {
         HelpText helpText = new HelpText();
         // CALCULATION
         TextArea textAreaCalc = new TextArea();
-        textAreaCalc.setMinWidth(textwidth);
-        textAreaCalc.setMaxWidth(textwidth);
-        textAreaCalc.setMinHeight(textheight);
-        textAreaCalc.setMaxHeight(textheight);
+        textAreaCalc.setMinWidth(this.textwidth);
+        textAreaCalc.setMaxWidth(this.textwidth);
+        textAreaCalc.setMinHeight(this.textheight);
+        textAreaCalc.setMaxHeight(this.textheight);
         textAreaCalc.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
         textAreaCalc.setBorder(null);
         textAreaCalc.setEditable(false);
@@ -322,10 +317,10 @@ public class MainApp extends Application {
         textAreaCalc.setBlendMode(BlendMode.DIFFERENCE);
         // SIMULATION
         TextArea textAreaSim = new TextArea();
-        textAreaSim.setMinWidth(textwidth);
-        textAreaSim.setMaxWidth(textwidth);
-        textAreaSim.setMinHeight(simheight);
-        textAreaSim.setMaxHeight(simheight);
+        textAreaSim.setMinWidth(this.textwidth);
+        textAreaSim.setMaxWidth(this.textwidth);
+        textAreaSim.setMinHeight(this.simheight);
+        textAreaSim.setMaxHeight(this.simheight);
         textAreaSim.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
         textAreaSim.setBorder(null);
         textAreaSim.setEditable(false);
@@ -335,10 +330,10 @@ public class MainApp extends Application {
         textAreaSim.setBlendMode(BlendMode.DIFFERENCE);
         // ANIMATION
         TextArea textAreaAnim = new TextArea();
-        textAreaAnim.setMinWidth(animwidth);
-        textAreaAnim.setMaxWidth(animwidth);
-        textAreaAnim.setMinHeight(animheight);
-        textAreaAnim.setMaxHeight(animheight);
+        textAreaAnim.setMinWidth(this.animwidth);
+        textAreaAnim.setMaxWidth(this.animwidth);
+        textAreaAnim.setMinHeight(this.animheight);
+        textAreaAnim.setMaxHeight(this.animheight);
         textAreaAnim.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
         textAreaAnim.setBorder(null);
         textAreaAnim.setEditable(false);
@@ -348,10 +343,10 @@ public class MainApp extends Application {
         textAreaAnim.setBlendMode(BlendMode.DIFFERENCE);
         // MMC
         TextArea textAreaMMC = new TextArea();
-        textAreaMMC.setMinWidth(textwidth);
-        textAreaMMC.setMaxWidth(textwidth);
-        textAreaMMC.setMinHeight(mmcheight);
-        textAreaMMC.setMaxHeight(mmcheight);
+        textAreaMMC.setMinWidth(this.textwidth);
+        textAreaMMC.setMaxWidth(this.textwidth);
+        textAreaMMC.setMinHeight(this.mmcheight);
+        textAreaMMC.setMaxHeight(this.mmcheight);
         textAreaMMC.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
         textAreaMMC.setBorder(null);
         textAreaMMC.setEditable(false);
@@ -363,10 +358,10 @@ public class MainApp extends Application {
         ////////////////////////////////////////////////////
         // TEXT AREA MENU
         TextArea textAreaMenu = new TextArea(helpText.welcome());
-        textAreaMenu.setMinWidth(textwidth);
-        textAreaMenu.setMaxWidth(textwidth);
-        textAreaMenu.setMinHeight(textheight);
-        textAreaMenu.setMaxHeight(textheight);
+        textAreaMenu.setMinWidth(this.textwidth);
+        textAreaMenu.setMaxWidth(this.textwidth);
+        textAreaMenu.setMinHeight(this.textheight);
+        textAreaMenu.setMaxHeight(this.textheight);
         textAreaMenu.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
         textAreaMenu.setBorder(null);
         textAreaMenu.setEditable(false);
@@ -377,17 +372,17 @@ public class MainApp extends Application {
         
         ////////////////////////////////////////////////////
         // ANIMATION COMPONENTS
-        Canvas animAlusta = new Canvas(animwidth, animheight);
+        Canvas animAlusta = new Canvas(this.animwidth, this.animheight);
         animAlusta.setVisible(true);
 
         GraphicsContext piirturi = animAlusta.getGraphicsContext2D();
         piirturi.setFill(Color.BLACK);
-        piirturi.fillRect(0, 0, animwidth, animheight);
+        piirturi.fillRect(0, 0, this.animwidth, this.animheight);
         piirturi.setStroke(Color.YELLOW);
         piirturi.setGlobalAlpha(0.2);
 
         Pane pane = new Pane();
-        pane.setPrefSize(animwidth, animheight);
+        pane.setPrefSize(this.animwidth, this.animheight);
         pane.getChildren().add(animAlusta);
         pane.setVisible(true);
 
@@ -409,8 +404,8 @@ public class MainApp extends Application {
         // OTHER VIEWS BUTTON: EXECUTE CALCULATION
         Button executeNappiCalc = new Button("EXECUTE");
         executeNappiCalc.setDefaultButton(true);
-        executeNappiCalc.setMinWidth(buttonWidth);
-        executeNappiCalc.setMaxWidth(buttonWidth);
+        executeNappiCalc.setMinWidth(this.buttonWidth);
+        executeNappiCalc.setMaxWidth(this.buttonWidth);
         executeNappiCalc.setTextFill(Color.RED);
                     executeNappiCalc.setBackground(
                         new Background(
@@ -428,8 +423,8 @@ public class MainApp extends Application {
 
         // OTHER VIEWS BUTTON: CALCULATION MENU
         Button menuNappiCalc = new Button("BACK TO MENU");
-        menuNappiCalc.setMinWidth(buttonWidth);
-        menuNappiCalc.setMaxWidth(buttonWidth);
+        menuNappiCalc.setMinWidth(this.buttonWidth);
+        menuNappiCalc.setMaxWidth(this.buttonWidth);
         menuNappiCalc.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
                 menuNappiCalc.setEffect(shadow);
@@ -442,8 +437,8 @@ public class MainApp extends Application {
 
         // OTHER VIEWS BUTTON: CALCULATION HELP
         Button helpNappiCalc = new Button("HELP");
-        helpNappiCalc.setMinWidth(buttonWidth);
-        helpNappiCalc.setMaxWidth(buttonWidth);
+        helpNappiCalc.setMinWidth(this.buttonWidth);
+        helpNappiCalc.setMaxWidth(this.buttonWidth);
         GridPane.setHalignment(helpNappiCalc, HPos.LEFT);
         helpNappiCalc.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
@@ -462,8 +457,8 @@ public class MainApp extends Application {
         // OTHER VIEWS BUTTON: EXECUTE SIMULATION
         Button executeNappiSim = new Button("EXECUTE");
         executeNappiSim.setDefaultButton(true);
-        executeNappiSim.setMinWidth(buttonWidth);
-        executeNappiSim.setMaxWidth(buttonWidth);
+        executeNappiSim.setMinWidth(this.buttonWidth);
+        executeNappiSim.setMaxWidth(this.buttonWidth);
         executeNappiSim.setTextFill(Color.RED);
         executeNappiSim.setBackground(
                     new Background(
@@ -481,8 +476,8 @@ public class MainApp extends Application {
 
         // OTHER VIEWS BUTTON: SIMULATION MENU
         Button menuNappiSim = new Button("BACK TO MENU");
-        menuNappiSim.setMinWidth(buttonWidth);
-        menuNappiSim.setMaxWidth(buttonWidth);
+        menuNappiSim.setMinWidth(this.buttonWidth);
+        menuNappiSim.setMaxWidth(this.buttonWidth);
         menuNappiSim.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
                 menuNappiSim.setEffect(shadow);
@@ -495,8 +490,8 @@ public class MainApp extends Application {
 
         // OTHER VIEWS BUTTON: SIMULATION HELP
         Button helpNappiSim = new Button("HELP");
-        helpNappiSim.setMinWidth(buttonWidth);
-        helpNappiSim.setMaxWidth(buttonWidth);
+        helpNappiSim.setMinWidth(this.buttonWidth);
+        helpNappiSim.setMaxWidth(this.buttonWidth);
         helpNappiSim.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
                 helpNappiSim.setEffect(shadow);
@@ -514,8 +509,8 @@ public class MainApp extends Application {
         // OTHER VIEWS BUTTON: RUN ANIMATION
         Button runAnim = new Button("RUN");
         runAnim.setDefaultButton(true);
-        runAnim.setMinWidth(buttonWidth);
-        runAnim.setMaxWidth(buttonWidth);
+        runAnim.setMinWidth(this.buttonWidth);
+        runAnim.setMaxWidth(this.buttonWidth);
         runAnim.setTextFill(Color.RED);
                     runAnim.setBackground(
                         new Background(
@@ -533,8 +528,8 @@ public class MainApp extends Application {
 
         // OTHER VIEWS BUTTON: ANIMATION MENU
         Button menuNappiAnim = new Button("BACK TO MENU");
-        menuNappiAnim.setMinWidth(buttonWidth);
-        menuNappiAnim.setMaxWidth(buttonWidth);
+        menuNappiAnim.setMinWidth(this.buttonWidth);
+        menuNappiAnim.setMaxWidth(this.buttonWidth);
         menuNappiAnim.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
                 menuNappiAnim.setEffect(shadow);
@@ -547,8 +542,8 @@ public class MainApp extends Application {
 
         // OTHER VIEWS BUTTON: ANIMATION HELP
         Button helpNappiAnim = new Button("HELP");
-        helpNappiAnim.setMinWidth(buttonWidth);
-        helpNappiAnim.setMaxWidth(buttonWidth);
+        helpNappiAnim.setMinWidth(this.buttonWidth);
+        helpNappiAnim.setMaxWidth(this.buttonWidth);
         GridPane.setHalignment(helpNappiAnim, HPos.LEFT);
         helpNappiAnim.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
@@ -571,8 +566,8 @@ public class MainApp extends Application {
         // OTHER VIEWS BUTTON: EXECUTE MMC
         Button runMMC = new Button("RUN");
         runMMC.setDefaultButton(true);
-        runMMC.setMinWidth(buttonWidth);
-        runMMC.setMaxWidth(buttonWidth);
+        runMMC.setMinWidth(this.buttonWidth);
+        runMMC.setMaxWidth(this.buttonWidth);
         runMMC.setTextFill(Color.RED);
                     runMMC.setBackground(
                         new Background(
@@ -590,8 +585,8 @@ public class MainApp extends Application {
 
         // OTHER VIEWS BUTTON: MMC MENU
         Button menuNappiMMC = new Button("BACK TO MENU");
-        menuNappiMMC.setMinWidth(buttonWidth);
-        menuNappiMMC.setMaxWidth(buttonWidth);
+        menuNappiMMC.setMinWidth(this.buttonWidth);
+        menuNappiMMC.setMaxWidth(this.buttonWidth);
         menuNappiMMC.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
                 menuNappiMMC.setEffect(shadow);
@@ -604,8 +599,8 @@ public class MainApp extends Application {
 
         // OTHER VIEWS BUTTON: MMC HELP
         Button helpNappiMMC = new Button("HELP");
-        helpNappiMMC.setMinWidth(buttonWidth);
-        helpNappiMMC.setMaxWidth(buttonWidth);
+        helpNappiMMC.setMinWidth(this.buttonWidth);
+        helpNappiMMC.setMaxWidth(this.buttonWidth);
         GridPane.setHalignment(helpNappiMMC, HPos.LEFT);
         helpNappiMMC.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
@@ -684,23 +679,24 @@ public class MainApp extends Application {
 
         ////////////////////////////////////////////////////
         // SET SCENES
-        Scene firstScene = new Scene(asetteluMenu,stageWidth,stageHeight);
+        Scene firstScene = new Scene(asetteluMenu,this.stageWidth,this.stageHeight);
         firstScene.getStylesheets().add("/styles/Styles.css");
 
-        Scene calcScene = new Scene(asetteluCalc,stageWidth,stageHeight);
+        Scene calcScene = new Scene(asetteluCalc,this.stageWidth,this.stageHeight);
         calcScene.getStylesheets().add("/styles/Styles.css");
 
-        Scene simScene = new Scene(asetteluSim,stageWidth,stageHeight + (simheight-textheight));
+        Scene simScene = new Scene(asetteluSim,this.stageWidth,this.stageHeight
+            + (this.simheight-this.textheight));
         simScene.getStylesheets().add("/styles/Styles.css");
 
         Scene animScene = new Scene(asetteluAnim,
-            stageWidth + (animwidth-textwidth),
-            stageHeight + (animheight-textheight));
+            this.stageWidth + (this.animwidth-this.textwidth),
+            this.stageHeight + (this.animheight-this.textheight));
         animScene.getStylesheets().add("/styles/Styles.css");
 
         Scene mmcScene = new Scene(asetteluMMC,
-            stageWidth + (animwidth-textwidth),
-            stageHeight + (animheight-textheight));
+            this.stageWidth + (this.animwidth-this.textwidth),
+            this.stageHeight + (this.animheight-this.textheight));
         mmcScene.getStylesheets().add("/styles/Styles.css");
 
         ////////////////////////////////////////////////////
@@ -722,9 +718,9 @@ public class MainApp extends Application {
         // SIMULATION
         nappiScene2.setOnMouseClicked(event -> {
             stage.setTitle("Random Walk simulation");
-            if ( stage.getHeight() == stageHeight ){
-                stage.setHeight(stageHeight+(simheight-textheight));
-                stage.setY((screenHeight-stageHeight)/2-(simheight-textheight)/2);
+            if ( stage.getHeight() == this.stageHeight ){
+                stage.setHeight(this.stageHeight+(this.simheight-this.textheight));
+                stage.setY((this.screenHeight-this.stageHeight)/2-(this.simheight-this.textheight)/2);
             }
             stage.setScene(simScene);
         });
@@ -734,18 +730,19 @@ public class MainApp extends Application {
                 textAreaMenu.setText(helpText.welcome());
             else
                 textAreaMenu.setText(textAreaSim.getText());
-            stage.setY((screenHeight-stageHeight)/2);
-            stage.setHeight(stageHeight);
+            stage.setY((this.screenHeight-this.stageHeight)/2);
+            stage.setHeight(this.stageHeight);
             stage.setScene(firstScene);
         });
         // ANIMATION
         nappiScene3.setOnMouseClicked(event -> {
             stage.setTitle("Random Walk Animation");
-            if ( stage.getWidth() == stageWidth ){
-                stage.setWidth(stageWidth+(animwidth-textwidth));
-                stage.setHeight(stageHeight+(animheight-textheight));
-                stage.setX(screenWidth/2-(animwidth-textwidth)+15);
-                stage.setY((screenHeight-stageHeight)/2-(animheight-textheight)/2-30);
+            if ( stage.getWidth() == this.stageWidth ){
+                stage.setWidth(this.stageWidth+(this.animwidth-this.textwidth));
+                stage.setHeight(this.stageHeight+(this.animheight-this.textheight));
+                stage.setX(this.screenWidth/2-(this.animwidth-this.textwidth)+15);
+                stage.setY((this.screenHeight-this.stageHeight)/2
+                    -(this.animheight-this.textheight)/2-30);
             }
             stage.setScene(animScene);
         });
@@ -755,20 +752,21 @@ public class MainApp extends Application {
                 textAreaMenu.setText(helpText.welcome());
             else
                 textAreaMenu.clear();
-            stage.setX(screenWidth/2);
-            stage.setY((screenHeight-stageHeight)/2);
-            stage.setWidth(stageWidth);
-            stage.setHeight(stageHeight);
+            stage.setX(this.screenWidth/2);
+            stage.setY((this.screenHeight-this.stageHeight)/2);
+            stage.setWidth(this.stageWidth);
+            stage.setHeight(this.stageHeight);
             stage.setScene(firstScene);
         });
         // MMC
         nappiScene4.setOnMouseClicked(event -> {
             stage.setTitle("MMC Random Walk");
-            if ( stage.getWidth() == stageWidth ){
-                stage.setWidth(stageWidth+(animwidth-textwidth));
-                stage.setHeight(stageHeight+(animheight-textheight));
-                stage.setX(screenWidth/2-(animwidth-textwidth)+15);
-                stage.setY((screenHeight-stageHeight)/2-(animheight-textheight)/2-30);
+            if ( stage.getWidth() == this.stageWidth ){
+                stage.setWidth(this.stageWidth+(this.animwidth-this.textwidth));
+                stage.setHeight(this.stageHeight+(this.animheight-this.textheight));
+                stage.setX(this.screenWidth/2-(this.animwidth-this.textwidth)+15);
+                stage.setY((this.screenHeight-this.stageHeight)/2
+                    -(this.animheight-this.textheight)/2-30);
             }
             stage.setScene(mmcScene);
         });
@@ -778,10 +776,10 @@ public class MainApp extends Application {
                 textAreaMenu.setText(helpText.welcome());
             else
                 textAreaMenu.setText(textAreaMMC.getText());
-            stage.setX(screenWidth/2);
-            stage.setY((screenHeight-stageHeight)/2);
-            stage.setWidth(stageWidth);
-            stage.setHeight(stageHeight);
+            stage.setX(this.screenWidth/2);
+            stage.setY((this.screenHeight-this.stageHeight)/2);
+            stage.setWidth(this.stageWidth);
+            stage.setHeight(this.stageHeight);
             stage.setScene(firstScene);
         });
 
@@ -799,7 +797,7 @@ public class MainApp extends Application {
             // BUTTON PRESSED ON
             this.vars = getCalcScene.getVars();
             Data data = new Data(this.vars);
-            ex.executeRms(datafolder, textAreaSim, frame, data, vars);
+            ex.executeRms(datafolder, textAreaSim, frame, data, this.vars);
         });
 
         ////////////////////////////////////////////////////
@@ -808,7 +806,7 @@ public class MainApp extends Application {
             // BUTTON PRESSED ON
             this.vars = getSimScene.getVars();
             Data data = new Data(this.vars);
-            ex.executeSim(datafolder, textAreaSim, frame, data, vars);
+            ex.executeSim(datafolder, textAreaSim, frame, data, this.vars);
         });
 
         ////////////////////////////////////////////////////
@@ -831,13 +829,12 @@ public class MainApp extends Application {
             private final long sleepNanoseconds = 100 * 1000000;
             private long prevTime = 0;
             private int dim;
-            private double steps;
 
             @Override
             public void handle(long currentNanoTime) {
 
                 // päivitetään animaatiota noin 100 millisekunnin välein
-                if ((currentNanoTime - prevTime) < sleepNanoseconds) {
+                if ((currentNanoTime - this.prevTime) < this.sleepNanoseconds) {
                     return;
                 }
 
@@ -849,22 +846,6 @@ public class MainApp extends Application {
                     textAreaAnim.clear();
                     isovalikkoAnim.getChildren().remove(textAreaAnim);
                     isovalikkoAnim.getChildren().add(pane);
-                }
-
-                piirturi.setGlobalAlpha(1.0);
-                piirturi.setFill(Color.BLACK);
-                if ( dim == 1 )
-                    piirturi.fillRect(0, 0, 1.0/scalefactor*animwidth, animheight);
-                else
-                    piirturi.fillRect(0, 0, 1.0/scalefactor*animwidth, 1.0/scalefactor*animheight);
-                piirturi.fill();
-                piirturi.setStroke(Color.YELLOW);
-                if (isscaled) {
-                    if ( dim == 1 )
-                        piirturi.scale(1.0/scalefactor, 1.0);
-                    else
-                        piirturi.scale(1.0/scalefactor, 1.0/scalefactor);
-                    isscaled = false;
                 }
 
                 String[] vars = getAnimScene.getVars();
@@ -880,36 +861,27 @@ public class MainApp extends Application {
                 // vars[7] = lattice,
                 // vars[8] = avoid,         n/a
                 // vars[9] = save           n/a
-                steps = Double.valueOf(vars[3]);
-                dim = Integer.valueOf(vars[4]);
+                this.dim = Integer.valueOf(vars[4]);
 
-                if ( dim == 1 ) {
-                    scalefactor = Math.sqrt((animwidth+200)
-                                / Math.sqrt(steps))
-                                - Math.sqrt(Math.log10(steps));
-                    linewidth = (Math.log10(steps) + 1.0)
-                                / Math.sqrt(steps);
-                    piirturi.scale(scalefactor, 1.0);
-                    isscaled = true;
-                } else if ( dim > 1 ) {
-                    scalefactor = Math.sqrt((animwidth+200)
-                            / Math.sqrt(steps))
-                            - Math.sqrt(Math.log10(steps));
-                    linewidth = Math.pow(Math.log10(steps),2.0)
-                            / (Math.sqrt(2.0 * scalefactor * steps));
-                    piirturi.scale(scalefactor, scalefactor);
-                    isscaled = true;
-                }
+                piirturi.setGlobalAlpha(1.0);
+                piirturi.setFill(Color.BLACK);
+                if ( this.dim == 1 )
+                    piirturi.fillRect(0, 0, 1.0/scalefactor*animwidth, animheight);
+                else if ( this.dim == 2 )
+                    piirturi.fillRect(0, 0, 1.0/scalefactor*animwidth, 1.0/scalefactor*animheight);
+                else if ( this.dim == 3 )
+                    piirturi.fillRect(0, 0, 1.0/scalefactor*animwidth, 1.0/scalefactor*animheight);
+                piirturi.fill();
 
                 // DRAW ANIMATION
                 getAnimScene.refresh(
                     datafolder, fexec, piirturi, scalefactor,
-                    linewidth, fxplot, rms_runs, rms_std, newdata
+                    linewidth, fxplot, rms_runs, rms_norm, newdata
                 );
                 newdata = false;
 
                 // älä muuta tätä
-                prevTime = currentNanoTime;
+                this.prevTime = currentNanoTime;
             }
         }.start();
 
@@ -917,32 +889,142 @@ public class MainApp extends Application {
         // RUN BUTTON ANIMATION
         runAnim.setOnMouseClicked((MouseEvent event) -> {
             if (getAnimScene.isRunning()) {
-                // FOR ONE ROUND OPERATION
-                // COMMENT OUT NEXT LINE
                 getAnimScene.stop();
+                String[] vars = getAnimScene.getVars();
+                int dim = Integer.valueOf(vars[4]);
+                if ( this.isscaled == true ) {
+                    if ( dim == 1 )
+                        piirturi.scale(1.0/this.scalefactor, 1.0);
+                    else 
+                        piirturi.scale(1.0/this.scalefactor, 1.0/this.scalefactor);
+                }
                 runAnim.setText("RUN");
             } else {
-                // FOR ONE ROUND OPERATION
-                // COMMENT OUT NEXT LINE
+                String[] vars = getAnimScene.getVars();
+                int dim = Integer.valueOf(vars[4]);
+                double steps = Double.valueOf(vars[3]);
+
+                this.scalefactor = 
+                    Math.sqrt( this.animwidth + 100 * Math.pow(Math.log10(steps),2.0) )
+                    / Math.pow(Math.log10(steps),2.0);
+                if ( dim == 1 ) {
+                    this.linewidth = 1.0 / Math.log10(steps);
+                    piirturi.scale(this.scalefactor, 1.0);
+                } else if ( dim == 2 ) {
+                    this.linewidth = 1.0 / ( this.scalefactor * Math.sqrt(Math.log10(steps)) );
+                    piirturi.scale(this.scalefactor, this.scalefactor);
+                } else if ( dim == 3 ) {
+                    this.linewidth = 1.0 / ( 3.0 * this.scalefactor * Math.sqrt(Math.log10(steps)) );
+                    piirturi.scale(this.scalefactor, this.scalefactor);
+                }
+                this.isscaled = true;
+                piirturi.setGlobalAlpha(1.0 / this.scalefactor * Math.pow(Math.log10(steps),2.0));
+
                 this.newdata = true;
                 this.rms_runs = new double[10];
-                this.rms_std = new double[10];
+                this.rms_norm = new double[10];
                 Arrays.fill(this.rms_runs, 0.0);
-                String[] vars = getAnimScene.getVars();
-                double mean = Math.sqrt(Double.valueOf(vars[3]));
+                Arrays.fill(this.rms_norm, 0.0);
+                double expected = Math.sqrt(steps);
                 int mincount;
-                if ( (int) mean < 5 )
+                if ( (int) expected < 5 )
                     mincount = 0;
                 else
-                    mincount = (int) mean - 5;
-                int maxcount = (int) mean + 5;
-                fxplot.setWData("sqrt(N)", "R_rms", rms_runs, rms_runs);
-                fxplot.setHData("mean","norm", rms_std, rms_std, mincount, maxcount, mean);
+                    mincount = (int) expected - 5;
+                int maxcount = (int) expected + 5;
+                fxplot.setWData("R_rms", "sqrt(N)", this.rms_runs, this.rms_runs, expected);
+                fxplot.setHData("norm", this.rms_norm, this.rms_norm, mincount, maxcount);
         
                 getAnimScene.start();
                 runAnim.setText("STOP");
             }
         });
+
+        ////////////////////////////////////////////////////
+        // RUN BUTTON ONE ROUND DEBUGGING
+        /*runAnim.setOnMouseClicked((MouseEvent event) -> {
+
+            int dim;
+            double steps;
+            
+            this.newdata = true;
+            this.rms_runs = new double[10];
+            this.rms_std = new double[10];
+            Arrays.fill(this.rms_runs, 0.0);
+            String[] vars = getAnimScene.getVars();
+            double expected = Math.sqrt(Double.valueOf(vars[3]));
+            int mincount;
+            if ( (int) expected < 5 )
+                mincount = 0;
+            else
+                mincount = (int) expected - 5;
+            int maxcount = (int) expected + 5;
+            fxplot.setWData("R_rms", "sqrt(N)", rms_runs, rms_runs, expected);
+            fxplot.setHData("norm", rms_std, rms_std, mincount, maxcount);
+
+            if ( isovalikkoAnim.getChildren().contains(textAreaAnim)) {
+                textAreaAnim.clear();
+                isovalikkoAnim.getChildren().remove(textAreaAnim);
+                isovalikkoAnim.getChildren().add(pane);
+            }
+
+            // FROM SCENEANIMATION
+            // vars from user:
+            // vars[0] = particles,
+            // vars[1] = diameter,
+            // vars[2] = charge,        n/a
+            // vars[3] = steps,
+            // vars[4] = dimension,
+            // vars[5] = temperature,   n/a
+            // vars[6] = fixed,         n/a
+            // vars[7] = lattice,
+            // vars[8] = avoid,         n/a
+            // vars[9] = save           n/a
+            steps = Double.valueOf(vars[3]);
+            dim = Integer.valueOf(vars[4]);
+
+            piirturi.setGlobalAlpha(1.0);
+            piirturi.setFill(Color.BLACK);
+            if ( dim == 1 )
+                piirturi.fillRect(0, 0, 1.0/scalefactor*animwidth, animheight);
+            else
+                piirturi.fillRect(0, 0, 1.0/scalefactor*animwidth, 1.0/scalefactor*animheight);
+            piirturi.fill();
+            piirturi.setStroke(Color.YELLOW);
+            if (isscaled) {
+                if ( dim == 1 )
+                    piirturi.scale(1.0/scalefactor, 1.0);
+                else
+                    piirturi.scale(1.0/scalefactor, 1.0/scalefactor);
+                isscaled = false;
+            }
+
+            if ( dim == 1 ) {
+                scalefactor = Math.sqrt((animwidth+200)
+                            / Math.sqrt(steps))
+                            - Math.sqrt(Math.log10(steps));
+                linewidth = (Math.log10(steps) + 1.0)
+                            / Math.sqrt(steps);
+                piirturi.scale(scalefactor, 1.0);
+                isscaled = true;
+            } else if ( dim > 1 ) {
+                scalefactor = Math.sqrt((animwidth+200)
+                        / Math.sqrt(steps))
+                        - Math.sqrt(Math.log10(steps));
+                linewidth = Math.pow(Math.log10(steps),2.0)
+                       / (Math.sqrt(2.0 * scalefactor * steps));
+                piirturi.scale(scalefactor, scalefactor);
+                isscaled = true;
+            }
+
+            // DRAW ANIMATION
+            getAnimScene.refresh(
+                datafolder, fexec, piirturi, scalefactor,
+                linewidth, fxplot, rms_runs, rms_std, newdata
+            );
+            newdata = false;
+
+        });*/
 
         stage.setScene(firstScene);
         Image img = new Image("images/icon.png");
