@@ -81,13 +81,19 @@ public class SceneCalculation extends Data {
         Label labNumSteps = new Label("number of steps:");
         TextField setNumSteps = new TextField("");
         setNumSteps.setOnKeyReleased(e -> {
-            this.vars[3] = setNumSteps.getText().trim();
+            if (isNumInteger(setNumSteps.getText().trim())){
+                this.vars[3] = setNumSteps.getText().trim();
+            } else
+                this.vars[3] = "0";
         });
 
         Label labNumDimensions = new Label("dimensions:");
         TextField setNumDimensions = new TextField("");
         setNumDimensions.setOnKeyReleased(e -> {
-            this.vars[4] = setNumDimensions.getText().trim();
+            if (isNumInteger(setNumDimensions.getText().trim())){
+                this.vars[4] = setNumDimensions.getText().trim();
+            } else
+                this.vars[4] = "0";
         });
 
         // this.vars[5] = "0" temperature

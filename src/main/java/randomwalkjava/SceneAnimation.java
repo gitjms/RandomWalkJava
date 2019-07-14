@@ -29,7 +29,6 @@ public class SceneAnimation extends Data {
     private double rms_data;
     private double smallest;
     private double greatest;
-    
 
     @Override
     public String[] getVars() {
@@ -86,7 +85,7 @@ public class SceneAnimation extends Data {
     }
 
     public void refresh(File folderPath, String executable,
-        GraphicsContext piirturi, double scalefactor, double linewidth,
+        GraphicsContext piirturi, double scalefactor, int animwidth, double linewidth,
         FXPlot fxplot, double[] rms_runs, double[] rms_norm, boolean newdata) {
 
         int i = 0;
@@ -209,7 +208,7 @@ public class SceneAnimation extends Data {
                                 try {
                                     values[0][i] = Double.parseDouble(valStr[0].trim()) + centerX/scalefactor;
                                     values[1][i] = Double.parseDouble(valStr[1].trim()) + centerX/scalefactor;
-                                    values[2][i] = Double.parseDouble(valStr[2].trim()) + centerX/scalefactor;
+                                    values[2][i] = Double.parseDouble(valStr[2].trim()) + 1.2*centerX/scalefactor;
                                 } catch (NumberFormatException e) {
                                     continue;
                                 }
@@ -220,19 +219,19 @@ public class SceneAnimation extends Data {
                                 if (dim == 1) {
                                     piirturi.fillRect(
                                         values[0][i], centerY,
-                                        expected / 8.0,
+                                        expected / ( 10.0 * Math.sqrt(Math.log10(steps)) ),
                                         Math.sqrt(centerY/2.0));
                                 } else if (dim == 2) {
                                     piirturi.fillRect(
                                         values[0][i], values[1][i],
-                                        expected  / 8.0,
-                                        expected / 8.0);
+                                        expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ),
+                                        expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ));
                                 } else if (dim == 3) {
                                     piirturi.fillRect(
                                         values[0][i] + Math.cos(values[2][i]),
                                         values[1][i] + Math.sin(values[2][i]),
-                                        expected  / 8.0,
-                                        expected / 8.0);
+                                        expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ),
+                                        expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ));
                                 }
                                 piirturi.setStroke(Color.YELLOW);
                             }
@@ -243,8 +242,8 @@ public class SceneAnimation extends Data {
                                         piirturi.strokeLine(
                                             muistiX[k], muistiY[k], values[0][k], values[1][k]);
                                     } else {
-                                        linewidth = Math.sqrt(values[2][k])
-                                            * 1.0 / ( 4.0 * Math.log10(steps) * scalefactor );
+                                        linewidth = 10.0 * Math.log10(steps)
+                                            / ( values[2][k] * scalefactor );
                                         piirturi.setLineWidth(linewidth);
                                         piirturi.strokeLine(
                                             muistiX[k], muistiY[k],
@@ -398,7 +397,7 @@ public class SceneAnimation extends Data {
                 this.vars[0] = "0";
         });
 
-        // this.vars[1] = "0.1" (diameter of particl)
+        // this.vars[1] = "0.1" (diameter of particle)
         // this.vars[2] = "0" (charge of particles)
 
         Label labNumSteps = new Label("number of steps:");

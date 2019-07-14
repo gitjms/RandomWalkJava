@@ -11,10 +11,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
+import javafx.event.EventType;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -51,10 +54,10 @@ public class MainApp extends Application {
     private final int animwidth = 900;
     private final int animheight = 900;
     private final int simheight = 610;
-    private final int mmcheight = 630;
     private final int paneWidth = 200;
     private final int screenWidth = Screen.getMainScreen().getWidth();
     private final int screenHeight = Screen.getMainScreen().getHeight();
+    private FXPlot fxplot;
     // DATA
     public String[] vars;
     private double scalefactor = 1.0;
@@ -64,10 +67,12 @@ public class MainApp extends Application {
     private boolean newdata = false;
     private double[] rms_runs;
     private double[] rms_norm;
+    private List <Double> energy_x;
+    private List <Double> energy_y;
 
     @Override
     public void start(Stage stage) throws Exception {
-
+        this.fxplot = null;
         ////////////////////////////////////////////////////
         // FILE AND FOLDER CHECK
         String datapath = "C:\\DATA";
@@ -343,10 +348,10 @@ public class MainApp extends Application {
         textAreaAnim.setBlendMode(BlendMode.DIFFERENCE);
         // MMC
         TextArea textAreaMMC = new TextArea();
-        textAreaMMC.setMinWidth(this.textwidth);
-        textAreaMMC.setMaxWidth(this.textwidth);
-        textAreaMMC.setMinHeight(this.mmcheight);
-        textAreaMMC.setMaxHeight(this.mmcheight);
+        textAreaMMC.setMinWidth(this.animwidth);
+        textAreaMMC.setMaxWidth(this.animwidth);
+        textAreaMMC.setMinHeight(this.animheight);
+        textAreaMMC.setMaxHeight(this.animheight);
         textAreaMMC.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
         textAreaMMC.setBorder(null);
         textAreaMMC.setEditable(false);
@@ -378,13 +383,29 @@ public class MainApp extends Application {
         GraphicsContext piirturi = animAlusta.getGraphicsContext2D();
         piirturi.setFill(Color.BLACK);
         piirturi.fillRect(0, 0, this.animwidth, this.animheight);
-        piirturi.setStroke(Color.YELLOW);
-        piirturi.setGlobalAlpha(0.2);
+        //piirturi.setStroke(Color.YELLOW);
+        //piirturi.setGlobalAlpha(0.2);
 
         Pane pane = new Pane();
         pane.setPrefSize(this.animwidth, this.animheight);
         pane.getChildren().add(animAlusta);
         pane.setVisible(true);
+        
+        ////////////////////////////////////////////////////
+        // MMC COMPONENTS
+        Canvas mmcAlusta = new Canvas(this.animwidth, this.animheight);
+        mmcAlusta.setVisible(true);
+
+        GraphicsContext mmcpiirturi = mmcAlusta.getGraphicsContext2D();
+        mmcpiirturi.setFill(Color.BLACK);
+        mmcpiirturi.fillRect(0, 0, this.animwidth, this.animheight);
+        //mmcpiirturi.setStroke(Color.YELLOW);
+        //mmcpiirturi.setGlobalAlpha(0.2);
+
+        Pane mmcpane = new Pane();
+        mmcpane.setPrefSize(this.animwidth, this.animheight);
+        mmcpane.getChildren().add(mmcAlusta);
+        mmcpane.setVisible(true);
 
         ////////////////////////////////////////////////////
         // FIRST VIEW BUTTON: HELP
@@ -564,7 +585,7 @@ public class MainApp extends Application {
 
         ////////////////////////////////////////////////////
         // OTHER VIEWS BUTTON: EXECUTE MMC
-        Button runMMC = new Button("RUN");
+        Button runMMC = new Button("EXECUTE");
         runMMC.setDefaultButton(true);
         runMMC.setMinWidth(this.buttonWidth);
         runMMC.setMaxWidth(this.buttonWidth);
@@ -810,25 +831,13 @@ public class MainApp extends Application {
         });
 
         ////////////////////////////////////////////////////
-        // EXECUTE BUTTON MMC
-        runMMC.setOnMouseClicked((MouseEvent event) -> {
-            // BUTTON PRESSED ON
-            this.vars = getMMCScene.getVars();
-            Data data = new Data(this.vars);
-            //ex.executeMMC(datafolder, textAreaMMC, frame, data, vars);
-        });
-
-        ////////////////////////////////////////////////////
-        // CREATE AN INSTANCE FOR REAL TIME PLOTTING
-        FXPlot fxplot = new FXPlot();
-
-        ////////////////////////////////////////////////////
         // ANIMATION TIMER FOR REAL TIME RANDOM WALK ANIMATION
         new AnimationTimer() {
             // päivitetään animaatiota noin 100 millisekunnin välein
             private final long sleepNanoseconds = 100 * 1000000;
             private long prevTime = 0;
             private int dim;
+            private String[] vars;
 
             @Override
             public void handle(long currentNanoTime) {
@@ -838,30 +847,30 @@ public class MainApp extends Application {
                     return;
                 }
 
-                if (!getAnimScene.isRunning()) {
+                if ( !getAnimScene.isRunning())
                     return;
-                }
 
-                if ( isovalikkoAnim.getChildren().contains(textAreaAnim)) {
+                if ( isovalikkoAnim.getChildren().contains(textAreaAnim) ) {
                     textAreaAnim.clear();
                     isovalikkoAnim.getChildren().remove(textAreaAnim);
                     isovalikkoAnim.getChildren().add(pane);
                 }
 
-                String[] vars = getAnimScene.getVars();
+                this.vars = getAnimScene.getVars();
                 // FROM SCENEANIMATION
                 // vars from user:
-                // vars[0] = particles,
-                // vars[1] = diameter,
+                // vars[0] = particles,     USER
+                // vars[1] = diameter,      USER
                 // vars[2] = charge,        n/a
-                // vars[3] = steps,
-                // vars[4] = dimension,
+                // vars[3] = steps,         USER
+                // vars[4] = dimension,     USER
                 // vars[5] = temperature,   n/a
                 // vars[6] = fixed,         n/a
-                // vars[7] = lattice,
+                // vars[7] = lattice,       USER
                 // vars[8] = avoid,         n/a
                 // vars[9] = save           n/a
-                this.dim = Integer.valueOf(vars[4]);
+
+                this.dim = Integer.valueOf(this.vars[4]);
 
                 piirturi.setGlobalAlpha(1.0);
                 piirturi.setFill(Color.BLACK);
@@ -875,7 +884,7 @@ public class MainApp extends Application {
 
                 // DRAW ANIMATION
                 getAnimScene.refresh(
-                    datafolder, fexec, piirturi, scalefactor,
+                    datafolder, fexec, piirturi, scalefactor, animwidth,
                     linewidth, fxplot, rms_runs, rms_norm, newdata
                 );
                 newdata = false;
@@ -900,13 +909,22 @@ public class MainApp extends Application {
                 }
                 runAnim.setText("RUN");
             } else {
+                if (this.fxplot != null) {
+                if (this.fxplot.isRunning()) this.fxplot.stop();
+                if (this.fxplot.getFrame().isShowing()
+                    || this.fxplot.getFrame().isActive()
+                    || this.fxplot.getFrame().isDisplayable())
+                    this.fxplot.getFrame().dispose();
+                }
+                this.fxplot = new FXPlot("W&H", this.screenHeight);
                 String[] vars = getAnimScene.getVars();
                 int dim = Integer.valueOf(vars[4]);
                 double steps = Double.valueOf(vars[3]);
 
                 this.scalefactor = 
-                    Math.sqrt( this.animwidth + 100 * Math.pow(Math.log10(steps),2.0) )
-                    / Math.pow(Math.log10(steps),2.0);
+                Math.sqrt( this.animwidth + Math.pow(dim,2.0) * 100 * Math.pow(Math.log10(steps),2.0) )
+                / Math.pow(Math.log10(steps),2.0);
+ 
                 if ( dim == 1 ) {
                     this.linewidth = 1.0 / Math.log10(steps);
                     piirturi.scale(this.scalefactor, 1.0);
@@ -914,7 +932,7 @@ public class MainApp extends Application {
                     this.linewidth = 1.0 / ( this.scalefactor * Math.sqrt(Math.log10(steps)) );
                     piirturi.scale(this.scalefactor, this.scalefactor);
                 } else if ( dim == 3 ) {
-                    this.linewidth = 1.0 / ( 3.0 * this.scalefactor * Math.sqrt(Math.log10(steps)) );
+                    //this.linewidth = 1.0 / ( this.scalefactor * Math.sqrt(Math.log10(steps)) );
                     piirturi.scale(this.scalefactor, this.scalefactor);
                 }
                 this.isscaled = true;
@@ -941,95 +959,158 @@ public class MainApp extends Application {
         });
 
         ////////////////////////////////////////////////////
+        // EXECUTE BUTTON MMC
+        runMMC.setOnMouseClicked((MouseEvent event) -> {
+            // BUTTON PRESSED ON
+            if (this.fxplot != null) {
+                if (this.fxplot.isRunning()) this.fxplot.stop();
+                if (this.fxplot.getFrame().isShowing()
+                    || this.fxplot.getFrame().isActive()
+                    || this.fxplot.getFrame().isDisplayable())
+                    this.fxplot.getFrame().dispose();
+            }
+            this.fxplot = new FXPlot("E", this.screenHeight);
+            this.vars = getMMCScene.getVars();
+            Data data = new Data(this.vars);
+            int particles = Integer.valueOf(vars[0]);
+            double steps = Double.valueOf(vars[3]);
+            int dim = Integer.valueOf(vars[4]);
+
+            if ( this.isscaled == true ) {
+                if ( dim == 1 )
+                    mmcpiirturi.scale(1.0/this.scalefactor, 1.0);
+                else 
+                    mmcpiirturi.scale(1.0/this.scalefactor, 1.0/this.scalefactor);
+            }
+
+            this.scalefactor = 
+                Math.sqrt( this.animwidth + Math.pow(dim,2.0) * 100 * Math.pow(Math.log10(steps),2.0) )
+                / Math.pow(Math.log10(steps),2.0);
+ 
+            if ( dim == 1 ) {
+                    this.linewidth = 1.0 / Math.log10(steps);
+                    mmcpiirturi.scale(this.scalefactor, 1.0);
+                } else if ( dim == 2 ) {
+                    this.linewidth = 1.0 / ( this.scalefactor * Math.sqrt(Math.log10(steps)) );
+                    mmcpiirturi.scale(this.scalefactor, this.scalefactor);
+                } else if ( dim == 3 ) {
+                    //this.linewidth = 1.0 / ( this.scalefactor * Math.sqrt(Math.log10(steps)) );
+                    mmcpiirturi.scale(this.scalefactor, this.scalefactor);
+                }
+            this.isscaled = true;
+            mmcpiirturi.setGlobalAlpha(1.0 / this.scalefactor * Math.pow(Math.log10(steps),2.0));
+
+            this.newdata = true;
+            this.energy_x = new ArrayList();
+            this.energy_y = new ArrayList();
+
+			if ( isovalikkoMMC.getChildren().contains(textAreaMMC)) {
+                textAreaMMC.clear();
+                isovalikkoMMC.getChildren().remove(textAreaMMC);
+                isovalikkoMMC.getChildren().add(mmcpane);
+            }
+
+            mmcpiirturi.setGlobalAlpha(1.0);
+            mmcpiirturi.setFill(Color.BLACK);
+            if ( dim == 1 )
+                mmcpiirturi.fillRect(0, 0, 1.0/this.scalefactor*this.animwidth, this.animheight);
+            else if ( dim == 2 )
+                mmcpiirturi.fillRect(0, 0, 1.0/this.scalefactor*this.animwidth, 1.0/this.scalefactor*this.animheight);
+            else if ( dim == 3 )
+                mmcpiirturi.fillRect(0, 0, 1.0/this.scalefactor*this.animwidth, 1.0/this.scalefactor*this.animheight);
+            mmcpiirturi.fill();
+
+            // DRAW ANIMATION
+            getMMCScene.refresh(
+                datafolder, fexec, mmcpiirturi, this.scalefactor,
+                this.animwidth, this.linewidth, this.fxplot, this.energy_x, this.energy_y, this.newdata
+            );
+            this.newdata = false;
+        });
+
+        ////////////////////////////////////////////////////
         // RUN BUTTON ONE ROUND DEBUGGING
         /*runAnim.setOnMouseClicked((MouseEvent event) -> {
+            String[] vars = getAnimScene.getVars();
+            double steps = Double.valueOf(vars[3]);
+            int dim = Integer.valueOf(vars[4]);
+            if ( this.isscaled == true ) {
+                if ( dim == 1 )
+                    piirturi.scale(1.0/this.scalefactor, 1.0);
+                else 
+                    piirturi.scale(1.0/this.scalefactor, 1.0/this.scalefactor);
+            }
 
-            int dim;
-            double steps;
-            
+            this.scalefactor = 
+                Math.sqrt( this.animwidth + 100 * Math.pow(Math.log10(steps),2.0) )
+                / Math.pow(Math.log10(steps),2.0);
+ 
+            if ( dim == 1 ) {
+                this.linewidth = 1.0 / Math.log10(steps);
+                piirturi.scale(this.scalefactor, 1.0);
+            } else if ( dim == 2 ) {
+                this.linewidth = 1.0 / ( this.scalefactor * Math.sqrt(Math.log10(steps)) );
+                piirturi.scale(this.scalefactor, this.scalefactor);
+            } else if ( dim == 3 ) {
+                this.linewidth = 1.0 / ( 3.0 * this.scalefactor * Math.sqrt(Math.log10(steps)) );
+                piirturi.scale(this.scalefactor, this.scalefactor);
+            }
+            this.isscaled = true;
+            piirturi.setGlobalAlpha(1.0 / this.scalefactor * Math.pow(Math.log10(steps),2.0));
+
             this.newdata = true;
             this.rms_runs = new double[10];
-            this.rms_std = new double[10];
+            this.rms_norm = new double[10];
             Arrays.fill(this.rms_runs, 0.0);
-            String[] vars = getAnimScene.getVars();
-            double expected = Math.sqrt(Double.valueOf(vars[3]));
+            Arrays.fill(this.rms_norm, 0.0);
+            double expected = Math.sqrt(steps);
             int mincount;
             if ( (int) expected < 5 )
                 mincount = 0;
             else
                 mincount = (int) expected - 5;
             int maxcount = (int) expected + 5;
-            fxplot.setWData("R_rms", "sqrt(N)", rms_runs, rms_runs, expected);
-            fxplot.setHData("norm", rms_std, rms_std, mincount, maxcount);
+            fxplot.setWData("R_rms", "sqrt(N)", this.rms_runs, this.rms_runs, expected);
+            fxplot.setHData("norm", this.rms_norm, this.rms_norm, mincount, maxcount);
 
-            if ( isovalikkoAnim.getChildren().contains(textAreaAnim)) {
+			if ( isovalikkoAnim.getChildren().contains(textAreaAnim)) {
                 textAreaAnim.clear();
                 isovalikkoAnim.getChildren().remove(textAreaAnim);
                 isovalikkoAnim.getChildren().add(pane);
             }
 
-            // FROM SCENEANIMATION
-            // vars from user:
-            // vars[0] = particles,
-            // vars[1] = diameter,
-            // vars[2] = charge,        n/a
-            // vars[3] = steps,
-            // vars[4] = dimension,
-            // vars[5] = temperature,   n/a
-            // vars[6] = fixed,         n/a
-            // vars[7] = lattice,
-            // vars[8] = avoid,         n/a
-            // vars[9] = save           n/a
-            steps = Double.valueOf(vars[3]);
-            dim = Integer.valueOf(vars[4]);
-
             piirturi.setGlobalAlpha(1.0);
             piirturi.setFill(Color.BLACK);
             if ( dim == 1 )
                 piirturi.fillRect(0, 0, 1.0/scalefactor*animwidth, animheight);
-            else
+            else if ( dim == 2 )
+                piirturi.fillRect(0, 0, 1.0/scalefactor*animwidth, 1.0/scalefactor*animheight);
+            else if ( dim == 3 )
                 piirturi.fillRect(0, 0, 1.0/scalefactor*animwidth, 1.0/scalefactor*animheight);
             piirturi.fill();
-            piirturi.setStroke(Color.YELLOW);
-            if (isscaled) {
-                if ( dim == 1 )
-                    piirturi.scale(1.0/scalefactor, 1.0);
-                else
-                    piirturi.scale(1.0/scalefactor, 1.0/scalefactor);
-                isscaled = false;
-            }
-
-            if ( dim == 1 ) {
-                scalefactor = Math.sqrt((animwidth+200)
-                            / Math.sqrt(steps))
-                            - Math.sqrt(Math.log10(steps));
-                linewidth = (Math.log10(steps) + 1.0)
-                            / Math.sqrt(steps);
-                piirturi.scale(scalefactor, 1.0);
-                isscaled = true;
-            } else if ( dim > 1 ) {
-                scalefactor = Math.sqrt((animwidth+200)
-                        / Math.sqrt(steps))
-                        - Math.sqrt(Math.log10(steps));
-                linewidth = Math.pow(Math.log10(steps),2.0)
-                       / (Math.sqrt(2.0 * scalefactor * steps));
-                piirturi.scale(scalefactor, scalefactor);
-                isscaled = true;
-            }
 
             // DRAW ANIMATION
             getAnimScene.refresh(
                 datafolder, fexec, piirturi, scalefactor,
-                linewidth, fxplot, rms_runs, rms_std, newdata
+                linewidth, fxplot, rms_runs, rms_norm, newdata
             );
             newdata = false;
-
         });*/
 
         stage.setScene(firstScene);
         Image img = new Image("images/icon.png");
         stage.getIcons().add(img);
-
+        stage.addEventHandler(EventType.ROOT, e -> {
+            stage.setOnHiding(f-> {
+                if (this.fxplot != null) {
+                    if (this.fxplot.isRunning()) this.fxplot.stop();
+                    if (this.fxplot.getFrame().isShowing()
+                        || this.fxplot.getFrame().isActive()
+                        || this.fxplot.getFrame().isDisplayable())
+                        this.fxplot.getFrame().dispose();
+                }
+            });
+        });
         stage.show();
     }
 

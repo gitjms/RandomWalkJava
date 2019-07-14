@@ -96,17 +96,18 @@ public class SceneSimulation extends Data {
         TextField setSizeParticles = new TextField("");
         setSizeParticles.setOnKeyReleased(e -> {
             if ( this.vars[2].equals("0") || this.vars[8].equals("-") ) {
-                if (isNumInteger(setSizeParticles.getText().trim())){
+                if (isNumDouble(setSizeParticles.getText().trim())){
                     if (!setSizeParticles.getText().trim().equals("0.1")){
                         setSizeParticles.setText("0.1");
                         this.vars[1] = "0.1";
                     }
-                }
+                } else
+                    this.vars[1] = "0.0";
             } else
-                if (isNumInteger(setSizeParticles.getText().trim()))
+                if (isNumDouble(setSizeParticles.getText().trim()))
                     this.vars[1] = setSizeParticles.getText().trim();
                 else
-                    this.vars[1] = "0";
+                    this.vars[1] = "0.0";
         });
 
         Label labCharge = new Label("charge of particles:");
