@@ -48,7 +48,7 @@ public class SceneMMC extends Data {
             "0",    // vars[3] steps            USER
             "0",    // vars[4] dimension        USER
             "0",    // vars[5] temperature      USER
-            "f",    // vars[6] fixed(/spread)   USER
+            "-",    // vars[6] (fixed/)spread   n/a
             "-",    // vars[7] (lattice/)free   USER
             "a",    // vars[8] avoid on(/off)   n/a
             "-"};   // vars[9] save (on)        n/a
@@ -420,40 +420,7 @@ public class SceneMMC extends Data {
         setTemperature.setMaxWidth(this.compwidth);
         asettelu.add(setTemperature, 0, 11);
 
-        // BUTTON: FIXED
-        this.nappiFixed.setMinWidth(this.compwidth);
-        this.nappiFixed.setMaxWidth(this.compwidth);
-        this.nappiFixed.setBackground(new Background(
-            new BackgroundFill(
-                Color.ORANGE,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.nappiFixed.setId("fixed");
-        this.nappiFixed.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                this.nappiFixed.setEffect(shadow);
-        });
-        this.nappiFixed.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                this.nappiFixed.setEffect(null);
-        });
-        this.nappiFixed.setOnMouseClicked((MouseEvent event) -> {
-            if (this.nappiFixed.getText().equals("SPREAD")){
-                // BUTTON PRESSED ON
-                this.nappiFixed.setText("FIXED");
-                this.nappiFixed.setBackground(
-                    new Background(
-                        new BackgroundFill(
-                            Color.ORANGE,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[6] = "f";
-            } else if (this.nappiFixed.getText().equals("FIXED")){
-                // BUTTON PRESSED OFF
-                this.nappiFixed.setText("SPREAD");
-                this.nappiFixed.setBackground(
-                    new Background(new BackgroundFill(
-                        Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[6] = "-";
-            }
-        });
-        valikko.getChildren().add(this.nappiFixed);
+        this.vars[6] = "-"; // spread out
 
         // BUTTON: LATTICE
         this.nappiLattice.setMinWidth(this.compwidth);

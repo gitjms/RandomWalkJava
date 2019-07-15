@@ -962,6 +962,9 @@ public class MainApp extends Application {
         // EXECUTE BUTTON MMC
         runMMC.setOnMouseClicked((MouseEvent event) -> {
             // BUTTON PRESSED ON
+            this.vars = getMMCScene.getVars();
+            int particles = Integer.valueOf(vars[0]);
+
             if (this.fxplot != null) {
                 if (this.fxplot.isRunning()) this.fxplot.stop();
                 if (this.fxplot.getFrame().isShowing()
@@ -970,9 +973,9 @@ public class MainApp extends Application {
                     this.fxplot.getFrame().dispose();
             }
             this.fxplot = new FXPlot("E", this.screenHeight);
-            this.vars = getMMCScene.getVars();
+            
             Data data = new Data(this.vars);
-            int particles = Integer.valueOf(vars[0]);
+            
             double steps = Double.valueOf(vars[3]);
             int dim = Integer.valueOf(vars[4]);
 
