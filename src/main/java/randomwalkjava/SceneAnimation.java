@@ -180,7 +180,7 @@ public class SceneAnimation extends Data {
                     process.getInputStream(), "", fos);
                 outputGobbler.start();*/
 
-                    while ((line = input.readLine()) != null){
+                while ((line = input.readLine()) != null){
                         if (line.trim().startsWith("S")) {
                             failed = true;
                             break;
@@ -348,12 +348,12 @@ public class SceneAnimation extends Data {
                                 }
                                 fxplot.updateHData("norm", xnormAxis, ynormAxis, expected);
                             }
-                         }
                     }
-                    if ( failed == false )
-                        this.runs++;
-                    else
-                        failed = false;
+                }
+                if ( failed == false )
+                    this.runs++;
+                else
+                    failed = false;
 
                 exitVal = process.waitFor();
                 if (exitVal != 0) {

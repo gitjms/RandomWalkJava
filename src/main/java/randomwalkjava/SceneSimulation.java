@@ -42,7 +42,7 @@ public class SceneSimulation extends Data {
             "0",    // vars[5] temperature      n/a
             "f",    // vars[6] fixed(/spread)   USER
             "-",    // vars[7] (lattice/)free   USER
-            "a",    // vars[8] avoid on(/off)   USER
+            "-",    // vars[8] avoid on(/off)   USER
             "s"};   // vars[9] save (on)        n/a
     }
 
@@ -95,7 +95,7 @@ public class SceneSimulation extends Data {
         Label labSizeParticles = new Label("diameter of particle:");
         TextField setSizeParticles = new TextField("");
         setSizeParticles.setOnKeyReleased(e -> {
-            if ( this.vars[2].equals("0") || this.vars[8].equals("-") ) {
+            /*if ( this.vars[2].equals("0") || this.vars[8].equals("-") ) {
                 if (isNumDouble(setSizeParticles.getText().trim())){
                     if (!setSizeParticles.getText().trim().equals("0.1")){
                         setSizeParticles.setText("0.1");
@@ -103,7 +103,7 @@ public class SceneSimulation extends Data {
                     }
                 } else
                     this.vars[1] = "0.0";
-            } else
+            } else*/
                 if (isNumDouble(setSizeParticles.getText().trim()))
                     this.vars[1] = setSizeParticles.getText().trim();
                 else
@@ -114,25 +114,26 @@ public class SceneSimulation extends Data {
         TextField setCharge = new TextField("");
         setCharge.setOnKeyReleased(e -> {
             if (isNumInteger(setCharge.getText().trim())){
-                if (setCharge.getText().trim().equals("0")){
-                    setSizeParticles.setText("0.1");
-                    this.vars[1] = "0.1";
+                this.vars[2] = setCharge.getText().trim();
+                /*if (setCharge.getText().trim().equals("0")){
+                    //setSizeParticles.setText("0.1");
+                    //this.vars[1] = "0.1";
                     this.nappiAvoid.setText("AVOID OFF");
                     this.nappiAvoid.setBackground(
                         new Background(new BackgroundFill(
-                            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-                    this.vars[1] = "0.1";   // diameter
-                    this.vars[2] = "0";     // charge
-                    this.vars[8] = "-";     // avoid
-                } else {
+                            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));*/
+                    //this.vars[1] = "0.1";   // diameter
+                    //this.vars[2] = "0";     // charge
+                    //this.vars[8] = "-";     // avoid
+                /*} else {
                     this.vars[2] = setCharge.getText().trim();
                     this.nappiAvoid.setText("AVOID ON");
                     this.nappiAvoid.setBackground(
                         new Background(
                             new BackgroundFill(
-                                Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                    this.vars[8] = "a";
-                }
+                                Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));*/
+                    //this.vars[8] = "a";
+                //}
             } else
                 this.vars[2] = "0";
         });
@@ -268,7 +269,7 @@ public class SceneSimulation extends Data {
         this.nappiAvoid.setMaxWidth(compwidth);
         this.nappiAvoid.setBackground(new Background(
             new BackgroundFill(
-                Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
+                Color.LIGHTGREY,CornerRadii.EMPTY,Insets.EMPTY)));
         this.nappiAvoid.setId("avoid");
         this.nappiAvoid.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
@@ -286,9 +287,9 @@ public class SceneSimulation extends Data {
                     new Background(
                         new BackgroundFill(
                             Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[2] = setSizeParticles.getText().trim();
-                setSizeParticles.clear();
-                setCharge.clear();
+                //this.vars[2] = setSizeParticles.getText().trim();
+                //setSizeParticles.clear();
+                //setCharge.clear();
                 this.vars[8] = "a";
             } else if (this.nappiAvoid.getText().equals("AVOID ON")){
                 // BUTTON PRESSED OFF
@@ -296,10 +297,10 @@ public class SceneSimulation extends Data {
                 this.nappiAvoid.setBackground(
                     new Background(new BackgroundFill(
                         Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-                setCharge.setText("0");
-                setSizeParticles.setText("0.1");
-                this.vars[1] = "0.1";   // diameter
-                this.vars[2] = "0";     // charge
+                //setCharge.setText("0");
+                //setSizeParticles.setText("0.1");
+                //this.vars[1] = "0.1";   // diameter
+                //this.vars[2] = "0";     // charge
                 this.vars[8] = "-";     // avoid
             }
         });

@@ -147,10 +147,10 @@ public class FXPlot extends SceneAnimation {
 
             // XYChart calcChartE
             this.calcChartE.getStyler().setLegendVisible(false);
-            this.calcChartE.setXAxisTitle("steps");
+            this.calcChartE.setXAxisTitle("successful steps");
             this.calcChartE.setYAxisTitle("Energy");
             this.calcChartE.getStyler().setMarkerSize(0);
-            this.calcChartE.getStyler().setXAxisDecimalPattern("0.0");
+            this.calcChartE.getStyler().setXAxisDecimalPattern("0");
             this.calcChartE.getStyler().setYAxisDecimalPattern("0.0");
             this.calcChartE.getStyler().setAxisTickLabelsFont(new java.awt.Font(null,0,15));
             this.calcChartE.getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);

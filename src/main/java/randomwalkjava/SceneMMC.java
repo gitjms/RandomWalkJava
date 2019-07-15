@@ -107,6 +107,7 @@ public class SceneMMC extends Data {
         double centerY = height/2;
 
         int num_part = Integer.valueOf(this.vars[0]);
+        double diam = Double.valueOf(this.vars[1]);
         int num_steps = Integer.valueOf(this.vars[3]) + 1;
         int steps = Integer.valueOf(this.vars[3]);
         int dim = Integer.valueOf(this.vars[4]);
@@ -151,138 +152,138 @@ public class SceneMMC extends Data {
                     process.getInputStream(), "", fos);
                 outputGobbler.start();*/
 
-                    while ((line = input.readLine()) != null){
-                        if (line.trim().startsWith("S")) {
-                            break;
-                        }
-                        if (!line.substring(0,1).matches("([0-9]|-|\\+)|E"))
-                            continue;
-                        if (!line.trim().split("(\\s+)")[0].trim().equals("E")) {
-                            if (dim == 1) {
-                                try {
-                                    values[0][i] = Double.parseDouble(line.trim()) + centerX/scalefactor;
-                                } catch (NumberFormatException e) {
-                                    continue;
-                                }
-                                values[1][i] = centerY;
-                            } else if (dim == 2) {
-                                String[] valStr = line.split("(\\s+)");
-                                try {
-                                    values[0][i] = Double.parseDouble(valStr[0].trim()) + centerX/scalefactor;
-                                    values[1][i] = Double.parseDouble(valStr[1].trim()) + centerX/scalefactor;
-                                } catch (NumberFormatException e) {
-                                    continue;
-                                }
-                            } else if (dim == 3) {
-                                String[] valStr = line.split("(\\s+)");
-                                try {
-                                    values[0][i] = Double.parseDouble(valStr[0].trim()) + centerX/scalefactor;
-                                    values[1][i] = Double.parseDouble(valStr[1].trim()) + centerX/scalefactor;
-                                    values[2][i] = Double.parseDouble(valStr[2].trim()) + 1.2*centerX/scalefactor;
-                                } catch (NumberFormatException e) {
-                                    continue;
-                                }
-                            }
-                            // RED SOURCE DOT
-                            /*if ( j == 0 && i == 0 ) {
-                                piirturi.setFill(Color.RED);
-                                if (dim == 1) {
-                                    piirturi.fillRect(
-                                        values[0][i], centerY,
-                                        expected / ( 10.0 * Math.sqrt(Math.log10(steps)) ),
-                                        Math.sqrt(centerY/2.0));
-                                } else if (dim == 2) {
-                                    piirturi.fillRect(
-                                        values[0][i], values[1][i],
-                                        expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ),
-                                        expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ));
-                                } else if (dim == 3) {
-                                    piirturi.fillRect(
-                                        values[0][i] + Math.cos(values[2][i]),
-                                        values[1][i] + Math.sin(values[2][i]),
-                                        expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ),
-                                        expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ));
-                                }
-                                piirturi.setStroke(Color.YELLOW);
-                            }*/
-
-                            if ( j > 0){
-                                for (int k = 0; k < num_part; k++){
-                                    if ( dim < 3 ) {
-                                        piirturi.strokeRoundRect(values[0][k], values[1][k], 1.0, 1.0, 1.0, 1.0);
-                                        piirturi.setStroke(Color.BLACK);
-                                        piirturi.strokeRoundRect(muistiX[k], muistiY[k], 1.0, 1.0, 1.0, 1.0);
-                                        piirturi.setStroke(Color.YELLOW);
-                                    } else {
-                                        linewidth = 10.0 * Math.log10((double) steps)
-                                            / ( values[2][k] * scalefactor );
-                                        piirturi.setLineWidth(linewidth);
-                                        piirturi.strokeRoundRect(
-                                            values[0][k], values[1][k],
-                                            values[0][i] + Math.cos(values[2][i]),
-                                            values[1][i] + Math.sin(values[2][i]),
-                                            values[0][i] + Math.cos(values[2][i]),
-                                            values[1][i] + Math.sin(values[2][i]));
-                                        piirturi.setStroke(Color.BLACK);
-                                        piirturi.strokeRoundRect(
-                                            muistiX[k], muistiY[k],
-                                            muistiX[k] + Math.cos(muistiZ[k]),
-                                            muistiY[k] + Math.sin(muistiZ[k]),
-                                            muistiX[k] + Math.cos(muistiZ[k]),
-                                            muistiY[k] + Math.sin(muistiZ[k]));
-                                            piirturi.setStroke(Color.YELLOW);
-                                    }
-                                }
-                            }
-                            if ( dim < 3 ) {
-                                muistiX[i] = values[0][i];
-                                muistiY[i] = values[1][i];
-                            } else {
-                                muistiX[i] = values[0][i]
-                                    + Math.cos(values[2][i]);
-                                muistiY[i] = values[1][i]
-                                    + Math.sin(values[2][i]);
-                                muistiZ[i] = values[2][i];
-                            }
-
-                            i++;
-
-                            if ( i == num_part ){
-                                i = 0;
-                                j++;
-                            }
-
-                            if ( j == num_steps ) {
-                                i = 0;
-                                j = 0;
-                            }
-
-                        } else {
+                while ((line = input.readLine()) != null){
+                    if (line.trim().startsWith("S")) {
+                        break;
+                    }
+                    if (!line.substring(0,1).matches("([0-9]|-|\\+)|E"))
+                        continue;
+                    if (!line.trim().split("(\\s+)")[0].trim().equals("E")) {
+                        if (dim == 1) {
                             try {
-                                if ( this.first == false ) {
-                                    this.first = true;
-                                    energy_y.add(Double.parseDouble(line.split("(\\s+)")[1].trim()));
-                                    energy_x.add((double) this.phase);
-                                    this.phase++;
-                                    this.greatest = energy_y.get(0);
-                                    fxplot.setEData("energy", energy_x, energy_y);
-                                } else {
-                                    energy_y.add(Double.parseDouble(line.split("(\\s+)")[1].trim()));
-                                    energy_x.add((double) this.phase);
-                                    this.phase++;
-                                }
+                                values[0][i] = Double.parseDouble(line.trim()) + centerX/scalefactor;
                             } catch (NumberFormatException e) {
                                 continue;
                             }
-
-                            Thread.sleep(100);
-                            if ( energy_y.get((int) this.phase - 1) > this.greatest ) {
-                                this.greatest = energy_y.get((int) this.phase - 1);
-                                fxplot.setEMaxY(this.greatest);
+                            values[1][i] = centerY;
+                        } else if (dim == 2) {
+                            String[] valStr = line.split("(\\s+)");
+                            try {
+                                values[0][i] = Double.parseDouble(valStr[0].trim()) + centerX/scalefactor;
+                                values[1][i] = Double.parseDouble(valStr[1].trim()) + centerX/scalefactor;
+                            } catch (NumberFormatException e) {
+                                continue;
                             }
-                            fxplot.updateEData("energy", energy_x, energy_y);
+                        } else if (dim == 3) {
+                            String[] valStr = line.split("(\\s+)");
+                            try {
+                                values[0][i] = Double.parseDouble(valStr[0].trim()) + centerX/scalefactor;
+                                values[1][i] = Double.parseDouble(valStr[1].trim()) + centerX/scalefactor;
+                                values[2][i] = Double.parseDouble(valStr[2].trim()) + 1.2*centerX/scalefactor;
+                            } catch (NumberFormatException e) {
+                                continue;
+                            }
                         }
+                        // RED SOURCE DOT
+                        /*if ( j == 0 && i == 0 ) {
+                            piirturi.setFill(Color.RED);
+                            if (dim == 1) {
+                                piirturi.fillRect(
+                                    values[0][i], centerY,
+                                    expected / ( 10.0 * Math.sqrt(Math.log10(steps)) ),
+                                    Math.sqrt(centerY/2.0));
+                            } else if (dim == 2) {
+                                piirturi.fillRect(
+                                    values[0][i], values[1][i],
+                                    expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ),
+                                    expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ));
+                            } else if (dim == 3) {
+                                piirturi.fillRect(
+                                    values[0][i] + Math.cos(values[2][i]),
+                                    values[1][i] + Math.sin(values[2][i]),
+                                    expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ),
+                                    expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ));
+                            }
+                            piirturi.setStroke(Color.YELLOW);
+                        }*/
+
+                        if ( j > 0){
+                            for (int k = 0; k < num_part; k++){
+                                if ( dim < 3 ) {
+                                    piirturi.strokeRoundRect(values[0][k], values[1][k], 1.0, 1.0, 1.0, 1.0);
+                                    piirturi.setStroke(Color.BLACK);
+                                    piirturi.strokeRoundRect(muistiX[k], muistiY[k], 1.0, 1.0, 1.0, 1.0);
+                                    piirturi.setStroke(Color.YELLOW);
+                                } else {
+                                    linewidth = 10.0 * Math.log10((double) steps)
+                                        / ( values[2][k] * scalefactor );
+                                    piirturi.setLineWidth(linewidth);
+                                    piirturi.strokeRoundRect(
+                                        values[0][k], values[1][k],
+                                        diam * values[0][i] + Math.cos(values[2][i]),
+                                        diam * values[1][i] + Math.sin(values[2][i]),
+                                        diam * values[0][i] + Math.cos(values[2][i]),
+                                        diam * values[1][i] + Math.sin(values[2][i]));
+                                    piirturi.setStroke(Color.BLACK);
+                                    piirturi.strokeRoundRect(
+                                        muistiX[k], muistiY[k],
+                                        diam * muistiX[k] + Math.cos(muistiZ[k]),
+                                        diam * muistiY[k] + Math.sin(muistiZ[k]),
+                                        diam * muistiX[k] + Math.cos(muistiZ[k]),
+                                        diam * muistiY[k] + Math.sin(muistiZ[k]));
+                                        piirturi.setStroke(Color.YELLOW);
+                                }
+                            }
+                        }
+                        if ( dim < 3 ) {
+                            muistiX[i] = values[0][i];
+                            muistiY[i] = values[1][i];
+                        } else {
+                            muistiX[i] = values[0][i]
+                                + Math.cos(values[2][i]);
+                            muistiY[i] = values[1][i]
+                                + Math.sin(values[2][i]);
+                            muistiZ[i] = values[2][i];
+                        }
+
+                        i++;
+
+                        if ( i == num_part ){
+                            i = 0;
+                            j++;
+                        }
+
+                        if ( j == num_steps ) {
+                            i = 0;
+                            j = 0;
+                        }
+
+                    } else {
+                        try {
+                            if ( this.first == false ) {
+                                this.first = true;
+                                energy_y.add(Double.parseDouble(line.split("(\\s+)")[1].trim()));
+                                energy_x.add((double) this.phase);
+                                this.phase++;
+                                this.greatest = energy_y.get(0);
+                                fxplot.setEData("energy", energy_x, energy_y);
+                            } else {
+                                energy_y.add(Double.parseDouble(line.split("(\\s+)")[1].trim()));
+                                energy_x.add((double) this.phase);
+                                this.phase++;
+                            }
+                        } catch (NumberFormatException e) {
+                            continue;
+                        }
+
+                        Thread.sleep(100);
+                        if ( energy_y.get((int) this.phase - 1) > this.greatest ) {
+                            this.greatest = energy_y.get((int) this.phase - 1);
+                            fxplot.setEMaxY(this.greatest);
+                        }
+                        fxplot.updateEData("energy", energy_x, energy_y);
                     }
+                }
 
                 exitVal = process.waitFor();
                 if (exitVal != 0) {
