@@ -14,6 +14,8 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
@@ -69,6 +71,8 @@ public class MainApp extends Application {
     private double[] rms_norm;
     private List <Double> energy_x;
     private List <Double> energy_y;
+    /*private Sprite sprite;
+    private DrawCanvas canvas;*/
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -399,8 +403,7 @@ public class MainApp extends Application {
         GraphicsContext mmcpiirturi = mmcAlusta.getGraphicsContext2D();
         mmcpiirturi.setFill(Color.BLACK);
         mmcpiirturi.fillRect(0, 0, this.animwidth, this.animheight);
-        //mmcpiirturi.setStroke(Color.YELLOW);
-        //mmcpiirturi.setGlobalAlpha(0.2);
+        mmcpiirturi.setStroke(Color.YELLOW);
 
         Pane mmcpane = new Pane();
         mmcpane.setPrefSize(this.animwidth, this.animheight);
@@ -818,6 +821,16 @@ public class MainApp extends Application {
             // BUTTON PRESSED ON
             this.vars = getCalcScene.getVars();
             Data data = new Data(this.vars);
+            boolean ok = false;
+
+            if ( Integer.valueOf(this.vars[3]) < 1 ) ok = false; // steps
+            if ( Integer.valueOf(this.vars[4]) < 1
+                || Integer.valueOf(this.vars[4]) > 3 ) ok = false; // dimension
+            if ( !this.vars[7].equals("l")
+                && !this.vars[7].equals("-") ) ok = false; // lattice/free
+
+            if ( ok == false ) return;
+
             ex.executeRms(datafolder, textAreaSim, frame, data, this.vars);
         });
 
@@ -827,6 +840,25 @@ public class MainApp extends Application {
             // BUTTON PRESSED ON
             this.vars = getSimScene.getVars();
             Data data = new Data(this.vars);
+            boolean fail = false;
+
+            if ( Integer.valueOf(this.vars[0]) < 0 ) fail = true; // particles
+            if ( Double.valueOf(this.vars[1]) <= 0.0
+                || Double.valueOf(this.vars[1]) >= 1.0 ) fail = true; // diameter
+            if ( Integer.valueOf(this.vars[2]) < 0
+                || Integer.valueOf(this.vars[2]) > 2 ) fail = true; // charge
+            if ( Integer.valueOf(this.vars[3]) < 1 ) fail = true; // steps
+            if ( Integer.valueOf(this.vars[4]) < 1
+                || Integer.valueOf(this.vars[4]) > 3 ) fail = true; // dimension
+            if ( !this.vars[6].equals("f")
+                && !this.vars[6].equals("-") ) fail = true; // fixed/spread
+            if ( !this.vars[7].equals("l")
+                && !this.vars[7].equals("-") ) fail = true; // lattice/free
+            if ( !this.vars[8].equals("a")
+                && !this.vars[8].equals("-") ) fail = true; // avoid/no avoid
+
+            if ( fail == true ) return;
+
             ex.executeSim(datafolder, textAreaSim, frame, data, this.vars);
         });
 
@@ -860,13 +892,13 @@ public class MainApp extends Application {
                 // FROM SCENEANIMATION
                 // vars from user:
                 // vars[0] = particles,     USER
-                // vars[1] = diameter,      USER
+                // vars[1] = diameter,      n/a
                 // vars[2] = charge,        n/a
                 // vars[3] = steps,         USER
                 // vars[4] = dimension,     USER
                 // vars[5] = temperature,   n/a
                 // vars[6] = fixed,         n/a
-                // vars[7] = lattice,       USER
+                // vars[7] = lattice,       n/a
                 // vars[8] = avoid,         n/a
                 // vars[9] = save           n/a
 
@@ -899,16 +931,22 @@ public class MainApp extends Application {
         runAnim.setOnMouseClicked((MouseEvent event) -> {
             if (getAnimScene.isRunning()) {
                 getAnimScene.stop();
-                String[] vars = getAnimScene.getVars();
-                int dim = Integer.valueOf(vars[4]);
                 if ( this.isscaled == true ) {
-                    if ( dim == 1 )
-                        piirturi.scale(1.0/this.scalefactor, 1.0);
-                    else 
-                        piirturi.scale(1.0/this.scalefactor, 1.0/this.scalefactor);
+                    piirturi.scale(1.0/this.scalefactor, 1.0/this.scalefactor);
                 }
                 runAnim.setText("RUN");
             } else {
+                this.vars = getAnimScene.getVars();
+                int dim = Integer.valueOf(this.vars[4]);
+                int steps = Integer.valueOf(vars[3]);
+                boolean fail = false;
+ 
+                if ( Integer.valueOf(this.vars[0]) < 0 ) fail = true; // particles
+                if ( steps < 1 ) fail = true; // steps
+                if ( dim < 1 || dim > 3 ) fail = true; // dimension
+
+                if ( fail == true ) return;
+
                 if (this.fxplot != null) {
                 if (this.fxplot.isRunning()) this.fxplot.stop();
                 if (this.fxplot.getFrame().isShowing()
@@ -917,33 +955,30 @@ public class MainApp extends Application {
                     this.fxplot.getFrame().dispose();
                 }
                 this.fxplot = new FXPlot("W&H", this.screenHeight);
-                String[] vars = getAnimScene.getVars();
-                int dim = Integer.valueOf(vars[4]);
-                double steps = Double.valueOf(vars[3]);
 
                 this.scalefactor = 
-                Math.sqrt( this.animwidth + Math.pow(dim,2.0) * 100 * Math.pow(Math.log10(steps),2.0) )
-                / Math.pow(Math.log10(steps),2.0);
+                Math.sqrt( this.animwidth + Math.pow(dim,2.0) * 100 * Math.pow(Math.log10((double) steps),2.0) )
+                / Math.pow(Math.log10((double) steps),2.0);
  
                 if ( dim == 1 ) {
-                    this.linewidth = 1.0 / Math.log10(steps);
+                    this.linewidth = 1.0 / Math.log10((double) steps);
                     piirturi.scale(this.scalefactor, 1.0);
                 } else if ( dim == 2 ) {
-                    this.linewidth = 1.0 / ( this.scalefactor * Math.sqrt(Math.log10(steps)) );
+                    this.linewidth = 1.0 / ( this.scalefactor * Math.sqrt(Math.log10((double) steps)) );
                     piirturi.scale(this.scalefactor, this.scalefactor);
                 } else if ( dim == 3 ) {
-                    //this.linewidth = 1.0 / ( this.scalefactor * Math.sqrt(Math.log10(steps)) );
+                    //this.linewidth = 1.0 / ( this.scalefactor * Math.sqrt(Math.log10((double) steps)) );
                     piirturi.scale(this.scalefactor, this.scalefactor);
                 }
                 this.isscaled = true;
-                piirturi.setGlobalAlpha(1.0 / this.scalefactor * Math.pow(Math.log10(steps),2.0));
+                piirturi.setGlobalAlpha(1.0 / this.scalefactor * Math.pow(Math.log10((double) steps),2.0));
 
                 this.newdata = true;
                 this.rms_runs = new double[10];
                 this.rms_norm = new double[10];
                 Arrays.fill(this.rms_runs, 0.0);
                 Arrays.fill(this.rms_norm, 0.0);
-                double expected = Math.sqrt(steps);
+                double expected = Math.sqrt((double) steps);
                 int mincount;
                 if ( (int) expected < 5 )
                     mincount = 0;
@@ -961,10 +996,40 @@ public class MainApp extends Application {
         ////////////////////////////////////////////////////
         // EXECUTE BUTTON MMC
         runMMC.setOnMouseClicked((MouseEvent event) -> {
+            //if (getMMCScene.isRunning()) {
+            // BUTTON PRESSED OFF
+                //getMMCScene.stop();
+                //runMMC.setText("EXECUTE");
+            //} else {
             // BUTTON PRESSED ON
             this.vars = getMMCScene.getVars();
             int particles = Integer.valueOf(vars[0]);
+            double diam = Double.valueOf(vars[1]);
+            int charge = Integer.valueOf(vars[2]);
+            int steps = Integer.valueOf(vars[3]);
+            int dim = Integer.valueOf(vars[4]);
+            double temp = Double.valueOf(vars[5]);
+            String latt = this.vars[7];
+            boolean fail = false;
 
+            if ( particles < 0 ) fail = true;
+            if ( diam <= 0.0 || diam >= 1.0 ) fail = true;
+            if ( charge < 0 || charge > 2 ) fail = true;
+            if ( steps == 0 ) fail = true;
+            if ( dim < 2 || dim > 3 ) fail = true;
+            if ( temp < 0.0 ) fail = true;
+            if ( !latt.equals("l") && !latt.equals("-") ) fail = true;
+
+            if ( fail == true ) return;
+
+            runMMC.setDisable(true);
+            valikkoMMC.setDisable(true);
+            menuNappiMMC.setDisable(true);
+            helpNappiMMC.setDisable(true);
+
+            File initialDataFile = new File(
+                datapath + "\\startMMC_" + dim + "D_" + particles + "N.xy");
+            
             if (this.fxplot != null) {
                 if (this.fxplot.isRunning()) this.fxplot.stop();
                 if (this.fxplot.getFrame().isShowing()
@@ -973,35 +1038,21 @@ public class MainApp extends Application {
                     this.fxplot.getFrame().dispose();
             }
             this.fxplot = new FXPlot("E", this.screenHeight);
-            
-            Data data = new Data(this.vars);
-            
-            double steps = Double.valueOf(vars[3]);
-            int dim = Integer.valueOf(vars[4]);
 
             if ( this.isscaled == true ) {
-                if ( dim == 1 )
-                    mmcpiirturi.scale(1.0/this.scalefactor, 1.0);
-                else 
-                    mmcpiirturi.scale(1.0/this.scalefactor, 1.0/this.scalefactor);
+                mmcpiirturi.scale(1.0/this.scalefactor, 1.0/this.scalefactor);
             }
 
-            this.scalefactor = 
-                Math.sqrt( this.animwidth + Math.pow(dim,2.0) * 100 * Math.pow(Math.log10(steps),2.0) )
-                / Math.pow(Math.log10(steps),2.0);
- 
-            if ( dim == 1 ) {
-                    this.linewidth = 1.0 / Math.log10(steps);
-                    mmcpiirturi.scale(this.scalefactor, 1.0);
-                } else if ( dim == 2 ) {
-                    this.linewidth = 1.0 / ( this.scalefactor * Math.sqrt(Math.log10(steps)) );
-                    mmcpiirturi.scale(this.scalefactor, this.scalefactor);
-                } else if ( dim == 3 ) {
-                    //this.linewidth = 1.0 / ( this.scalefactor * Math.sqrt(Math.log10(steps)) );
-                    mmcpiirturi.scale(this.scalefactor, this.scalefactor);
-                }
+            this.scalefactor = Math.log10(Math.pow((double) particles, 2.0)) * 400.0
+                / Math.pow((double) particles, 2.0);
+
+            if ( dim == 2 )
+                this.linewidth = 1.0 / ( this.scalefactor );// * Math.sqrt(Math.log10((double) steps)) );
+
+            mmcpiirturi.scale(this.scalefactor, this.scalefactor);
+
             this.isscaled = true;
-            mmcpiirturi.setGlobalAlpha(1.0 / this.scalefactor * Math.pow(Math.log10(steps),2.0));
+            mmcpiirturi.setGlobalAlpha(1.0 / this.scalefactor );// * Math.pow(Math.log10((double) steps),2.0));
 
             this.newdata = true;
             this.energy_x = new ArrayList();
@@ -1015,43 +1066,70 @@ public class MainApp extends Application {
 
             mmcpiirturi.setGlobalAlpha(1.0);
             mmcpiirturi.setFill(Color.BLACK);
-            if ( dim == 1 )
-                mmcpiirturi.fillRect(0, 0, 1.0/this.scalefactor*this.animwidth, this.animheight);
-            else if ( dim == 2 )
-                mmcpiirturi.fillRect(0, 0, 1.0/this.scalefactor*this.animwidth, 1.0/this.scalefactor*this.animheight);
+            if ( dim == 2 )
+                mmcpiirturi.fillRect(0, 0, 1.0/this.scalefactor*this.animwidth,
+                    1.0/this.scalefactor*this.animheight);
             else if ( dim == 3 )
-                mmcpiirturi.fillRect(0, 0, 1.0/this.scalefactor*this.animwidth, 1.0/this.scalefactor*this.animheight);
+                mmcpiirturi.fillRect(0, 0, 1.0/this.scalefactor*this.animwidth,
+                    1.0/this.scalefactor*this.animheight);
             mmcpiirturi.fill();
 
+            //runMMC.setText("STOP");
             // DRAW ANIMATION
             getMMCScene.refresh(
-                datafolder, fexec, mmcpiirturi, this.scalefactor,
-                this.animwidth, this.linewidth, this.fxplot, this.energy_x, this.energy_y, this.newdata
-            );
+                datafolder, initialDataFile, fexec, mmcpiirturi, this.scalefactor,
+                this.animwidth, this.linewidth, this.fxplot,
+                this.energy_x, this.energy_y, this.newdata
+                );
+            
+            /*if (getMMCScene.isRunning())
+                try {
+                    stop();
+                } catch (Exception ex1) {
+                Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex1);
+                }*/
+
             this.newdata = false;
+
+            runMMC.setDisable(false);
+            valikkoMMC.setDisable(false);
+            menuNappiMMC.setDisable(false);
+            helpNappiMMC.setDisable(false);
+
         });
 
         ////////////////////////////////////////////////////
         // RUN BUTTON ONE ROUND DEBUGGING
         /*runAnim.setOnMouseClicked((MouseEvent event) -> {
-            String[] vars = getAnimScene.getVars();
+            this.vars = getAnimScene.getVars();
+            int dim = Integer.valueOf(this.vars[4]);
             double steps = Double.valueOf(vars[3]);
-            int dim = Integer.valueOf(vars[4]);
+
+            boolean fail = false;
+            if ( Integer.valueOf(this.vars[0]) < 0 ) fail = true; // particles
+                if ( steps < 1 ) fail = true; // steps
+                if ( dim < 1 || dim > 3 ) fail = true; // dimension
+
+                if ( fail == true ) return;
+
+            if (this.fxplot != null) {
+                if (this.fxplot.isRunning()) this.fxplot.stop();
+                if (this.fxplot.getFrame().isShowing()
+                    || this.fxplot.getFrame().isActive()
+                    || this.fxplot.getFrame().isDisplayable())
+                    this.fxplot.getFrame().dispose();
+            }
+            this.fxplot = new FXPlot("W&H", this.screenHeight);
+
             if ( this.isscaled == true ) {
-                if ( dim == 1 )
-                    piirturi.scale(1.0/this.scalefactor, 1.0);
-                else 
-                    piirturi.scale(1.0/this.scalefactor, 1.0/this.scalefactor);
+                piirturi.scale(1.0/this.scalefactor, 1.0/this.scalefactor);
             }
 
             this.scalefactor = 
                 Math.sqrt( this.animwidth + 100 * Math.pow(Math.log10(steps),2.0) )
                 / Math.pow(Math.log10(steps),2.0);
  
-            if ( dim == 1 ) {
-                this.linewidth = 1.0 / Math.log10(steps);
-                piirturi.scale(this.scalefactor, 1.0);
-            } else if ( dim == 2 ) {
+            if ( dim == 2 ) {
                 this.linewidth = 1.0 / ( this.scalefactor * Math.sqrt(Math.log10(steps)) );
                 piirturi.scale(this.scalefactor, this.scalefactor);
             } else if ( dim == 3 ) {
@@ -1084,9 +1162,7 @@ public class MainApp extends Application {
 
             piirturi.setGlobalAlpha(1.0);
             piirturi.setFill(Color.BLACK);
-            if ( dim == 1 )
-                piirturi.fillRect(0, 0, 1.0/scalefactor*animwidth, animheight);
-            else if ( dim == 2 )
+            if ( dim == 2 )
                 piirturi.fillRect(0, 0, 1.0/scalefactor*animwidth, 1.0/scalefactor*animheight);
             else if ( dim == 3 )
                 piirturi.fillRect(0, 0, 1.0/scalefactor*animwidth, 1.0/scalefactor*animheight);
@@ -1112,9 +1188,26 @@ public class MainApp extends Application {
                         || this.fxplot.getFrame().isDisplayable())
                         this.fxplot.getFrame().dispose();
                 }
+                if (getMMCScene.platfIsRunning()) {
+                    getMMCScene.platfStop();
+                    javafx.application.Platform.exit();
+                }
+                if (getMMCScene.timerIsRunning())
+                    getMMCScene.timerStop();
+                if (getMMCScene.isRunning())
+                    getMMCScene.stop();
+                
+                stage.close();
+                try {
+                    stop();
+                } catch (Exception ex1) {
+                    Logger.getLogger(
+                        MainApp.class.getName()).log(Level.SEVERE, null, ex1);
+                }
             });
         });
         stage.show();
+        stage.toFront();
     }
 
     public boolean createFolder(String source, String destination, String executable, boolean createDir){

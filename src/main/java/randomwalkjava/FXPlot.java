@@ -83,7 +83,7 @@ public class FXPlot extends SceneAnimation {
             this.frame.getContentPane().setLayout(new GridLayout(2,1));
         } else if (which.equals("E")) {
             this.frame.setLocation(0, (screenHeight-this.height/2)/2);
-            this.frame.setPreferredSize(new Dimension(this.width,this.height/2));
+            this.frame.setPreferredSize(new Dimension(this.width,this.height-400));
             this.frame.setTitle("Real Time MMC");
         }
         ImageIcon icon = new ImageIcon("src/main/resources/images/icon.png");
@@ -141,17 +141,18 @@ public class FXPlot extends SceneAnimation {
             this.calcChartH.getStyler().setYAxisMin(0.0);
             this.calcChartH.getStyler().setYAxisMax(10.0);
             this.calcChartH.getStyler().setToolTipsEnabled(true);
+
         } else if (which.equals("E")) {
             this.chartPanelE.setBounds(0, 0, this.width, this.height-400);
             this.chartPanelE.setVisible(true);
 
             // XYChart calcChartE
             this.calcChartE.getStyler().setLegendVisible(false);
-            this.calcChartE.setXAxisTitle("successful steps");
+            this.calcChartE.setXAxisTitle("steps");
             this.calcChartE.setYAxisTitle("Energy");
             this.calcChartE.getStyler().setMarkerSize(0);
             this.calcChartE.getStyler().setXAxisDecimalPattern("0");
-            this.calcChartE.getStyler().setYAxisDecimalPattern("0.0");
+            this.calcChartE.getStyler().setYAxisDecimalPattern("#.#E0");
             this.calcChartE.getStyler().setAxisTickLabelsFont(new java.awt.Font(null,0,15));
             this.calcChartE.getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
             this.calcChartE.getStyler().setChartTitleFont(new java.awt.Font(null,0,20));
@@ -217,7 +218,6 @@ public class FXPlot extends SceneAnimation {
         };
         this.calcChartE.addSeries(String.valueOf(name), x, y)
             .setLineStyle(BasicStroke[0]).setLineColor(Color.MAGENTA);
-
         this.calcChartE.setTitle("MMC energy minimizing");
         this.calcChartE.getStyler().setAntiAlias(true);
         this.frame.getContentPane().add(this.chartPanelE);
@@ -234,9 +234,9 @@ public class FXPlot extends SceneAnimation {
 
     public void updateHData(String name, double[] x, double[] y, double expected) {
         this.calcChartH.updateXYSeries(name, x, y, null);
-        for (int i = 0; i < x.length; i++)
-            if (x[i] == (double) expected)
-                this.calcChartH.getToolTips().addData(x[i], y[i], String.valueOf(x[i]));
+        //for (int i = 0; i < x.length; i++)
+        //    if (x[i] == (double) expected)
+        //        this.calcChartH.getToolTips().addData(x[i], y[i], String.valueOf(x[i]));
         this.calcChartH.getStyler().setToolTipType(Styler.ToolTipType.xLabels);
         this.calcChartH.getStyler().setToolTipFont(new java.awt.Font(null,0,18));
         this.frame.add(this.chartPanelH,1);
@@ -246,6 +246,8 @@ public class FXPlot extends SceneAnimation {
 
     public void updateEData(String name, List<Double> x, List<Double> y) {
         this.calcChartE.updateXYSeries(name, x, y, null);
+        this.calcChartE.getStyler().setToolTipType(Styler.ToolTipType.yLabels);
+        this.calcChartE.getStyler().setToolTipFont(new java.awt.Font(null,0,18));
         this.frame.add(this.chartPanelE);
         this.frame.repaint();
         this.frame.pack();

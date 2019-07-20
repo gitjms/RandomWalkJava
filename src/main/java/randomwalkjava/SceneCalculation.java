@@ -6,15 +6,19 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 public class SceneCalculation extends Data {
 
@@ -74,9 +78,9 @@ public class SceneCalculation extends Data {
         DropShadow shadow = new DropShadow();
 
         // COMPONENTS...
-        // this.vars[0] = "0" (amount of particles)
-        // this.vars[1] = "0.1" (diameter of particl)
-        // this.vars[2] = "0" (charge of particles)
+        this.vars[0] = "0"; // (amount of particles)
+        this.vars[1] = "0.1"; // (diameter of particl)
+        this.vars[2] = "0"; // (charge of particles)
 
         Label labNumSteps = new Label("number of steps:");
         TextField setNumSteps = new TextField("");
@@ -88,15 +92,76 @@ public class SceneCalculation extends Data {
         });
 
         Label labNumDimensions = new Label("dimensions:");
-        TextField setNumDimensions = new TextField("");
-        setNumDimensions.setOnKeyReleased(e -> {
-            if (isNumInteger(setNumDimensions.getText().trim())){
-                this.vars[4] = setNumDimensions.getText().trim();
-            } else
-                this.vars[4] = "0";
+        ToggleButton setDim1 = new ToggleButton("1");
+        setDim1.setMinWidth(35);
+        setDim1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        setDim1.setBackground(new Background(new BackgroundFill(
+            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        setDim1.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                setDim1.setEffect(shadow);
+        });
+        setDim1.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                setDim1.setEffect(null);
+        });
+        ToggleButton setDim2 = new ToggleButton("2");
+        setDim2.setMinWidth(35);
+        setDim2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        setDim2.setBackground(new Background(new BackgroundFill(
+            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        setDim2.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                setDim2.setEffect(shadow);
+        });
+        setDim2.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                setDim2.setEffect(null);
+        });
+        ToggleButton setDim3 = new ToggleButton("3");
+        setDim3.setMinWidth(35);
+        setDim3.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        setDim3.setBackground(new Background(new BackgroundFill(
+            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        setDim3.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                setDim3.setEffect(shadow);
+        });
+        setDim3.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                setDim3.setEffect(null);
+        });
+        HBox setDimension = new HBox(setDim1,setDim2,setDim3);
+        setDimension.setSpacing(20);
+        setDim1.setOnMouseClicked(f -> {
+            setDim1.setBackground(new Background(new BackgroundFill(
+                Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
+            setDim2.setBackground(new Background(new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            setDim3.setBackground(new Background(new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.vars[4] = "1";
+        });
+        setDim2.setOnMouseClicked(f -> {
+            setDim1.setBackground(new Background(new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            setDim2.setBackground(new Background(new BackgroundFill(
+                Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
+            setDim3.setBackground(new Background(new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.vars[4] = "2";
+        });
+        setDim3.setOnMouseClicked(f -> {
+            setDim1.setBackground(new Background(new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            setDim2.setBackground(new Background(new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            setDim3.setBackground(new Background(new BackgroundFill(
+                Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.vars[4] = "3";
         });
 
-        // this.vars[5] = "0" temperature
+        this.vars[5] = "0"; // temperature
 
         // ...THEIR PLACEMENTS
         GridPane.setHalignment(labNumSteps, HPos.LEFT);
@@ -108,12 +173,12 @@ public class SceneCalculation extends Data {
         
         GridPane.setHalignment(labNumDimensions, HPos.LEFT);
         asettelu.add(labNumDimensions, 0, 2);
-        GridPane.setHalignment(setNumDimensions, HPos.CENTER);
-        setNumDimensions.setMinWidth(compwidth);
-        setNumDimensions.setMaxWidth(compwidth);
-        asettelu.add(setNumDimensions, 0, 3);
+        GridPane.setHalignment(setDimension, HPos.CENTER);
+        setDimension.setMinWidth(compwidth);
+        setDimension.setMaxWidth(compwidth);
+        asettelu.add(setDimension, 0, 3);
 
-        // this.vars[6] = "f" fixed(/spread)
+        this.vars[6] = "f"; // fixed(/spread)
 
         // BUTTON: LATTICE
         this.nappiLattice.setMinWidth(compwidth);
@@ -144,14 +209,14 @@ public class SceneCalculation extends Data {
                 this.nappiLattice.setText("LATTICE");
                 this.nappiLattice.setBackground(
                     new Background(new BackgroundFill(
-                        Color.ORANGE,CornerRadii.EMPTY,Insets.EMPTY)));
+                        Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[7] = "l";
             }
         });
         valikko.getChildren().add(this.nappiLattice);
 
-        // this.vars[8] = "-" avoid off
-        // this.vars[9] = "s" save on
+        this.vars[8] = "-"; // avoid off
+        this.vars[9] = "s"; // save on
 
         GridPane.setHalignment(valikko, HPos.LEFT);
         asettelu.add(valikko, 0, 4, 2, 1);

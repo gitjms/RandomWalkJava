@@ -62,11 +62,7 @@ public class Data {
                 this.vars[0], this.vars[1], this.vars[2], this.vars[3],
                 this.vars[4], this.vars[5], this.vars[6], this.vars[7],
                 this.vars[8], this.vars[9]};
-            System.out.println("part: "+this.vars[0]+"\tdiam: "+this.vars[1]+
-                "\tchar: "+this.vars[2]+"\tstep: "+this.vars[3]+
-                "\tdim: "+this.vars[4]+"\ttemp: "+this.vars[5]+
-                "\tfix: "+this.vars[6]+"\tlatt: "+this.vars[7]+
-                "\tavo: "+this.vars[8]+"\tsave: "+this.vars[9]);
+
             FileOutputStream fos = new FileOutputStream(command[0]);
             Runtime runtime = Runtime.getRuntime();
 
@@ -127,7 +123,7 @@ public class Data {
         return new Pair(ok,teksti);
     }
 
-    public static Pair< String, List< Pair< Double, Double > > > readDataCalc(File filePath){
+    /*public static Pair< String, List< Pair< Double, Double > > > readDataCalc(File filePath){
     
         List<Pair<Double,Double>> data = new ArrayList<>();
         boolean first = false;
@@ -181,5 +177,26 @@ public class Data {
         }
         
         return new Pair(header,dataList);
+    }*/
+
+    public static List<double[]> readDataMMC(File filePath, Integer dim){
+    
+        double[] values;
+        List<double[]> dataList = new ArrayList<>();
+
+        try (Scanner sc = new Scanner(filePath)) {
+            while (sc.hasNextLine()) {
+                values = new double[dim];
+                String data = sc.nextLine();
+                String[] osat = data.trim().split("(\\s+)");
+                for ( int i = 0; i < osat.length; i++)
+                    values[i] = Double.valueOf(osat[i]);
+                dataList.add(values);
+             }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return dataList;
     }
 }

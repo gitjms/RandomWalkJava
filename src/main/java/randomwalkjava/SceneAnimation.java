@@ -11,10 +11,19 @@ import javafx.scene.Parent;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 /*
     TODO    3D plot
@@ -382,6 +391,8 @@ public class SceneAnimation extends Data {
         valikko.setPadding(new Insets(20, 10, 0, 0));
         valikko.setSpacing(10);
 
+        DropShadow shadow = new DropShadow();
+
         // COMPONENTS...
         Label labNumParticles = new Label("number of particles:");
         TextField setNumParticles = new TextField("");
@@ -397,8 +408,8 @@ public class SceneAnimation extends Data {
                 this.vars[0] = "0";
         });
 
-        // this.vars[1] = "0.1" (diameter of particle)
-        // this.vars[2] = "0" (charge of particles)
+        this.vars[1] = "0.1"; // (diameter of particle)
+        this.vars[2] = "0"; // (charge of particles)
 
         Label labNumSteps = new Label("number of steps:");
         TextField setNumSteps = new TextField("");
@@ -410,19 +421,80 @@ public class SceneAnimation extends Data {
         });
 
         Label labNumDimensions = new Label("dimensions:");
-        TextField setNumDimensions = new TextField("");
-        setNumDimensions.setOnKeyReleased(e -> {
-            if (isNumInteger(setNumDimensions.getText().trim())){
-                this.vars[4] = setNumDimensions.getText().trim();
-            } else
-                this.vars[4] = "0";
+        ToggleButton setDim1 = new ToggleButton("1");
+        setDim1.setMinWidth(35);
+        setDim1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        setDim1.setBackground(new Background(new BackgroundFill(
+            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        setDim1.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                setDim1.setEffect(shadow);
+        });
+        setDim1.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                setDim1.setEffect(null);
+        });
+        ToggleButton setDim2 = new ToggleButton("2");
+        setDim2.setMinWidth(35);
+        setDim2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        setDim2.setBackground(new Background(new BackgroundFill(
+            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        setDim2.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                setDim2.setEffect(shadow);
+        });
+        setDim2.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                setDim2.setEffect(null);
+        });
+        ToggleButton setDim3 = new ToggleButton("3");
+        setDim3.setMinWidth(35);
+        setDim3.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        setDim3.setBackground(new Background(new BackgroundFill(
+            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        setDim3.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                setDim3.setEffect(shadow);
+        });
+        setDim3.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                setDim3.setEffect(null);
+        });
+        HBox setDimension = new HBox(setDim1,setDim2,setDim3);
+        setDimension.setSpacing(20);
+        setDim1.setOnMouseClicked(f -> {
+            setDim1.setBackground(new Background(new BackgroundFill(
+                Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
+            setDim2.setBackground(new Background(new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            setDim3.setBackground(new Background(new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.vars[4] = "1";
+        });
+        setDim2.setOnMouseClicked(f -> {
+            setDim1.setBackground(new Background(new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            setDim2.setBackground(new Background(new BackgroundFill(
+                Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
+            setDim3.setBackground(new Background(new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.vars[4] = "2";
+        });
+        setDim3.setOnMouseClicked(f -> {
+            setDim1.setBackground(new Background(new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            setDim2.setBackground(new Background(new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            setDim3.setBackground(new Background(new BackgroundFill(
+                Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.vars[4] = "3";
         });
 
-        // this.vars[5] = "0" temperature      n/a
-        // this.vars[6] = "f" fixed(/spread)   n/a
-        // this.vars[7] = "-" (lattice/)free   n/a
-        // this.vars[8] = "-" avoid (on/)off   n/a
-        // this.vars[9] = "-" save (off)       n/a
+        this.vars[5] = "0"; // temperature      n/a
+        this.vars[6] = "f"; // fixed(/spread)   n/a
+        this.vars[7] = "-"; // (lattice/)free   n/a
+        this.vars[8] = "-"; // avoid (on/)off   n/a
+        this.vars[9] = "-"; // save (off)       n/a
 
         // ...THEIR PLACEMENTS
         GridPane.setHalignment(labNumParticles, HPos.LEFT);
@@ -441,10 +513,10 @@ public class SceneAnimation extends Data {
         
         GridPane.setHalignment(labNumDimensions, HPos.LEFT);
         asettelu.add(labNumDimensions, 0, 4);
-        GridPane.setHalignment(setNumDimensions, HPos.CENTER);
-        setNumDimensions.setMinWidth(compwidth);
-        setNumDimensions.setMaxWidth(compwidth);
-        asettelu.add(setNumDimensions, 0, 5);
+        GridPane.setHalignment(setDimension, HPos.CENTER);
+        setDimension.setMinWidth(compwidth);
+        setDimension.setMaxWidth(compwidth);
+        asettelu.add(setDimension, 0, 5);
 
         GridPane.setHalignment(valikko, HPos.LEFT);
         asettelu.add(valikko, 0, 6, 2, 1);
