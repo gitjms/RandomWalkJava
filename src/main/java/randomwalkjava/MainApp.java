@@ -14,8 +14,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
@@ -42,6 +40,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javax.swing.JFrame;
 
 public class MainApp extends Application {
@@ -71,8 +70,6 @@ public class MainApp extends Application {
     private double[] rms_norm;
     private List <Double> energy_x;
     private List <Double> energy_y;
-    /*private Sprite sprite;
-    private DrawCanvas canvas;*/
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -821,15 +818,17 @@ public class MainApp extends Application {
             // BUTTON PRESSED ON
             this.vars = getCalcScene.getVars();
             Data data = new Data(this.vars);
-            boolean ok = false;
+            boolean fail = false;
 
-            if ( Integer.valueOf(this.vars[3]) < 1 ) ok = false; // steps
-            if ( Integer.valueOf(this.vars[4]) < 1
-                || Integer.valueOf(this.vars[4]) > 3 ) ok = false; // dimension
-            if ( !this.vars[7].equals("l")
-                && !this.vars[7].equals("-") ) ok = false; // lattice/free
+            int steps = Integer.valueOf(vars[3]);
+            int dim = Integer.valueOf(this.vars[4]);
+            String lattice = this.vars[7];
 
-            if ( ok == false ) return;
+            if ( steps < 1 ) fail = true;
+            if ( dim < 1 || dim > 3 ) fail = true;
+            if ( !lattice.equals("l") && !lattice.equals("-") ) fail = true;
+
+            if ( fail == true ) return;
 
             ex.executeRms(datafolder, textAreaSim, frame, data, this.vars);
         });
@@ -842,20 +841,23 @@ public class MainApp extends Application {
             Data data = new Data(this.vars);
             boolean fail = false;
 
-            if ( Integer.valueOf(this.vars[0]) < 0 ) fail = true; // particles
-            if ( Double.valueOf(this.vars[1]) <= 0.0
-                || Double.valueOf(this.vars[1]) >= 1.0 ) fail = true; // diameter
-            if ( Integer.valueOf(this.vars[2]) < 0
-                || Integer.valueOf(this.vars[2]) > 2 ) fail = true; // charge
-            if ( Integer.valueOf(this.vars[3]) < 1 ) fail = true; // steps
-            if ( Integer.valueOf(this.vars[4]) < 1
-                || Integer.valueOf(this.vars[4]) > 3 ) fail = true; // dimension
-            if ( !this.vars[6].equals("f")
-                && !this.vars[6].equals("-") ) fail = true; // fixed/spread
-            if ( !this.vars[7].equals("l")
-                && !this.vars[7].equals("-") ) fail = true; // lattice/free
-            if ( !this.vars[8].equals("a")
-                && !this.vars[8].equals("-") ) fail = true; // avoid/no avoid
+            int particles = Integer.valueOf(vars[0]);
+            double diam = Double.valueOf(vars[1]);
+            int charge = Integer.valueOf(vars[2]);
+            int steps = Integer.valueOf(vars[3]);
+            int dim = Integer.valueOf(this.vars[4]);
+            String fixed = this.vars[6];
+            String lattice = this.vars[7];
+            String avoid = this.vars[8];
+
+            if ( particles < 0 ) fail = true;
+            if ( diam <= 0.0 || diam >= 1.0 ) fail = true;
+            if ( charge < 0 || charge > 2 ) fail = true;
+            if ( steps < 1 ) fail = true;
+            if ( dim < 1 || dim > 3 ) fail = true;
+            if ( !fixed.equals("f") && !fixed.equals("-") ) fail = true;
+            if ( !lattice.equals("l") && !lattice.equals("-") ) fail = true;
+            if ( !avoid.equals("a") && !avoid.equals("-") ) fail = true;
 
             if ( fail == true ) return;
 
@@ -937,13 +939,15 @@ public class MainApp extends Application {
                 runAnim.setText("RUN");
             } else {
                 this.vars = getAnimScene.getVars();
+                boolean fail = false;
+
+                int particles = Integer.valueOf(vars[0]);
                 int dim = Integer.valueOf(this.vars[4]);
                 int steps = Integer.valueOf(vars[3]);
-                boolean fail = false;
  
-                if ( Integer.valueOf(this.vars[0]) < 0 ) fail = true; // particles
-                if ( steps < 1 ) fail = true; // steps
-                if ( dim < 1 || dim > 3 ) fail = true; // dimension
+                if ( particles < 0 ) fail = true;
+                if ( steps < 1 ) fail = true;
+                if ( dim < 1 || dim > 3 ) fail = true;
 
                 if ( fail == true ) return;
 
@@ -996,11 +1000,6 @@ public class MainApp extends Application {
         ////////////////////////////////////////////////////
         // EXECUTE BUTTON MMC
         runMMC.setOnMouseClicked((MouseEvent event) -> {
-            //if (getMMCScene.isRunning()) {
-            // BUTTON PRESSED OFF
-                //getMMCScene.stop();
-                //runMMC.setText("EXECUTE");
-            //} else {
             // BUTTON PRESSED ON
             this.vars = getMMCScene.getVars();
             int particles = Integer.valueOf(vars[0]);
@@ -1009,7 +1008,7 @@ public class MainApp extends Application {
             int steps = Integer.valueOf(vars[3]);
             int dim = Integer.valueOf(vars[4]);
             double temp = Double.valueOf(vars[5]);
-            String latt = this.vars[7];
+            String lattice = this.vars[7];
             boolean fail = false;
 
             if ( particles < 0 ) fail = true;
@@ -1018,7 +1017,7 @@ public class MainApp extends Application {
             if ( steps == 0 ) fail = true;
             if ( dim < 2 || dim > 3 ) fail = true;
             if ( temp < 0.0 ) fail = true;
-            if ( !latt.equals("l") && !latt.equals("-") ) fail = true;
+            if ( !lattice.equals("l") && !lattice.equals("-") ) fail = true;
 
             if ( fail == true ) return;
 
@@ -1043,8 +1042,7 @@ public class MainApp extends Application {
                 mmcpiirturi.scale(1.0/this.scalefactor, 1.0/this.scalefactor);
             }
 
-            this.scalefactor = Math.log10(Math.pow((double) particles, 2.0)) * 400.0
-                / Math.pow((double) particles, 2.0);
+            this.scalefactor = (this.animwidth - 100.0) / Math.pow((double) particles, 2.0);
 
             if ( dim == 2 )
                 this.linewidth = 1.0 / ( this.scalefactor );// * Math.sqrt(Math.log10((double) steps)) );
@@ -1074,21 +1072,13 @@ public class MainApp extends Application {
                     1.0/this.scalefactor*this.animheight);
             mmcpiirturi.fill();
 
-            //runMMC.setText("STOP");
             // DRAW ANIMATION
             getMMCScene.refresh(
                 datafolder, initialDataFile, fexec, mmcpiirturi, this.scalefactor,
                 this.animwidth, this.linewidth, this.fxplot,
                 this.energy_x, this.energy_y, this.newdata
-                );
+            );
             
-            /*if (getMMCScene.isRunning())
-                try {
-                    stop();
-                } catch (Exception ex1) {
-                Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex1);
-                }*/
-
             this.newdata = false;
 
             runMMC.setDisable(false);
@@ -1188,26 +1178,12 @@ public class MainApp extends Application {
                         || this.fxplot.getFrame().isDisplayable())
                         this.fxplot.getFrame().dispose();
                 }
-                if (getMMCScene.platfIsRunning()) {
-                    getMMCScene.platfStop();
-                    javafx.application.Platform.exit();
-                }
-                if (getMMCScene.timerIsRunning())
-                    getMMCScene.timerStop();
-                if (getMMCScene.isRunning())
-                    getMMCScene.stop();
-                
-                stage.close();
-                try {
-                    stop();
-                } catch (Exception ex1) {
-                    Logger.getLogger(
-                        MainApp.class.getName()).log(Level.SEVERE, null, ex1);
-                }
+                getMMCScene.stopRuntime();
             });
         });
-        stage.show();
+        stage.initStyle(StageStyle.UTILITY);
         stage.toFront();
+        stage.show();
     }
 
     public boolean createFolder(String source, String destination, String executable, boolean createDir){

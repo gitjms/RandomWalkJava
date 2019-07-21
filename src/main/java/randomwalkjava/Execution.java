@@ -137,13 +137,13 @@ public class Execution {
         // FROM SCENECALCULATION
         // vars from user:
         // vars[0] = particles,     n/a
-        // vars[1] = diameter,
+        // vars[1] = diameter,      n/a
         // vars[2] = charge,        n/a
-        // vars[3] = steps,
-        // vars[4] = dimension,
+        // vars[3] = steps,         USER
+        // vars[4] = dimension,     USER
         // vars[5] = temperature,   n/a
         // vars[6] = fixed,         n/a
-        // vars[7] = lattice,
+        // vars[7] = lattice,       USER
         // vars[8] = avoid,         n/a
         // vars[9] = save           n/a
         String pyexecrms = "python plotrms.py";
