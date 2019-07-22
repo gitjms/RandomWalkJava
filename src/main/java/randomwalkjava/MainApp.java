@@ -23,7 +23,10 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Skin;
 import javafx.scene.control.TextArea;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.DropShadow;
@@ -37,6 +40,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
@@ -54,7 +58,7 @@ public class MainApp extends Application {
     private final int textheight = 600;
     private final int animwidth = 900;
     private final int animheight = 900;
-    private final int simheight = 610;
+    private final int simheight = 660;
     private final int paneWidth = 200;
     private final int screenWidth = Screen.getMainScreen().getWidth();
     private final int screenHeight = Screen.getMainScreen().getHeight();
@@ -421,6 +425,33 @@ public class MainApp extends Application {
             textAreaMenu.setText(helpText.menu());
         });
 
+        // FIRST VIEW BUTTON: CLOSE
+        Button closeNappiMenu = new Button("CLOSE");
+        closeNappiMenu.setMinWidth(this.buttonWidth);
+        closeNappiMenu.setMaxWidth(this.buttonWidth);
+        closeNappiMenu.setStyle("-fx-background-color: Red");
+        closeNappiMenu.setTextFill(Color.WHITE);
+        GridPane.setHalignment(closeNappiMenu, HPos.LEFT);
+        closeNappiMenu.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                closeNappiMenu.setEffect(shadow);
+        });
+        closeNappiMenu.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                closeNappiMenu.setEffect(null);
+        });
+        closeNappiMenu.setOnAction(event -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                "Close application?",
+                ButtonType.OK, ButtonType.CANCEL);
+            alert.showAndWait();
+            if ( alert.getResult() == ButtonType.OK ) {
+                System.gc();
+                stage.close();
+            }
+        });
+        closeNappiMenu.setVisible(true);
+
         ////////////////////////////////////////////////////
         // OTHER VIEWS BUTTON: EXECUTE CALCULATION
         Button executeNappiCalc = new Button("EXECUTE");
@@ -474,6 +505,33 @@ public class MainApp extends Application {
         });
         helpNappiCalc.setVisible(true);
 
+        // OTHER VIEWS BUTTON: CALCULATION CLOSE
+        Button closeNappiCalc = new Button("CLOSE");
+        closeNappiCalc.setMinWidth(this.buttonWidth);
+        closeNappiCalc.setMaxWidth(this.buttonWidth);
+        closeNappiCalc.setStyle("-fx-background-color: Red");
+        closeNappiCalc.setTextFill(Color.WHITE);
+        GridPane.setHalignment(closeNappiCalc, HPos.LEFT);
+        closeNappiCalc.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                closeNappiCalc.setEffect(shadow);
+        });
+        closeNappiCalc.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                closeNappiCalc.setEffect(null);
+        });
+        closeNappiCalc.setOnAction(event -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                "Close application?",
+                ButtonType.OK, ButtonType.CANCEL);
+            alert.showAndWait();
+            if ( alert.getResult() == ButtonType.OK ) {
+                System.gc();
+                stage.close();
+            }
+        });
+        closeNappiCalc.setVisible(true);
+
         ////////////////////////////////////////////////////
         // OTHER VIEWS BUTTON: EXECUTE SIMULATION
         Button executeNappiSim = new Button("EXECUTE");
@@ -525,6 +583,33 @@ public class MainApp extends Application {
             textAreaSim.setText(helpText.simulation());
         });
         helpNappiSim.setVisible(true);
+
+        // OTHER VIEWS BUTTON: SIMULATION CLOSE
+        Button closeNappiSim = new Button("CLOSE");
+        closeNappiSim.setMinWidth(this.buttonWidth);
+        closeNappiSim.setMaxWidth(this.buttonWidth);
+        closeNappiSim.setStyle("-fx-background-color: Red");
+        closeNappiSim.setTextFill(Color.WHITE);
+        GridPane.setHalignment(closeNappiSim, HPos.LEFT);
+        closeNappiSim.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                closeNappiSim.setEffect(shadow);
+        });
+        closeNappiSim.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                closeNappiSim.setEffect(null);
+        });
+        closeNappiSim.setOnAction(event -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                "Close application?",
+                ButtonType.OK, ButtonType.CANCEL);
+            alert.showAndWait();
+            if ( alert.getResult() == ButtonType.OK ) {
+                System.gc();
+                stage.close();
+            }
+        });
+        closeNappiSim.setVisible(true);
 
         ////////////////////////////////////////////////////
         // OTHER VIEWS BUTTON: RUN ANIMATION
@@ -583,6 +668,33 @@ public class MainApp extends Application {
         });
         helpNappiAnim.setVisible(true);
 
+        // OTHER VIEWS BUTTON: ANIMATION CLOSE
+        Button closeNappiAnim = new Button("CLOSE");
+        closeNappiAnim.setMinWidth(this.buttonWidth);
+        closeNappiAnim.setMaxWidth(this.buttonWidth);
+        closeNappiAnim.setStyle("-fx-background-color: Red");
+        closeNappiAnim.setTextFill(Color.WHITE);
+        GridPane.setHalignment(closeNappiAnim, HPos.LEFT);
+        closeNappiAnim.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                closeNappiAnim.setEffect(shadow);
+        });
+        closeNappiAnim.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                closeNappiAnim.setEffect(null);
+        });
+        closeNappiAnim.setOnAction(event -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                "Close application?",
+                ButtonType.OK, ButtonType.CANCEL);
+            alert.showAndWait();
+            if ( alert.getResult() == ButtonType.OK ) {
+                System.gc();
+                stage.close();
+            }
+        });
+        closeNappiAnim.setVisible(true);
+
         ////////////////////////////////////////////////////
         // OTHER VIEWS BUTTON: EXECUTE MMC
         Button runMMC = new Button("EXECUTE");
@@ -640,11 +752,40 @@ public class MainApp extends Application {
         });
         helpNappiMMC.setVisible(true);
 
+        // OTHER VIEWS BUTTON: MMC CLOSE
+        Button closeNappiMMC = new Button("CLOSE");
+        closeNappiMMC.setMinWidth(this.buttonWidth);
+        closeNappiMMC.setMaxWidth(this.buttonWidth);
+        closeNappiMMC.setStyle("-fx-background-color: Red");
+        closeNappiMMC.setTextFill(Color.WHITE);
+        GridPane.setHalignment(closeNappiMMC, HPos.LEFT);
+        closeNappiMMC.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                closeNappiMMC.setEffect(shadow);
+        });
+        closeNappiMMC.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                closeNappiMMC.setEffect(null);
+        });
+        closeNappiMMC.setOnAction(event -> {
+            if ( getMMCScene.timerIsRunning()) return;
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                "Close application?",
+                ButtonType.OK, ButtonType.CANCEL);
+            alert.showAndWait();
+            if ( alert.getResult() == ButtonType.OK ) {
+                System.gc();
+                stage.close();
+            }
+        });
+        closeNappiMMC.setVisible(true);
+
         ////////////////////////////////////////////////////
         // SET FIRST VIEW BORDERPANE
         valikkoMenu.getChildren().addAll(
             asettelu,
-            nappiMenuHelp);
+            nappiMenuHelp,
+            closeNappiMenu);
         isovalikkoMenu.getChildren().addAll(
             valikkoMenu,
             textAreaMenu);
@@ -656,7 +797,8 @@ public class MainApp extends Application {
             menuNappiCalc,
             helpNappiCalc,
             getCalcScene.getSceneCalc(),
-            executeNappiCalc);
+            executeNappiCalc,
+            closeNappiCalc);
         isovalikkoCalc.getChildren().addAll(
             valikkoCalc,
             textAreaCalc);
@@ -668,7 +810,8 @@ public class MainApp extends Application {
             menuNappiSim,
             helpNappiSim,
             getSimScene.getSceneSim(),
-            executeNappiSim);
+            executeNappiSim,
+            closeNappiSim);
         isovalikkoSim.getChildren().addAll(
             valikkoSim,
             textAreaSim);
@@ -680,7 +823,8 @@ public class MainApp extends Application {
             menuNappiAnim,
             helpNappiAnim,
             getAnimScene.getSceneAnim(),
-            runAnim);
+            runAnim,
+            closeNappiAnim);
         isovalikkoAnim.getChildren().addAll(
             valikkoAnim,
             textAreaAnim);
@@ -692,7 +836,8 @@ public class MainApp extends Application {
             menuNappiMMC,
             helpNappiMMC,
             getMMCScene.getSceneMMC(),
-            runMMC);
+            runMMC,
+            closeNappiMMC);
         isovalikkoMMC.getChildren().addAll(
             valikkoMMC,
             textAreaMMC);
@@ -1001,6 +1146,7 @@ public class MainApp extends Application {
         // EXECUTE BUTTON MMC
         runMMC.setOnMouseClicked((MouseEvent event) -> {
             // BUTTON PRESSED ON
+            if ( getMMCScene.timerIsRunning()) return;
             this.vars = getMMCScene.getVars();
             int particles = Integer.valueOf(vars[0]);
             double diam = Double.valueOf(vars[1]);
@@ -1021,14 +1167,6 @@ public class MainApp extends Application {
 
             if ( fail == true ) return;
 
-            runMMC.setDisable(true);
-            valikkoMMC.setDisable(true);
-            menuNappiMMC.setDisable(true);
-            helpNappiMMC.setDisable(true);
-
-            File initialDataFile = new File(
-                datapath + "\\startMMC_" + dim + "D_" + particles + "N.xy");
-            
             if (this.fxplot != null) {
                 if (this.fxplot.isRunning()) this.fxplot.stop();
                 if (this.fxplot.getFrame().isShowing()
@@ -1045,12 +1183,12 @@ public class MainApp extends Application {
             this.scalefactor = (this.animwidth - 100.0) / Math.pow((double) particles, 2.0);
 
             if ( dim == 2 )
-                this.linewidth = 1.0 / ( this.scalefactor );// * Math.sqrt(Math.log10((double) steps)) );
+                this.linewidth = 1.0 / ( this.scalefactor );
 
             mmcpiirturi.scale(this.scalefactor, this.scalefactor);
 
             this.isscaled = true;
-            mmcpiirturi.setGlobalAlpha(1.0 / this.scalefactor );// * Math.pow(Math.log10((double) steps),2.0));
+            mmcpiirturi.setGlobalAlpha(1.0 / this.scalefactor );
 
             this.newdata = true;
             this.energy_x = new ArrayList();
@@ -1064,13 +1202,13 @@ public class MainApp extends Application {
 
             mmcpiirturi.setGlobalAlpha(1.0);
             mmcpiirturi.setFill(Color.BLACK);
-            if ( dim == 2 )
-                mmcpiirturi.fillRect(0, 0, 1.0/this.scalefactor*this.animwidth,
-                    1.0/this.scalefactor*this.animheight);
-            else if ( dim == 3 )
-                mmcpiirturi.fillRect(0, 0, 1.0/this.scalefactor*this.animwidth,
-                    1.0/this.scalefactor*this.animheight);
+            mmcpiirturi.fillRect(0, 0, 1.0/this.scalefactor*this.animwidth,
+                1.0/this.scalefactor*this.animheight);
             mmcpiirturi.fill();
+
+            // GET INITIAL DATA
+            File initialDataFile = new File(
+                datapath + "\\startMMC_" + dim + "D_" + particles + "N.xy");
 
             // DRAW ANIMATION
             getMMCScene.refresh(
@@ -1080,11 +1218,6 @@ public class MainApp extends Application {
             );
             
             this.newdata = false;
-
-            runMMC.setDisable(false);
-            valikkoMMC.setDisable(false);
-            menuNappiMMC.setDisable(false);
-            helpNappiMMC.setDisable(false);
 
         });
 
@@ -1178,7 +1311,8 @@ public class MainApp extends Application {
                         || this.fxplot.getFrame().isDisplayable())
                         this.fxplot.getFrame().dispose();
                 }
-                getMMCScene.stopRuntime();
+                if (getMMCScene.runtimeIsRunning())
+                    getMMCScene.stopRuntime();
             });
         });
         stage.initStyle(StageStyle.UTILITY);

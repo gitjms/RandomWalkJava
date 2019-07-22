@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -50,13 +52,24 @@ public class SceneMMC extends Data {
     private double center;
     private Runtime runtime;
     private int exitVal;
+    private Timer timer;
+    private double margin;
+    private double[][] values;
+    private boolean running;
 
     @Override
     public String[] getVars() {
         return this.vars;
     }
 
+    public void runtimeStart() {
+        this.running = true;
+    }
+    public boolean runtimeIsRunning() {
+        return this.running;
+    }
     public void stopRuntime() {
+        this.running = false;
         this.runtime.exit(this.exitVal);
     }
 
@@ -64,6 +77,8 @@ public class SceneMMC extends Data {
         this.timerRunning = true;
     }
     public void timerStop() {
+        this.timer.cancel();
+        this.timer.purge();
         this.timerRunning = false;
     }
     public boolean timerIsRunning() {
@@ -96,10 +111,10 @@ public class SceneMMC extends Data {
             "-"};   // vars[9] save (off)       n/a
     }
 
-     public void refresh(File folderPath, File initialDataFile,
-        String executable, GraphicsContext piirturi, double scalefactor,
-        int animwidth, double linewidth, FXPlot fxplot,
-        List<Double> energy_x, List<Double> energy_y, boolean newdata) {
+     public void refresh(File folderPath, File initialDataFile, String executable,
+        GraphicsContext piirturi, double scalefactor, int animwidth,
+        double linewidth, FXPlot fxplot, List<Double> energy_x,
+        List<Double> energy_y, boolean newdata) {
 
         this.piirturi = piirturi;
         this.linewidth = linewidth;
@@ -109,38 +124,28 @@ public class SceneMMC extends Data {
         if (newdata == true) {
             this.phase = 0;
             this.first = false;
+            energy_x.clear();
+            energy_y.clear();
         }
 
         this.center = (double) this.animwidth/2.0;
 
         int num_part = Integer.valueOf(this.vars[0]);
         double diam = Double.valueOf(this.vars[1]);
-        double d = diam + num_part/scalefactor;
+        double d = diam - diam / ( this.scalefactor);
         int dim = Integer.valueOf(this.vars[4]);
+        if ( num_part == 2)
+            this.margin = 200.0;
+        else
+            this.margin = 50.0;
 
-        double[][] values = new double[dim][num_part];
+        this.values = new double[dim][num_part];
+
+        piirturi.setLineWidth(linewidth);
 
         String[] command = null;
 
         fxplot.setFrameVis(true);
-
-        piirturi.setLineWidth(linewidth);
-        List<double[]> initialData = readDataMMC(initialDataFile, dim);
-
-        // Draw bounds
-        draw2Bounds(num_part, d);
-
-        // Initial data spots
-        for (int k = 0; k < num_part; k++){
-            values[0][k] = initialData.get(k)[0] + (this.center + 00.0)/scalefactor;
-            values[1][k] = initialData.get(k)[1] + (this.center + 00.0)/scalefactor;
-            if ( dim == 3 )
-                values[2][k] = initialData.get(k)[2] + 1.2*(this.center + 00.0)/scalefactor;
-            if ( dim == 2 )
-                draw2Dots(values[0][k], values[1][k], d);
-            if ( dim == 3 )
-                draw3Dots(values[0][k], values[1][k], values[2][k], diam);
-        }
 
         try
         {
@@ -150,31 +155,25 @@ public class SceneMMC extends Data {
             this.vars[8], this.vars[9]};
 
         this.runtime = Runtime.getRuntime();
+        runtimeStart();
         this.process = this.runtime.exec(command, null, folderPath);
 
-        
-        //piirturi.getCanvas().setBlendMode(BlendMode.SRC_OVER);
-        
-        /*try
-        {
-        Thread.sleep(100);
+        // DRAW INITIAL PARTICLES
+        try {
+            Thread.sleep(100);
+            drawInitials( initialDataFile, num_part, dim, d);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(SceneMMC.class.getName()).log(Level.SEVERE, null, ex);
         }
-        catch (InterruptedException ex) {
-        Logger.getLogger(
-            SceneMMC.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
-        
 
         timerStart();
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
+        this.timer = new Timer();
+        this.timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 int i = 0;
-                int j = 0;
 
-                if ( !timerIsRunning())
-                    return;
+                if ( !timerIsRunning()) return;
 
                 try (BufferedReader input = new BufferedReader(new InputStreamReader(
                     process.getInputStream())))
@@ -192,9 +191,9 @@ public class SceneMMC extends Data {
                             String[] valStr = line.split("(\\s+)");
                             try {
                                 values[0][i] = Double.parseDouble(valStr[0].trim())
-                                    + (center + 00.0)/scalefactor;
+                                    + (center - margin) / scalefactor;
                                 values[1][i] = Double.parseDouble(valStr[1].trim())
-                                    + (center + 00.0)/scalefactor;
+                                    + (center - margin) / scalefactor;
                             } catch (NumberFormatException e) {
                                 continue;
                             }
@@ -202,45 +201,39 @@ public class SceneMMC extends Data {
                             String[] valStr = line.split("(\\s+)");
                             try {
                                 values[0][i] = Double.parseDouble(valStr[0].trim())
-                                    + center/scalefactor;
+                                    + (center - margin)/scalefactor;
                                 values[1][i] = Double.parseDouble(valStr[1].trim())
-                                    + center/scalefactor;
+                                    + (center - margin)/scalefactor;
                                 values[2][i] = Double.parseDouble(valStr[2].trim())
-                                    + 1.2*center/scalefactor;
+                                    + (center - margin + 50.0)/scalefactor;
                             } catch (NumberFormatException e) {
                                 continue;
                             }
                         }
 
                         platfStart();
-                        //if ( j >= num_part ) {
-                            javafx.application.Platform.runLater(new Runnable() {
-                                @Override
-                                public void run() {
+                        javafx.application.Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
 
-                                    if ( !platfIsRunning())
-                                        return;
+                                if ( !platfIsRunning()) return;
 
-                                    // DRAW
-                                    clearDots();
-                                    draw2Bounds(num_part, d);
-                                    for (int k = 0; k < num_part; k++){
-                                        if ( dim == 2 ) {
-                                            draw2Dots(values[0][k], values[1][k], d);
-                                        } else if ( dim == 3 ) {
-                                            draw3Dots(values[0][k], values[1][k], values[2][k], diam);
-                                        }
+                                // DRAW
+                                clearDots(dim);
+                                for (int k = 0; k < num_part; k++){
+                                    if ( dim == 2 ) {
+                                        draw2Dots(values[0][k], values[1][k], d);
+                                    } else if ( dim == 3 ) {
+                                        draw3Dots(values[0][k], values[1][k],
+                                            values[2][k], num_part, d);
                                     }
                                 }
-                            });
-                        //}
+                            }
+                        });
 
                         i++;
 
-                        if ( i == num_part ){
-                            i = 0;
-                            j++;
-                        }
+                        if ( i == num_part ) i = 0;
 
                     } else {
                         try
@@ -305,47 +298,57 @@ public class SceneMMC extends Data {
 
     }
 
-    public void draw2Bounds( int n, double d ){
+    public void drawInitials( File initialDataFile,
+        int num_part, int dim, double d ){
+
         this.piirturi.setLineWidth(linewidth);
-        this.piirturi.setStroke(Color.ANTIQUEWHITE);
-        double xy0 = ( (this.center - (double) n - d ) / this.scalefactor - Math.pow((double) n, 2.0) /2.0 );
-        double xy1 = ( (this.center + (double) n + d )/ this.scalefactor + Math.pow((double) n, 2.0) /2.0 );
-        this.piirturi.strokeLine( xy0, xy0, xy0, xy1 );
-        this.piirturi.strokeLine( xy1, xy0, xy1, xy1 );
-        this.piirturi.strokeLine( xy0, xy0, xy1, xy0 );
-        this.piirturi.strokeLine( xy0, xy1, xy1, xy1 );
+        List<double[]> initialData = readDataMMC(initialDataFile, dim);
+
+        // Draw initial data spots
+        for (int k = 0; k < num_part; k++){
+            this.values[0][k] = initialData.get(k)[0]
+                + (this.center - this.margin) / this.scalefactor;
+            this.values[1][k] = initialData.get(k)[1]
+                + (this.center - this.margin) / this.scalefactor;
+            if ( dim == 2 )
+                draw2Dots(this.values[0][k], this.values[1][k], d);
+            else if ( dim == 3 ) {
+                this.values[2][k] = initialData.get(k)[2]
+                    + (this.center - this.margin + 50.0) / this.scalefactor;
+                draw3Dots(this.values[0][k], this.values[1][k], this.values[2][k], num_part, d);
+            }
+        }
     }
 
-    public void clearDots(){
+    public void clearDots( int dim ){
         this.piirturi.setGlobalAlpha(1.0);
         this.piirturi.setFill(Color.BLACK);
-        if ( Integer.valueOf(this.vars[4]) == 2 )
-            this.piirturi.fillRect(
-                0,0,
-                this.piirturi.getCanvas().getScaleX()
-                    * this.piirturi.getCanvas().getWidth(),
-                this.piirturi.getCanvas().getScaleY()
-                    * this.piirturi.getCanvas().getHeight());
-        else if ( Integer.valueOf(this.vars[4]) == 3 )
-            this.piirturi.fillRect(0, 0, 1.0/this.scalefactor*this.animwidth,
+        if ( dim == 2 )
+            this.piirturi.fillRect( 0, 0,
+                this.animwidth / this.scalefactor,
+                this.animwidth / this.scalefactor);
+        else if ( dim == 3 )
+            this.piirturi.fillRect(0, 0,
+                1.0/this.scalefactor*this.animwidth,
                 1.0/this.scalefactor*this.animwidth);
         this.piirturi.fill();
     }
 
     public void draw2Dots(double x, double y, double d){
-        //this.piirturi.setLineWidth(linewidth);
+        this.piirturi.setGlobalAlpha(1.0);
+        this.piirturi.setLineWidth(this.linewidth);
         this.piirturi.setStroke(Color.YELLOW);
-        this.piirturi.strokeRoundRect( x, y, d, d, d, d );
+        this.piirturi.strokeRoundRect(x, y, d, d, d, d );
     }
 
-    public void draw3Dots(double x, double y, double z, double d){
-        this.piirturi.setLineWidth(linewidth / ( z * scalefactor ));
+    public void draw3Dots(double x, double y, double z, int num_part, double d){
+        this.piirturi.setGlobalAlpha(
+             Math.pow((double) num_part, 2.0) * d/z );
+        this.piirturi.setLineWidth( d/this.scalefactor );
         this.piirturi.setStroke(Color.YELLOW);
-        this.piirturi.strokeRoundRect( x, y,
-            d * x + Math.cos(z),
-            d * y + Math.sin(z),
-            d * x + Math.cos(z),
-            d * y + Math.sin(z));
+        this.piirturi.strokeRoundRect(x, y,
+            num_part*d/(2.0*Math.sqrt(z)), num_part*d/(2.0*Math.sqrt(z)),
+            num_part*d/(2.0*Math.sqrt(z)), num_part*d/(2.0*Math.sqrt(z)));
     }
  
     public static boolean isNumDouble(String str) {
