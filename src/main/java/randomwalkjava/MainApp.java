@@ -26,7 +26,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Skin;
 import javafx.scene.control.TextArea;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.DropShadow;
@@ -40,7 +39,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
@@ -1160,7 +1158,7 @@ public class MainApp extends Application {
             if ( particles < 0 ) fail = true;
             if ( diam <= 0.0 || diam >= 1.0 ) fail = true;
             if ( charge < 0 || charge > 2 ) fail = true;
-            if ( steps == 0 ) fail = true;
+            if ( steps <= 0 ) fail = true;
             if ( dim < 2 || dim > 3 ) fail = true;
             if ( temp < 0.0 ) fail = true;
             if ( !lattice.equals("l") && !lattice.equals("-") ) fail = true;
@@ -1180,10 +1178,13 @@ public class MainApp extends Application {
                 mmcpiirturi.scale(1.0/this.scalefactor, 1.0/this.scalefactor);
             }
 
-            this.scalefactor = (this.animwidth - 100.0) / Math.pow((double) particles, 2.0);
+            this.scalefactor = (this.animwidth - 100.0) * Math.log((double) particles ) / Math.pow((double) particles, 2.0);
 
             if ( dim == 2 )
-                this.linewidth = 1.0 / ( this.scalefactor );
+                if ( particles < 15 )
+                    this.linewidth = 1.0 / this.scalefactor;
+                else
+                    this.linewidth = 1.0;
 
             mmcpiirturi.scale(this.scalefactor, this.scalefactor);
 

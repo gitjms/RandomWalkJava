@@ -20,7 +20,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
@@ -102,7 +101,7 @@ public class SceneMMC extends Data {
             "0",    // vars[0] particles        USER
             "0.0",  // vars[1] diameter         USER
             "0",    // vars[2] charge           USER
-            "1",    // vars[3] steps            n/a
+            "0",    // vars[3] steps            USER
             "0",    // vars[4] dimension        USER
             "0",    // vars[5] temperature      USER
             "-",    // vars[6] (fixed/)spread   n/a
@@ -134,10 +133,11 @@ public class SceneMMC extends Data {
         double diam = Double.valueOf(this.vars[1]);
         double d = diam - diam / ( this.scalefactor);
         int dim = Integer.valueOf(this.vars[4]);
-        if ( num_part == 2)
+        boolean lattice = this.vars[7].equals("l");
+        if ( num_part == 2 && lattice == true)
             this.margin = 200.0;
         else
-            this.margin = 50.0;
+            this.margin = 0.0;
 
         this.values = new double[dim][num_part];
 
@@ -222,7 +222,7 @@ public class SceneMMC extends Data {
                                 clearDots(dim);
                                 for (int k = 0; k < num_part; k++){
                                     if ( dim == 2 ) {
-                                        draw2Dots(values[0][k], values[1][k], d);
+                                        draw2Dots(values[0][k], values[1][k], num_part, d);
                                     } else if ( dim == 3 ) {
                                         draw3Dots(values[0][k], values[1][k],
                                             values[2][k], num_part, d);
@@ -311,7 +311,7 @@ public class SceneMMC extends Data {
             this.values[1][k] = initialData.get(k)[1]
                 + (this.center - this.margin) / this.scalefactor;
             if ( dim == 2 )
-                draw2Dots(this.values[0][k], this.values[1][k], d);
+                draw2Dots(this.values[0][k], this.values[1][k], num_part, d);
             else if ( dim == 3 ) {
                 this.values[2][k] = initialData.get(k)[2]
                     + (this.center - this.margin + 50.0) / this.scalefactor;
@@ -334,16 +334,22 @@ public class SceneMMC extends Data {
         this.piirturi.fill();
     }
 
-    public void draw2Dots(double x, double y, double d){
+    public void draw2Dots(double x, double y, int num_part, double d){
         this.piirturi.setGlobalAlpha(1.0);
         this.piirturi.setLineWidth(this.linewidth);
         this.piirturi.setStroke(Color.YELLOW);
-        this.piirturi.strokeRoundRect(x, y, d, d, d, d );
+        if ( num_part < 50 ) {
+            this.piirturi.strokeRoundRect(x, y, d, d, d, d );
+        } else {
+            this.piirturi.strokeRect(x, y,
+                Math.log10(Math.pow((double) num_part, 2.0))/this.scalefactor,
+                Math.log10(Math.pow((double) num_part, 2.0))/this.scalefactor);
+        }
     }
 
     public void draw3Dots(double x, double y, double z, int num_part, double d){
         this.piirturi.setGlobalAlpha(
-             Math.pow((double) num_part, 2.0) * d/z );
+             Math.pow((double) num_part, 2.0) / Math.log((double) num_part ) * d/z );
         this.piirturi.setLineWidth( d/this.scalefactor );
         this.piirturi.setStroke(Color.YELLOW);
         this.piirturi.strokeRoundRect(x, y,
@@ -476,7 +482,14 @@ public class SceneMMC extends Data {
             this.vars[2] = "2";
         });
 
-        this.vars[3] = "1";
+        Label labMaxIter = new Label("max iteration:");
+        TextField setMaxIter = new TextField("");
+        setMaxIter.setOnKeyReleased(e -> {
+            if (isNumInteger(setMaxIter.getText().trim())){
+                this.vars[3] = setMaxIter.getText().trim();
+            } else
+                this.vars[3] = "0";
+        });
 
         Label labNumDimensions = new Label("dimensions:");
         ToggleButton setDim2 = new ToggleButton("2");
@@ -553,19 +566,26 @@ public class SceneMMC extends Data {
         setCharge.setMaxWidth(this.compwidth);
         asettelu.add(setCharge, 0, 5);
         
+        GridPane.setHalignment(labMaxIter, HPos.LEFT);
+        asettelu.add(labMaxIter, 0, 6);
+        GridPane.setHalignment(setMaxIter, HPos.CENTER);
+        setMaxIter.setMinWidth(this.compwidth);
+        setMaxIter.setMaxWidth(this.compwidth);
+        asettelu.add(setMaxIter, 0, 7);
+        
         GridPane.setHalignment(labNumDimensions, HPos.LEFT);
-        asettelu.add(labNumDimensions, 0, 6);
+        asettelu.add(labNumDimensions, 0, 8);
         GridPane.setHalignment(setDimension, HPos.CENTER);
         setDimension.setMinWidth(this.compwidth);
         setDimension.setMaxWidth(this.compwidth);
-        asettelu.add(setDimension, 0, 7);
+        asettelu.add(setDimension, 0, 9);
         
         GridPane.setHalignment(labTemperature, HPos.LEFT);
-        asettelu.add(labTemperature, 0, 8);
+        asettelu.add(labTemperature, 0, 10);
         GridPane.setHalignment(setTemperature, HPos.CENTER);
         setTemperature.setMinWidth(this.compwidth);
         setTemperature.setMaxWidth(this.compwidth);
-        asettelu.add(setTemperature, 0, 9);
+        asettelu.add(setTemperature, 0, 11);
 
         this.vars[6] = "-"; // spread out
 
@@ -608,11 +628,11 @@ public class SceneMMC extends Data {
         this.vars[9] = "-"; // save off
 
         GridPane.setHalignment(valikko, HPos.LEFT);
-        asettelu.add(valikko, 0, 10, 2, 1);
+        asettelu.add(valikko, 0, 12, 2, 1);
 
         final Pane empty = new Pane();
         GridPane.setHalignment(empty, HPos.CENTER);
-        asettelu.add(empty, 0, 11, 2, 1);
+        asettelu.add(empty, 0, 13, 2, 1);
 
        return asettelu;
     }
