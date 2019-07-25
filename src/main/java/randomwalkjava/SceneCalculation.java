@@ -39,7 +39,7 @@ public class SceneCalculation extends Data {
             "0",    // vars[2] charge           n/a
             "0",    // vars[3] steps            USER
             "0",    // vars[4] dimension        USER
-            "0",    // vars[5] temperature      n/a
+            "-",    // vars[5] mmc              n/a
             "f",    // vars[6] fixed(/spread)   n/a
             "-",    // vars[7] (lattice/)free   USER
             "-",    // vars[8] avoid (on/)off   n/a
@@ -161,7 +161,7 @@ public class SceneCalculation extends Data {
             this.vars[4] = "3";
         });
 
-        this.vars[5] = "0"; // temperature
+        this.vars[5] = "-"; // mmc
 
         // ...THEIR PLACEMENTS
         GridPane.setHalignment(labNumSteps, HPos.LEFT);

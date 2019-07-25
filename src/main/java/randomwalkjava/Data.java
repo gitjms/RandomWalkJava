@@ -52,7 +52,7 @@ public class Data {
         // vars[2] = charge,
         // vars[3] = steps,
         // vars[4] = dimension,
-        // vars[5] = temperature,
+        // vars[5] = mmc,
         // vars[6] = fixed,
         // vars[7] = lattice,
         // vars[8] = avoid,

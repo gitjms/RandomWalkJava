@@ -1041,7 +1041,7 @@ public class MainApp extends Application {
                 // vars[2] = charge,        n/a
                 // vars[3] = steps,         USER
                 // vars[4] = dimension,     USER
-                // vars[5] = temperature,   n/a
+                // vars[5] = mmc,           n/a
                 // vars[6] = fixed,         n/a
                 // vars[7] = lattice,       n/a
                 // vars[8] = avoid,         n/a
@@ -1149,18 +1149,14 @@ public class MainApp extends Application {
             int particles = Integer.valueOf(vars[0]);
             double diam = Double.valueOf(vars[1]);
             int charge = Integer.valueOf(vars[2]);
-            int steps = Integer.valueOf(vars[3]);
             int dim = Integer.valueOf(vars[4]);
-            double temp = Double.valueOf(vars[5]);
             String lattice = this.vars[7];
             boolean fail = false;
 
             if ( particles < 0 ) fail = true;
             if ( diam <= 0.0 || diam >= 1.0 ) fail = true;
             if ( charge < 0 || charge > 2 ) fail = true;
-            if ( steps <= 0 ) fail = true;
             if ( dim < 2 || dim > 3 ) fail = true;
-            if ( temp < 0.0 ) fail = true;
             if ( !lattice.equals("l") && !lattice.equals("-") ) fail = true;
 
             if ( fail == true ) return;
@@ -1178,10 +1174,15 @@ public class MainApp extends Application {
                 mmcpiirturi.scale(1.0/this.scalefactor, 1.0/this.scalefactor);
             }
 
-            this.scalefactor = (this.animwidth - 100.0) * Math.log((double) particles ) / Math.pow((double) particles, 2.0);
+            if ( particles < 25 )
+                this.scalefactor = (this.animwidth - 100.0)
+                    / 10.0;
+            else
+                this.scalefactor = (this.animwidth - 100.0)
+                    / ( 2.0 * Math.sqrt((double) particles ) );
 
             if ( dim == 2 )
-                if ( particles < 15 )
+                if ( particles < 100 )
                     this.linewidth = 1.0 / this.scalefactor;
                 else
                     this.linewidth = 1.0;
