@@ -1182,10 +1182,9 @@ public class MainApp extends Application {
                     / ( 2.0 * Math.sqrt((double) particles ) );
 
             if ( dim == 2 )
-                if ( particles < 100 )
-                    this.linewidth = 1.0 / this.scalefactor;
-                else
-                    this.linewidth = 1.0;
+                this.linewidth = 1.0 / this.scalefactor;
+            else
+                this.linewidth = diam / this.scalefactor;
 
             mmcpiirturi.scale(this.scalefactor, this.scalefactor);
 

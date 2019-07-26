@@ -20,6 +20,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
@@ -103,7 +104,7 @@ public class SceneMMC extends Data {
             "0",    // vars[2] charge           USER
             "0",    // vars[3] steps            n/a
             "0",    // vars[4] dimension        USER
-            "m",    // vars[5] mmc              USER
+            "m",    // vars[5] mmc              n/a
             "-",    // vars[6] (fixed/)spread   n/a
             "-",    // vars[7] (lattice/)free   USER
             "a",    // vars[8] avoid on(/off)   n/a
@@ -119,25 +120,19 @@ public class SceneMMC extends Data {
         this.linewidth = linewidth;
         this.animwidth = animwidth;
         this.scalefactor = scalefactor;
+        this.center = (double) this.animwidth/2.0;
+
+        int num_part = Integer.valueOf(this.vars[0]);
+        double diam = Double.valueOf(this.vars[1]);
+        int dim = Integer.valueOf(this.vars[4]);
 
         if (newdata == true) {
             this.phase = 0;
             this.first = false;
             energy_x.clear();
             energy_y.clear();
+            clearDots(dim);
         }
-
-        this.center = (double) this.animwidth/2.0;
-
-        int num_part = Integer.valueOf(this.vars[0]);
-        double diam = Double.valueOf(this.vars[1]);
-        double d = diam - diam / ( this.scalefactor);
-        int dim = Integer.valueOf(this.vars[4]);
-        boolean lattice = this.vars[7].equals("l");
-        if ( num_part == 2 && lattice == true)
-            this.margin = 200.0;
-        else
-            this.margin = 0.0;
 
         this.values = new double[dim][num_part];
 
@@ -191,9 +186,9 @@ public class SceneMMC extends Data {
                             String[] valStr = line.split("(\\s+)");
                             try {
                                 values[0][i] = Double.parseDouble(valStr[0].trim())
-                                    + (center - margin) / scalefactor;
+                                     + center / scalefactor;
                                 values[1][i] = Double.parseDouble(valStr[1].trim())
-                                    + (center - margin) / scalefactor;
+                                     + center / scalefactor;
                             } catch (NumberFormatException e) {
                                 continue;
                             }
@@ -201,11 +196,11 @@ public class SceneMMC extends Data {
                             String[] valStr = line.split("(\\s+)");
                             try {
                                 values[0][i] = Double.parseDouble(valStr[0].trim())
-                                    + (center - margin)/scalefactor;
+                                     + center / scalefactor;
                                 values[1][i] = Double.parseDouble(valStr[1].trim())
-                                    + (center - margin)/scalefactor;
+                                     + center / scalefactor;
                                 values[2][i] = Double.parseDouble(valStr[2].trim())
-                                    + (center - margin + 50.0)/scalefactor;
+                                     + center / scalefactor;
                             } catch (NumberFormatException e) {
                                 continue;
                             }
@@ -300,7 +295,7 @@ public class SceneMMC extends Data {
     }
 
     public void drawInitials( File initialDataFile,
-        int num_part, int dim, double d ){
+        int num_part, int dim, double diam ){
 
         this.piirturi.setLineWidth(linewidth);
         List<double[]> initialData = readDataMMC(initialDataFile, dim);
@@ -308,21 +303,23 @@ public class SceneMMC extends Data {
         // Draw initial data spots
         for (int k = 0; k < num_part; k++){
             this.values[0][k] = initialData.get(k)[0]
-                + (this.center - this.margin) / this.scalefactor;
+                + this.center / this.scalefactor;
             this.values[1][k] = initialData.get(k)[1]
-                + (this.center - this.margin) / this.scalefactor;
+                + this.center / this.scalefactor;
             if ( dim == 2 )
-                draw2Dots(this.values[0][k], this.values[1][k], num_part, d);
+                draw2Dots(this.values[0][k], this.values[1][k], num_part, diam);
             else if ( dim == 3 ) {
                 this.values[2][k] = initialData.get(k)[2]
-                    + (this.center - this.margin + 50.0) / this.scalefactor;
-                draw3Dots(this.values[0][k], this.values[1][k], this.values[2][k], num_part, d);
+                    + this.center / this.scalefactor;
+                draw3Dots(this.values[0][k], this.values[1][k],
+                    this.values[2][k], num_part, diam);
             }
         }
     }
 
     public void clearDots( int dim ){
         this.piirturi.setGlobalAlpha(1.0);
+        this.piirturi.setGlobalBlendMode(BlendMode.SRC_OVER);
         this.piirturi.setFill(Color.BLACK);
         if ( dim == 2 )
             this.piirturi.fillRect( 0, 0,
@@ -335,31 +332,26 @@ public class SceneMMC extends Data {
         this.piirturi.fill();
     }
 
-    public void draw2Dots(double x, double y, int num_part, double d){
+    public void draw2Dots(double x, double y, int num_part, double diam){
         this.piirturi.setGlobalAlpha(1.0);
         this.piirturi.setLineWidth(this.linewidth);
         this.piirturi.setStroke(Color.YELLOW);
-        if ( num_part < 50 ) {
-            this.piirturi.strokeRoundRect(x, y,
-                2.0 * Math.sqrt((double) num_part) * d/this.scalefactor,
-                2.0 * Math.sqrt((double) num_part) * d/this.scalefactor,
-                2.0 * Math.sqrt((double) num_part) * d/this.scalefactor,
-                2.0 * Math.sqrt((double) num_part) * d/this.scalefactor);
-        } else {
-            this.piirturi.strokeRect(x, y,
-                2.0 * Math.sqrt((double) num_part)/this.scalefactor,
-                2.0 * Math.sqrt((double) num_part)/this.scalefactor);
-        }
+        this.piirturi.strokeRoundRect(
+            x - diam/2.0, y - diam/2.0,
+            diam, diam, diam, diam);
     }
 
-    public void draw3Dots(double x, double y, double z, int num_part, double d){
+    public void draw3Dots(double x, double y, double z, int num_part, double diam){
         this.piirturi.setGlobalAlpha(
-             Math.pow((double) num_part, 2.0) / Math.log((double) num_part ) * d/z );
-        this.piirturi.setLineWidth( d/this.scalefactor );
+            Math.pow((double) num_part, 2.0)
+                / ( this.scalefactor * z ) + 0.2 );
+        this.piirturi.setLineWidth(this.linewidth);
         this.piirturi.setStroke(Color.YELLOW);
-        this.piirturi.strokeRoundRect(x, y,
-            num_part*d/(2.0*Math.sqrt(z)), num_part*d/(2.0*Math.sqrt(z)),
-            num_part*d/(2.0*Math.sqrt(z)), num_part*d/(2.0*Math.sqrt(z)));
+        this.piirturi.setGlobalBlendMode(BlendMode.SCREEN);
+        this.piirturi.setFill(Color.color(1.0, 1.0, 0.0, 0.7));
+        this.piirturi.fillRoundRect(
+            x - diam/( 2.0 * z ), y - diam/( 2.0 * z ),
+            diam/z, diam/z, diam/z, diam/z);
     }
  
     public static boolean isNumDouble(String str) {
@@ -604,11 +596,11 @@ public class SceneMMC extends Data {
         this.vars[9] = "-"; // save off
 
         GridPane.setHalignment(valikko, HPos.LEFT);
-        asettelu.add(valikko, 0, 10, 2, 1);
+        asettelu.add(valikko, 0, 8, 2, 1);
 
         final Pane empty = new Pane();
         GridPane.setHalignment(empty, HPos.CENTER);
-        asettelu.add(empty, 0, 11, 2, 1);
+        asettelu.add(empty, 0, 9, 2, 1);
 
        return asettelu;
     }
