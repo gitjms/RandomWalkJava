@@ -1178,8 +1178,12 @@ public class MainApp extends Application {
                 this.scalefactor = (this.animwidth - 100.0)
                     / 10.0;
             else
-                this.scalefactor = (this.animwidth - 100.0)
-                    / ( 2.0 * Math.sqrt((double) particles ) );
+                if ( dim < 3 )
+                    this.scalefactor = (this.animwidth - 100.0)
+                        / ( 2.0 * Math.sqrt( 2.0 * (double) particles ) );
+                else
+                    this.scalefactor = (this.animwidth - 100.0)
+                        / ( Math.sqrt( 2.0 * (double) particles ) );
 
             if ( dim == 2 )
                 this.linewidth = 1.0 / this.scalefactor;

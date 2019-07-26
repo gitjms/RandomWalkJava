@@ -252,7 +252,7 @@ public class SceneMMC extends Data {
                         continue;
                         }
 
-                        Thread.sleep(100);
+                        Thread.sleep(50);
                         if ( energy_y.get((int) phase - 1) > greatest ) {
                             greatest = energy_y.get((int) phase - 1);
                             fxplot.setEMaxY(greatest);
@@ -344,14 +344,14 @@ public class SceneMMC extends Data {
     public void draw3Dots(double x, double y, double z, int num_part, double diam){
         this.piirturi.setGlobalAlpha(
             Math.pow((double) num_part, 2.0)
-                / ( this.scalefactor * z ) + 0.2 );
+                / ( this.scalefactor * z ) + 0.5 );
         this.piirturi.setLineWidth(this.linewidth);
         this.piirturi.setStroke(Color.YELLOW);
         this.piirturi.setGlobalBlendMode(BlendMode.SCREEN);
-        this.piirturi.setFill(Color.color(1.0, 1.0, 0.0, 0.7));
+        this.piirturi.setFill(Color.color(1.0, 1.0, 0.0, 0.6));
         this.piirturi.fillRoundRect(
             x - diam/( 2.0 * z ), y - diam/( 2.0 * z ),
-            diam/z, diam/z, diam/z, diam/z);
+             2.0 * diam/z,  2.0 * diam/z,  2.0 * diam/z,  2.0 * diam/z);
     }
  
     public static boolean isNumDouble(String str) {
