@@ -149,10 +149,10 @@ public class FXPlot extends SceneAnimation {
             // XYChart calcChartE
             this.calcChartE.getStyler().setLegendVisible(false);
             this.calcChartE.setXAxisTitle("steps");
-            this.calcChartE.setYAxisTitle("Energy");
+            this.calcChartE.setYAxisTitle("Arbitrary Energy Unit");
             this.calcChartE.getStyler().setMarkerSize(0);
             this.calcChartE.getStyler().setXAxisDecimalPattern("0");
-            this.calcChartE.getStyler().setYAxisDecimalPattern("#.#E0");
+            this.calcChartE.getStyler().setYAxisDecimalPattern("0.0");
             this.calcChartE.getStyler().setAxisTickLabelsFont(new java.awt.Font(null,0,15));
             this.calcChartE.getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
             this.calcChartE.getStyler().setChartTitleFont(new java.awt.Font(null,0,20));
@@ -218,7 +218,7 @@ public class FXPlot extends SceneAnimation {
         };
         this.calcChartE.addSeries(String.valueOf(name), x, y)
             .setLineStyle(BasicStroke[0]).setLineColor(Color.MAGENTA);
-        this.calcChartE.setTitle("MMC energy minimizing");
+        this.calcChartE.setTitle("MMC Diffusion Random Walk");
         this.calcChartE.getStyler().setAntiAlias(true);
         this.frame.getContentPane().add(this.chartPanelE);
         this.frame.repaint();

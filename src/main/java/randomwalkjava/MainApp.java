@@ -784,14 +784,19 @@ public class MainApp extends Application {
                 closeNappiMMC.setEffect(null);
         });
         closeNappiMMC.setOnAction(event -> {
-            if ( getMMCScene.timerIsRunning()) return;
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
-                "Close application?",
-                ButtonType.OK, ButtonType.CANCEL);
-            alert.showAndWait();
-            if ( alert.getResult() == ButtonType.OK ) {
-                System.gc();
-                stage.close();
+            if ( getMMCScene.timerIsRunning()) {
+                if ( getMMCScene.barrierIsOn() ) {
+                    Alert alert = new Alert(
+                        Alert.AlertType.CONFIRMATION,
+                        "Close application?",
+                        ButtonType.OK, ButtonType.CANCEL);
+                    alert.showAndWait();
+                    if ( alert.getResult() == ButtonType.OK ) {
+                        System.gc();
+                        stage.close();
+                    }
+                } else
+                    return;
             }
         });
         closeNappiMMC.setVisible(true);
@@ -1234,7 +1239,7 @@ public class MainApp extends Application {
             File initialDataFile = new File(
                 datapath + "\\startMMC_" + dim + "D_" + particles + "N.xy");
 
-            // DRAW ANIMATION
+            // DRAW MMC ANIMATION
             getMMCScene.refresh(
                 datafolder, initialDataFile, fexec, mmcpiirturi, this.scalefactor,
                 this.animwidth, this.linewidth, this.fxplot, remBarNappiMMC,

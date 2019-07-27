@@ -56,16 +56,23 @@ public class SceneMMC extends Data {
     private Runtime runtime;
     private int exitVal;
     private Timer timer;
-    private double margin;
     private double[][] values;
     private boolean running;
-    private Runtime barRun;
-    private Process barProcess;
     private boolean barrier;
 
     @Override
     public String[] getVars() {
         return this.vars;
+    }
+
+    public void barrierOn() {
+        this.barrier = true;
+    }
+    public void barrierOff() {
+        this.barrier = false;
+    }
+    public boolean barrierIsOn() {
+        return this.barrier;
     }
 
     public void runtimeStart() {
@@ -127,7 +134,7 @@ public class SceneMMC extends Data {
         this.animwidth = animwidth;
         this.scalefactor = scalefactor;
         this.center = (double) this.animwidth/2.0;
-        this.barrier = true;
+        barrierOn();
 
         int num_part = Integer.valueOf(this.vars[0]);
         double diam = Double.valueOf(this.vars[1]);
@@ -143,7 +150,7 @@ public class SceneMMC extends Data {
 
         remBarNappiMMC.setVisible(true);
         remBarNappiMMC.setOnMouseClicked(event -> {
-            this.barrier = false;
+            barrierOff();
             remBarNappiMMC.setVisible(false);
             fxplot.setFrameVis(true);
         });
@@ -182,7 +189,7 @@ public class SceneMMC extends Data {
 
                 if ( !timerIsRunning()) return;
 
-                while ( barrier == true ) {
+                while ( barrierIsOn() == true ) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException ex) {
@@ -190,7 +197,7 @@ public class SceneMMC extends Data {
                     }
                 }
         
-                if ( barrier == false ) {
+                if ( barrierIsOn() == false ) {
                     try (BufferedWriter output = new BufferedWriter(new OutputStreamWriter(
                         process.getOutputStream()))) {
                         PrintWriter pw = null;
@@ -329,6 +336,15 @@ public class SceneMMC extends Data {
 
         this.piirturi.setLineWidth(linewidth);
         List<double[]> initialData = readDataMMC(initialDataFile, dim);
+
+        this.piirturi.setGlobalAlpha(1.0);
+        this.piirturi.setLineWidth(5.0 * this.linewidth);
+        this.piirturi.setStroke(Color.RED);
+        this.piirturi.strokeLine(
+            this.center / this.scalefactor,
+            0.0,
+            this.center / this.scalefactor,
+            2.0 * this.center / this.scalefactor);
 
         // Draw initial data spots
         for (int k = 0; k < num_part; k++){
