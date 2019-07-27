@@ -72,6 +72,7 @@ public class MainApp extends Application {
     private double[] rms_norm;
     private List <Double> energy_x;
     private List <Double> energy_y;
+    private boolean barrier;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -427,8 +428,10 @@ public class MainApp extends Application {
         Button closeNappiMenu = new Button("CLOSE");
         closeNappiMenu.setMinWidth(this.buttonWidth);
         closeNappiMenu.setMaxWidth(this.buttonWidth);
-        closeNappiMenu.setStyle("-fx-background-color: Red");
-        closeNappiMenu.setTextFill(Color.WHITE);
+        closeNappiMenu.setTextFill(Color.RED);
+        closeNappiMenu.setBackground(new Background(
+            new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         GridPane.setHalignment(closeNappiMenu, HPos.LEFT);
         closeNappiMenu.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
@@ -456,11 +459,8 @@ public class MainApp extends Application {
         executeNappiCalc.setDefaultButton(true);
         executeNappiCalc.setMinWidth(this.buttonWidth);
         executeNappiCalc.setMaxWidth(this.buttonWidth);
-        executeNappiCalc.setTextFill(Color.RED);
-                    executeNappiCalc.setBackground(
-                        new Background(
-                            new BackgroundFill(
-                                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        executeNappiCalc.setStyle("-fx-background-color: Red");
+        executeNappiCalc.setTextFill(Color.WHITE);
         executeNappiCalc.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
                 executeNappiCalc.setEffect(shadow);
@@ -507,8 +507,10 @@ public class MainApp extends Application {
         Button closeNappiCalc = new Button("CLOSE");
         closeNappiCalc.setMinWidth(this.buttonWidth);
         closeNappiCalc.setMaxWidth(this.buttonWidth);
-        closeNappiCalc.setStyle("-fx-background-color: Red");
-        closeNappiCalc.setTextFill(Color.WHITE);
+        closeNappiCalc.setTextFill(Color.RED);
+        closeNappiCalc.setBackground(new Background(
+            new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         GridPane.setHalignment(closeNappiCalc, HPos.LEFT);
         closeNappiCalc.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
@@ -536,11 +538,8 @@ public class MainApp extends Application {
         executeNappiSim.setDefaultButton(true);
         executeNappiSim.setMinWidth(this.buttonWidth);
         executeNappiSim.setMaxWidth(this.buttonWidth);
-        executeNappiSim.setTextFill(Color.RED);
-        executeNappiSim.setBackground(
-                    new Background(
-                        new BackgroundFill(
-                            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        executeNappiSim.setStyle("-fx-background-color: Red");
+        executeNappiSim.setTextFill(Color.WHITE);
         executeNappiSim.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
                 executeNappiSim.setEffect(shadow);
@@ -586,8 +585,10 @@ public class MainApp extends Application {
         Button closeNappiSim = new Button("CLOSE");
         closeNappiSim.setMinWidth(this.buttonWidth);
         closeNappiSim.setMaxWidth(this.buttonWidth);
-        closeNappiSim.setStyle("-fx-background-color: Red");
-        closeNappiSim.setTextFill(Color.WHITE);
+        closeNappiSim.setTextFill(Color.RED);
+        closeNappiSim.setBackground(new Background(
+            new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         GridPane.setHalignment(closeNappiSim, HPos.LEFT);
         closeNappiSim.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
@@ -615,11 +616,8 @@ public class MainApp extends Application {
         runAnim.setDefaultButton(true);
         runAnim.setMinWidth(this.buttonWidth);
         runAnim.setMaxWidth(this.buttonWidth);
-        runAnim.setTextFill(Color.RED);
-                    runAnim.setBackground(
-                        new Background(
-                            new BackgroundFill(
-                                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        runAnim.setStyle("-fx-background-color: Red");
+        runAnim.setTextFill(Color.WHITE);
         runAnim.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
                 runAnim.setEffect(shadow);
@@ -670,8 +668,10 @@ public class MainApp extends Application {
         Button closeNappiAnim = new Button("CLOSE");
         closeNappiAnim.setMinWidth(this.buttonWidth);
         closeNappiAnim.setMaxWidth(this.buttonWidth);
-        closeNappiAnim.setStyle("-fx-background-color: Red");
-        closeNappiAnim.setTextFill(Color.WHITE);
+        closeNappiAnim.setTextFill(Color.RED);
+        closeNappiAnim.setBackground(new Background(
+            new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         GridPane.setHalignment(closeNappiAnim, HPos.LEFT);
         closeNappiAnim.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
@@ -699,11 +699,8 @@ public class MainApp extends Application {
         runMMC.setDefaultButton(true);
         runMMC.setMinWidth(this.buttonWidth);
         runMMC.setMaxWidth(this.buttonWidth);
-        runMMC.setTextFill(Color.RED);
-                    runMMC.setBackground(
-                        new Background(
-                            new BackgroundFill(
-                                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        runMMC.setStyle("-fx-background-color: Red");
+        runMMC.setTextFill(Color.WHITE);
         runMMC.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
                 runMMC.setEffect(shadow);
@@ -750,12 +747,33 @@ public class MainApp extends Application {
         });
         helpNappiMMC.setVisible(true);
 
+        // OTHER VIEWS BUTTON: MMC REMOVE BARRIER
+        Button remBarNappiMMC = new Button("REMOVE BARRIER");
+        remBarNappiMMC.setMinWidth(this.buttonWidth);
+        remBarNappiMMC.setMaxWidth(this.buttonWidth);
+        remBarNappiMMC.setTextFill(Color.RED);
+        remBarNappiMMC.setBackground(new Background(
+            new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        GridPane.setHalignment(remBarNappiMMC, HPos.LEFT);
+        remBarNappiMMC.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                remBarNappiMMC.setEffect(shadow);
+        });
+        remBarNappiMMC.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                remBarNappiMMC.setEffect(null);
+        });
+        remBarNappiMMC.setVisible(false);
+
         // OTHER VIEWS BUTTON: MMC CLOSE
         Button closeNappiMMC = new Button("CLOSE");
         closeNappiMMC.setMinWidth(this.buttonWidth);
         closeNappiMMC.setMaxWidth(this.buttonWidth);
-        closeNappiMMC.setStyle("-fx-background-color: Red");
-        closeNappiMMC.setTextFill(Color.WHITE);
+        closeNappiMMC.setTextFill(Color.RED);
+        closeNappiMMC.setBackground(new Background(
+            new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         GridPane.setHalignment(closeNappiMMC, HPos.LEFT);
         closeNappiMMC.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
@@ -835,6 +853,7 @@ public class MainApp extends Application {
             helpNappiMMC,
             getMMCScene.getSceneMMC(),
             runMMC,
+            remBarNappiMMC,
             closeNappiMMC);
         isovalikkoMMC.getChildren().addAll(
             valikkoMMC,
@@ -1218,10 +1237,10 @@ public class MainApp extends Application {
             // DRAW ANIMATION
             getMMCScene.refresh(
                 datafolder, initialDataFile, fexec, mmcpiirturi, this.scalefactor,
-                this.animwidth, this.linewidth, this.fxplot,
+                this.animwidth, this.linewidth, this.fxplot, remBarNappiMMC,
                 this.energy_x, this.energy_y, this.newdata
             );
-            
+
             this.newdata = false;
 
         });

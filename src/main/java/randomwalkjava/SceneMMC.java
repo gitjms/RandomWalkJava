@@ -1,9 +1,12 @@
 
 package randomwalkjava;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -56,6 +59,9 @@ public class SceneMMC extends Data {
     private double margin;
     private double[][] values;
     private boolean running;
+    private Runtime barRun;
+    private Process barProcess;
+    private boolean barrier;
 
     @Override
     public String[] getVars() {
@@ -113,7 +119,7 @@ public class SceneMMC extends Data {
 
      public void refresh(File folderPath, File initialDataFile, String executable,
         GraphicsContext piirturi, double scalefactor, int animwidth,
-        double linewidth, FXPlot fxplot, List<Double> energy_x,
+        double linewidth, FXPlot fxplot, Button remBarNappiMMC, List<Double> energy_x,
         List<Double> energy_y, boolean newdata) {
 
         this.piirturi = piirturi;
@@ -121,6 +127,7 @@ public class SceneMMC extends Data {
         this.animwidth = animwidth;
         this.scalefactor = scalefactor;
         this.center = (double) this.animwidth/2.0;
+        this.barrier = true;
 
         int num_part = Integer.valueOf(this.vars[0]);
         double diam = Double.valueOf(this.vars[1]);
@@ -134,13 +141,18 @@ public class SceneMMC extends Data {
             clearDots(dim);
         }
 
+        remBarNappiMMC.setVisible(true);
+        remBarNappiMMC.setOnMouseClicked(event -> {
+            this.barrier = false;
+            remBarNappiMMC.setVisible(false);
+            fxplot.setFrameVis(true);
+        });
+
         this.values = new double[dim][num_part];
 
         piirturi.setLineWidth(linewidth);
 
         String[] command = null;
-
-        fxplot.setFrameVis(true);
 
         try
         {
@@ -170,126 +182,144 @@ public class SceneMMC extends Data {
 
                 if ( !timerIsRunning()) return;
 
-                try (BufferedReader input = new BufferedReader(new InputStreamReader(
-                    process.getInputStream())))
-                {
-                String line = null;
-
-                while ((line = input.readLine()) != null){
-                    if (line.trim().startsWith("S") || line.isEmpty()) {
-                        break;
+                while ( barrier == true ) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        System.out.println(ex.getMessage());
                     }
-                    if (!line.substring(0,1).matches("([0-9]|-|\\+)|E"))
-                        continue;
-                    if (!line.trim().split("(\\s+)")[0].trim().equals("E")) {
-                        if (dim == 2) {
-                            String[] valStr = line.split("(\\s+)");
-                            try {
-                                values[0][i] = Double.parseDouble(valStr[0].trim())
-                                     + center / scalefactor;
-                                values[1][i] = Double.parseDouble(valStr[1].trim())
-                                     + center / scalefactor;
-                            } catch (NumberFormatException e) {
-                                continue;
-                            }
-                        } else if (dim == 3) {
-                            String[] valStr = line.split("(\\s+)");
-                            try {
-                                values[0][i] = Double.parseDouble(valStr[0].trim())
-                                     + center / scalefactor;
-                                values[1][i] = Double.parseDouble(valStr[1].trim())
-                                     + center / scalefactor;
-                                values[2][i] = Double.parseDouble(valStr[2].trim())
-                                     + center / scalefactor;
-                            } catch (NumberFormatException e) {
-                                continue;
-                            }
+                }
+        
+                if ( barrier == false ) {
+                    try (BufferedWriter output = new BufferedWriter(new OutputStreamWriter(
+                        process.getOutputStream()))) {
+                        PrintWriter pw = null;
+                        if (output != null)
+                            pw = new PrintWriter(output);
+                        if (pw != null)
+                            pw.println("x");
+                        if (pw != null) {
+                            pw.flush();
+                            pw.close();
                         }
-
-                        platfStart();
-                        javafx.application.Platform.runLater(new Runnable() {
-                            @Override
-                            public void run() {
-
-                                if ( !platfIsRunning()) return;
-
-                                // DRAW
-                                clearDots(dim);
-                                for (int k = 0; k < num_part; k++){
-                                    if ( dim == 2 ) {
-                                        draw2Dots(values[0][k], values[1][k],
-                                            num_part, diam);
-                                    } else if ( dim == 3 ) {
-                                        draw3Dots(values[0][k], values[1][k],
-                                            values[2][k], num_part, diam);
-                                    }
-                                }
-                            }
-                        });
-
-                        i++;
-
-                        if ( i == num_part ) i = 0;
-
-                    } else {
-                        try
-                        {
-                        if ( first == false ) {
-                            first = true;
-                            energy_y.add(Double.parseDouble(line.split("(\\s+)")[1].trim()));
-                            energy_x.add((double) phase);
-                            phase++;
-                            greatest = energy_y.get(0);
-                            fxplot.setEData("energy", energy_x, energy_y);
-                        } else {
-                            energy_y.add(Double.parseDouble(line.split("(\\s+)")[1].trim()));
-                            energy_x.add((double) phase);
-                            phase++;
-                         }
-                        }
-                        catch (NumberFormatException e)
-                        {
-                        continue;
-                        }
-
-                        Thread.sleep(50);
-                        if ( energy_y.get((int) phase - 1) > greatest ) {
-                            greatest = energy_y.get((int) phase - 1);
-                            fxplot.setEMaxY(greatest);
-                        }
-                        fxplot.updateEData("energy", energy_x, energy_y);
+                        output.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(SceneMMC.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
 
-                exitVal = process.waitFor();
-                if (exitVal != 0) {
+                try (BufferedReader input = new BufferedReader(new InputStreamReader(
+                    process.getInputStream()))) {
+                    String line = null;
+
+                    while ((line = input.readLine()) != null){
+                        if (line.trim().startsWith("S") || line.isEmpty()) {
+                            break;
+                        }
+                        if (!line.substring(0,1).matches("([0-9]|-|\\+)|E"))
+                            continue;
+                        if (!line.trim().split("(\\s+)")[0].trim().equals("E")) {
+                            if (dim == 2) {
+                                String[] valStr = line.split("(\\s+)");
+                                try {
+                                    values[0][i] = Double.parseDouble(valStr[0].trim())
+                                        + center / scalefactor;
+                                    values[1][i] = Double.parseDouble(valStr[1].trim())
+                                        + center / scalefactor;
+                                } catch (NumberFormatException e) {
+                                    continue;
+                                }
+                            } else if (dim == 3) {
+                                String[] valStr = line.split("(\\s+)");
+                                try {
+                                    values[0][i] = Double.parseDouble(valStr[0].trim())
+                                        + center / scalefactor;
+                                    values[1][i] = Double.parseDouble(valStr[1].trim())
+                                        + center / scalefactor;
+                                    values[2][i] = Double.parseDouble(valStr[2].trim())
+                                        + center / scalefactor;
+                                } catch (NumberFormatException e) {
+                                    continue;
+                                }
+                            }
+
+                            platfStart();
+                            javafx.application.Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    if ( !platfIsRunning()) return;
+
+                                    // DRAW
+                                    clearDots(dim);
+                                    for (int k = 0; k < num_part; k++){
+                                        if ( dim == 2 ) {
+                                            draw2Dots(values[0][k], values[1][k],
+                                                num_part, diam);
+                                        } else if ( dim == 3 ) {
+                                            draw3Dots(values[0][k], values[1][k],
+                                                values[2][k], num_part, diam);
+                                        }
+                                    }
+                                }
+                            });
+
+                            i++;
+
+                            if ( i == num_part ) i = 0;
+
+                        } else {
+                            try {
+                                if ( first == false ) {
+                                    first = true;
+                                    energy_y.add(Double.parseDouble(line.split("(\\s+)")[1].trim()));
+                                    energy_x.add((double) phase);
+                                    phase++;
+                                    greatest = energy_y.get(0);
+                                    fxplot.setEData("energy", energy_x, energy_y);
+                                } else {
+                                    energy_y.add(Double.parseDouble(line.split("(\\s+)")[1].trim()));
+                                    energy_x.add((double) phase);
+                                    phase++;
+                                }
+                            } catch (NumberFormatException e) {
+                                continue;
+                            }
+
+                            Thread.sleep(50);
+                            if ( energy_y.get((int) phase - 1) > greatest ) {
+                                greatest = energy_y.get((int) phase - 1);
+                                fxplot.setEMaxY(greatest);
+                            }
+                            fxplot.updateEData("energy", energy_x, energy_y);
+                        }
+                    }
+
+                    exitVal = process.waitFor();
+                    if (exitVal != 0) {
+                        platfStop();
+                        timerStop();
+                        runtime.gc();
+                        runtime.exit(exitVal);
+                    }
+
+                } catch (IOException | InterruptedException e) {
                     platfStop();
                     timerStop();
                     runtime.gc();
-                    runtime.exit(exitVal);
+                    Platform.runLater(() -> {
+                        Alert alert = new Alert(AlertType.INFORMATION);
+                        alert.setContentText("Walk finished.");
+                        alert.show();
+                    });
                 }
-
-                }
-                catch (IOException | InterruptedException e)
-                {
-                platfStop();
-                timerStop();
-                runtime.gc();
-                Platform.runLater(() -> {
-                    Alert alert = new Alert(AlertType.INFORMATION);
-                    alert.setContentText("Walk finished.");
-                    alert.show();
-                });
-                }
-                
+            // timer run ends
             }
-            
+        // timer ends
         }, 0, 50);
 
-        }
-        catch (IOException e)
-        {
-        System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
         }
 
     }
