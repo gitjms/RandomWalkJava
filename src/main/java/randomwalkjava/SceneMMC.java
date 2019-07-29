@@ -25,6 +25,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -59,6 +60,11 @@ public class SceneMMC extends Data {
     private double[][] values;
     private boolean running;
     private boolean barrier;
+    private boolean walk;
+    private Image yellowP;
+    private Image grayP;
+    private boolean lattice;
+    private BufferedWriter output;
 
     @Override
     public String[] getVars() {
@@ -73,6 +79,16 @@ public class SceneMMC extends Data {
     }
     public boolean barrierIsOn() {
         return this.barrier;
+    }
+
+    public void walkStart() {
+        this.walk = true;
+    }
+    public void walkStop() {
+        this.walk = false;
+    }
+    public boolean walkState() {
+        return this.walk;
     }
 
     public void runtimeStart() {
@@ -97,7 +113,11 @@ public class SceneMMC extends Data {
     public boolean timerIsRunning() {
         return this.timerRunning;
     }
-    
+
+    public BufferedWriter getProcOut() {
+        return this.output;
+    }
+
     public void platfStart() {
         this.platfRunning = true;
     }
@@ -129,11 +149,19 @@ public class SceneMMC extends Data {
         double linewidth, FXPlot fxplot, Button remBarNappiMMC, List<Double> energy_x,
         List<Double> energy_y, boolean newdata) {
 
+        //this.yellowP = new Image("images/Mickey.png");
+        this.yellowP = new Image("images/Pyellow.png");
+        this.grayP = new Image("images/Pgray.png");
+
         this.piirturi = piirturi;
         this.linewidth = linewidth;
         this.animwidth = animwidth;
         this.scalefactor = scalefactor;
         this.center = (double) this.animwidth/2.0;
+        if ( this.vars[7].equals("l") )
+            this.lattice = true;
+        else
+            this.lattice = false;
         barrierOn();
 
         int num_part = Integer.valueOf(this.vars[0]);
@@ -170,11 +198,14 @@ public class SceneMMC extends Data {
 
         this.runtime = Runtime.getRuntime();
         runtimeStart();
+
         this.process = this.runtime.exec(command, null, folderPath);
+        walkStart();
 
         // DRAW INITIAL PARTICLES
         try {
             Thread.sleep(100);
+            clearDots( dim );
             drawInitials( initialDataFile, num_part, dim, diam);
         } catch (InterruptedException ex) {
             Logger.getLogger(SceneMMC.class.getName()).log(Level.SEVERE, null, ex);
@@ -196,10 +227,10 @@ public class SceneMMC extends Data {
                         System.out.println(ex.getMessage());
                     }
                 }
-        
+
                 if ( barrierIsOn() == false ) {
-                    try (BufferedWriter output = new BufferedWriter(new OutputStreamWriter(
-                        process.getOutputStream()))) {
+                    output = new BufferedWriter(new OutputStreamWriter(
+                        process.getOutputStream()));// {
                         PrintWriter pw = null;
                         if (output != null)
                             pw = new PrintWriter(output);
@@ -209,6 +240,7 @@ public class SceneMMC extends Data {
                             pw.flush();
                             pw.close();
                         }
+                    try {
                         output.close();
                     } catch (IOException ex) {
                         Logger.getLogger(SceneMMC.class.getName()).log(Level.SEVERE, null, ex);
@@ -258,7 +290,8 @@ public class SceneMMC extends Data {
                                     if ( !platfIsRunning()) return;
 
                                     // DRAW
-                                    clearDots(dim);
+                                    clearDots( dim );
+                                    if ( lattice == true ) drawLattice( dim, num_part );
                                     for (int k = 0; k < num_part; k++){
                                         if ( dim == 2 ) {
                                             draw2Dots(values[0][k], values[1][k],
@@ -304,12 +337,12 @@ public class SceneMMC extends Data {
 
                     exitVal = process.waitFor();
                     if (exitVal != 0) {
+                        walkStop();
                         platfStop();
                         timerStop();
                         runtime.gc();
                         runtime.exit(exitVal);
                     }
-
                 } catch (IOException | InterruptedException e) {
                     platfStop();
                     timerStop();
@@ -317,6 +350,7 @@ public class SceneMMC extends Data {
                     Platform.runLater(() -> {
                         Alert alert = new Alert(AlertType.INFORMATION);
                         alert.setContentText("Walk finished.");
+                        walkStop();
                         alert.show();
                     });
                 }
@@ -328,12 +362,12 @@ public class SceneMMC extends Data {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-
     }
 
     public void drawInitials( File initialDataFile,
         int num_part, int dim, double diam ){
 
+        if ( lattice == true ) drawLattice( dim, num_part );
         this.piirturi.setLineWidth(linewidth);
         List<double[]> initialData = readDataMMC(initialDataFile, dim);
 
@@ -379,27 +413,44 @@ public class SceneMMC extends Data {
     }
 
     public void draw2Dots(double x, double y, int num_part, double diam){
-        this.piirturi.setGlobalAlpha(1.0);
-        this.piirturi.setLineWidth(this.linewidth);
-        this.piirturi.setStroke(Color.YELLOW);
-        this.piirturi.strokeRoundRect(
-            x - diam/2.0, y - diam/2.0,
-            diam, diam, diam, diam);
+        this.piirturi.drawImage(this.yellowP, x - diam/2.0, y - diam/2.0, diam, diam);
     }
 
     public void draw3Dots(double x, double y, double z, int num_part, double diam){
         this.piirturi.setGlobalAlpha(
             Math.pow((double) num_part, 2.0)
                 / ( this.scalefactor * z ) + 0.5 );
-        this.piirturi.setLineWidth(this.linewidth);
-        this.piirturi.setStroke(Color.YELLOW);
-        this.piirturi.setGlobalBlendMode(BlendMode.SCREEN);
-        this.piirturi.setFill(Color.color(1.0, 1.0, 0.0, 0.6));
-        this.piirturi.fillRoundRect(
+        this.piirturi.drawImage(this.yellowP,
             x - diam/( 2.0 * z ), y - diam/( 2.0 * z ),
-             2.0 * diam/z,  2.0 * diam/z,  2.0 * diam/z,  2.0 * diam/z);
+             2.0 * diam/z,  2.0 * diam/z);
     }
  
+    public void drawLattice( int dim, int num_part ) {
+        double max = 1.0/this.scalefactor*this.animwidth;
+        double measure = (this.animwidth - 100.0) / this.scalefactor;
+        int diff = (int) measure - (int)( 3.0 * Math.sqrt( 2.0 * (double) num_part ) );
+        System.out.println(diff);
+        double plus = 0.3 + (double) diff/10.0;
+
+        for ( int i = 0; i < (int) max + 2; i+=2 ) {
+            for ( int j = 0; j < (int) max + 2; j+=2 ) {
+                if ( dim == 2 ) {
+                    this.piirturi.drawImage(this.grayP,
+                        (double) i + plus, (double) j + plus,
+                        1.0, 1.0);
+                } else if ( dim == 3 ) {
+                    /*this.piirturi.fillRect(0, 0,
+                    1.0/this.scalefactor*this.animwidth,
+                    1.0/this.scalefactor*this.animwidth);*/
+                this.piirturi.drawImage(this.grayP,
+                    (double) i - 1.0/( 2.0 * (double) i ),
+                    (double) j - 1.0/( 2.0 * (double) j ),
+                    2.0 * 1.0/(double) i,  2.0 * 1.0/(double) i);
+                }
+            }
+        }
+    }
+
     public static boolean isNumDouble(String str) {
         try {
             Double.parseDouble(str);

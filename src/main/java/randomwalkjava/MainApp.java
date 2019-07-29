@@ -4,16 +4,21 @@ import com.sun.glass.ui.Screen;
 import javafx.scene.image.Image;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
@@ -748,7 +753,7 @@ public class MainApp extends Application {
         helpNappiMMC.setVisible(true);
 
         // OTHER VIEWS BUTTON: MMC REMOVE BARRIER
-        Button remBarNappiMMC = new Button("REMOVE BARRIER");
+        Button remBarNappiMMC = new Button("CONTINUE");
         remBarNappiMMC.setMinWidth(this.buttonWidth);
         remBarNappiMMC.setMaxWidth(this.buttonWidth);
         remBarNappiMMC.setTextFill(Color.RED);
@@ -784,8 +789,17 @@ public class MainApp extends Application {
                 closeNappiMMC.setEffect(null);
         });
         closeNappiMMC.setOnAction(event -> {
-            if ( getMMCScene.timerIsRunning()) {
-                if ( getMMCScene.barrierIsOn() ) {
+            if ( getMMCScene.timerIsRunning() && getMMCScene.barrierIsOn() ) {
+                    if ( getMMCScene.walkState() == true ) {
+                        PrintWriter pw = null;
+                        if (getMMCScene.getProcOut() != null)
+                            pw = new PrintWriter(getMMCScene.getProcOut());
+                        if (pw != null) {
+                            pw.println("-");
+                            pw.flush();
+                            pw.close();
+                        }
+                    }
                     Alert alert = new Alert(
                         Alert.AlertType.CONFIRMATION,
                         "Close application?",
@@ -795,9 +809,18 @@ public class MainApp extends Application {
                         System.gc();
                         stage.close();
                     }
-                } else
-                    return;
-            }
+            } else if ( !getMMCScene.timerIsRunning() && !getMMCScene.barrierIsOn() ) {
+                Alert alert = new Alert(
+                    Alert.AlertType.CONFIRMATION,
+                    "Close application?",
+                    ButtonType.OK, ButtonType.CANCEL);
+                alert.showAndWait();
+                if ( alert.getResult() == ButtonType.OK ) {
+                    System.gc();
+                    stage.close();
+                }
+            } else
+                return;
         });
         closeNappiMMC.setVisible(true);
 
@@ -1198,16 +1221,24 @@ public class MainApp extends Application {
                 mmcpiirturi.scale(1.0/this.scalefactor, 1.0/this.scalefactor);
             }
 
-            if ( particles < 25 )
-                this.scalefactor = (this.animwidth - 100.0)
-                    / 10.0;
-            else
-                if ( dim < 3 )
-                    this.scalefactor = (this.animwidth - 100.0)
-                        / ( 2.0 * Math.sqrt( 2.0 * (double) particles ) );
-                else
-                    this.scalefactor = (this.animwidth - 100.0)
-                        / ( Math.sqrt( 2.0 * (double) particles ) );
+            int measure;
+            if ( particles < 25 ) {
+                if ( lattice.equals("l") ) {
+                    measure = 21;
+                } else {
+                    measure = 11;
+                }
+            } else {
+                if ( dim < 3 ) {
+                    measure = (int)( 3.0 * Math.sqrt( 2.0 * (double) particles ) );
+                } else {
+                    measure = (int)( Math.sqrt( 2.0 * (double) particles ) );
+                }
+                if ( lattice.equals("l") && ( measure%2 == 0 ) ) {
+                    measure += 3.0;
+                }
+            }System.out.println(measure);
+            this.scalefactor = (this.animwidth - 100.0) / measure;
 
             if ( dim == 2 )
                 this.linewidth = 1.0 / this.scalefactor;
