@@ -44,6 +44,11 @@ public class SceneMMC extends Data {
     private final int paneWidth = 200;
     private long phase;
     private double greatest;
+    private ToggleButton setCharge0;
+    private ToggleButton setCharge1;
+    private ToggleButton setCharge2;
+    private ToggleButton setDim2;
+    private ToggleButton setDim3;
     private final Button nappiLattice;
     private boolean first;
     private double linewidth;
@@ -146,10 +151,13 @@ public class SceneMMC extends Data {
 
      public void refresh(File folderPath, File initialDataFile, String executable,
         GraphicsContext piirturi, double scalefactor, int animwidth,
-        double linewidth, FXPlot fxplot, Button remBarNappiMMC, List<Double> energy_x,
-        List<Double> energy_y, boolean newdata) {
+        double linewidth, FXPlot fxplot, Button remBarNappiMMC, Button runMMC,
+        Button closeNappiMMC, Button menuNappiMMC, Button helpNappiMMC,
+        List<Double> energy_x, List<Double> energy_y,
+        boolean newdata, int measure, double diff) {
 
         //this.yellowP = new Image("images/Mickey.png");
+        //this.grayP = new Image("images/Minnie.png");
         this.yellowP = new Image("images/Pyellow.png");
         this.grayP = new Image("images/Pgray.png");
 
@@ -179,7 +187,17 @@ public class SceneMMC extends Data {
         remBarNappiMMC.setVisible(true);
         remBarNappiMMC.setOnMouseClicked(event -> {
             barrierOff();
+            menuNappiMMC.setDisable(true);
+            helpNappiMMC.setDisable(true);
+            this.setCharge0.setDisable(true);
+            this.setCharge1.setDisable(true);
+            this.setCharge2.setDisable(true);
+            this.setDim2.setDisable(true);
+            this.setDim3.setDisable(true);
+            this.nappiLattice.setDisable(true);
+            closeNappiMMC.setDisable(true);
             remBarNappiMMC.setVisible(false);
+            runMMC.setDisable(true);
             fxplot.setFrameVis(true);
         });
 
@@ -206,7 +224,7 @@ public class SceneMMC extends Data {
         try {
             Thread.sleep(100);
             clearDots( dim );
-            drawInitials( initialDataFile, num_part, dim, diam);
+            drawInitials( initialDataFile, num_part, dim, diam, measure, diff );
         } catch (InterruptedException ex) {
             Logger.getLogger(SceneMMC.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -291,7 +309,7 @@ public class SceneMMC extends Data {
 
                                     // DRAW
                                     clearDots( dim );
-                                    if ( lattice == true ) drawLattice( dim, num_part );
+                                    if ( lattice == true ) drawLattice( dim, num_part, measure, diff );
                                     for (int k = 0; k < num_part; k++){
                                         if ( dim == 2 ) {
                                             draw2Dots(values[0][k], values[1][k],
@@ -340,12 +358,32 @@ public class SceneMMC extends Data {
                         walkStop();
                         platfStop();
                         timerStop();
+                        menuNappiMMC.setDisable(false);
+                        helpNappiMMC.setDisable(false);
+                        runMMC.setDisable(false);
+                        setCharge0.setDisable(false);
+                        setCharge1.setDisable(false);
+                        setCharge2.setDisable(false);
+                        setDim2.setDisable(false);
+                        setDim3.setDisable(false);
+                        nappiLattice.setDisable(false);
+                        closeNappiMMC.setDisable(false);
                         runtime.gc();
                         runtime.exit(exitVal);
                     }
                 } catch (IOException | InterruptedException e) {
                     platfStop();
                     timerStop();
+                    menuNappiMMC.setDisable(false);
+                    helpNappiMMC.setDisable(false);
+                    runMMC.setDisable(false);
+                    setCharge0.setDisable(false);
+                    setCharge1.setDisable(false);
+                    setCharge2.setDisable(false);
+                    setDim2.setDisable(false);
+                    setDim3.setDisable(false);
+                    nappiLattice.setDisable(false);
+                    closeNappiMMC.setDisable(false);
                     runtime.gc();
                     Platform.runLater(() -> {
                         Alert alert = new Alert(AlertType.INFORMATION);
@@ -365,14 +403,14 @@ public class SceneMMC extends Data {
     }
 
     public void drawInitials( File initialDataFile,
-        int num_part, int dim, double diam ){
+        int num_part, int dim, double diam, int measure, double diff ){
 
-        if ( lattice == true ) drawLattice( dim, num_part );
+        if ( lattice == true ) drawLattice( dim, num_part, measure, diff );
         this.piirturi.setLineWidth(linewidth);
         List<double[]> initialData = readDataMMC(initialDataFile, dim);
 
         this.piirturi.setGlobalAlpha(1.0);
-        this.piirturi.setLineWidth(5.0 * this.linewidth);
+        this.piirturi.setLineWidth(10.0 / (Math.log(num_part)*this.scalefactor));
         this.piirturi.setStroke(Color.RED);
         this.piirturi.strokeLine(
             this.center / this.scalefactor,
@@ -417,35 +455,25 @@ public class SceneMMC extends Data {
     }
 
     public void draw3Dots(double x, double y, double z, int num_part, double diam){
-        this.piirturi.setGlobalAlpha(
-            Math.pow((double) num_part, 2.0)
-                / ( this.scalefactor * z ) + 0.5 );
-        this.piirturi.drawImage(this.yellowP,
-            x - diam/( 2.0 * z ), y - diam/( 2.0 * z ),
-             2.0 * diam/z,  2.0 * diam/z);
+        this.piirturi.setGlobalAlpha( 1.0 / ( Math.log(2.0 * z) ) );
+        this.piirturi.setLineWidth(this.linewidth);
+        this.piirturi.setGlobalBlendMode(BlendMode.LIGHTEN);
+        this.piirturi.setFill(Color.YELLOW);
+        this.piirturi.fillRoundRect(
+            x - diam/( Math.log(2.0 * z) ),
+            y - diam/( Math.log(2.0 * z) ),
+            5.0*diam/( 2.0*Math.log(2.0 * z)),  5.0*diam/( 2.0*Math.log(2.0 * z)),
+            5.0*diam/( 2.0*Math.log(2.0 * z)),  5.0*diam/( 2.0*Math.log(2.0 * z))
+        );
     }
  
-    public void drawLattice( int dim, int num_part ) {
-        double max = 1.0/this.scalefactor*this.animwidth;
-        double measure = (this.animwidth - 100.0) / this.scalefactor;
-        int diff = (int) measure - (int)( 3.0 * Math.sqrt( 2.0 * (double) num_part ) );
-        System.out.println(diff);
-        double plus = 0.3 + (double) diff/10.0;
-
-        for ( int i = 0; i < (int) max + 2; i+=2 ) {
-            for ( int j = 0; j < (int) max + 2; j+=2 ) {
-                if ( dim == 2 ) {
+    public void drawLattice( int dim, int num_part, int measure, double diff ) {
+        if ( dim == 2 ) {
+            for ( int i = 0; i < measure + 2; i+=2 ) {
+                for ( int j = 0; j < measure + 2; j+=2 ) {
                     this.piirturi.drawImage(this.grayP,
-                        (double) i + plus, (double) j + plus,
+                        (double) i + diff, (double) j + diff,
                         1.0, 1.0);
-                } else if ( dim == 3 ) {
-                    /*this.piirturi.fillRect(0, 0,
-                    1.0/this.scalefactor*this.animwidth,
-                    1.0/this.scalefactor*this.animwidth);*/
-                this.piirturi.drawImage(this.grayP,
-                    (double) i - 1.0/( 2.0 * (double) i ),
-                    (double) j - 1.0/( 2.0 * (double) j ),
-                    2.0 * 1.0/(double) i,  2.0 * 1.0/(double) i);
                 }
             }
         }
@@ -507,71 +535,71 @@ public class SceneMMC extends Data {
         });
 
         Label labCharge = new Label("charge of particles:");
-        ToggleButton setCharge0 = new ToggleButton("0");
-        setCharge0.setMinWidth(35);
-        setCharge0.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        setCharge0.setBackground(new Background(new BackgroundFill(
+        this.setCharge0 = new ToggleButton("0");
+        this.setCharge0.setMinWidth(35);
+        this.setCharge0.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.setCharge0.setBackground(new Background(new BackgroundFill(
             Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        setCharge0.addEventHandler(
+        this.setCharge0.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                setCharge0.setEffect(shadow);
+                this.setCharge0.setEffect(shadow);
         });
-        setCharge0.addEventHandler(
+        this.setCharge0.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                setCharge0.setEffect(null);
+                this.setCharge0.setEffect(null);
         });
-        ToggleButton setCharge1 = new ToggleButton("1");
-        setCharge1.setMinWidth(35);
-        setCharge1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        setCharge1.setBackground(new Background(new BackgroundFill(
+        this.setCharge1 = new ToggleButton("1");
+        this.setCharge1.setMinWidth(35);
+        this.setCharge1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.setCharge1.setBackground(new Background(new BackgroundFill(
             Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        setCharge1.addEventHandler(
+        this.setCharge1.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                setCharge1.setEffect(shadow);
+                this.setCharge1.setEffect(shadow);
         });
-        setCharge1.addEventHandler(
+        this.setCharge1.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                setCharge1.setEffect(null);
+                this.setCharge1.setEffect(null);
         });
-        ToggleButton setCharge2 = new ToggleButton("2");
-        setCharge2.setMinWidth(35);
-        setCharge2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        setCharge2.setBackground(new Background(new BackgroundFill(
+        this.setCharge2 = new ToggleButton("2");
+        this.setCharge2.setMinWidth(35);
+        this.setCharge2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.setCharge2.setBackground(new Background(new BackgroundFill(
             Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        setCharge2.addEventHandler(
+        this.setCharge2.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                setCharge2.setEffect(shadow);
+                this.setCharge2.setEffect(shadow);
         });
-        setCharge2.addEventHandler(
+        this.setCharge2.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                setCharge2.setEffect(null);
+                this.setCharge2.setEffect(null);
         });
         HBox setCharge = new HBox(setCharge0,setCharge1,setCharge2);
         setCharge.setSpacing(20);
-        setCharge0.setOnMouseClicked(f -> {
-            setCharge0.setBackground(new Background(new BackgroundFill(
+        this.setCharge0.setOnMouseClicked(f -> {
+            this.setCharge0.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
-            setCharge1.setBackground(new Background(new BackgroundFill(
+            this.setCharge1.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            setCharge2.setBackground(new Background(new BackgroundFill(
+            this.setCharge2.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[2] = "0";
         });
-        setCharge1.setOnMouseClicked(f -> {
-            setCharge0.setBackground(new Background(new BackgroundFill(
+        this.setCharge1.setOnMouseClicked(f -> {
+            this.setCharge0.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            setCharge1.setBackground(new Background(new BackgroundFill(
+            this.setCharge1.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
-            setCharge2.setBackground(new Background(new BackgroundFill(
+            this.setCharge2.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[2] = "1";
         });
-        setCharge2.setOnMouseClicked(f -> {
-            setCharge0.setBackground(new Background(new BackgroundFill(
+        this.setCharge2.setOnMouseClicked(f -> {
+            this.setCharge0.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            setCharge1.setBackground(new Background(new BackgroundFill(
+            this.setCharge1.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            setCharge2.setBackground(new Background(new BackgroundFill(
+            this.setCharge2.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[2] = "2";
         });
@@ -579,45 +607,45 @@ public class SceneMMC extends Data {
         this.vars[3] = "0";
 
         Label labNumDimensions = new Label("dimensions:");
-        ToggleButton setDim2 = new ToggleButton("2");
-        setDim2.setMinWidth(55);
-        setDim2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        setDim2.setBackground(new Background(new BackgroundFill(
+        this.setDim2 = new ToggleButton("2");
+        this.setDim2.setMinWidth(55);
+        this.setDim2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.setDim2.setBackground(new Background(new BackgroundFill(
             Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        setDim2.addEventHandler(
+        this.setDim2.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                setDim2.setEffect(shadow);
+                this.setDim2.setEffect(shadow);
         });
-        setDim2.addEventHandler(
+        this.setDim2.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                setDim2.setEffect(null);
+                this.setDim2.setEffect(null);
         });
-        ToggleButton setDim3 = new ToggleButton("3");
-        setDim3.setMinWidth(55);
-        setDim3.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        setDim3.setBackground(new Background(new BackgroundFill(
+        this.setDim3 = new ToggleButton("3");
+        this.setDim3.setMinWidth(55);
+        this.setDim3.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.setDim3.setBackground(new Background(new BackgroundFill(
             Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        setDim3.addEventHandler(
+        this.setDim3.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                setDim3.setEffect(shadow);
+                this.setDim3.setEffect(shadow);
         });
-        setDim3.addEventHandler(
+        this.setDim3.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                setDim3.setEffect(null);
+                this.setDim3.setEffect(null);
         });
         HBox setDimension = new HBox(setDim2,setDim3);
         setDimension.setSpacing(40);
-        setDim2.setOnMouseClicked(f -> {
-            setDim2.setBackground(new Background(new BackgroundFill(
+        this.setDim2.setOnMouseClicked(f -> {
+            this.setDim2.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
-            setDim3.setBackground(new Background(new BackgroundFill(
+            this.setDim3.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[4] = "2";
         });
-        setDim3.setOnMouseClicked(f -> {
-            setDim2.setBackground(new Background(new BackgroundFill(
+        this.setDim3.setOnMouseClicked(f -> {
+            this.setDim2.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            setDim3.setBackground(new Background(new BackgroundFill(
+            this.setDim3.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[4] = "3";
         });

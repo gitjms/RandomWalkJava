@@ -14,6 +14,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.file.Files;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -756,10 +758,10 @@ public class MainApp extends Application {
         Button remBarNappiMMC = new Button("CONTINUE");
         remBarNappiMMC.setMinWidth(this.buttonWidth);
         remBarNappiMMC.setMaxWidth(this.buttonWidth);
-        remBarNappiMMC.setTextFill(Color.RED);
+        remBarNappiMMC.setTextFill(Color.WHITE);
         remBarNappiMMC.setBackground(new Background(
             new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+                Color.LIMEGREEN,CornerRadii.EMPTY,Insets.EMPTY)));
         GridPane.setHalignment(remBarNappiMMC, HPos.LEFT);
         remBarNappiMMC.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
@@ -1220,26 +1222,34 @@ public class MainApp extends Application {
             if ( this.isscaled == true ) {
                 mmcpiirturi.scale(1.0/this.scalefactor, 1.0/this.scalefactor);
             }
-
-            int measure;
+  
+            int measure = 0;
+            double diff = 0.3;
             if ( particles < 25 ) {
                 if ( lattice.equals("l") ) {
                     measure = 21;
                 } else {
-                    measure = 11;
+                    measure = 21;
                 }
             } else {
                 if ( dim < 3 ) {
                     measure = (int)( 3.0 * Math.sqrt( 2.0 * (double) particles ) );
                 } else {
-                    measure = (int)( Math.sqrt( 2.0 * (double) particles ) );
+                    measure = (int)( 3.0 * Math.sqrt( 2.0 * (double) particles ) );
                 }
-                if ( lattice.equals("l") && ( measure%2 == 0 ) ) {
-                    measure += 3.0;
-                }
-            }System.out.println(measure);
-            this.scalefactor = (this.animwidth - 100.0) / measure;
 
+                if ( (measure+1)%4 == 0 || measure%2 == 0 ) {
+                    diff = diff + Math.sqrt(measure)/10.0 + measure/20.0 - 1.0;
+                    measure -= 1;
+                }else if ( measure%4 == 0 ) {
+                    diff = diff + Math.sqrt(measure)/10.0 + measure/20.0 - 1.0;
+                    measure -= 2;
+                } else if ( measure%2 != 0 ) {
+                    diff = diff + measure/20.0 - 1.0;
+                }
+            }
+
+            this.scalefactor = (this.animwidth - 100.0) / (double) measure;
             if ( dim == 2 )
                 this.linewidth = 1.0 / this.scalefactor;
             else
@@ -1274,7 +1284,8 @@ public class MainApp extends Application {
             getMMCScene.refresh(
                 datafolder, initialDataFile, fexec, mmcpiirturi, this.scalefactor,
                 this.animwidth, this.linewidth, this.fxplot, remBarNappiMMC,
-                this.energy_x, this.energy_y, this.newdata
+                runMMC, closeNappiMMC, menuNappiMMC, helpNappiMMC,
+                this.energy_x, this.energy_y, this.newdata, measure, diff
             );
 
             this.newdata = false;
