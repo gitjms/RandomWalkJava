@@ -39,26 +39,29 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 public class SceneMMC extends Data {
-    
+
+    final File folder = new File("C:\\DATA");
     private final int compwidth = 150;
     private final int paneWidth = 200;
-    private long phase;
-    private double greatest;
     private ToggleButton setCharge0;
     private ToggleButton setCharge1;
     private ToggleButton setCharge2;
     private ToggleButton setDim2;
     private ToggleButton setDim3;
     private final Button nappiLattice;
+
+    private long phase;
+    private double greatest;
     private boolean first;
     private double linewidth;
     private double scalefactor;
-    private GraphicsContext piirturi;
     private boolean timerRunning;
     private int animwidth;
+    private double center;
+    private GraphicsContext piirturi;
+
     private boolean platfRunning;
     private Process process;
-    private double center;
     private Runtime runtime;
     private int exitVal;
     private Timer timer;
@@ -66,9 +69,9 @@ public class SceneMMC extends Data {
     private boolean running;
     private boolean barrier;
     private boolean walk;
+    private boolean lattice;
     private Image yellowP;
     private Image grayP;
-    private boolean lattice;
     private BufferedWriter output;
 
     @Override
@@ -149,11 +152,11 @@ public class SceneMMC extends Data {
             "-"};   // vars[9] save (off)       n/a
     }
 
-     public void refresh(File folderPath, File initialDataFile, String executable,
+     public void refresh(File initialDataFile, String executable,
         GraphicsContext piirturi, double scalefactor, int animwidth,
         double linewidth, FXPlot fxplot, Button remBarNappiMMC, Button runMMC,
-        Button closeNappiMMC, Button menuNappiMMC, Button helpNappiMMC,
-        List<Double> energy_x, List<Double> energy_y,
+        Button plotMMC, Button closeNappiMMC, Button menuNappiMMC,
+        Button helpNappiMMC, List<Double> energy_x, List<Double> energy_y,
         boolean newdata, int measure, double diff) {
 
         //this.yellowP = new Image("images/Mickey.png");
@@ -185,6 +188,7 @@ public class SceneMMC extends Data {
         }
 
         remBarNappiMMC.setVisible(true);
+        plotMMC.setVisible(false);
         remBarNappiMMC.setOnMouseClicked(event -> {
             barrierOff();
             menuNappiMMC.setDisable(true);
@@ -217,7 +221,7 @@ public class SceneMMC extends Data {
         this.runtime = Runtime.getRuntime();
         runtimeStart();
 
-        this.process = this.runtime.exec(command, null, folderPath);
+        this.process = this.runtime.exec(command, null, this.folder);
         walkStart();
 
         // DRAW INITIAL PARTICLES
@@ -361,6 +365,7 @@ public class SceneMMC extends Data {
                         menuNappiMMC.setDisable(false);
                         helpNappiMMC.setDisable(false);
                         runMMC.setDisable(false);
+                        plotMMC.setVisible(true);
                         setCharge0.setDisable(false);
                         setCharge1.setDisable(false);
                         setCharge2.setDisable(false);
@@ -377,6 +382,7 @@ public class SceneMMC extends Data {
                     menuNappiMMC.setDisable(false);
                     helpNappiMMC.setDisable(false);
                     runMMC.setDisable(false);
+                    plotMMC.setVisible(true);
                     setCharge0.setDisable(false);
                     setCharge1.setDisable(false);
                     setCharge2.setDisable(false);
@@ -410,7 +416,10 @@ public class SceneMMC extends Data {
         List<double[]> initialData = readDataMMC(initialDataFile, dim);
 
         this.piirturi.setGlobalAlpha(1.0);
-        this.piirturi.setLineWidth(10.0 / (Math.log(num_part)*this.scalefactor));
+        if ( num_part < 25 )
+            this.piirturi.setLineWidth(1.0 / (Math.log(num_part)*this.scalefactor));
+        else
+            this.piirturi.setLineWidth(10.0 / (Math.log(num_part)*this.scalefactor));
         this.piirturi.setStroke(Color.RED);
         this.piirturi.strokeLine(
             this.center / this.scalefactor,

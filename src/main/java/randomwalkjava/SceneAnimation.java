@@ -12,6 +12,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
@@ -29,15 +30,22 @@ import javafx.scene.text.FontWeight;
     TODO    3D plot
 */
 public class SceneAnimation extends Data {
-    
+
+    final File folder = new File("C:\\DATA");
     final int compwidth = 150;
     final int paneWidth = 200;
+    private double scalefactor;
+    private double linewidth;
+    private GraphicsContext piirturi;
+    private int animwidth;
     private boolean running;
     private long runs;
     private double rms_sum;
     private double rms_data;
     private double smallest;
     private double greatest;
+    private Runtime runtime;
+    private int exitVal;
 
     @Override
     public String[] getVars() {
@@ -66,13 +74,22 @@ public class SceneAnimation extends Data {
     public void start() {
         this.running = true;
     }
-
     public void stop() {
         this.running = false;
     }
-
     public boolean isRunning() {
         return this.running;
+    }
+
+    public void runtimeStart() {
+        this.running = true;
+    }
+    public boolean runtimeIsRunning() {
+        return this.running;
+    }
+    public void stopRuntime() {
+        this.running = false;
+        this.runtime.exit(this.exitVal);
     }
 
     public static boolean isNumDouble(String str) {
@@ -93,13 +110,18 @@ public class SceneAnimation extends Data {
         }
     }
 
-    public void refresh(File folderPath, String executable,
+    public void refresh(String executable,
         GraphicsContext piirturi, double scalefactor, int animwidth, double linewidth,
         FXPlot fxplot, double[] rms_runs, double[] rms_norm, boolean newdata) {
 
         int i = 0;
         int j = 0;
         int p = 0;
+
+        this.piirturi = piirturi;
+        this.linewidth = linewidth;
+        this.animwidth = animwidth;
+        this.scalefactor = scalefactor;
 
         if (newdata == true) {
             this.runs = 1;
@@ -131,7 +153,7 @@ public class SceneAnimation extends Data {
 
         String[] command = null;
 
-        double[] plotData = new double[num_steps];
+        double[] plotData = new double[num_part];
 
         double[] xAxis = new double[10];
         for (int x = 0; x < 10; x++)
@@ -157,12 +179,12 @@ public class SceneAnimation extends Data {
         double[] ynormAxis = new double[1000];
         Arrays.fill(ynormAxis, 0.0);
 
-        double[] sum = new double[num_steps];
+        double[] sum = new double[num_part];
         double sum_parts = 0.0;
 
         fxplot.setFrameVis(true);
 
-        piirturi.setLineWidth(linewidth);
+        this.piirturi.setLineWidth(this.linewidth);
 
         try {
             command = new String[]{"cmd","/c",executable,
@@ -170,24 +192,16 @@ public class SceneAnimation extends Data {
                 this.vars[4], this.vars[5], this.vars[6], this.vars[7],
                 this.vars[8], this.vars[9]};
 
-            // FOR DEBUGGING
-            //FileOutputStream fos = new FileOutputStream(command[0]);
+            this.runtime = Runtime.getRuntime();
+            runtimeStart();
 
-            Runtime runtime = Runtime.getRuntime();
+            Process process = this.runtime.exec(command, null, this.folder);
 
-            Process process = runtime.exec(command, null, folderPath);
-            
-            int exitVal;
             try (BufferedReader input = new BufferedReader(new InputStreamReader(
                 process.getInputStream()))) {
 
                 String line = null;
                 boolean failed = false;
-
-                // FOR DEBUGGING
-                /*StreamGobbler outputGobbler = new StreamGobbler(
-                    process.getInputStream(), "", fos);
-                outputGobbler.start();*/
 
                 while ((line = input.readLine()) != null){
                         if (line.trim().startsWith("S")) {
@@ -199,7 +213,7 @@ public class SceneAnimation extends Data {
                         if (!line.trim().split("(\\s+)")[0].trim().equals("+")) {
                             if (dim == 1) {
                                 try {
-                                    values[0][i] = Double.parseDouble(line.trim()) + centerX/scalefactor;
+                                    values[0][i] = Double.parseDouble(line.trim()) + centerX/this.scalefactor;
                                 } catch (NumberFormatException e) {
                                     continue;
                                 }
@@ -207,59 +221,59 @@ public class SceneAnimation extends Data {
                             } else if (dim == 2) {
                                 String[] valStr = line.split("(\\s+)");
                                 try {
-                                    values[0][i] = Double.parseDouble(valStr[0].trim()) + centerX/scalefactor;
-                                    values[1][i] = Double.parseDouble(valStr[1].trim()) + centerX/scalefactor;
+                                    values[0][i] = Double.parseDouble(valStr[0].trim()) + centerX/this.scalefactor;
+                                    values[1][i] = Double.parseDouble(valStr[1].trim()) + centerX/this.scalefactor;
                                 } catch (NumberFormatException e) {
                                     continue;
                                 }
                             } else if (dim == 3) {
                                 String[] valStr = line.split("(\\s+)");
                                 try {
-                                    values[0][i] = Double.parseDouble(valStr[0].trim()) + centerX/scalefactor;
-                                    values[1][i] = Double.parseDouble(valStr[1].trim()) + centerX/scalefactor;
-                                    values[2][i] = Double.parseDouble(valStr[2].trim()) + 1.2*centerX/scalefactor;
+                                    values[0][i] = Double.parseDouble(valStr[0].trim()) + centerX/this.scalefactor;
+                                    values[1][i] = Double.parseDouble(valStr[1].trim()) + centerX/this.scalefactor;
+                                    values[2][i] = Double.parseDouble(valStr[2].trim()) + 1.2*centerX/this.scalefactor;
                                 } catch (NumberFormatException e) {
                                     continue;
                                 }
                             }
                             // RED SOURCE DOT
                             if ( j == 0 && i == 0 ) {
-                                piirturi.setFill(Color.RED);
+                                this.piirturi.setFill(Color.RED);
                                 if (dim == 1) {
-                                    piirturi.fillRect(
+                                    this.piirturi.fillRect(
                                         values[0][i], centerY,
                                         expected / ( 10.0 * Math.sqrt(Math.log10(steps)) ),
                                         Math.sqrt(centerY/2.0));
                                 } else if (dim == 2) {
-                                    piirturi.fillRect(
+                                    this.piirturi.fillRect(
                                         values[0][i], values[1][i],
                                         expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ),
                                         expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ));
                                 } else if (dim == 3) {
-                                    piirturi.fillRect(
+                                    this.piirturi.fillRect(
                                         values[0][i] + Math.cos(values[2][i]),
                                         values[1][i] + Math.sin(values[2][i]),
                                         expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ),
                                         expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ));
                                 }
-                                piirturi.setStroke(Color.YELLOW);
+                                this.piirturi.setStroke(Color.YELLOW);
                             }
 
                             if ( j > 0){
                                 for (int k = 0; k < num_part; k++){
                                     if ( dim < 3 ) {
-                                        piirturi.strokeLine(
+                                        this.piirturi.strokeLine(
                                             muistiX[k], muistiY[k], values[0][k], values[1][k]);
                                     } else {
-                                        linewidth = 10.0 * Math.log10(steps)
+                                        this.linewidth = 10.0 * Math.log10(steps)
                                             / ( values[2][k] * scalefactor );
-                                        piirturi.setLineWidth(linewidth);
-                                        piirturi.strokeLine(
+                                        this.piirturi.setLineWidth(this.linewidth);
+                                        this.piirturi.strokeLine(
                                             muistiX[k], muistiY[k],
-                                            values[0][i]
-                                                + Math.cos(values[2][i]),
-                                            values[1][i]
-                                                + Math.sin(values[2][i]));
+                                            values[0][k]
+                                                + Math.cos(values[2][k]),
+                                            values[1][k]
+                                                + Math.sin(values[2][k]));
                                     }
                                 }
                             }
@@ -364,20 +378,18 @@ public class SceneAnimation extends Data {
                 else
                     failed = false;
 
-                exitVal = process.waitFor();
-                if (exitVal != 0) {
-                    runtime.exit(exitVal);
+                this.exitVal = process.waitFor();
+                if (this.exitVal != 0) {
+                    this.runtime.gc();
+                    this.runtime.exit(exitVal);
+                    this.runtime.exit(this.exitVal);
                 }
-                // FOR DEBUGGING
-                //fos.flush();
-                //fos.close();
             } 
 
         } catch (IOException | InterruptedException e) {
-            //System.out.println(e.getMessage());
+            this.runtime.gc();
+            System.out.println(e.getMessage());
         }
-        // FOR ONE ROUND OPERATION
-        //stop();
     }
 
     // RANDOM WALK ANIMATION

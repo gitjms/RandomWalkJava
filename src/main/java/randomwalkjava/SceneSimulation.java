@@ -384,7 +384,7 @@ public class SceneSimulation extends Data {
                 this.nappiAvoid.setBackground(
                     new Background(
                         new BackgroundFill(
-                            Color.LEMONCHIFFON,CornerRadii.EMPTY,Insets.EMPTY)));
+                            Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[8] = "a";
             } else if (this.nappiAvoid.getText().equals("AVOID ON")){
                 // BUTTON PRESSED OFF

@@ -4,23 +4,17 @@ import com.sun.glass.ui.Screen;
 import javafx.scene.image.Image;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.file.Files;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
@@ -68,6 +62,7 @@ public class MainApp extends Application {
     private final int screenWidth = Screen.getMainScreen().getWidth();
     private final int screenHeight = Screen.getMainScreen().getHeight();
     private FXPlot fxplot;
+    private JFrame frame;
     // DATA
     public String[] vars;
     private double scalefactor = 1.0;
@@ -79,7 +74,6 @@ public class MainApp extends Application {
     private double[] rms_norm;
     private List <Double> energy_x;
     private List <Double> energy_y;
-    private boolean barrier;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -93,6 +87,8 @@ public class MainApp extends Application {
         String pyexec1d = "plot1d.py";
         String pyexec2d = "plot2d.py";
         String pyexec3d = "plot3d.py";
+        String pyexecmmc2d = "plotmmc2d.py";
+        String pyexecmmc3d = "plotmmc3d.py";
         File datafolder = new File(datapath);
         File sourceFile = new File(datapath + "\\" + fexec);
         boolean sourceFound = false;
@@ -110,6 +106,12 @@ public class MainApp extends Application {
             if (sourceFound == false)
                 this.stop();
             sourceFound = createFolder(sourcepath, datapath, pyexec3d, false);
+            if (sourceFound == false)
+                this.stop();
+            sourceFound = createFolder(sourcepath, datapath, pyexecmmc2d, false);
+            if (sourceFound == false)
+                this.stop();
+            sourceFound = createFolder(sourcepath, datapath, pyexecmmc3d, false);
             if (sourceFound == false)
                 this.stop();
         } else if (Files.notExists(sourceFile.toPath())) {
@@ -137,6 +139,18 @@ public class MainApp extends Application {
             sourceFile = new File(datapath + "\\" + pyexec3d);
             if (Files.notExists(sourceFile.toPath())) {
                 sourceFound = createFolder(sourcepath, datapath, pyexec3d, false);
+                if (sourceFound == false)
+                    this.stop();
+            }
+            sourceFile = new File(datapath + "\\" + pyexecmmc2d);
+            if (Files.notExists(sourceFile.toPath())) {
+                sourceFound = createFolder(sourcepath, datapath, pyexecmmc2d, false);
+                if (sourceFound == false)
+                    this.stop();
+            }
+            sourceFile = new File(datapath + "\\" + pyexecmmc3d);
+            if (Files.notExists(sourceFile.toPath())) {
+                sourceFound = createFolder(sourcepath, datapath, pyexecmmc3d, false);
                 if (sourceFound == false)
                     this.stop();
             }
@@ -533,6 +547,12 @@ public class MainApp extends Application {
                 ButtonType.OK, ButtonType.CANCEL);
             alert.showAndWait();
             if ( alert.getResult() == ButtonType.OK ) {
+                if (this.frame != null) {
+                    if (this.frame.isShowing()
+                        || this.frame.isActive()
+                        || this.frame.isDisplayable())
+                        this.frame.dispose();
+                }
                 System.gc();
                 stage.close();
             }
@@ -611,6 +631,12 @@ public class MainApp extends Application {
                 ButtonType.OK, ButtonType.CANCEL);
             alert.showAndWait();
             if ( alert.getResult() == ButtonType.OK ) {
+                if (this.frame != null) {
+                    if (this.frame.isShowing()
+                        || this.frame.isActive()
+                        || this.frame.isDisplayable())
+                        this.frame.dispose();
+                }
                 System.gc();
                 stage.close();
             }
@@ -689,20 +715,23 @@ public class MainApp extends Application {
                 closeNappiAnim.setEffect(null);
         });
         closeNappiAnim.setOnAction(event -> {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
-                "Close application?",
-                ButtonType.OK, ButtonType.CANCEL);
-            alert.showAndWait();
-            if ( alert.getResult() == ButtonType.OK ) {
-                System.gc();
-                stage.close();
-            }
+            if ( !getAnimScene.isRunning() ) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                    "Close application?",
+                    ButtonType.OK, ButtonType.CANCEL);
+                alert.showAndWait();
+                if ( alert.getResult() == ButtonType.OK ) {
+                    System.gc();
+                    stage.close();
+                }
+            } else
+                return;
         });
         closeNappiAnim.setVisible(true);
 
         ////////////////////////////////////////////////////
         // OTHER VIEWS BUTTON: EXECUTE MMC
-        Button runMMC = new Button("EXECUTE");
+        Button runMMC = new Button("ANIMATION");
         runMMC.setDefaultButton(true);
         runMMC.setMinWidth(this.buttonWidth);
         runMMC.setMaxWidth(this.buttonWidth);
@@ -717,6 +746,23 @@ public class MainApp extends Application {
                 runMMC.setEffect(null);
         });
         runMMC.setVisible(true);
+
+        // OTHER VIEWS BUTTON: PLOT MMC
+        Button plotMMC = new Button("PLOT");
+        plotMMC.setDefaultButton(true);
+        plotMMC.setMinWidth(this.buttonWidth);
+        plotMMC.setMaxWidth(this.buttonWidth);
+        plotMMC.setStyle("-fx-background-color: Blue");
+        plotMMC.setTextFill(Color.WHITE);
+        plotMMC.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                plotMMC.setEffect(shadow);
+        });
+        plotMMC.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                plotMMC.setEffect(null);
+        });
+        plotMMC.setVisible(true);
 
         // OTHER VIEWS BUTTON: MMC MENU
         Button menuNappiMMC = new Button("BACK TO MENU");
@@ -758,10 +804,10 @@ public class MainApp extends Application {
         Button remBarNappiMMC = new Button("CONTINUE");
         remBarNappiMMC.setMinWidth(this.buttonWidth);
         remBarNappiMMC.setMaxWidth(this.buttonWidth);
-        remBarNappiMMC.setTextFill(Color.WHITE);
+        remBarNappiMMC.setTextFill(Color.BLACK);
         remBarNappiMMC.setBackground(new Background(
             new BackgroundFill(
-                Color.LIMEGREEN,CornerRadii.EMPTY,Insets.EMPTY)));
+                Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
         GridPane.setHalignment(remBarNappiMMC, HPos.LEFT);
         remBarNappiMMC.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
@@ -808,6 +854,12 @@ public class MainApp extends Application {
                         ButtonType.OK, ButtonType.CANCEL);
                     alert.showAndWait();
                     if ( alert.getResult() == ButtonType.OK ) {
+                        if (this.frame != null) {
+                            if (this.frame.isShowing()
+                                || this.frame.isActive()
+                                || this.frame.isDisplayable())
+                                this.frame.dispose();
+                        }
                         System.gc();
                         stage.close();
                     }
@@ -883,6 +935,7 @@ public class MainApp extends Application {
             helpNappiMMC,
             getMMCScene.getSceneMMC(),
             runMMC,
+            plotMMC,
             remBarNappiMMC,
             closeNappiMMC);
         isovalikkoMMC.getChildren().addAll(
@@ -998,7 +1051,7 @@ public class MainApp extends Application {
 
         ////////////////////////////////////////////////////
         // CREATE A FRAME FOR CALCULATION AND SIMULATION PLOTS
-        JFrame frame = new JFrame();
+        this.frame = new JFrame();
 
         ////////////////////////////////////////////////////
         // CREATE AN INSTANCE FOR CODE EXECUTIONS
@@ -1022,7 +1075,7 @@ public class MainApp extends Application {
 
             if ( fail == true ) return;
 
-            ex.executeRms(datafolder, textAreaSim, frame, data, this.vars);
+            ex.executeRms(textAreaSim, this.frame, data, this.vars);
         });
 
         ////////////////////////////////////////////////////
@@ -1053,7 +1106,7 @@ public class MainApp extends Application {
 
             if ( fail == true ) return;
 
-            ex.executeSim(datafolder, textAreaSim, frame, data, this.vars);
+            ex.executeSim(textAreaSim, this.frame, data, this.vars);
         });
 
         ////////////////////////////////////////////////////
@@ -1110,7 +1163,7 @@ public class MainApp extends Application {
 
                 // DRAW ANIMATION
                 getAnimScene.refresh(
-                    datafolder, fexec, piirturi, scalefactor, animwidth,
+                    fexec, piirturi, scalefactor, animwidth,
                     linewidth, fxplot, rms_runs, rms_norm, newdata
                 );
                 newdata = false;
@@ -1126,7 +1179,10 @@ public class MainApp extends Application {
             if (getAnimScene.isRunning()) {
                 getAnimScene.stop();
                 if ( this.isscaled == true ) {
-                    piirturi.scale(1.0/this.scalefactor, 1.0/this.scalefactor);
+                    if ( this.vars[4].equals("1") )
+                        piirturi.scale(1.0/this.scalefactor, 1.0);
+                    else
+                        piirturi.scale(1.0/this.scalefactor, 1.0/this.scalefactor);
                 }
                 runAnim.setText("RUN");
             } else {
@@ -1153,8 +1209,9 @@ public class MainApp extends Application {
                 this.fxplot = new FXPlot("W&H", this.screenHeight);
 
                 this.scalefactor = 
-                Math.sqrt( this.animwidth + Math.pow(dim,2.0) * 100 * Math.pow(Math.log10((double) steps),2.0) )
-                / Math.pow(Math.log10((double) steps),2.0);
+                    Math.sqrt( this.animwidth + Math.pow(dim,2.0) * 100
+                    * Math.pow(Math.log10((double) steps),2.0) )
+                    / Math.pow(Math.log10((double) steps),2.0);
  
                 if ( dim == 1 ) {
                     this.linewidth = 1.0 / Math.log10((double) steps);
@@ -1181,12 +1238,38 @@ public class MainApp extends Application {
                 else
                     mincount = (int) expected - 5;
                 int maxcount = (int) expected + 5;
-                fxplot.setWData("R_rms", "sqrt(N)", this.rms_runs, this.rms_runs, expected);
-                fxplot.setHData("norm", this.rms_norm, this.rms_norm, mincount, maxcount);
+                this.fxplot.setWData("R_rms", "sqrt(N)", this.rms_runs, this.rms_runs, expected);
+                this.fxplot.setHData("norm", this.rms_norm, this.rms_norm, mincount, maxcount);
         
                 getAnimScene.start();
                 runAnim.setText("STOP");
             }
+        });
+
+        ////////////////////////////////////////////////////
+        // PLOT BUTTON MMC
+        plotMMC.setOnMouseClicked((MouseEvent event) -> {
+            // BUTTON PRESSED ON
+            valikkoMMC.setDisable(true);
+            this.vars = getMMCScene.getVars();
+            getMMCScene.setVar(9, "s");
+            Data data = new Data(this.vars);
+            int particles = Integer.valueOf(vars[0]);
+            double diam = Double.valueOf(vars[1]);
+            int charge = Integer.valueOf(vars[2]);
+            int dim = Integer.valueOf(vars[4]);
+            String lattice = this.vars[7];
+            boolean fail = false;
+
+            if ( particles < 0 ) fail = true;
+            if ( diam <= 0.0 || diam >= 1.0 ) fail = true;
+            if ( charge < 0 || charge > 2 ) fail = true;
+            if ( dim < 2 || dim > 3 ) fail = true;
+            if ( !lattice.equals("l") && !lattice.equals("-") ) fail = true;
+
+            if ( fail == true ) return;
+
+            ex.executeMMC(valikkoMMC, textAreaMMC, this.frame, data, this.vars);
         });
 
         ////////////////////////////////////////////////////
@@ -1226,17 +1309,9 @@ public class MainApp extends Application {
             int measure = 0;
             double diff = 0.3;
             if ( particles < 25 ) {
-                if ( lattice.equals("l") ) {
-                    measure = 21;
-                } else {
-                    measure = 21;
-                }
+                measure = 21;
             } else {
-                if ( dim < 3 ) {
-                    measure = (int)( 3.0 * Math.sqrt( 2.0 * (double) particles ) );
-                } else {
-                    measure = (int)( 3.0 * Math.sqrt( 2.0 * (double) particles ) );
-                }
+                measure = (int)( 3.0 * Math.sqrt( 2.0 * (double) particles ) );
 
                 if ( (measure+1)%4 == 0 || measure%2 == 0 ) {
                     diff = diff + Math.sqrt(measure)/10.0 + measure/20.0 - 1.0;
@@ -1282,93 +1357,14 @@ public class MainApp extends Application {
 
             // DRAW MMC ANIMATION
             getMMCScene.refresh(
-                datafolder, initialDataFile, fexec, mmcpiirturi, this.scalefactor,
+                initialDataFile, fexec, mmcpiirturi, this.scalefactor,
                 this.animwidth, this.linewidth, this.fxplot, remBarNappiMMC,
-                runMMC, closeNappiMMC, menuNappiMMC, helpNappiMMC,
+                runMMC, plotMMC, closeNappiMMC, menuNappiMMC, helpNappiMMC,
                 this.energy_x, this.energy_y, this.newdata, measure, diff
             );
-
             this.newdata = false;
 
         });
-
-        ////////////////////////////////////////////////////
-        // RUN BUTTON ONE ROUND DEBUGGING
-        /*runAnim.setOnMouseClicked((MouseEvent event) -> {
-            this.vars = getAnimScene.getVars();
-            int dim = Integer.valueOf(this.vars[4]);
-            double steps = Double.valueOf(vars[3]);
-
-            boolean fail = false;
-            if ( Integer.valueOf(this.vars[0]) < 0 ) fail = true; // particles
-                if ( steps < 1 ) fail = true; // steps
-                if ( dim < 1 || dim > 3 ) fail = true; // dimension
-
-                if ( fail == true ) return;
-
-            if (this.fxplot != null) {
-                if (this.fxplot.isRunning()) this.fxplot.stop();
-                if (this.fxplot.getFrame().isShowing()
-                    || this.fxplot.getFrame().isActive()
-                    || this.fxplot.getFrame().isDisplayable())
-                    this.fxplot.getFrame().dispose();
-            }
-            this.fxplot = new FXPlot("W&H", this.screenHeight);
-
-            if ( this.isscaled == true ) {
-                piirturi.scale(1.0/this.scalefactor, 1.0/this.scalefactor);
-            }
-
-            this.scalefactor = 
-                Math.sqrt( this.animwidth + 100 * Math.pow(Math.log10(steps),2.0) )
-                / Math.pow(Math.log10(steps),2.0);
- 
-            if ( dim == 2 ) {
-                this.linewidth = 1.0 / ( this.scalefactor * Math.sqrt(Math.log10(steps)) );
-                piirturi.scale(this.scalefactor, this.scalefactor);
-            } else if ( dim == 3 ) {
-                this.linewidth = 1.0 / ( 3.0 * this.scalefactor * Math.sqrt(Math.log10(steps)) );
-                piirturi.scale(this.scalefactor, this.scalefactor);
-            }
-            this.isscaled = true;
-            piirturi.setGlobalAlpha(1.0 / this.scalefactor * Math.pow(Math.log10(steps),2.0));
-
-            this.newdata = true;
-            this.rms_runs = new double[10];
-            this.rms_norm = new double[10];
-            Arrays.fill(this.rms_runs, 0.0);
-            Arrays.fill(this.rms_norm, 0.0);
-            double expected = Math.sqrt(steps);
-            int mincount;
-            if ( (int) expected < 5 )
-                mincount = 0;
-            else
-                mincount = (int) expected - 5;
-            int maxcount = (int) expected + 5;
-            fxplot.setWData("R_rms", "sqrt(N)", this.rms_runs, this.rms_runs, expected);
-            fxplot.setHData("norm", this.rms_norm, this.rms_norm, mincount, maxcount);
-
-			if ( isovalikkoAnim.getChildren().contains(textAreaAnim)) {
-                textAreaAnim.clear();
-                isovalikkoAnim.getChildren().remove(textAreaAnim);
-                isovalikkoAnim.getChildren().add(pane);
-            }
-
-            piirturi.setGlobalAlpha(1.0);
-            piirturi.setFill(Color.BLACK);
-            if ( dim == 2 )
-                piirturi.fillRect(0, 0, 1.0/scalefactor*animwidth, 1.0/scalefactor*animheight);
-            else if ( dim == 3 )
-                piirturi.fillRect(0, 0, 1.0/scalefactor*animwidth, 1.0/scalefactor*animheight);
-            piirturi.fill();
-
-            // DRAW ANIMATION
-            getAnimScene.refresh(
-                datafolder, fexec, piirturi, scalefactor,
-                linewidth, fxplot, rms_runs, rms_norm, newdata
-            );
-            newdata = false;
-        });*/
 
         stage.setScene(firstScene);
         Image img = new Image("images/icon.png");
@@ -1384,6 +1380,8 @@ public class MainApp extends Application {
                 }
                 if (getMMCScene.runtimeIsRunning())
                     getMMCScene.stopRuntime();
+                if (getAnimScene.runtimeIsRunning())
+                    getAnimScene.stopRuntime();
             });
         });
         stage.initStyle(StageStyle.UTILITY);

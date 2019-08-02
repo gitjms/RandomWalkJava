@@ -16,7 +16,9 @@ public class Pyplot {
     public Pyplot() {
     }
 
-    public String createPlot(File folderPath, String[] files, int dim, String executable, boolean rms) {
+    public String createPlot(File folderPath, String[] files, int dim,
+        String executable, boolean rms, boolean mmc) {
+
         String teksti = "";
         String[] command = null;
 
@@ -24,12 +26,15 @@ public class Pyplot {
             if ( dim == 1 || rms == true )
                 command = new String[]{"cmd","/c", executable,
                     files[0]};
-            if ( dim == 2 && rms == false )
+            if ( dim == 2 && rms == false && mmc == false )
                 command = new String[]{"cmd","/c", executable,
                     files[0], files[1]};
-            else if ( dim == 3 && rms == false )
+            else if ( dim == 3 && rms == false && mmc == false )
                 command = new String[]{"cmd","/c", executable,
                     files[0], files[1], files[2]};
+            else if ( mmc == true )
+                command = new String[]{"cmd","/c", executable,
+                    files[0], files[1]};
 
             FileOutputStream fos = new FileOutputStream(command[0]);
             Runtime runtime = Runtime.getRuntime();
@@ -56,7 +61,7 @@ public class Pyplot {
                     if (teksti.isEmpty())
                         teksti = line;
                     else
-                        teksti = teksti + "\n" + line;
+                        teksti = teksti + "\n" + line + "\n";
                 }
 
                 exitVal = process.waitFor();
