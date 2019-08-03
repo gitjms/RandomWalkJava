@@ -188,10 +188,13 @@ public class Data {
             while (sc.hasNextLine()) {
                 values = new double[dim];
                 String data = sc.nextLine();
-                String[] osat = data.trim().split("(\\s+)");
-                for ( int i = 0; i < osat.length; i++)
-                    values[i] = Double.valueOf(osat[i]);
-                dataList.add(values);
+                String[] osat;
+                if ( !data.startsWith("Start")) {
+                    osat = data.trim().split("(\\s+)");
+                    for ( int i = 0; i < osat.length; i++)
+                        values[i] = Double.valueOf(osat[i]);
+                    dataList.add(values);
+                }
              }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);

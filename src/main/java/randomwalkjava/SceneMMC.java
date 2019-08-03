@@ -244,7 +244,7 @@ public class SceneMMC extends Data {
 
                 while ( barrierIsOn() == true ) {
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(500);
                     } catch (InterruptedException ex) {
                         System.out.println(ex.getMessage());
                     }
@@ -313,7 +313,8 @@ public class SceneMMC extends Data {
 
                                     // DRAW
                                     clearDots( dim );
-                                    if ( lattice == true ) drawLattice( dim, num_part, measure, diff );
+                                    if ( dim == 2 && lattice == true )
+                                        drawLattice( num_part, measure, diff );
                                     for (int k = 0; k < num_part; k++){
                                         if ( dim == 2 ) {
                                             draw2Dots(values[0][k], values[1][k],
@@ -411,13 +412,14 @@ public class SceneMMC extends Data {
     public void drawInitials( File initialDataFile,
         int num_part, int dim, double diam, int measure, double diff ){
 
-        if ( lattice == true ) drawLattice( dim, num_part, measure, diff );
+        if ( dim == 2 && lattice == true )
+            drawLattice( num_part, measure, diff );
         this.piirturi.setLineWidth(linewidth);
         List<double[]> initialData = readDataMMC(initialDataFile, dim);
 
         this.piirturi.setGlobalAlpha(1.0);
         if ( num_part < 25 )
-            this.piirturi.setLineWidth(1.0 / (Math.log(num_part)*this.scalefactor));
+            this.piirturi.setLineWidth(5.0 / (Math.log(num_part)*this.scalefactor));
         else
             this.piirturi.setLineWidth(10.0 / (Math.log(num_part)*this.scalefactor));
         this.piirturi.setStroke(Color.RED);
@@ -476,14 +478,13 @@ public class SceneMMC extends Data {
         );
     }
  
-    public void drawLattice( int dim, int num_part, int measure, double diff ) {
-        if ( dim == 2 ) {
-            for ( int i = 0; i < measure + 2; i+=2 ) {
-                for ( int j = 0; j < measure + 2; j+=2 ) {
-                    this.piirturi.drawImage(this.grayP,
-                        (double) i + diff, (double) j + diff,
-                        1.0, 1.0);
-                }
+    public void drawLattice( int num_part, int measure, double diff ) {
+        for ( int i = 0; i < measure + 2; i+=2 ) {
+            for ( int j = 0; j < measure + 2; j+=2 ) {
+                this.piirturi.drawImage(this.grayP,
+                    (double) i + diff,
+                    (double) j + diff,
+                    1.0, 1.0);
             }
         }
     }

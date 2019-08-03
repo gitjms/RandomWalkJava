@@ -15,6 +15,8 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
@@ -177,10 +179,10 @@ public class MainApp extends Application {
 
         ////////////////////////////////////////////////////
         // FIRST VIEW LABELS AND BUTTONS
-        Button nappiScene1 = new Button("R_RMS vs SQRT(N)");
-        Button nappiScene2 = new Button("RANDOM WALK");
-        Button nappiScene3 = new Button("REAL TIME WALK");
-        Button nappiScene4 = new Button("MMC");
+        Button nappiScene1 = new Button("RMS vs SQRT(N)"); // SceneCalculation
+        Button nappiScene2 = new Button("PATH TRACING"); // SceneSimulation
+        Button nappiScene3 = new Button("REAL TIME RMS"); // SceneAnimation
+        Button nappiScene4 = new Button("MMC DIFFUSION"); // SceneMMC
         nappiScene1.setMinWidth(this.buttonWidth);
         nappiScene1.setMaxWidth(this.buttonWidth);
         nappiScene2.setMinWidth(this.buttonWidth);
