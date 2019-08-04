@@ -18,7 +18,7 @@ import org.knowm.xchart.XYSeries.XYSeriesRenderStyle;
 import org.knowm.xchart.style.Styler;
 import org.knowm.xchart.style.Styler.ChartTheme;
 
-public class FXPlot extends SceneAnimation {
+public class FXPlot extends SceneRealTimeRms {
 
     private final int width = 800;
     private final int height = 1000;
@@ -68,6 +68,10 @@ public class FXPlot extends SceneAnimation {
 
     public void setHMaxX(double maxX) {
         this.calcChartH.getStyler().setXAxisMax(maxX);
+    }
+
+    public void setHMaxY(double maxY) {
+        this.calcChartH.getStyler().setYAxisMax(maxY);
     }
 
     public FXPlot(String which, Integer screenHeight) {
@@ -187,7 +191,8 @@ public class FXPlot extends SceneAnimation {
         this.frame.pack();
     }
 
-    public void setHData(String name, double[] x, double[] y, double minx, double maxx) {
+    public void setHData(String name, double[] x, double[] y, double minx,
+        double maxx, boolean standnorm) {
         this.calcChartH.getSeriesMap().clear();
         this.chartPanelH.removeAll();
         this.frame.getContentPane().remove(this.chartPanelH);
@@ -198,10 +203,14 @@ public class FXPlot extends SceneAnimation {
         this.calcChartH.addSeries(String.valueOf(name), x, y)
             .setLineStyle(BasicStroke[0]).setLineColor(Color.orange);
 
-        this.calcChartH.getStyler().setXAxisMin(minx+1);
+        if ( standnorm == true ) {
+            this.calcChartH.setTitle("R_rms standard normal distribution");
+        } else {
+            this.calcChartH.setTitle("R_rms normal distribution");
+        }
+        this.calcChartH.getStyler().setXAxisMin(minx);
         this.calcChartH.getStyler().setXAxisMax(maxx);
         this.calcChartH.getStyler().setYAxisMax( 1.05 );
-        this.calcChartH.setTitle("R_rms normal distribution");
         this.calcChartH.getStyler().setAntiAlias(true);
         this.frame.getContentPane().add(this.chartPanelH);
         this.frame.repaint();
@@ -234,10 +243,7 @@ public class FXPlot extends SceneAnimation {
 
     public void updateHData(String name, double[] x, double[] y, double expected) {
         this.calcChartH.updateXYSeries(name, x, y, null);
-        //for (int i = 0; i < x.length; i++)
-        //    if (x[i] == (double) expected)
-        //        this.calcChartH.getToolTips().addData(x[i], y[i], String.valueOf(x[i]));
-        this.calcChartH.getStyler().setToolTipType(Styler.ToolTipType.xLabels);
+        this.calcChartH.getStyler().setToolTipType(Styler.ToolTipType.xAndYLabels);
         this.calcChartH.getStyler().setToolTipFont(new java.awt.Font(null,0,18));
         this.frame.add(this.chartPanelH,1);
         this.frame.repaint();

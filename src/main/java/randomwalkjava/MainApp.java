@@ -15,8 +15,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
@@ -59,7 +57,7 @@ public class MainApp extends Application {
     private final int textheight = 600;
     private final int animwidth = 900;
     private final int animheight = 900;
-    private final int simheight = 660;
+    private final int pathheight = 660;
     private final int paneWidth = 200;
     private final int screenWidth = Screen.getMainScreen().getWidth();
     private final int screenHeight = Screen.getMainScreen().getHeight();
@@ -72,6 +70,9 @@ public class MainApp extends Application {
     private boolean isscaled = false;
 
     private boolean newdata = false;
+    private boolean standnorm = true;
+    private double mincount;
+    private double maxcount;
     private double[] rms_runs;
     private double[] rms_norm;
     private List <Double> energy_x;
@@ -83,7 +84,7 @@ public class MainApp extends Application {
         ////////////////////////////////////////////////////
         // FILE AND FOLDER CHECK
         String datapath = "C:\\DATA";
-        String sourcepath = "lib\\";
+        String sourcepath = "src\\main\\resources\\lib\\";
         String fexec = "walk.exe";
         String pyexecrms = "plotrms.py";
         String pyexec1d = "plot1d.py";
@@ -180,8 +181,8 @@ public class MainApp extends Application {
         ////////////////////////////////////////////////////
         // FIRST VIEW LABELS AND BUTTONS
         Button nappiScene1 = new Button("RMS vs SQRT(N)"); // SceneCalculation
-        Button nappiScene2 = new Button("PATH TRACING"); // SceneSimulation
-        Button nappiScene3 = new Button("REAL TIME RMS"); // SceneAnimation
+        Button nappiScene2 = new Button("PATH TRACING"); // ScenePathTracing
+        Button nappiScene3 = new Button("REAL TIME RMS"); // SceneRealTimeRms
         Button nappiScene4 = new Button("MMC DIFFUSION"); // SceneMMC
         nappiScene1.setMinWidth(this.buttonWidth);
         nappiScene1.setMaxWidth(this.buttonWidth);
@@ -290,26 +291,26 @@ public class MainApp extends Application {
         ////////////////////////////////////////////////////
         // OTHER VIEWS
         SceneCalculation getCalcScene = new SceneCalculation();
-        SceneSimulation getSimScene = new SceneSimulation();
-        SceneAnimation getAnimScene = new SceneAnimation();
+        ScenePathTracing getPathScene = new ScenePathTracing();
+        SceneRealTimeRms getRealScene = new SceneRealTimeRms();
         SceneMMC getMMCScene = new SceneMMC();
 
         BorderPane asetteluCalc = new BorderPane();
-        BorderPane asetteluSim = new BorderPane();
-        BorderPane asetteluAnim = new BorderPane();
+        BorderPane asetteluPath = new BorderPane();
+        BorderPane asetteluReal = new BorderPane();
         BorderPane asetteluMMC = new BorderPane();
 
         HBox isovalikkoCalc = new HBox();
         isovalikkoCalc.setPadding(new Insets(0, 0, 0, 0));
         isovalikkoCalc.setSpacing(0);
         
-        HBox isovalikkoSim = new HBox();
-        isovalikkoSim.setPadding(new Insets(0, 0, 0, 0));
-        isovalikkoSim.setSpacing(0);
+        HBox isovalikkoPath = new HBox();
+        isovalikkoPath.setPadding(new Insets(0, 0, 0, 0));
+        isovalikkoPath.setSpacing(0);
 
-        HBox isovalikkoAnim = new HBox();
-        isovalikkoAnim.setPadding(new Insets(0, 0, 0, 0));
-        isovalikkoAnim.setSpacing(0);
+        HBox isovalikkoReal = new HBox();
+        isovalikkoReal.setPadding(new Insets(0, 0, 0, 0));
+        isovalikkoReal.setSpacing(0);
 
         HBox isovalikkoMMC = new HBox();
         isovalikkoMMC.setPadding(new Insets(0, 0, 0, 0));
@@ -319,13 +320,13 @@ public class MainApp extends Application {
         valikkoCalc.setPadding(new Insets(10, 10, 10, 10));
         valikkoCalc.setSpacing(20);
 
-        VBox valikkoSim = new VBox();
-        valikkoSim.setPadding(new Insets(10, 10, 10, 10));
-        valikkoSim.setSpacing(20);
+        VBox valikkoPath = new VBox();
+        valikkoPath.setPadding(new Insets(10, 10, 10, 10));
+        valikkoPath.setSpacing(20);
 
-        VBox valikkoAnim = new VBox();
-        valikkoAnim.setPadding(new Insets(10, 10, 10, 10));
-        valikkoAnim.setSpacing(20);
+        VBox valikkoReal = new VBox();
+        valikkoReal.setPadding(new Insets(10, 10, 10, 10));
+        valikkoReal.setSpacing(20);
 
         VBox valikkoMMC = new VBox();
         valikkoMMC.setPadding(new Insets(10, 10, 10, 10));
@@ -347,32 +348,32 @@ public class MainApp extends Application {
             new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         textAreaCalc.setBlendMode(BlendMode.DIFFERENCE);
-        // SIMULATION
-        TextArea textAreaSim = new TextArea();
-        textAreaSim.setMinWidth(this.textwidth);
-        textAreaSim.setMaxWidth(this.textwidth);
-        textAreaSim.setMinHeight(this.simheight);
-        textAreaSim.setMaxHeight(this.simheight);
-        textAreaSim.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
-        textAreaSim.setBorder(null);
-        textAreaSim.setEditable(false);
-        textAreaSim.setBackground(
+        // PATH TRACING
+        TextArea textAreaPath = new TextArea();
+        textAreaPath.setMinWidth(this.textwidth);
+        textAreaPath.setMaxWidth(this.textwidth);
+        textAreaPath.setMinHeight(this.pathheight);
+        textAreaPath.setMaxHeight(this.pathheight);
+        textAreaPath.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
+        textAreaPath.setBorder(null);
+        textAreaPath.setEditable(false);
+        textAreaPath.setBackground(
             new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        textAreaSim.setBlendMode(BlendMode.DIFFERENCE);
-        // ANIMATION
-        TextArea textAreaAnim = new TextArea();
-        textAreaAnim.setMinWidth(this.animwidth);
-        textAreaAnim.setMaxWidth(this.animwidth);
-        textAreaAnim.setMinHeight(this.animheight);
-        textAreaAnim.setMaxHeight(this.animheight);
-        textAreaAnim.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
-        textAreaAnim.setBorder(null);
-        textAreaAnim.setEditable(false);
-        textAreaAnim.setBackground(
+        textAreaPath.setBlendMode(BlendMode.DIFFERENCE);
+        // REAL TIME RMS
+        TextArea textAreaReal = new TextArea();
+        textAreaReal.setMinWidth(this.animwidth);
+        textAreaReal.setMaxWidth(this.animwidth);
+        textAreaReal.setMinHeight(this.animheight);
+        textAreaReal.setMaxHeight(this.animheight);
+        textAreaReal.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
+        textAreaReal.setBorder(null);
+        textAreaReal.setEditable(false);
+        textAreaReal.setBackground(
             new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        textAreaAnim.setBlendMode(BlendMode.DIFFERENCE);
+        textAreaReal.setBlendMode(BlendMode.DIFFERENCE);
         // MMC
         TextArea textAreaMMC = new TextArea();
         textAreaMMC.setMinWidth(this.animwidth);
@@ -403,19 +404,17 @@ public class MainApp extends Application {
         textAreaMenu.setBlendMode(BlendMode.DIFFERENCE);
         
         ////////////////////////////////////////////////////
-        // ANIMATION COMPONENTS
-        Canvas animAlusta = new Canvas(this.animwidth, this.animheight);
-        animAlusta.setVisible(true);
+        // REAL TIME RMS COMPONENTS
+        Canvas rtrmsAlusta = new Canvas(this.animwidth, this.animheight);
+        rtrmsAlusta.setVisible(true);
 
-        GraphicsContext piirturi = animAlusta.getGraphicsContext2D();
+        GraphicsContext piirturi = rtrmsAlusta.getGraphicsContext2D();
         piirturi.setFill(Color.BLACK);
         piirturi.fillRect(0, 0, this.animwidth, this.animheight);
-        //piirturi.setStroke(Color.YELLOW);
-        //piirturi.setGlobalAlpha(0.2);
 
         Pane pane = new Pane();
         pane.setPrefSize(this.animwidth, this.animheight);
-        pane.getChildren().add(animAlusta);
+        pane.getChildren().add(rtrmsAlusta);
         pane.setVisible(true);
         
         ////////////////////////////////////////////////////
@@ -562,72 +561,72 @@ public class MainApp extends Application {
         closeNappiCalc.setVisible(true);
 
         ////////////////////////////////////////////////////
-        // OTHER VIEWS BUTTON: EXECUTE SIMULATION
-        Button executeNappiSim = new Button("EXECUTE");
-        executeNappiSim.setDefaultButton(true);
-        executeNappiSim.setMinWidth(this.buttonWidth);
-        executeNappiSim.setMaxWidth(this.buttonWidth);
-        executeNappiSim.setStyle("-fx-background-color: Red");
-        executeNappiSim.setTextFill(Color.WHITE);
-        executeNappiSim.addEventHandler(
+        // OTHER VIEWS BUTTON: EXECUTE PATH TRACING
+        Button executeNappiPath = new Button("EXECUTE");
+        executeNappiPath.setDefaultButton(true);
+        executeNappiPath.setMinWidth(this.buttonWidth);
+        executeNappiPath.setMaxWidth(this.buttonWidth);
+        executeNappiPath.setStyle("-fx-background-color: Red");
+        executeNappiPath.setTextFill(Color.WHITE);
+        executeNappiPath.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                executeNappiSim.setEffect(shadow);
+                executeNappiPath.setEffect(shadow);
         });
-        executeNappiSim.addEventHandler(
+        executeNappiPath.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                executeNappiSim.setEffect(null);
+                executeNappiPath.setEffect(null);
         });
-        executeNappiSim.setVisible(true);
+        executeNappiPath.setVisible(true);
 
-        // OTHER VIEWS BUTTON: SIMULATION MENU
-        Button menuNappiSim = new Button("BACK TO MENU");
-        menuNappiSim.setMinWidth(this.buttonWidth);
-        menuNappiSim.setMaxWidth(this.buttonWidth);
-        menuNappiSim.addEventHandler(
+        // OTHER VIEWS BUTTON: PATH TRACING MENU
+        Button menuNappiPath = new Button("BACK TO MENU");
+        menuNappiPath.setMinWidth(this.buttonWidth);
+        menuNappiPath.setMaxWidth(this.buttonWidth);
+        menuNappiPath.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                menuNappiSim.setEffect(shadow);
+                menuNappiPath.setEffect(shadow);
         });
-        menuNappiSim.addEventHandler(
+        menuNappiPath.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                menuNappiSim.setEffect(null);
+                menuNappiPath.setEffect(null);
         });
-        menuNappiSim.setVisible(true);
+        menuNappiPath.setVisible(true);
 
-        // OTHER VIEWS BUTTON: SIMULATION HELP
-        Button helpNappiSim = new Button("HELP");
-        helpNappiSim.setMinWidth(this.buttonWidth);
-        helpNappiSim.setMaxWidth(this.buttonWidth);
-        helpNappiSim.addEventHandler(
+        // OTHER VIEWS BUTTON: PATH TRACING HELP
+        Button helpNappiPath = new Button("HELP");
+        helpNappiPath.setMinWidth(this.buttonWidth);
+        helpNappiPath.setMaxWidth(this.buttonWidth);
+        helpNappiPath.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                helpNappiSim.setEffect(shadow);
+                helpNappiPath.setEffect(shadow);
         });
-        helpNappiSim.addEventHandler(
+        helpNappiPath.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                helpNappiSim.setEffect(null);
+                helpNappiPath.setEffect(null);
         });
-        helpNappiSim.setOnAction(event -> {
-            textAreaSim.setText(helpText.simulation());
+        helpNappiPath.setOnAction(event -> {
+            textAreaPath.setText(helpText.pathtracing());
         });
-        helpNappiSim.setVisible(true);
+        helpNappiPath.setVisible(true);
 
-        // OTHER VIEWS BUTTON: SIMULATION CLOSE
-        Button closeNappiSim = new Button("CLOSE");
-        closeNappiSim.setMinWidth(this.buttonWidth);
-        closeNappiSim.setMaxWidth(this.buttonWidth);
-        closeNappiSim.setTextFill(Color.RED);
-        closeNappiSim.setBackground(new Background(
+        // OTHER VIEWS BUTTON: PATH TRACING CLOSE
+        Button closeNappiPath = new Button("CLOSE");
+        closeNappiPath.setMinWidth(this.buttonWidth);
+        closeNappiPath.setMaxWidth(this.buttonWidth);
+        closeNappiPath.setTextFill(Color.RED);
+        closeNappiPath.setBackground(new Background(
             new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        GridPane.setHalignment(closeNappiSim, HPos.LEFT);
-        closeNappiSim.addEventHandler(
+        GridPane.setHalignment(closeNappiPath, HPos.LEFT);
+        closeNappiPath.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                closeNappiSim.setEffect(shadow);
+                closeNappiPath.setEffect(shadow);
         });
-        closeNappiSim.addEventHandler(
+        closeNappiPath.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                closeNappiSim.setEffect(null);
+                closeNappiPath.setEffect(null);
         });
-        closeNappiSim.setOnAction(event -> {
+        closeNappiPath.setOnAction(event -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
                 "Close application?",
                 ButtonType.OK, ButtonType.CANCEL);
@@ -643,81 +642,118 @@ public class MainApp extends Application {
                 stage.close();
             }
         });
-        closeNappiSim.setVisible(true);
+        closeNappiPath.setVisible(true);
 
         ////////////////////////////////////////////////////
-        // OTHER VIEWS BUTTON: RUN ANIMATION
-        Button runAnim = new Button("RUN");
-        runAnim.setDefaultButton(true);
-        runAnim.setMinWidth(this.buttonWidth);
-        runAnim.setMaxWidth(this.buttonWidth);
-        runAnim.setStyle("-fx-background-color: Red");
-        runAnim.setTextFill(Color.WHITE);
-        runAnim.addEventHandler(
+        // OTHER VIEWS BUTTON: PLOT CHOICE REAL TIME RMS
+        Button standNorm = new Button("STD NORM");
+        standNorm.setMinWidth(this.buttonWidth);
+        standNorm.setMaxWidth(this.buttonWidth);
+        standNorm.setBackground(new Background(
+            new BackgroundFill(
+                Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
+        standNorm.setId("standnorm");
+        standNorm.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                runAnim.setEffect(shadow);
+                standNorm.setEffect(shadow);
         });
-        runAnim.addEventHandler(
+        standNorm.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                runAnim.setEffect(null);
+                standNorm.setEffect(null);
         });
-        runAnim.setVisible(true);
-
-        // OTHER VIEWS BUTTON: ANIMATION MENU
-        Button menuNappiAnim = new Button("BACK TO MENU");
-        menuNappiAnim.setMinWidth(this.buttonWidth);
-        menuNappiAnim.setMaxWidth(this.buttonWidth);
-        menuNappiAnim.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                menuNappiAnim.setEffect(shadow);
-        });
-        menuNappiAnim.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                menuNappiAnim.setEffect(null);
-        });
-        menuNappiAnim.setVisible(true);
-
-        // OTHER VIEWS BUTTON: ANIMATION HELP
-        Button helpNappiAnim = new Button("HELP");
-        helpNappiAnim.setMinWidth(this.buttonWidth);
-        helpNappiAnim.setMaxWidth(this.buttonWidth);
-        GridPane.setHalignment(helpNappiAnim, HPos.LEFT);
-        helpNappiAnim.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                helpNappiAnim.setEffect(shadow);
-        });
-        helpNappiAnim.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                helpNappiAnim.setEffect(null);
-        });
-        helpNappiAnim.setOnAction(event -> {
-            if (isovalikkoAnim.getChildren().contains(pane)){
-                isovalikkoAnim.getChildren().remove(pane);
-                isovalikkoAnim.getChildren().add(textAreaAnim);
+        standNorm.setOnMouseClicked((MouseEvent event) -> {
+            if (standNorm.getText().equals("NORM")){
+                // BUTTON PRESSED ON
+                standNorm.setText("STD NORM");
+                standNorm.setBackground(
+                    new Background(
+                        new BackgroundFill(
+                            Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.standnorm = true;
+            } else if (standNorm.getText().equals("STD NORM")){
+                // BUTTON PRESSED OFF
+                standNorm.setText("NORM");
+                standNorm.setBackground(
+                    new Background(new BackgroundFill(
+                        Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.standnorm = false;
             }
-            textAreaAnim.setText(helpText.animation());
         });
-        helpNappiAnim.setVisible(true);
+        standNorm.setVisible(true);
 
-        // OTHER VIEWS BUTTON: ANIMATION CLOSE
-        Button closeNappiAnim = new Button("CLOSE");
-        closeNappiAnim.setMinWidth(this.buttonWidth);
-        closeNappiAnim.setMaxWidth(this.buttonWidth);
-        closeNappiAnim.setTextFill(Color.RED);
-        closeNappiAnim.setBackground(new Background(
+        ////////////////////////////////////////////////////
+        // OTHER VIEWS BUTTON: RUN REAL TIME RMS
+        Button runReal = new Button("RUN");
+        runReal.setDefaultButton(true);
+        runReal.setMinWidth(this.buttonWidth);
+        runReal.setMaxWidth(this.buttonWidth);
+        runReal.setStyle("-fx-background-color: Red");
+        runReal.setTextFill(Color.WHITE);
+        runReal.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                runReal.setEffect(shadow);
+        });
+        runReal.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                runReal.setEffect(null);
+        });
+        runReal.setVisible(true);
+
+        // OTHER VIEWS BUTTON: REAL TIME RMS MENU
+        Button menuNappiReal = new Button("BACK TO MENU");
+        menuNappiReal.setMinWidth(this.buttonWidth);
+        menuNappiReal.setMaxWidth(this.buttonWidth);
+        menuNappiReal.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                menuNappiReal.setEffect(shadow);
+        });
+        menuNappiReal.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                menuNappiReal.setEffect(null);
+        });
+        menuNappiReal.setVisible(true);
+
+        // OTHER VIEWS BUTTON: REAL TIME RMS HELP
+        Button helpNappiReal = new Button("HELP");
+        helpNappiReal.setMinWidth(this.buttonWidth);
+        helpNappiReal.setMaxWidth(this.buttonWidth);
+        GridPane.setHalignment(helpNappiReal, HPos.LEFT);
+        helpNappiReal.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
+                helpNappiReal.setEffect(shadow);
+        });
+        helpNappiReal.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
+                helpNappiReal.setEffect(null);
+        });
+        helpNappiReal.setOnAction(event -> {
+            if (isovalikkoReal.getChildren().contains(pane)){
+                isovalikkoReal.getChildren().remove(pane);
+                isovalikkoReal.getChildren().add(textAreaReal);
+            }
+            textAreaReal.setText(helpText.realtimerms());
+        });
+        helpNappiReal.setVisible(true);
+
+        // OTHER VIEWS BUTTON: REAL TIME RMS CLOSE
+        Button closeNappiReal = new Button("CLOSE");
+        closeNappiReal.setMinWidth(this.buttonWidth);
+        closeNappiReal.setMaxWidth(this.buttonWidth);
+        closeNappiReal.setTextFill(Color.RED);
+        closeNappiReal.setBackground(new Background(
             new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        GridPane.setHalignment(closeNappiAnim, HPos.LEFT);
-        closeNappiAnim.addEventHandler(
+        GridPane.setHalignment(closeNappiReal, HPos.LEFT);
+        closeNappiReal.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                closeNappiAnim.setEffect(shadow);
+                closeNappiReal.setEffect(shadow);
         });
-        closeNappiAnim.addEventHandler(
+        closeNappiReal.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                closeNappiAnim.setEffect(null);
+                closeNappiReal.setEffect(null);
         });
-        closeNappiAnim.setOnAction(event -> {
-            if ( !getAnimScene.isRunning() ) {
+        closeNappiReal.setOnAction(event -> {
+            if ( !getRealScene.isRunning() ) {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
                     "Close application?",
                     ButtonType.OK, ButtonType.CANCEL);
@@ -729,7 +765,7 @@ public class MainApp extends Application {
             } else
                 return;
         });
-        closeNappiAnim.setVisible(true);
+        closeNappiReal.setVisible(true);
 
         ////////////////////////////////////////////////////
         // OTHER VIEWS BUTTON: EXECUTE MMC
@@ -905,30 +941,31 @@ public class MainApp extends Application {
         asetteluCalc.setCenter(isovalikkoCalc);
 
         ////////////////////////////////////////////////////
-        // SET SIMULATION BORDERPANE
-        valikkoSim.getChildren().addAll(
-            menuNappiSim,
-            helpNappiSim,
-            getSimScene.getSceneSim(),
-            executeNappiSim,
-            closeNappiSim);
-        isovalikkoSim.getChildren().addAll(
-            valikkoSim,
-            textAreaSim);
-        asetteluSim.setCenter(isovalikkoSim);
+        // SET PATH TRACING BORDERPANE
+        valikkoPath.getChildren().addAll(
+            menuNappiPath,
+            helpNappiPath,
+            getPathScene.getScenePath(),
+            executeNappiPath,
+            closeNappiPath);
+        isovalikkoPath.getChildren().addAll(
+            valikkoPath,
+            textAreaPath);
+        asetteluPath.setCenter(isovalikkoPath);
 
         ////////////////////////////////////////////////////
-        // SET ANIMATION BORDERPANE
-        valikkoAnim.getChildren().addAll(
-            menuNappiAnim,
-            helpNappiAnim,
-            getAnimScene.getSceneAnim(),
-            runAnim,
-            closeNappiAnim);
-        isovalikkoAnim.getChildren().addAll(
-            valikkoAnim,
-            textAreaAnim);
-        asetteluAnim.setCenter(isovalikkoAnim);
+        // SET REAL TIME RMS BORDERPANE
+        valikkoReal.getChildren().addAll(
+            menuNappiReal,
+            helpNappiReal,
+            getRealScene.getSceneReal(),
+            standNorm,
+            runReal,
+            closeNappiReal);
+        isovalikkoReal.getChildren().addAll(
+            valikkoReal,
+            textAreaReal);
+        asetteluReal.setCenter(isovalikkoReal);
 
         ////////////////////////////////////////////////////
         // SET MMC BORDERPANE
@@ -953,11 +990,11 @@ public class MainApp extends Application {
         Scene calcScene = new Scene(asetteluCalc,this.stageWidth,this.stageHeight);
         calcScene.getStylesheets().add("/styles/Styles.css");
 
-        Scene simScene = new Scene(asetteluSim,this.stageWidth,this.stageHeight
-            + (this.simheight-this.textheight));
-        simScene.getStylesheets().add("/styles/Styles.css");
+        Scene pathScene = new Scene(asetteluPath,this.stageWidth,this.stageHeight
+            + (this.pathheight-this.textheight));
+        pathScene.getStylesheets().add("/styles/Styles.css");
 
-        Scene animScene = new Scene(asetteluAnim,
+        Scene animScene = new Scene(asetteluReal,
             this.stageWidth + (this.animwidth-this.textwidth),
             this.stageHeight + (this.animheight-this.textheight));
         animScene.getStylesheets().add("/styles/Styles.css");
@@ -983,28 +1020,28 @@ public class MainApp extends Application {
                 textAreaMenu.setText(textAreaCalc.getText());
             stage.setScene(firstScene);
         });
-        // SIMULATION
+        // PATH TRACING
         nappiScene2.setOnMouseClicked(event -> {
-            stage.setTitle("Random Walk simulation");
+            stage.setTitle("Path Tracing");
             if ( stage.getHeight() == this.stageHeight ){
-                stage.setHeight(this.stageHeight+(this.simheight-this.textheight));
-                stage.setY((this.screenHeight-this.stageHeight)/2-(this.simheight-this.textheight)/2);
+                stage.setHeight(this.stageHeight+(this.pathheight-this.textheight));
+                stage.setY((this.screenHeight-this.stageHeight)/2-(this.pathheight-this.textheight)/2);
             }
-            stage.setScene(simScene);
+            stage.setScene(pathScene);
         });
-        menuNappiSim.setOnAction(event -> {
+        menuNappiPath.setOnAction(event -> {
             stage.setTitle("Random Walk");
-            if (textAreaSim.getText().equals(helpText.simulation()))
+            if (textAreaPath.getText().equals(helpText.pathtracing()))
                 textAreaMenu.setText(helpText.welcome());
             else
-                textAreaMenu.setText(textAreaSim.getText());
+                textAreaMenu.setText(textAreaPath.getText());
             stage.setY((this.screenHeight-this.stageHeight)/2);
             stage.setHeight(this.stageHeight);
             stage.setScene(firstScene);
         });
-        // ANIMATION
+        // REAL TIME RMS
         nappiScene3.setOnMouseClicked(event -> {
-            stage.setTitle("Random Walk Animation");
+            stage.setTitle("Real Time rms");
             if ( stage.getWidth() == this.stageWidth ){
                 stage.setWidth(this.stageWidth+(this.animwidth-this.textwidth));
                 stage.setHeight(this.stageHeight+(this.animheight-this.textheight));
@@ -1014,9 +1051,9 @@ public class MainApp extends Application {
             }
             stage.setScene(animScene);
         });
-        menuNappiAnim.setOnAction(event -> {
+        menuNappiReal.setOnAction(event -> {
             stage.setTitle("Random Walk");
-            if (textAreaAnim.getText().equals(helpText.animation()))
+            if (textAreaReal.getText().equals(helpText.realtimerms()))
                 textAreaMenu.setText(helpText.welcome());
             else
                 textAreaMenu.clear();
@@ -1028,7 +1065,7 @@ public class MainApp extends Application {
         });
         // MMC
         nappiScene4.setOnMouseClicked(event -> {
-            stage.setTitle("MMC Random Walk");
+            stage.setTitle("MMC Diffusion");
             if ( stage.getWidth() == this.stageWidth ){
                 stage.setWidth(this.stageWidth+(this.animwidth-this.textwidth));
                 stage.setHeight(this.stageHeight+(this.animheight-this.textheight));
@@ -1052,7 +1089,7 @@ public class MainApp extends Application {
         });
 
         ////////////////////////////////////////////////////
-        // CREATE A FRAME FOR CALCULATION AND SIMULATION PLOTS
+        // CREATE A FRAME FOR CALCULATION AND PATH TRACING PLOTS
         this.frame = new JFrame();
 
         ////////////////////////////////////////////////////
@@ -1077,14 +1114,14 @@ public class MainApp extends Application {
 
             if ( fail == true ) return;
 
-            ex.executeRms(textAreaSim, this.frame, data, this.vars);
+            ex.executeRms(textAreaPath, this.frame, data, this.vars);
         });
 
         ////////////////////////////////////////////////////
-        // EXECUTE BUTTON SIMULATION
-        executeNappiSim.setOnMouseClicked((MouseEvent event) -> {
+        // EXECUTE BUTTON PATH TRACING
+        executeNappiPath.setOnMouseClicked((MouseEvent event) -> {
             // BUTTON PRESSED ON
-            this.vars = getSimScene.getVars();
+            this.vars = getPathScene.getVars();
             Data data = new Data(this.vars);
             boolean fail = false;
 
@@ -1095,7 +1132,6 @@ public class MainApp extends Application {
             int dim = Integer.valueOf(this.vars[4]);
             String fixed = this.vars[6];
             String lattice = this.vars[7];
-            String avoid = this.vars[8];
 
             if ( particles < 0 ) fail = true;
             if ( diam <= 0.0 || diam >= 1.0 ) fail = true;
@@ -1104,17 +1140,16 @@ public class MainApp extends Application {
             if ( dim < 1 || dim > 3 ) fail = true;
             if ( !fixed.equals("f") && !fixed.equals("-") ) fail = true;
             if ( !lattice.equals("l") && !lattice.equals("-") ) fail = true;
-            if ( !avoid.equals("a") && !avoid.equals("-") ) fail = true;
 
             if ( fail == true ) return;
 
-            ex.executeSim(textAreaSim, this.frame, data, this.vars);
+            ex.executePath(textAreaPath, this.frame, data, this.vars);
         });
 
         ////////////////////////////////////////////////////
-        // ANIMATION TIMER FOR REAL TIME RANDOM WALK ANIMATION
+        // ANIMATION TIMER FOR REAL TIME RMS ANIMATION
         new AnimationTimer() {
-            // päivitetään animaatiota noin 100 millisekunnin välein
+            // REFESH ANIMATION ABOUT 100 MILLISECOND STEPS
             private final long sleepNanoseconds = 100 * 1000000;
             private long prevTime = 0;
             private int dim;
@@ -1123,22 +1158,21 @@ public class MainApp extends Application {
             @Override
             public void handle(long currentNanoTime) {
 
-                // päivitetään animaatiota noin 100 millisekunnin välein
                 if ((currentNanoTime - this.prevTime) < this.sleepNanoseconds) {
                     return;
                 }
 
-                if ( !getAnimScene.isRunning())
+                if ( !getRealScene.isRunning())
                     return;
 
-                if ( isovalikkoAnim.getChildren().contains(textAreaAnim) ) {
-                    textAreaAnim.clear();
-                    isovalikkoAnim.getChildren().remove(textAreaAnim);
-                    isovalikkoAnim.getChildren().add(pane);
+                if ( isovalikkoReal.getChildren().contains(textAreaReal) ) {
+                    textAreaReal.clear();
+                    isovalikkoReal.getChildren().remove(textAreaReal);
+                    isovalikkoReal.getChildren().add(pane);
                 }
 
-                this.vars = getAnimScene.getVars();
-                // FROM SCENEANIMATION
+                this.vars = getRealScene.getVars();
+                // FROM SCENEREALTIMERMS
                 // vars from user:
                 // vars[0] = particles,     USER
                 // vars[1] = diameter,      n/a
@@ -1148,8 +1182,7 @@ public class MainApp extends Application {
                 // vars[5] = mmc,           n/a
                 // vars[6] = fixed,         n/a
                 // vars[7] = lattice,       n/a
-                // vars[8] = avoid,         n/a
-                // vars[9] = save           n/a
+                // vars[8] = save           n/a
 
                 this.dim = Integer.valueOf(this.vars[4]);
 
@@ -1164,9 +1197,9 @@ public class MainApp extends Application {
                 piirturi.fill();
 
                 // DRAW ANIMATION
-                getAnimScene.refresh(
-                    fexec, piirturi, scalefactor, animwidth,
-                    linewidth, fxplot, rms_runs, rms_norm, newdata
+                getRealScene.refresh(
+                    fexec, piirturi, scalefactor, animwidth, linewidth, fxplot,
+                    rms_runs, rms_norm, newdata, mincount, maxcount, standnorm
                 );
                 newdata = false;
 
@@ -1176,19 +1209,19 @@ public class MainApp extends Application {
         }.start();
 
         ////////////////////////////////////////////////////
-        // RUN BUTTON ANIMATION
-        runAnim.setOnMouseClicked((MouseEvent event) -> {
-            if (getAnimScene.isRunning()) {
-                getAnimScene.stop();
+        // RUN BUTTON REAL TIME RMS
+        runReal.setOnMouseClicked((MouseEvent event) -> {
+            if (getRealScene.isRunning()) {
+                getRealScene.stop();
                 if ( this.isscaled == true ) {
                     if ( this.vars[4].equals("1") )
                         piirturi.scale(1.0/this.scalefactor, 1.0);
                     else
                         piirturi.scale(1.0/this.scalefactor, 1.0/this.scalefactor);
                 }
-                runAnim.setText("RUN");
+                runReal.setText("RUN");
             } else {
-                this.vars = getAnimScene.getVars();
+                this.vars = getRealScene.getVars();
                 boolean fail = false;
 
                 int particles = Integer.valueOf(vars[0]);
@@ -1222,7 +1255,6 @@ public class MainApp extends Application {
                     this.linewidth = 1.0 / ( this.scalefactor * Math.sqrt(Math.log10((double) steps)) );
                     piirturi.scale(this.scalefactor, this.scalefactor);
                 } else if ( dim == 3 ) {
-                    //this.linewidth = 1.0 / ( this.scalefactor * Math.sqrt(Math.log10((double) steps)) );
                     piirturi.scale(this.scalefactor, this.scalefactor);
                 }
                 this.isscaled = true;
@@ -1234,17 +1266,25 @@ public class MainApp extends Application {
                 Arrays.fill(this.rms_runs, 0.0);
                 Arrays.fill(this.rms_norm, 0.0);
                 double expected = Math.sqrt((double) steps);
-                int mincount;
-                if ( (int) expected < 5 )
-                    mincount = 0;
-                else
-                    mincount = (int) expected - 5;
-                int maxcount = (int) expected + 5;
+
+                if ( this.standnorm == false ) {
+                    if ( (int) expected < 5 ) {
+                        this.mincount = 0.0;
+                    } else {
+                        this.mincount = expected - 5.0;
+                    }
+                    this.maxcount = expected + 5.0;
+                } else {
+                    this.mincount = -4.0;
+                    this.maxcount = 4.0;
+                }
+
                 this.fxplot.setWData("R_rms", "sqrt(N)", this.rms_runs, this.rms_runs, expected);
-                this.fxplot.setHData("norm", this.rms_norm, this.rms_norm, mincount, maxcount);
+                this.fxplot.setHData("norm", this.rms_norm, this.rms_norm, this.mincount,
+                    this.maxcount, this.standnorm);
         
-                getAnimScene.start();
-                runAnim.setText("STOP");
+                getRealScene.start();
+                runReal.setText("STOP");
             }
         });
 
@@ -1254,7 +1294,7 @@ public class MainApp extends Application {
             // BUTTON PRESSED ON
             valikkoMMC.setDisable(true);
             this.vars = getMMCScene.getVars();
-            getMMCScene.setVar(9, "s");
+            getMMCScene.setVar(8, "s");
             Data data = new Data(this.vars);
             int particles = Integer.valueOf(vars[0]);
             double diam = Double.valueOf(vars[1]);
@@ -1280,6 +1320,7 @@ public class MainApp extends Application {
             // BUTTON PRESSED ON
             if ( getMMCScene.timerIsRunning()) return;
             this.vars = getMMCScene.getVars();
+            getMMCScene.setVar(8, "-");
             int particles = Integer.valueOf(vars[0]);
             double diam = Double.valueOf(vars[1]);
             int charge = Integer.valueOf(vars[2]);
@@ -1382,8 +1423,8 @@ public class MainApp extends Application {
                 }
                 if (getMMCScene.runtimeIsRunning())
                     getMMCScene.stopRuntime();
-                if (getAnimScene.runtimeIsRunning())
-                    getAnimScene.stopRuntime();
+                if (getRealScene.runtimeIsRunning())
+                    getRealScene.stopRuntime();
             });
         });
         stage.initStyle(StageStyle.UTILITY);
@@ -1412,7 +1453,6 @@ public class MainApp extends Application {
         File destinationFile = new File(destination + "\\" + executable);
         InputStream fin = null;
         OutputStream fout = null;
-        //sourceFile.deleteOnExit();
         
         try {
             fin = new BufferedInputStream(new FileInputStream(sourceFile));

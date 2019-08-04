@@ -7,86 +7,129 @@ public class HelpText {
     }
 
     public String menu() {
-        String text = " Button 'RRMS vs SQRT(N)' shows a control panel with which you can\n"
-                    + " calculate root mean square distances (R_rms) of random walk particles.\n\n"
-                    + " Program plots 'R_rms' versus 'sqrt(steps)'.\n\n"
-                    + " Every run will save the data in a file replacing the previous one.\n\n"
-                    + " ----------------------------------------------------------------------\n\n"
-                    + " Button 'RANDOM WALK' shows a control panel with which you can plot\n"
-                    + " different random walk simulations.\n\n"
-                    + " You can choose to save the data or to only plot without saving.";
+        String text = " \nButton 'RMS vs SQRT(N)' shows a control panel with which you can\n"
+                    + " calculate root mean square (rms) distances of random walk particles.\n\n"
+                    + " Program plots 'rms<dist>' versus 'sqrt(steps)'.\n\n"
+                    + " Every run will save the data in a file replacing the previous one if\n"
+                    + " the options are the same.\n\n"
+                    + " One run produces a data file ending with '.xy', and an image file in\n"
+                    + " '.png' format. The files will be in the 'C:\\DATA' folder.\n\n"
+                    + " ---------------------------------------------------------------------\n\n"
+                    + " Button 'PATH TRACING' will show a control panel with which you can\n"
+                    + " plot different random walk path simulations. One run produces an\n"
+                    + " image file and four or five data files; two ending with '.xy', and\n"
+                    + " two or three ending with axis indication, i.e. '.x', '.y', or '.z',\n"
+                    + " depending on dimension user chooses. The image is in '.png' format.\n\n"
+                    + " ---------------------------------------------------------------------\n\n"
+                    + " Button 'REAL TIME RMS' opens a bigger window in which will be an\n"
+                    + " animation of fixed source random walk. Program loops the number of\n"
+                    + " steps user defines until user stops the run.\n\n"
+                    + " During the animation there will be an image with two real time plots\n"
+                    + " running different graphics: 'rms and sqrt(N) vs. walks' and either\n"
+                    + " 'rms standard normal distribution' or 'rms normal distribution'. No\n"
+                    + " files will be saved automatically.\n\n"
+                    + " ---------------------------------------------------------------------\n\n"
+                    + " Button 'MMC DIFFUSION' also opens a bigger window in which will be an\n"
+                    + " animation if user so chooses.\n\n"
+                    + " User may choose between animation or plotting. The former only\n"
+                    + " creates one data file for its own use, ending with '.xy', and no\n"
+                    + " image will be saved. The latter creates an image file with start and\n"
+                    + " final positions of particles. In that case there will be four or five\n"
+                    + " data files; two ending with '.xy', and two or three ending with axis\n"
+                    + " indication, i.e. '.x', '.y', or '.z', depending on dimension user\n"
+                    + " chooses. The image will be saved in '.png' format.\n";
     
         return text;
     }
-
+    // rms
     public String calculation() {
-        String text = " Diameter is a positive real number on the interval ]0.0, 1.0[.\n\n"
-                    + " Steps is a positive integer. It means the cumulative random steps\n"
-                    + " the particles take while moving.\n\n"
-                    + " Skip is a positive integer meaning jumping in the iteration steps.\n"
-                    + " Iteration starts from skip, not from 1. No skip is 0 or 1.\n\n"
+        String text = "\n Number of Steps is a positive integer.\n\n"
                     + " Dimension is either 1, 2, or 3. One means moving along x-axis, two\n"
-                    + " means moving on a plane of x and y axes, three means moving in a\n"
-                    + " cube of x, y, and z axes.\n\n"
-                    + " --------------------------------------------------------------------\n\n"
-                    + " Program plots 'R_rms' versus 'sqrt(steps)'.\n\n"
-                    + " Every run will save the data in a file replacing the previous one.\n\n"
-                    + " You can save the image with 'Right-click + Save As...' or 'ctrl+S'.\n"
-                    + " Saving formats are: PNG, JPEG, BMP, GIF, SVG, EPS, and PDF.";
+                    + " means moving on a plane with axes x and y, three means moving in a\n"
+                    + " cube with axes x, y, and z.\n\n"
+                    + " Toggle button 'FREE'/'LATTICE' makes particles move either freely\n"
+                    + " or in lattice form.\n\n"
+                    + " Button 'EXECUTE' runs the code, and button 'CLOSE' safely closes the\n"
+                    + " application.\n\n"
+                    + " ---------------------------------------------------------------------\n\n"
+                    + " Program plots 'rms<distance>' versus 'sqrt(steps)'.\n\n"
+                    + " Every run will save the data in '.xy' format and an image file in\n"
+                    + " '.png' formata, replacing the previous ones.";
     
         return text;
     }
-
-    public String simulation() {
-        String text = " Number of particles is a positive integer, at least 1.\n\n"
+    // path tracing
+    public String pathtracing() {
+        String text = "\n Number of particles is a positive integer, at least 1.\n\n"
                     + " Diameter is a positive real number on the interval ]0.0, 1.0[.\n\n"
-                    + " Steps is a positive integer. It means the cumulative random steps\n"
-                    + " the particles take while moving.\n\n"
+                    + " Charge is either 1, 2, or 3. With 0 charge there is no charge, i.e.\n"
+                    + " the particles may be deemed as 'neutral'. With 1 charge the particles\n"
+                    + " are all the same charge, i.e. they will repel each other. With 2\n"
+                    + " charges the particles are randomly created with negative or positive\n"
+                    + " charges, so some will repel each other while others will attract each\n"
+                    + " other.\n\n"
+                    + " Number of steps is a positive integer. It means the cumulative random\n"
+                    + " steps the particles take while moving.\n\n"
                     + " Dimension is either 1, 2, or 3. One means moving along x-axis, two\n"
-                    + " means moving on a plane of x and y axes, three means moving in a\n"
-                    + " cube of x, y, and z axes.\n\n"
-                    + " --------------------------------------------------------------------\n\n"
-                    + " - Avoid sets the particles to self avoiding mode.\n"
-                    + " - Save toggle changes mode between realtime (no save) and save mode.\n"
-                    + "   Real time doesn't save the data, but shows the path trace in real\n"
-                    + "   time. Save mode saves the data, and you can plot the trace paths\n"
-                    + "   by yourself.";
+                    + " means moving on a plane with axes x and y, three means moving in a\n"
+                    + " cube with axes x, y, and z.\n\n"
+                    + " ---------------------------------------------------------------------\n\n"
+                    + " TOGGLE BUTTONS:\n\n"
+                    + " - 'FIXED'/'SPREAD' decides whether to create the particles starting\n"
+                    + "    from fixed source point (ordinate), or to create them spread out\n"
+                    + "    randomly in the area.\n\n"
+                    + " - 'FREE'/'LATTICE' decides whether the particles move freely or in\n"
+                    + "    lattice form.\n\n"
+                    + " Button 'EXECUTE' runs the code, and button 'CLOSE' safely closes the\n"
+                    + " application.\n";
     
         return text;
     }
-
-    public String animation() {
-        String text = " Number of particles is a positive integer, at least 1.\n\n"
-                    + " Diameter is a positive real number on the interval ]0.0, 1.0[.\n\n"
-                    + " Steps is a positive integer. It means the cumulative random steps\n"
+    // real time rms
+    public String realtimerms() {
+        String text = "\n Number of particles is a positive integer, at least 1.\n\n"
+                    + " Number of steps is a positive integer. It means the cumulative random steps\n"
                     + " the particles take while moving.\n\n"
-                    + " Dimension is either 1, 2, or 3. One means moving along x-axis, two\n"
-                    + " means moving on a plane of x and y axes, three means moving in a\n"
-                    + " cube of x, y, and z axes.\n\n"
-                    + " --------------------------------------------------------------------\n\n"
-                    + " - Avoid sets the particles to self avoiding mode.\n"
-                    + " - Save toggle changes mode between realtime (no save) and save mode.\n"
-                    + "   Real time doesn't save the data, but shows the path trace in real\n"
-                    + "   time. Save mode saves the data, and you can plot the trace paths\n"
-                    + "   by yourself.";
+                    + " Dimension is either 1, 2, or 3. One means moving along x-axis, two means moving on a\n"
+                    + " plane with axes x and y, three means moving in a cube with axes x, y, and z.\n\n"
+                    + " -------------------------------------------------------------------------------------\n\n"
+                    + " Toggle Button 'STD NORM'/'NORM' changes the lower side plot between standard normal\n"
+                    + " distribution and normal distribution.\n\n"
+                    + " Button 'RUN' starts an animation. During the animation there will be an image with\n"
+                    + " two real time plots running different graphics: 'rms and sqrt(N) vs. walks' and\n"
+                    + " either 'rms standard normal distribution' or 'rms normal distribution'.\n\n"
+                    + " User can save the image by right-clicking the mouse and choosing 'save' or 'export'.\n\n"
+                    + " 'Save' formats are: 'png', 'jpg', 'bmp', 'gif', 'svg', 'eps', and 'pdf'.\n\n"
+                    + " 'Export' will save the both plot data in 'csv' format separately.\n\n"
+                    + " Button 'RUN' runs the animation, and button 'CLOSE' safely closes the application.\n";
     
         return text;
     }
-
+    // MMC diffusion
     public String mmc() {
-        String text = " Number of particles is a positive integer, at least 1.\n\n"
+        String text = "\n Number of particles is a positive integer, at least 1.\n\n"
                     + " Diameter is a positive real number on the interval ]0.0, 1.0[.\n\n"
-                    + " Steps is a positive integer. It means the cumulative random steps\n"
-                    + " the particles take while moving.\n\n"
-                    + " Dimension is either 1, 2, or 3. One means moving along x-axis, two\n"
-                    + " means moving on a plane of x and y axes, three means moving in a\n"
-                    + " cube of x, y, and z axes.\n\n"
-                    + " --------------------------------------------------------------------\n\n"
-                    + " - Avoid sets the particles to self avoiding mode.\n"
-                    + " - Save toggle changes mode between realtime (no save) and save mode.\n"
-                    + "   Real time doesn't save the data, but shows the path trace in real\n"
-                    + "   time. Save mode saves the data, and you can plot the trace paths\n"
-                    + "   by yourself.";
+                    + " Charge is either 1, 2, or 3. With 0 charge there is no charge, i.e. the particles may\n"
+                    + " be deemed as 'neutral'. With 1 charge the particles are all the same charge, i.e. they\n"
+                    + " will repel each other. With 2 charges the particles are randomly created with negative\n"
+                    + " or positive charges, so some will repel each other while others will attract each\n"
+                    + " other.\n\n"
+                    + " Dimension is either 2 or 3. Two means moving on a plane with axes x and y, three means\n"
+                    + " moving in a cube with axes x, y, and z.\n\n"
+                    + " --------------------------------------------------------------------------------------\n\n"
+                    + " TOGGLE BUTTON:\n\n"
+                    + " - 'FREE'/'LATTICE' decides whether the particles move freely or in lattice form.\n\n"
+                    + " CHOICE BUTTONS:\n\n"
+                    + " - 'ANIMATION' (and later 'REMOVE BARRIER') starts an animation with first drawing the\n"
+                    + "    initial positions of particles and then waiting for the user to remove the barrier.\n"
+                    + "    Then the particles will start moving in real time. During the run there's also an\n"
+                    + "    image in which runs a plot of energy minimization. User can save the image by right-\n"
+                    + "    clicking the mouse and choosing 'save' or 'export'.\n"
+                    + "    'Save' formats are: 'png', 'jpg', 'bmp', 'gif', 'svg', 'eps', and 'pdf'.\n"
+                    + "    'Export' will save the energy data in 'csv' format.\n\n"
+                    + " - 'PLOT' only creates an image of diffusion walk with two subplots: a start and final\n"
+                    + "    positions of particles.\n\n"
+                    + " Button 'CLOSE' safely closes the application.\n";
     
         return text;
     }

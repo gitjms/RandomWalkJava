@@ -20,23 +20,21 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
-public class SceneSimulation extends Data {
+public class ScenePathTracing extends Data {
     
     final int compwidth = 150;
     final int paneWidth = 200;
     private final Button nappiFixed;
     private final Button nappiLattice;
-    private final Button nappiAvoid;
 
     @Override
     public String[] getVars() {
         return this.vars;
     }
  
-    public SceneSimulation() {
+    public ScenePathTracing() {
         this.nappiFixed = new Button("FIXED");
         this.nappiLattice = new Button("FREE");
-        this.nappiAvoid = new Button("AVOID OFF");
         this.vars = new String[]{
             "0",    // vars[0] particles        USER
             "0.0",  // vars[1] diameter         USER
@@ -46,8 +44,7 @@ public class SceneSimulation extends Data {
             "-",    // vars[5] mmc              n/a
             "f",    // vars[6] fixed(/spread)   USER
             "-",    // vars[7] (lattice/)free   USER
-            "-",    // vars[8] avoid on(/off)   USER
-            "s"};   // vars[9] save (on)        n/a
+            "s"};   // vars[8] save (on)        n/a
     }
 
     public static boolean isNumDouble(String str) {
@@ -68,8 +65,8 @@ public class SceneSimulation extends Data {
         }
     }
 
-    // RANDOM WALK SIMULATION
-    public Parent getSceneSim(){
+    // RANDOM WALK PATH TRACING
+    public Parent getScenePath(){
         GridPane asettelu = new GridPane();
         asettelu.setMaxWidth(paneWidth);
         asettelu.setVgap(5);
@@ -184,7 +181,7 @@ public class SceneSimulation extends Data {
                 this.vars[3] = "0";
         });
 
-        Label labNumDimensions = new Label("dimensions:");
+        Label labNumDimensions = new Label("dimension:");
         ToggleButton setDim1 = new ToggleButton("1");
         setDim1.setMinWidth(35);
         setDim1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
@@ -362,42 +359,7 @@ public class SceneSimulation extends Data {
         });
         valikko.getChildren().add(this.nappiLattice);
 
-        // BUTTON: AVOID
-        this.nappiAvoid.setMinWidth(compwidth);
-        this.nappiAvoid.setMaxWidth(compwidth);
-        this.nappiAvoid.setBackground(new Background(
-            new BackgroundFill(
-                Color.LIGHTGREY,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.nappiAvoid.setId("avoid");
-        this.nappiAvoid.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                this.nappiAvoid.setEffect(shadow);
-        });
-        this.nappiAvoid.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                this.nappiAvoid.setEffect(null);
-        });
-        this.nappiAvoid.setOnMouseClicked((MouseEvent event) -> {
-            if (this.nappiAvoid.getText().equals("AVOID OFF")){
-                // BUTTON PRESSED ON
-                this.nappiAvoid.setText("AVOID ON");
-                this.nappiAvoid.setBackground(
-                    new Background(
-                        new BackgroundFill(
-                            Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[8] = "a";
-            } else if (this.nappiAvoid.getText().equals("AVOID ON")){
-                // BUTTON PRESSED OFF
-                this.nappiAvoid.setText("AVOID OFF");
-                this.nappiAvoid.setBackground(
-                    new Background(new BackgroundFill(
-                        Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[8] = "-";     // avoid
-            }
-        });
-        valikko.getChildren().add(this.nappiAvoid);
-
-        this.vars[9] = "s"; // save on
+        this.vars[8] = "s"; // save on
 
         GridPane.setHalignment(valikko, HPos.LEFT);
         asettelu.add(valikko, 0, 10, 2, 1);

@@ -148,8 +148,7 @@ public class SceneMMC extends Data {
             "m",    // vars[5] mmc              n/a
             "-",    // vars[6] (fixed/)spread   n/a
             "-",    // vars[7] (lattice/)free   USER
-            "a",    // vars[8] avoid on(/off)   n/a
-            "-"};   // vars[9] save (off)       n/a
+            "-"};   // vars[8] save (off)       n/a
     }
 
      public void refresh(File initialDataFile, String executable,
@@ -159,8 +158,6 @@ public class SceneMMC extends Data {
         Button helpNappiMMC, List<Double> energy_x, List<Double> energy_y,
         boolean newdata, int measure, double diff) {
 
-        //this.yellowP = new Image("images/Mickey.png");
-        //this.grayP = new Image("images/Minnie.png");
         this.yellowP = new Image("images/Pyellow.png");
         this.grayP = new Image("images/Pgray.png");
 
@@ -216,7 +213,7 @@ public class SceneMMC extends Data {
         command = new String[]{"cmd","/c",executable,
             this.vars[0], this.vars[1], this.vars[2], this.vars[3],
             this.vars[4], this.vars[5], this.vars[6], this.vars[7],
-            this.vars[8], this.vars[9]};
+            this.vars[8]};
 
         this.runtime = Runtime.getRuntime();
         runtimeStart();
@@ -616,7 +613,7 @@ public class SceneMMC extends Data {
 
         this.vars[3] = "0";
 
-        Label labNumDimensions = new Label("dimensions:");
+        Label labNumDimensions = new Label("dimension:");
         this.setDim2 = new ToggleButton("2");
         this.setDim2.setMinWidth(55);
         this.setDim2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
@@ -727,8 +724,7 @@ public class SceneMMC extends Data {
         });
         valikko.getChildren().add(this.nappiLattice);
 
-        this.vars[8] = "a"; // avoid on
-        this.vars[9] = "-"; // save off
+        this.vars[8] = "-"; // save off
 
         GridPane.setHalignment(valikko, HPos.LEFT);
         asettelu.add(valikko, 0, 8, 2, 1);

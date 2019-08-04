@@ -26,7 +26,7 @@ public class Execution {
     public Execution() {
     }
 
-    public void executeSim(TextArea textArea, JFrame frame, Data data, String[] vars ) {
+    public void executePath(TextArea textArea, JFrame frame, Data data, String[] vars ) {
         // FROM SCENENOCALCULATION
         // vars from user:
         // vars[0] = particles,
@@ -37,8 +37,7 @@ public class Execution {
         // vars[5] = mmc,
         // vars[6] = fixed,
         // vars[7] = lattice,
-        // vars[8] = avoid,
-        // vars[9] = save           n/a
+        // vars[8] = save           n/a
         String pyexec1d = "python plot1d.py";
         String pyexec2d = "python plot2d.py";
         String pyexec3d = "python plot3d.py";
@@ -57,27 +56,19 @@ public class Execution {
         int steps = Integer.valueOf(vars[3]);
         int dimension = Integer.valueOf(vars[4]);
 
-        if ( vars[6].equals("f") && vars[7].equals("l") && vars[8].equals("a") )
-            titletext = "Fixed source lattice particles, avoid, ";
-        else if ( vars[6].equals("f") && vars[7].equals("l") && vars[8].equals("-") )
-            titletext = "Fixed source lattice particles, no avoid, ";
-        else if ( vars[6].equals("f") && vars[7].equals("-") && vars[8].equals("a") )
-            titletext = "Fixed source free particles, avoid, ";
-        else if ( vars[6].equals("f") && vars[7].equals("-") && vars[8].equals("-") )
-            titletext = "Fixed source free particles, no avoid, ";
-        else if ( vars[6].equals("-") && vars[7].equals("l") && vars[8].equals("a") )
-            titletext = "Spread out lattice particles, avoid, ";
-        else if ( vars[6].equals("-") && vars[7].equals("l") && vars[8].equals("-") )
-            titletext = "Spread out lattice particles, no avoid, ";
-        else if ( vars[6].equals("-") && vars[7].equals("-") && vars[8].equals("a") )
-            titletext = "Spread out free particles, avoid, ";
-        else if ( vars[6].equals("-") && vars[7].equals("-") && vars[8].equals("-") )
-            titletext = "Spread out free particles, no avoid, ";
+        if ( vars[6].equals("f") && vars[7].equals("l") )
+            titletext = "Fixed source lattice particles, ";
+       else if ( vars[6].equals("f") && vars[7].equals("-") )
+            titletext = "Fixed source free particles, ";
+        else if ( vars[6].equals("-") && vars[7].equals("l") )
+            titletext = "Spread out lattice particles, ";
+        else if ( vars[6].equals("-") && vars[7].equals("-") )
+            titletext = "Spread out free particles, ";
 
         xDataPath = this.path + "\\" + "x_path"
             + dimension + "D_"
             + particles + "N_"
-            + steps + "S.xy";
+            + steps + "S.x";
 
         String imgFile1d = "jpyplot" + dimension + "D_N" + particles + "_S" + steps + ".png";
 
@@ -95,7 +86,7 @@ public class Execution {
             yDataPath = this.path + "\\" + "y_path"
                 + dimension + "D_"
                 + particles + "N_"
-                + steps + "S.xy";
+                + steps + "S.y";
             if ( dimension == 2 ) {
                 Pyplot pyplot2d = new Pyplot();
                 String[] files2d = new String[]{xDataPath, yDataPath};
@@ -110,7 +101,7 @@ public class Execution {
             zDataPath = this.path + "\\" + "z_path"
                 + dimension + "D_"
                 + particles + "N_"
-                + steps + "S.xy";
+                + steps + "S.z";
             Pyplot pyplot3d = new Pyplot();
             String[] files3d = new String[]{xDataPath, yDataPath, zDataPath};
             textArea.setText(pyplot3d.createPlot(this.folder, files3d, dimension, pyexec3d, false, false));
@@ -148,8 +139,7 @@ public class Execution {
         // vars[5] = mmc,           n/a
         // vars[6] = fixed,         n/a
         // vars[7] = lattice,
-        // vars[8] = avoid,         n/a
-        // vars[9] = save           n/a
+        // vars[8] = save           n/a
         String pyexec = "";
         String imgFile1d = "";
         BufferedImage image = null;
@@ -210,8 +200,7 @@ public class Execution {
         // vars[5] = mmc,           n/a
         // vars[6] = fixed,         n/a
         // vars[7] = lattice,       USER
-        // vars[8] = avoid,         n/a
-        // vars[9] = save           n/a
+        // vars[8] = save           n/a
         String pyexecrms = "python plotrms.py";
         String rmsDataPath = "";
         String titletext = "";

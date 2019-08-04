@@ -12,7 +12,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
@@ -26,10 +25,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
-/*
-    TODO    3D plot
-*/
-public class SceneAnimation extends Data {
+public class SceneRealTimeRms extends Data {
 
     final File folder = new File("C:\\DATA");
     final int compwidth = 150;
@@ -37,7 +33,6 @@ public class SceneAnimation extends Data {
     private double scalefactor;
     private double linewidth;
     private GraphicsContext piirturi;
-    private int animwidth;
     private boolean running;
     private long runs;
     private double rms_sum;
@@ -52,7 +47,7 @@ public class SceneAnimation extends Data {
         return this.vars;
     }
  
-    public SceneAnimation() {
+    public SceneRealTimeRms() {
         this.vars = new String[]{
             "0",    // vars[0] particles        USER
             "0.1",  // vars[1] diameter         n/a
@@ -62,8 +57,7 @@ public class SceneAnimation extends Data {
             "-",    // vars[5] mmc              n/a
             "f",    // vars[6] fixed(/spread)   n/a
             "-",    // vars[7] (lattice/)free   n/a
-            "-",    // vars[8] avoid (on/)off   n/a
-            "-"};   // vars[9] save (off)       n/a
+            "-"};   // vars[8] save (off)       n/a
         this.running = false;
         this.runs = 1;
         this.rms_sum = 0.0;
@@ -111,8 +105,9 @@ public class SceneAnimation extends Data {
     }
 
     public void refresh(String executable,
-        GraphicsContext piirturi, double scalefactor, int animwidth, double linewidth,
-        FXPlot fxplot, double[] rms_runs, double[] rms_norm, boolean newdata) {
+        GraphicsContext piirturi, double scalefactor, int rtrmswidth, double linewidth,
+        FXPlot fxplot, double[] rms_runs, double[] rms_norm, boolean newdata,
+        double mincount, double maxcount, boolean standnorm) {
 
         int i = 0;
         int j = 0;
@@ -120,7 +115,6 @@ public class SceneAnimation extends Data {
 
         this.piirturi = piirturi;
         this.linewidth = linewidth;
-        this.animwidth = animwidth;
         this.scalefactor = scalefactor;
 
         if (newdata == true) {
@@ -166,16 +160,12 @@ public class SceneAnimation extends Data {
         Arrays.fill(y2Axis, expected);
 
         double[] xnormAxis = new double[1000];
-        double mincount;
-        if ( expected < 5.0 )
-            mincount = 0.0;
-        else
-            mincount = expected - 5.0;
-        double maxcount = expected + 5.0;
+
         double skip = (maxcount-mincount)/100.0;
         for (int x = 0; x < 1000; x++) {
             xnormAxis[x] = mincount + (double) x/100.0 + skip;
         }
+        
         double[] ynormAxis = new double[1000];
         Arrays.fill(ynormAxis, 0.0);
 
@@ -190,7 +180,7 @@ public class SceneAnimation extends Data {
             command = new String[]{"cmd","/c",executable,
                 this.vars[0], this.vars[1], this.vars[2], this.vars[3],
                 this.vars[4], this.vars[5], this.vars[6], this.vars[7],
-                this.vars[8], this.vars[9]};
+                this.vars[8]};
 
             this.runtime = Runtime.getRuntime();
             runtimeStart();
@@ -259,6 +249,7 @@ public class SceneAnimation extends Data {
                                 this.piirturi.setStroke(Color.YELLOW);
                             }
 
+                            // YELLOW LINES
                             if ( j > 0){
                                 for (int k = 0; k < num_part; k++){
                                     if ( dim < 3 ) {
@@ -300,6 +291,7 @@ public class SceneAnimation extends Data {
                             }
 
                         } else {
+                            // PLOTS
                             try {
                                 plotData[j] = Double.parseDouble(line.split("(\\s+)")[1].trim());
                             } catch (NumberFormatException e) {
@@ -357,17 +349,30 @@ public class SceneAnimation extends Data {
 
                                 double sigma2 = Math.pow(rrms - this.rms_sum/this.runs,2.0);
                                 double ynorm = 0.0;
-
+                                double mean = 0.0;
+                                
+                                if ( standnorm == true )
+                                    mean = 0.0;
+                                else
+                                    mean = this.rms_sum/this.runs;
+                                
+                                double ymax = 1.0;
                                 for (int h = 0; h < 1000; h++) {
-                                    ynorm = //1.0/(Math.sqrt(2.0*Math.PI*diff2)) *
-                                        Math.exp( - Math.pow( ( xnormAxis[h] - this.rms_sum/this.runs ), 2.0 ) / (2.0 * sigma2) );
-                                    if ( Math.pow( ( xnormAxis[h] - this.rms_sum/this.runs ), 2.0 ) / (2.0 * sigma2) > 2.0 &&
-                                        xnormAxis[h] > rrms - 0.0001 && xnormAxis[h] < rrms + 0.0001 )
-                                        ynorm = 1.0;
+                                    if ( standnorm ) {
+                                        ynorm = Math.exp( - Math.pow( ( xnormAxis[h] - mean ), 2.0 ) / (2.0 * sigma2) );
+                                    
+                                    } else {
+                                        ynorm = 1.0/(Math.sqrt(2.0*Math.PI*sigma2))
+                                            * Math.exp( - Math.pow( ( xnormAxis[h] - mean ), 2.0 ) / (2.0 * sigma2) );
+                                        if ( ynorm > ymax && ynorm > 1.0 ) {
+                                            ymax = ynorm;
+                                            fxplot.setHMaxY(ymax);
+                                        } else if ( ynorm < 1.0 && ymax < 1.0 )
+                                            fxplot.setHMaxY(1.0);
+                                        else
+                                            fxplot.setHMaxY(ymax);
+                                    }
                                     ynormAxis[h] = ynorm;
-                                    /*if ( ynew > ymax ) {
-                                        ymax = ynew;
-                                    }*/
                                 }
                                 fxplot.updateHData("norm", xnormAxis, ynormAxis, expected);
                             }
@@ -392,8 +397,8 @@ public class SceneAnimation extends Data {
         }
     }
 
-    // RANDOM WALK ANIMATION
-    public Parent getSceneAnim(){
+    // RANDOM WALK REAL TIME RMS
+    public Parent getSceneReal(){
         GridPane asettelu = new GridPane();
         asettelu.setMaxWidth(paneWidth);
         asettelu.setVgap(5);
@@ -432,7 +437,7 @@ public class SceneAnimation extends Data {
                 this.vars[3] = "0";
         });
 
-        Label labNumDimensions = new Label("dimensions:");
+        Label labNumDimensions = new Label("dimension:");
         ToggleButton setDim1 = new ToggleButton("1");
         setDim1.setMinWidth(35);
         setDim1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
@@ -505,8 +510,7 @@ public class SceneAnimation extends Data {
         this.vars[5] = "-"; // mmc              n/a
         this.vars[6] = "f"; // fixed(/spread)   n/a
         this.vars[7] = "-"; // (lattice/)free   n/a
-        this.vars[8] = "-"; // avoid (on/)off   n/a
-        this.vars[9] = "-"; // save (off)       n/a
+        this.vars[8] = "-"; // save (off)       n/a
 
         // ...THEIR PLACEMENTS
         GridPane.setHalignment(labNumParticles, HPos.LEFT);

@@ -55,13 +55,12 @@ public class Data {
         // vars[5] = mmc,
         // vars[6] = fixed,
         // vars[7] = lattice,
-        // vars[8] = avoid,
-        // vars[9] = save
+        // vars[8] = save
         try {
             command = new String[]{"cmd","/c",executable,
                 this.vars[0], this.vars[1], this.vars[2], this.vars[3],
                 this.vars[4], this.vars[5], this.vars[6], this.vars[7],
-                this.vars[8], this.vars[9]};
+                this.vars[8]};
 
             FileOutputStream fos = new FileOutputStream(command[0]);
             Runtime runtime = Runtime.getRuntime();
@@ -123,62 +122,6 @@ public class Data {
         return new Pair(ok,teksti);
     }
 
-    /*public static Pair< String, List< Pair< Double, Double > > > readDataCalc(File filePath){
-    
-        List<Pair<Double,Double>> data = new ArrayList<>();
-        boolean first = false;
-        String header = "";
-
-        try (Scanner sc = new Scanner(filePath)) {
-            while (sc.hasNextLine()) {
-                if (!first) {
-                    header = sc.nextLine();
-                    first = true;
-                } else {
-                    String datapair = sc.nextLine();
-                    data.add(new Pair(
-                        Double.valueOf(datapair.split("\t")[0].trim()),
-                        Double.valueOf(datapair.split("\t")[1].trim())
-                    ));
-                }
-            }
-
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        return new Pair(header,data);
-    }
-
-    public static Pair<String,List<Double[]>> readDataSim(File filePath, Integer particles){
-    
-        Double[] values = new Double[particles];
-        List<Double[]> dataList = new ArrayList<>();
-        
-        boolean first = false;
-        String header = "";
-
-        try (Scanner sc = new Scanner(filePath)) {
-            while (sc.hasNextLine()) {
-                if (!first) {
-                    header = sc.nextLine();
-                    first = true;
-                } else {
-                    String data = sc.nextLine();
-                    String[] osat = data.trim().split("(\\s+)");
-                    for ( int i = 0; i < osat.length; i++)
-                        values[i] = Double.valueOf(osat[i]);
-                    dataList.add(values);
-                }
-            }
-
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        return new Pair(header,dataList);
-    }*/
-
     public static List<double[]> readDataMMC(File filePath, Integer dim){
     
         double[] values;
@@ -189,12 +132,10 @@ public class Data {
                 values = new double[dim];
                 String data = sc.nextLine();
                 String[] osat;
-                if ( !data.startsWith("Start")) {
-                    osat = data.trim().split("(\\s+)");
-                    for ( int i = 0; i < osat.length; i++)
-                        values[i] = Double.valueOf(osat[i]);
-                    dataList.add(values);
-                }
+                osat = data.trim().split("(\\s+)");
+                for ( int i = 0; i < osat.length; i++)
+                    values[i] = Double.valueOf(osat[i]);
+                dataList.add(values);
              }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);

@@ -42,8 +42,7 @@ public class SceneCalculation extends Data {
             "-",    // vars[5] mmc              n/a
             "f",    // vars[6] fixed(/spread)   n/a
             "-",    // vars[7] (lattice/)free   USER
-            "-",    // vars[8] avoid (on/)off   n/a
-            "s"};   // vars[9] save (on)        n/a
+            "s"};   // vars[8] save (on)        n/a
     }
 
     public static boolean isNumDouble(String str) {
@@ -91,7 +90,7 @@ public class SceneCalculation extends Data {
                 this.vars[3] = "0";
         });
 
-        Label labNumDimensions = new Label("dimensions:");
+        Label labNumDimensions = new Label("dimension:");
         ToggleButton setDim1 = new ToggleButton("1");
         setDim1.setMinWidth(35);
         setDim1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
@@ -215,8 +214,7 @@ public class SceneCalculation extends Data {
         });
         valikko.getChildren().add(this.nappiLattice);
 
-        this.vars[8] = "-"; // avoid off
-        this.vars[9] = "s"; // save on
+        this.vars[8] = "s"; // save on
 
         GridPane.setHalignment(valikko, HPos.LEFT);
         asettelu.add(valikko, 0, 4, 2, 1);
