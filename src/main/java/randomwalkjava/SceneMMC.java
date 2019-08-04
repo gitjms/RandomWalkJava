@@ -1,5 +1,6 @@
 
 package randomwalkjava;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -7,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import static java.lang.Double.parseDouble;
+import static java.lang.Integer.parseInt;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -38,11 +41,17 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+/**
+ * @author Jari Sunnari
+ * jari.sunnari@gmail.com
+ * 
+ * Class for MMC DIFFUSION
+ */
 public class SceneMMC extends Data {
 
-    final File folder = new File("C:\\DATA");
-    private final int compwidth = 150;
-    private final int paneWidth = 200;
+    static File folder = new File("C:\\DATA");
+    static int compwidth = 150;
+    static int paneWidth = 200;
     private ToggleButton setCharge0;
     private ToggleButton setCharge1;
     private ToggleButton setCharge2;
@@ -172,9 +181,9 @@ public class SceneMMC extends Data {
             this.lattice = false;
         barrierOn();
 
-        int num_part = Integer.valueOf(this.vars[0]);
-        double diam = Double.valueOf(this.vars[1]);
-        int dim = Integer.valueOf(this.vars[4]);
+        int num_part = parseInt(this.vars[0]);
+        double diam = parseDouble(this.vars[1]);
+        int dim = parseInt(this.vars[4]);
 
         if (newdata == true) {
             this.phase = 0;
@@ -221,7 +230,9 @@ public class SceneMMC extends Data {
         this.process = this.runtime.exec(command, null, this.folder);
         walkStart();
 
-        // DRAW INITIAL PARTICLES
+        /**
+        * DRAW INITIAL PARTICLES
+        */
         try {
             Thread.sleep(100);
             clearDots( dim );
@@ -396,9 +407,13 @@ public class SceneMMC extends Data {
                         alert.show();
                     });
                 }
-            // timer run ends
+            /**
+            * timer run ends
+            */
             }
-        // timer ends
+        /**
+        * timer ends
+        */
         }, 0, 50);
 
         } catch (IOException e) {
@@ -426,7 +441,9 @@ public class SceneMMC extends Data {
             this.center / this.scalefactor,
             2.0 * this.center / this.scalefactor);
 
-        // Draw initial data spots
+        /**
+        * Draw initial data spots
+        */
         for (int k = 0; k < num_part; k++){
             this.values[0][k] = initialData.get(k)[0]
                 + this.center / this.scalefactor;
@@ -504,7 +521,10 @@ public class SceneMMC extends Data {
         }
     }
 
-    // RANDOM WALK MMC
+    /**
+     * 
+     * @return MMC DIFFUSION SCENE
+     */
     public Parent getSceneMMC(){
         GridPane asettelu = new GridPane();
         asettelu.setMaxWidth(paneWidth);
@@ -517,7 +537,9 @@ public class SceneMMC extends Data {
         
         DropShadow shadow = new DropShadow();
 
-        // COMPONENTS...
+        /**
+        * COMPONENTS...
+        */
         Label labNumParticles = new Label("number of particles:");
         TextField setNumParticles = new TextField("");
         setNumParticles.setOnKeyReleased(e -> {
@@ -657,7 +679,9 @@ public class SceneMMC extends Data {
             this.vars[4] = "3";
         });
 
-        // ...THEIR PLACEMENTS
+        /**
+        * ...THEIR PLACEMENTS
+        */
         GridPane.setHalignment(labNumParticles, HPos.LEFT);
         asettelu.add(labNumParticles, 0, 0);
         GridPane.setHalignment(setNumParticles, HPos.CENTER);
@@ -689,7 +713,9 @@ public class SceneMMC extends Data {
         this.vars[5] = "m"; // mmc
         this.vars[6] = "-"; // spread out
 
-        // BUTTON: LATTICE
+        /**
+        * BUTTON: LATTICE
+        */
         this.nappiLattice.setMinWidth(this.compwidth);
         this.nappiLattice.setMaxWidth(this.compwidth);
         this.nappiLattice.setBackground(new Background(
@@ -706,7 +732,6 @@ public class SceneMMC extends Data {
         });
         this.nappiLattice.setOnMouseClicked((MouseEvent event) -> {
             if (this.nappiLattice.getText().equals("LATTICE")){
-                // BUTTON PRESSED ON
                 this.nappiLattice.setText("FREE");
                 this.nappiLattice.setBackground(
                     new Background(
@@ -714,7 +739,6 @@ public class SceneMMC extends Data {
                             Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[7] = "-";
             } else if (this.nappiLattice.getText().equals("FREE")){
-                // BUTTON PRESSED OFF
                 this.nappiLattice.setText("LATTICE");
                 this.nappiLattice.setBackground(
                     new Background(new BackgroundFill(

@@ -11,6 +11,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
+/**
+ * @author Jari Sunnari
+ * jari.sunnari@gmail.com
+ * 
+ * Class for Python code execution and image reading
+ */
 public class Pyplot {
 
     public Pyplot() {

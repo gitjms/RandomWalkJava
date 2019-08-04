@@ -18,10 +18,16 @@ import org.knowm.xchart.XYSeries.XYSeriesRenderStyle;
 import org.knowm.xchart.style.Styler;
 import org.knowm.xchart.style.Styler.ChartTheme;
 
+/**
+ * @author Jari Sunnari
+ * jari.sunnari@gmail.com
+ * 
+ * Class for ORG.KNOWM XCHART creation and handling
+ */
 public class FXPlot extends SceneRealTimeRms {
 
-    private final int width = 800;
-    private final int height = 1000;
+    static int width = 800;
+    static int height = 1000;
     private final XYChart calcChartW;
     private final XYChart calcChartH;
     private final XYChart calcChartE;
@@ -75,7 +81,9 @@ public class FXPlot extends SceneRealTimeRms {
     }
 
     public FXPlot(String which, Integer screenHeight) {
-        // JFrame
+        /**
+        * JFrame
+        */
         this.frame = new JFrame();
         this.frame.setBackground(Color.white);
         this.frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -92,16 +100,18 @@ public class FXPlot extends SceneRealTimeRms {
         }
         ImageIcon icon = new ImageIcon("src/main/resources/images/icon.png");
         this.frame.setIconImage(icon.getImage());
-
-        // XYCharts
+        /**
+        * XYCharts
+        */
         this.calcChartW = new XYChartBuilder()
             .theme(ChartTheme.Matlab).build();
         this.calcChartH = new XYChartBuilder()
             .theme(ChartTheme.Matlab).build();
         this.calcChartE = new XYChartBuilder()
             .theme(ChartTheme.Matlab).build();
-
-        // XChartPanels
+        /**
+        * XChartPanels
+        */
         this.chartPanelW = new XChartPanel(this.calcChartW);
         this.chartPanelH = new XChartPanel(this.calcChartH);
         this.chartPanelE = new XChartPanel(this.calcChartE);
@@ -112,8 +122,9 @@ public class FXPlot extends SceneRealTimeRms {
 
             this.chartPanelH.setBounds(0, this.height/2, this.width, this.height/2-100);
             this.chartPanelH.setVisible(true);
-
-            // Upper XYChart calcChartW
+            /**
+            * Upper XYChart calcChartW
+            */
             this.calcChartW.getStyler().setXAxisTitleVisible(true);
             this.calcChartW.getStyler().setYAxisTitleVisible(true);
             this.calcChartW.setXAxisTitle("walks");
@@ -129,8 +140,9 @@ public class FXPlot extends SceneRealTimeRms {
             this.calcChartW.getStyler().setLegendFont(new java.awt.Font(null,0,18));
             this.calcChartW.getStyler().setChartTitlePadding(15);
             this.calcChartW.getStyler().setToolTipsEnabled(false);
-
-            // Lower XYChart calcChartH
+            /**
+            * Lower XYChart calcChartH
+            */
             this.calcChartH.getStyler().setLegendVisible(false);
             this.calcChartH.setXAxisTitle("<R_rms>");
             this.calcChartH.getStyler().setMarkerSize(0);
@@ -149,8 +161,9 @@ public class FXPlot extends SceneRealTimeRms {
         } else if (which.equals("E")) {
             this.chartPanelE.setBounds(0, 0, this.width, this.height-400);
             this.chartPanelE.setVisible(true);
-
-            // XYChart calcChartE
+            /**
+            * XYChart calcChartE
+            */
             this.calcChartE.getStyler().setLegendVisible(false);
             this.calcChartE.setXAxisTitle("steps");
             this.calcChartE.setYAxisTitle("Arbitrary Energy Unit");

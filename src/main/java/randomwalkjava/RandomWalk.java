@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import static java.lang.Double.parseDouble;
+import static java.lang.Integer.parseInt;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,12 +48,16 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javax.swing.JFrame;
 
-public class MainApp extends Application {
+/**
+ * @author Jari Sunnari
+ * jari.sunnari@gmail.com
+ * 
+ * TODO: javadocs
+ */
+public class RandomWalk extends Application {
 
-    // STAGE
     private final int stageWidth = 940;
     private final int stageHeight = 660;
-    // COMPONENTS
     private final int buttonWidth = 150;
     private final int textwidth = 740;
     private final int textheight = 600;
@@ -63,12 +69,10 @@ public class MainApp extends Application {
     private final int screenHeight = Screen.getMainScreen().getHeight();
     private FXPlot fxplot;
     private JFrame frame;
-    // DATA
-    public String[] vars;
+    private String[] vars;
     private double scalefactor = 1.0;
     private double linewidth = 1.0;
     private boolean isscaled = false;
-
     private boolean newdata = false;
     private boolean standnorm = true;
     private double mincount;
@@ -81,8 +85,12 @@ public class MainApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         this.fxplot = null;
-        ////////////////////////////////////////////////////
-        // FILE AND FOLDER CHECK
+        /**
+        * FILE AND FOLDER CHECK
+        * creates a folder C:\DATA if not exist
+        * copies Fortran and Python executables from lib folder
+        * to DATA folder if not in DATA folder already
+        */
         String datapath = "C:\\DATA";
         String sourcepath = "src\\main\\resources\\lib\\";
         String fexec = "walk.exe";
@@ -94,92 +102,81 @@ public class MainApp extends Application {
         String pyexecmmc3d = "plotmmc3d.py";
         File datafolder = new File(datapath);
         File sourceFile = new File(datapath + "\\" + fexec);
-        boolean sourceFound = false;
+
         if (Files.notExists(datafolder.toPath())){
-            sourceFound = createFolder(sourcepath, datapath, fexec, true);
-            if (sourceFound == false)
+            if ( createFolder(sourcepath, datapath, fexec, true) == false )
                 this.stop();
-            sourceFound = createFolder(sourcepath, datapath, pyexecrms, false);
-            if (sourceFound == false)
+            if ( createFolder(sourcepath, datapath, pyexecrms, false) == false )
                 this.stop();
-            sourceFound = createFolder(sourcepath, datapath, pyexec1d, false);
-            if (sourceFound == false)
+            if ( createFolder(sourcepath, datapath, pyexec1d, false) == false )
                 this.stop();
-            sourceFound = createFolder(sourcepath, datapath, pyexec2d, false);
-            if (sourceFound == false)
+            if ( createFolder(sourcepath, datapath, pyexec2d, false) == false )
                 this.stop();
-            sourceFound = createFolder(sourcepath, datapath, pyexec3d, false);
-            if (sourceFound == false)
+            if ( createFolder(sourcepath, datapath, pyexec3d, false) == false )
                 this.stop();
-            sourceFound = createFolder(sourcepath, datapath, pyexecmmc2d, false);
-            if (sourceFound == false)
+            if ( createFolder(sourcepath, datapath, pyexecmmc2d, false) == false )
                 this.stop();
-            sourceFound = createFolder(sourcepath, datapath, pyexecmmc3d, false);
-            if (sourceFound == false)
+            if ( createFolder(sourcepath, datapath, pyexecmmc3d, false) == false )
                 this.stop();
         } else if (Files.notExists(sourceFile.toPath())) {
-            sourceFound = createFolder(sourcepath, datapath, fexec, false);
-            if (sourceFound == false)
+            if ( createFolder(sourcepath, datapath, fexec, false) == false )
                 this.stop();
             sourceFile = new File(datapath + "\\" + pyexecrms);
             if (Files.notExists(sourceFile.toPath())) {
-                sourceFound = createFolder(sourcepath, datapath, pyexecrms, false);
-                if (sourceFound == false)
+                if ( createFolder(sourcepath, datapath, pyexecrms, false) == false )
                     this.stop();
             }
             sourceFile = new File(datapath + "\\" + pyexec1d);
             if (Files.notExists(sourceFile.toPath())) {
-                sourceFound = createFolder(sourcepath, datapath, pyexec1d, false);
-                if (sourceFound == false)
+                if ( createFolder(sourcepath, datapath, pyexec1d, false) == false )
                     this.stop();
             }
             sourceFile = new File(datapath + "\\" + pyexec2d);
             if (Files.notExists(sourceFile.toPath())) {
-                sourceFound = createFolder(sourcepath, datapath, pyexec2d, false);
-                if (sourceFound == false)
+                if ( createFolder(sourcepath, datapath, pyexec2d, false) == false )
                     this.stop();
             }
             sourceFile = new File(datapath + "\\" + pyexec3d);
             if (Files.notExists(sourceFile.toPath())) {
-                sourceFound = createFolder(sourcepath, datapath, pyexec3d, false);
-                if (sourceFound == false)
+                if ( createFolder(sourcepath, datapath, pyexec3d, false) == false )
                     this.stop();
             }
             sourceFile = new File(datapath + "\\" + pyexecmmc2d);
             if (Files.notExists(sourceFile.toPath())) {
-                sourceFound = createFolder(sourcepath, datapath, pyexecmmc2d, false);
-                if (sourceFound == false)
+                if ( createFolder(sourcepath, datapath, pyexecmmc2d, false) == false )
                     this.stop();
             }
             sourceFile = new File(datapath + "\\" + pyexecmmc3d);
             if (Files.notExists(sourceFile.toPath())) {
-                sourceFound = createFolder(sourcepath, datapath, pyexecmmc3d, false);
-                if (sourceFound == false)
+                if ( createFolder(sourcepath, datapath, pyexecmmc3d, false) == false )
                     this.stop();
             }
         }
 
-        ////////////////////////////////////////////////////
-        // CREATE STAGE
+        /**
+        * CREATE STAGE
+        */
         stage.setTitle("Random Walk");
         stage.setWidth(this.stageWidth);
         stage.setHeight(this.stageHeight);
         stage.setResizable(false);
-        stage.setX(this.screenWidth/2);
-        stage.setY((this.screenHeight-this.stageHeight)/2);
+        stage.setX( (double) this.screenWidth/2.0);
+        stage.setY((double) (this.screenHeight-this.stageHeight)/2.0);
 
         DropShadow shadow = new DropShadow();
 
-        ////////////////////////////////////////////////////
-        // SET FIRST VIEW BORDERPANE
+        /**
+        * SET FIRST VIEW BORDERPANE
+        */
         GridPane asettelu = new GridPane();
         asettelu.setMaxWidth(this.paneWidth);
         asettelu.setVgap(5);
         asettelu.setHgap(10);
         asettelu.setPadding(new Insets(0, 0, 0, 0));
 
-        ////////////////////////////////////////////////////
-        // FIRST VIEW LABELS AND BUTTONS
+        /**
+        * FIRST VIEW BUTTONS
+        */
         Button nappiScene1 = new Button("RMS vs SQRT(N)"); // SceneCalculation
         Button nappiScene2 = new Button("PATH TRACING"); // ScenePathTracing
         Button nappiScene3 = new Button("REAL TIME RMS"); // SceneRealTimeRms
@@ -279,7 +276,9 @@ public class MainApp extends Application {
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         nappiMenuHelp.setVisible(true);
 
-        // OTHER STUFF
+        /**
+        * OTHER COMPONENTS
+        */
         BorderPane asetteluMenu = new BorderPane();
         HBox isovalikkoMenu = new HBox();
         isovalikkoMenu.setPadding(new Insets(0, 0, 0, 0));
@@ -288,8 +287,9 @@ public class MainApp extends Application {
         valikkoMenu.setPadding(new Insets(10, 10, 10, 10));
         valikkoMenu.setSpacing(10);
 
-        ////////////////////////////////////////////////////
-        // OTHER VIEWS
+        /**
+        * OTHER VIEWS
+        */
         SceneCalculation getCalcScene = new SceneCalculation();
         ScenePathTracing getPathScene = new ScenePathTracing();
         SceneRealTimeRms getRealScene = new SceneRealTimeRms();
@@ -332,10 +332,13 @@ public class MainApp extends Application {
         valikkoMMC.setPadding(new Insets(10, 10, 10, 10));
         valikkoMMC.setSpacing(20);
 
-        ////////////////////////////////////////////////////
-        // TEXT AREAS
+        /**
+        * TEXT AREAS
+        */
         HelpText helpText = new HelpText();
-        // CALCULATION
+        /**
+        * CALCULATION TEXT AREA
+        */
         TextArea textAreaCalc = new TextArea();
         textAreaCalc.setMinWidth(this.textwidth);
         textAreaCalc.setMaxWidth(this.textwidth);
@@ -348,7 +351,9 @@ public class MainApp extends Application {
             new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         textAreaCalc.setBlendMode(BlendMode.DIFFERENCE);
-        // PATH TRACING
+        /**
+        * PATH TRACING TEXT AREA
+        */
         TextArea textAreaPath = new TextArea();
         textAreaPath.setMinWidth(this.textwidth);
         textAreaPath.setMaxWidth(this.textwidth);
@@ -361,7 +366,9 @@ public class MainApp extends Application {
             new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         textAreaPath.setBlendMode(BlendMode.DIFFERENCE);
-        // REAL TIME RMS
+        /**
+        * REAL TIME RMS TEXT AREA
+        */
         TextArea textAreaReal = new TextArea();
         textAreaReal.setMinWidth(this.animwidth);
         textAreaReal.setMaxWidth(this.animwidth);
@@ -374,7 +381,9 @@ public class MainApp extends Application {
             new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         textAreaReal.setBlendMode(BlendMode.DIFFERENCE);
-        // MMC
+        /**
+        * MMC TEXT AREA
+        */
         TextArea textAreaMMC = new TextArea();
         textAreaMMC.setMinWidth(this.animwidth);
         textAreaMMC.setMaxWidth(this.animwidth);
@@ -388,8 +397,9 @@ public class MainApp extends Application {
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         textAreaMMC.setBlendMode(BlendMode.DIFFERENCE);
 
-        ////////////////////////////////////////////////////
-        // TEXT AREA MENU
+        /**
+        * TEXT AREA MENU
+        */
         TextArea textAreaMenu = new TextArea(helpText.welcome());
         textAreaMenu.setMinWidth(this.textwidth);
         textAreaMenu.setMaxWidth(this.textwidth);
@@ -403,8 +413,9 @@ public class MainApp extends Application {
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         textAreaMenu.setBlendMode(BlendMode.DIFFERENCE);
         
-        ////////////////////////////////////////////////////
-        // REAL TIME RMS COMPONENTS
+        /**
+        * REAL TIME RMS COMPONENTS
+        */
         Canvas rtrmsAlusta = new Canvas(this.animwidth, this.animheight);
         rtrmsAlusta.setVisible(true);
 
@@ -417,8 +428,9 @@ public class MainApp extends Application {
         pane.getChildren().add(rtrmsAlusta);
         pane.setVisible(true);
         
-        ////////////////////////////////////////////////////
-        // MMC COMPONENTS
+        /**
+        * MMC COMPONENTS
+        */
         Canvas mmcAlusta = new Canvas(this.animwidth, this.animheight);
         mmcAlusta.setVisible(true);
 
@@ -432,8 +444,9 @@ public class MainApp extends Application {
         mmcpane.getChildren().add(mmcAlusta);
         mmcpane.setVisible(true);
 
-        ////////////////////////////////////////////////////
-        // FIRST VIEW BUTTON: HELP
+        /**
+        * FIRST VIEW BUTTON: HELP
+        */
         nappiMenuHelp.addEventHandler(
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
                 nappiMenuHelp.setEffect(shadow);
@@ -446,7 +459,9 @@ public class MainApp extends Application {
             textAreaMenu.setText(helpText.menu());
         });
 
-        // FIRST VIEW BUTTON: CLOSE
+        /**
+        * FIRST VIEW BUTTON: CLOSE
+        */
         Button closeNappiMenu = new Button("CLOSE");
         closeNappiMenu.setMinWidth(this.buttonWidth);
         closeNappiMenu.setMaxWidth(this.buttonWidth);
@@ -469,14 +484,15 @@ public class MainApp extends Application {
                 ButtonType.OK, ButtonType.CANCEL);
             alert.showAndWait();
             if ( alert.getResult() == ButtonType.OK ) {
-                System.gc();
+                //System.gc();
                 stage.close();
             }
         });
         closeNappiMenu.setVisible(true);
 
-        ////////////////////////////////////////////////////
-        // OTHER VIEWS BUTTON: EXECUTE CALCULATION
+        /**
+        * OTHER VIEWS BUTTON: EXECUTE CALCULATION
+        */
         Button executeNappiCalc = new Button("EXECUTE");
         executeNappiCalc.setDefaultButton(true);
         executeNappiCalc.setMinWidth(this.buttonWidth);
@@ -493,7 +509,9 @@ public class MainApp extends Application {
         });
         executeNappiCalc.setVisible(true);
 
-        // OTHER VIEWS BUTTON: CALCULATION MENU
+        /**
+        * OTHER VIEWS BUTTON: CALCULATION MENU
+        */
         Button menuNappiCalc = new Button("BACK TO MENU");
         menuNappiCalc.setMinWidth(this.buttonWidth);
         menuNappiCalc.setMaxWidth(this.buttonWidth);
@@ -507,7 +525,9 @@ public class MainApp extends Application {
         });
         menuNappiCalc.setVisible(true);
 
-        // OTHER VIEWS BUTTON: CALCULATION HELP
+        /**
+        * OTHER VIEWS BUTTON: CALCULATION HELP
+        */
         Button helpNappiCalc = new Button("HELP");
         helpNappiCalc.setMinWidth(this.buttonWidth);
         helpNappiCalc.setMaxWidth(this.buttonWidth);
@@ -525,7 +545,9 @@ public class MainApp extends Application {
         });
         helpNappiCalc.setVisible(true);
 
-        // OTHER VIEWS BUTTON: CALCULATION CLOSE
+        /**
+        * OTHER VIEWS BUTTON: CALCULATION CLOSE
+        */
         Button closeNappiCalc = new Button("CLOSE");
         closeNappiCalc.setMinWidth(this.buttonWidth);
         closeNappiCalc.setMaxWidth(this.buttonWidth);
@@ -554,14 +576,15 @@ public class MainApp extends Application {
                         || this.frame.isDisplayable())
                         this.frame.dispose();
                 }
-                System.gc();
+                //System.gc();
                 stage.close();
             }
         });
         closeNappiCalc.setVisible(true);
 
-        ////////////////////////////////////////////////////
-        // OTHER VIEWS BUTTON: EXECUTE PATH TRACING
+        /**
+        * OTHER VIEWS BUTTON: EXECUTE PATH TRACING
+        */
         Button executeNappiPath = new Button("EXECUTE");
         executeNappiPath.setDefaultButton(true);
         executeNappiPath.setMinWidth(this.buttonWidth);
@@ -578,7 +601,9 @@ public class MainApp extends Application {
         });
         executeNappiPath.setVisible(true);
 
-        // OTHER VIEWS BUTTON: PATH TRACING MENU
+        /**
+        * OTHER VIEWS BUTTON: PATH TRACING MENU
+        */
         Button menuNappiPath = new Button("BACK TO MENU");
         menuNappiPath.setMinWidth(this.buttonWidth);
         menuNappiPath.setMaxWidth(this.buttonWidth);
@@ -592,7 +617,9 @@ public class MainApp extends Application {
         });
         menuNappiPath.setVisible(true);
 
-        // OTHER VIEWS BUTTON: PATH TRACING HELP
+        /**
+        * OTHER VIEWS BUTTON: PATH TRACING HELP
+        */
         Button helpNappiPath = new Button("HELP");
         helpNappiPath.setMinWidth(this.buttonWidth);
         helpNappiPath.setMaxWidth(this.buttonWidth);
@@ -609,7 +636,9 @@ public class MainApp extends Application {
         });
         helpNappiPath.setVisible(true);
 
-        // OTHER VIEWS BUTTON: PATH TRACING CLOSE
+        /**
+        * OTHER VIEWS BUTTON: PATH TRACING CLOSE
+        */
         Button closeNappiPath = new Button("CLOSE");
         closeNappiPath.setMinWidth(this.buttonWidth);
         closeNappiPath.setMaxWidth(this.buttonWidth);
@@ -638,14 +667,15 @@ public class MainApp extends Application {
                         || this.frame.isDisplayable())
                         this.frame.dispose();
                 }
-                System.gc();
+                //System.gc();
                 stage.close();
             }
         });
         closeNappiPath.setVisible(true);
 
-        ////////////////////////////////////////////////////
-        // OTHER VIEWS BUTTON: PLOT CHOICE REAL TIME RMS
+        /**
+        * OTHER VIEWS BUTTON: PLOT CHOICE REAL TIME RMS
+        */
         Button standNorm = new Button("STD NORM");
         standNorm.setMinWidth(this.buttonWidth);
         standNorm.setMaxWidth(this.buttonWidth);
@@ -681,8 +711,9 @@ public class MainApp extends Application {
         });
         standNorm.setVisible(true);
 
-        ////////////////////////////////////////////////////
-        // OTHER VIEWS BUTTON: RUN REAL TIME RMS
+        /**
+        * OTHER VIEWS BUTTON: RUN REAL TIME RMS
+        */
         Button runReal = new Button("RUN");
         runReal.setDefaultButton(true);
         runReal.setMinWidth(this.buttonWidth);
@@ -699,7 +730,9 @@ public class MainApp extends Application {
         });
         runReal.setVisible(true);
 
-        // OTHER VIEWS BUTTON: REAL TIME RMS MENU
+        /**
+        * OTHER VIEWS BUTTON: REAL TIME RMS MENU
+        */
         Button menuNappiReal = new Button("BACK TO MENU");
         menuNappiReal.setMinWidth(this.buttonWidth);
         menuNappiReal.setMaxWidth(this.buttonWidth);
@@ -713,7 +746,9 @@ public class MainApp extends Application {
         });
         menuNappiReal.setVisible(true);
 
-        // OTHER VIEWS BUTTON: REAL TIME RMS HELP
+        /**
+        * OTHER VIEWS BUTTON: REAL TIME RMS HELP
+        */
         Button helpNappiReal = new Button("HELP");
         helpNappiReal.setMinWidth(this.buttonWidth);
         helpNappiReal.setMaxWidth(this.buttonWidth);
@@ -735,7 +770,9 @@ public class MainApp extends Application {
         });
         helpNappiReal.setVisible(true);
 
-        // OTHER VIEWS BUTTON: REAL TIME RMS CLOSE
+        /**
+        * OTHER VIEWS BUTTON: REAL TIME RMS CLOSE
+        */
         Button closeNappiReal = new Button("CLOSE");
         closeNappiReal.setMinWidth(this.buttonWidth);
         closeNappiReal.setMaxWidth(this.buttonWidth);
@@ -759,16 +796,16 @@ public class MainApp extends Application {
                     ButtonType.OK, ButtonType.CANCEL);
                 alert.showAndWait();
                 if ( alert.getResult() == ButtonType.OK ) {
-                    System.gc();
+                    //System.gc();
                     stage.close();
                 }
-            } else
-                return;
+            }
         });
         closeNappiReal.setVisible(true);
 
-        ////////////////////////////////////////////////////
-        // OTHER VIEWS BUTTON: EXECUTE MMC
+        /**
+        * OTHER VIEWS BUTTON: EXECUTE MMC
+        */
         Button runMMC = new Button("ANIMATION");
         runMMC.setDefaultButton(true);
         runMMC.setMinWidth(this.buttonWidth);
@@ -785,7 +822,9 @@ public class MainApp extends Application {
         });
         runMMC.setVisible(true);
 
-        // OTHER VIEWS BUTTON: PLOT MMC
+        /**
+        * OTHER VIEWS BUTTON: PLOT MMC
+        */
         Button plotMMC = new Button("PLOT");
         plotMMC.setDefaultButton(true);
         plotMMC.setMinWidth(this.buttonWidth);
@@ -802,7 +841,9 @@ public class MainApp extends Application {
         });
         plotMMC.setVisible(true);
 
-        // OTHER VIEWS BUTTON: MMC MENU
+        /**
+        * OTHER VIEWS BUTTON: MMC MENU
+        */
         Button menuNappiMMC = new Button("BACK TO MENU");
         menuNappiMMC.setMinWidth(this.buttonWidth);
         menuNappiMMC.setMaxWidth(this.buttonWidth);
@@ -816,7 +857,9 @@ public class MainApp extends Application {
         });
         menuNappiMMC.setVisible(true);
 
-        // OTHER VIEWS BUTTON: MMC HELP
+        /**
+        * OTHER VIEWS BUTTON: MMC HELP
+        */
         Button helpNappiMMC = new Button("HELP");
         helpNappiMMC.setMinWidth(this.buttonWidth);
         helpNappiMMC.setMaxWidth(this.buttonWidth);
@@ -838,7 +881,9 @@ public class MainApp extends Application {
         });
         helpNappiMMC.setVisible(true);
 
-        // OTHER VIEWS BUTTON: MMC REMOVE BARRIER
+        /**
+        * OTHER VIEWS BUTTON: MMC REMOVE BARRIER
+        */
         Button remBarNappiMMC = new Button("CONTINUE");
         remBarNappiMMC.setMinWidth(this.buttonWidth);
         remBarNappiMMC.setMaxWidth(this.buttonWidth);
@@ -857,7 +902,9 @@ public class MainApp extends Application {
         });
         remBarNappiMMC.setVisible(false);
 
-        // OTHER VIEWS BUTTON: MMC CLOSE
+        /**
+        * OTHER VIEWS BUTTON: MMC CLOSE
+        */
         Button closeNappiMMC = new Button("CLOSE");
         closeNappiMMC.setMinWidth(this.buttonWidth);
         closeNappiMMC.setMaxWidth(this.buttonWidth);
@@ -898,7 +945,7 @@ public class MainApp extends Application {
                                 || this.frame.isDisplayable())
                                 this.frame.dispose();
                         }
-                        System.gc();
+                        //System.gc();
                         stage.close();
                     }
             } else if ( !getMMCScene.timerIsRunning() && !getMMCScene.barrierIsOn() ) {
@@ -908,16 +955,16 @@ public class MainApp extends Application {
                     ButtonType.OK, ButtonType.CANCEL);
                 alert.showAndWait();
                 if ( alert.getResult() == ButtonType.OK ) {
-                    System.gc();
+                    //System.gc();
                     stage.close();
                 }
-            } else
-                return;
+            }
         });
         closeNappiMMC.setVisible(true);
 
-        ////////////////////////////////////////////////////
-        // SET FIRST VIEW BORDERPANE
+        /**
+        * SET FIRST VIEW BORDERPANE
+        */
         valikkoMenu.getChildren().addAll(
             asettelu,
             nappiMenuHelp,
@@ -927,8 +974,9 @@ public class MainApp extends Application {
             textAreaMenu);
         asetteluMenu.setCenter(isovalikkoMenu);
 
-        ////////////////////////////////////////////////////
-        // SET CALCULATION BORDERPANE
+        /**
+        * SET CALCULATION BORDERPANE
+        */
         valikkoCalc.getChildren().addAll(
             menuNappiCalc,
             helpNappiCalc,
@@ -940,8 +988,9 @@ public class MainApp extends Application {
             textAreaCalc);
         asetteluCalc.setCenter(isovalikkoCalc);
 
-        ////////////////////////////////////////////////////
-        // SET PATH TRACING BORDERPANE
+        /**
+        * SET PATH TRACING BORDERPANE
+        */
         valikkoPath.getChildren().addAll(
             menuNappiPath,
             helpNappiPath,
@@ -953,8 +1002,9 @@ public class MainApp extends Application {
             textAreaPath);
         asetteluPath.setCenter(isovalikkoPath);
 
-        ////////////////////////////////////////////////////
-        // SET REAL TIME RMS BORDERPANE
+        /**
+        * SET REAL TIME RMS BORDERPANE
+        */
         valikkoReal.getChildren().addAll(
             menuNappiReal,
             helpNappiReal,
@@ -967,8 +1017,9 @@ public class MainApp extends Application {
             textAreaReal);
         asetteluReal.setCenter(isovalikkoReal);
 
-        ////////////////////////////////////////////////////
-        // SET MMC BORDERPANE
+        /**
+        * SET MMC BORDERPANE
+        */
         valikkoMMC.getChildren().addAll(
             menuNappiMMC,
             helpNappiMMC,
@@ -982,8 +1033,9 @@ public class MainApp extends Application {
             textAreaMMC);
         asetteluMMC.setCenter(isovalikkoMMC);
 
-        ////////////////////////////////////////////////////
-        // SET SCENES
+        /**
+        * SET SCENES
+        */
         Scene firstScene = new Scene(asetteluMenu,this.stageWidth,this.stageHeight);
         firstScene.getStylesheets().add("/styles/Styles.css");
 
@@ -1004,9 +1056,10 @@ public class MainApp extends Application {
             this.stageHeight + (this.animheight-this.textheight));
         mmcScene.getStylesheets().add("/styles/Styles.css");
 
-        ////////////////////////////////////////////////////
-        // SET SCENE CHOICE BUTTONS' EFFECTS
-        // CALCULATION
+        /**
+        * SET SCENE CHOICE BUTTONS' EFFECTS
+        * CALCULATION
+        */
         nappiScene1.setOnMouseClicked(event -> {
             stage.setTitle("R_rms calculation");
             stage.setScene(calcScene);
@@ -1020,7 +1073,9 @@ public class MainApp extends Application {
                 textAreaMenu.setText(textAreaCalc.getText());
             stage.setScene(firstScene);
         });
-        // PATH TRACING
+        /**
+        * PATH TRACING
+        */
         nappiScene2.setOnMouseClicked(event -> {
             stage.setTitle("Path Tracing");
             if ( stage.getHeight() == this.stageHeight ){
@@ -1039,7 +1094,9 @@ public class MainApp extends Application {
             stage.setHeight(this.stageHeight);
             stage.setScene(firstScene);
         });
-        // REAL TIME RMS
+        /**
+        * REAL TIME RMS
+        */
         nappiScene3.setOnMouseClicked(event -> {
             stage.setTitle("Real Time rms");
             if ( stage.getWidth() == this.stageWidth ){
@@ -1063,7 +1120,9 @@ public class MainApp extends Application {
             stage.setHeight(this.stageHeight);
             stage.setScene(firstScene);
         });
-        // MMC
+        /**
+        * MMC
+        */
         nappiScene4.setOnMouseClicked(event -> {
             stage.setTitle("MMC Diffusion");
             if ( stage.getWidth() == this.stageWidth ){
@@ -1088,24 +1147,26 @@ public class MainApp extends Application {
             stage.setScene(firstScene);
         });
 
-        ////////////////////////////////////////////////////
-        // CREATE A FRAME FOR CALCULATION AND PATH TRACING PLOTS
+        /**
+        * CREATE A FRAME FOR CALCULATION AND PATH TRACING PLOTS
+        */
         this.frame = new JFrame();
 
-        ////////////////////////////////////////////////////
-        // CREATE AN INSTANCE FOR CODE EXECUTIONS
+        /**
+        * CREATE AN INSTANCE FOR CODE EXECUTIONS
+        */
         Execution ex = new Execution();
 
-        ////////////////////////////////////////////////////
-        // EXECUTE BUTTON CALCULATION
+        /**
+        * EXECUTE BUTTON CALCULATION
+        */
         executeNappiCalc.setOnMouseClicked((MouseEvent event) -> {
-            // BUTTON PRESSED ON
             this.vars = getCalcScene.getVars();
             Data data = new Data(this.vars);
             boolean fail = false;
 
-            int steps = Integer.valueOf(vars[3]);
-            int dim = Integer.valueOf(this.vars[4]);
+            int steps = parseInt(vars[3]);
+            int dim = parseInt(this.vars[4]);
             String lattice = this.vars[7];
 
             if ( steps < 1 ) fail = true;
@@ -1117,19 +1178,19 @@ public class MainApp extends Application {
             ex.executeRms(textAreaPath, this.frame, data, this.vars);
         });
 
-        ////////////////////////////////////////////////////
-        // EXECUTE BUTTON PATH TRACING
+        /**
+        * EXECUTE BUTTON PATH TRACING
+        */
         executeNappiPath.setOnMouseClicked((MouseEvent event) -> {
-            // BUTTON PRESSED ON
             this.vars = getPathScene.getVars();
             Data data = new Data(this.vars);
             boolean fail = false;
 
-            int particles = Integer.valueOf(vars[0]);
-            double diam = Double.valueOf(vars[1]);
-            int charge = Integer.valueOf(vars[2]);
-            int steps = Integer.valueOf(vars[3]);
-            int dim = Integer.valueOf(this.vars[4]);
+            int particles = parseInt(vars[0]);
+            double diam = parseDouble(vars[1]);
+            int charge = parseInt(vars[2]);
+            int steps = parseInt(vars[3]);
+            int dim = parseInt(this.vars[4]);
             String fixed = this.vars[6];
             String lattice = this.vars[7];
 
@@ -1146,10 +1207,13 @@ public class MainApp extends Application {
             ex.executePath(textAreaPath, this.frame, data, this.vars);
         });
 
-        ////////////////////////////////////////////////////
-        // ANIMATION TIMER FOR REAL TIME RMS ANIMATION
+        /**
+        * ANIMATION TIMER FOR REAL TIME RMS ANIMATION
+        */
         new AnimationTimer() {
-            // REFESH ANIMATION ABOUT 100 MILLISECOND STEPS
+            /**
+            * REFESH ANIMATION IN ABOUT 100 MILLISECOND STEPS
+            */
             private final long sleepNanoseconds = 100 * 1000000;
             private long prevTime = 0;
             private int dim;
@@ -1172,44 +1236,47 @@ public class MainApp extends Application {
                 }
 
                 this.vars = getRealScene.getVars();
-                // FROM SCENEREALTIMERMS
-                // vars from user:
-                // vars[0] = particles,     USER
-                // vars[1] = diameter,      n/a
-                // vars[2] = charge,        n/a
-                // vars[3] = steps,         USER
-                // vars[4] = dimension,     USER
-                // vars[5] = mmc,           n/a
-                // vars[6] = fixed,         n/a
-                // vars[7] = lattice,       n/a
-                // vars[8] = save           n/a
+                /**
+                * FROM SCENEREALTIMERMS
+                * vars from user:
+                * vars[0] = particles,     USER
+                * vars[1] = diameter,      n/a
+                * vars[2] = charge,        n/a
+                * vars[3] = steps,         USER
+                * vars[4] = dimension,     USER
+                * vars[5] = mmc,           n/a
+                * vars[6] = fixed,         n/a
+                * vars[7] = lattice,       n/a
+                * vars[8] = save           n/a
+                */
 
-                this.dim = Integer.valueOf(this.vars[4]);
+                this.dim = parseInt(this.vars[4]);
 
                 piirturi.setGlobalAlpha(1.0);
                 piirturi.setFill(Color.BLACK);
-                if ( this.dim == 1 )
+                if ( this.dim == 1 ) {
                     piirturi.fillRect(0, 0, 1.0/scalefactor*animwidth, animheight);
-                else if ( this.dim == 2 )
+                } else {
                     piirturi.fillRect(0, 0, 1.0/scalefactor*animwidth, 1.0/scalefactor*animheight);
-                else if ( this.dim == 3 )
-                    piirturi.fillRect(0, 0, 1.0/scalefactor*animwidth, 1.0/scalefactor*animheight);
+                }
                 piirturi.fill();
 
-                // DRAW ANIMATION
+                /**
+                * DRAW ANIMATION
+                */
                 getRealScene.refresh(
                     fexec, piirturi, scalefactor, animwidth, linewidth, fxplot,
                     rms_runs, rms_norm, newdata, mincount, maxcount, standnorm
                 );
                 newdata = false;
 
-                // älä muuta tätä
                 this.prevTime = currentNanoTime;
             }
         }.start();
 
-        ////////////////////////////////////////////////////
-        // RUN BUTTON REAL TIME RMS
+        /**
+        * RUN BUTTON REAL TIME RMS
+        */
         runReal.setOnMouseClicked((MouseEvent event) -> {
             if (getRealScene.isRunning()) {
                 getRealScene.stop();
@@ -1224,9 +1291,9 @@ public class MainApp extends Application {
                 this.vars = getRealScene.getVars();
                 boolean fail = false;
 
-                int particles = Integer.valueOf(vars[0]);
-                int dim = Integer.valueOf(this.vars[4]);
-                int steps = Integer.valueOf(vars[3]);
+                int particles = parseInt(vars[0]);
+                int dim = parseInt(this.vars[4]);
+                int steps = parseInt(vars[3]);
  
                 if ( particles < 0 ) fail = true;
                 if ( steps < 1 ) fail = true;
@@ -1248,14 +1315,20 @@ public class MainApp extends Application {
                     * Math.pow(Math.log10((double) steps),2.0) )
                     / Math.pow(Math.log10((double) steps),2.0);
  
-                if ( dim == 1 ) {
-                    this.linewidth = 1.0 / Math.log10((double) steps);
-                    piirturi.scale(this.scalefactor, 1.0);
-                } else if ( dim == 2 ) {
-                    this.linewidth = 1.0 / ( this.scalefactor * Math.sqrt(Math.log10((double) steps)) );
-                    piirturi.scale(this.scalefactor, this.scalefactor);
-                } else if ( dim == 3 ) {
-                    piirturi.scale(this.scalefactor, this.scalefactor);
+                switch (dim) {
+                    case 1:
+                        this.linewidth = 1.0 / Math.log10((double) steps);
+                        piirturi.scale(this.scalefactor, 1.0);
+                        break;
+                    case 2:
+                        this.linewidth = 1.0 / ( this.scalefactor * Math.sqrt(Math.log10((double) steps)) );
+                        piirturi.scale(this.scalefactor, this.scalefactor);
+                        break;
+                    case 3:
+                        piirturi.scale(this.scalefactor, this.scalefactor);
+                        break;
+                    default:
+                        break;
                 }
                 this.isscaled = true;
                 piirturi.setGlobalAlpha(1.0 / this.scalefactor * Math.pow(Math.log10((double) steps),2.0));
@@ -1288,18 +1361,18 @@ public class MainApp extends Application {
             }
         });
 
-        ////////////////////////////////////////////////////
-        // PLOT BUTTON MMC
+        /**
+        * PLOT BUTTON MMC
+        */
         plotMMC.setOnMouseClicked((MouseEvent event) -> {
-            // BUTTON PRESSED ON
             valikkoMMC.setDisable(true);
             this.vars = getMMCScene.getVars();
             getMMCScene.setVar(8, "s");
             Data data = new Data(this.vars);
-            int particles = Integer.valueOf(vars[0]);
-            double diam = Double.valueOf(vars[1]);
-            int charge = Integer.valueOf(vars[2]);
-            int dim = Integer.valueOf(vars[4]);
+            int particles = parseInt(vars[0]);
+            double diam = parseDouble(vars[1]);
+            int charge = parseInt(vars[2]);
+            int dim = parseInt(vars[4]);
             String lattice = this.vars[7];
             boolean fail = false;
 
@@ -1314,17 +1387,17 @@ public class MainApp extends Application {
             ex.executeMMC(valikkoMMC, textAreaMMC, this.frame, data, this.vars);
         });
 
-        ////////////////////////////////////////////////////
-        // EXECUTE BUTTON MMC
+        /**
+        * EXECUTE BUTTON MMC
+        */
         runMMC.setOnMouseClicked((MouseEvent event) -> {
-            // BUTTON PRESSED ON
             if ( getMMCScene.timerIsRunning()) return;
             this.vars = getMMCScene.getVars();
             getMMCScene.setVar(8, "-");
-            int particles = Integer.valueOf(vars[0]);
-            double diam = Double.valueOf(vars[1]);
-            int charge = Integer.valueOf(vars[2]);
-            int dim = Integer.valueOf(vars[4]);
+            int particles = parseInt(vars[0]);
+            double diam = parseDouble(vars[1]);
+            int charge = parseInt(vars[2]);
+            int dim = parseInt(vars[4]);
             String lattice = this.vars[7];
             boolean fail = false;
 
@@ -1349,7 +1422,7 @@ public class MainApp extends Application {
                 mmcpiirturi.scale(1.0/this.scalefactor, 1.0/this.scalefactor);
             }
   
-            int measure = 0;
+            int measure;
             double diff = 0.3;
             if ( particles < 25 ) {
                 measure = 21;
@@ -1394,11 +1467,15 @@ public class MainApp extends Application {
                 1.0/this.scalefactor*this.animheight);
             mmcpiirturi.fill();
 
-            // GET INITIAL DATA
+            /**
+            * GET INITIAL DATA
+            */
             File initialDataFile = new File(
                 datapath + "\\startMMC_" + dim + "D_" + particles + "N.xy");
 
-            // DRAW MMC ANIMATION
+            /**
+            * DRAW MMC ANIMATION
+            */
             getMMCScene.refresh(
                 initialDataFile, fexec, mmcpiirturi, this.scalefactor,
                 this.animwidth, this.linewidth, this.fxplot, remBarNappiMMC,
@@ -1458,7 +1535,7 @@ public class MainApp extends Application {
             fin = new BufferedInputStream(new FileInputStream(sourceFile));
             fout = new BufferedOutputStream(new FileOutputStream(destinationFile));
             byte[] readBytes = new byte[1024];
-            int readed = 0;
+            int readed;
             System.out.println("Copying resource file, please wait...");
             while((readed = fin.read(readBytes)) != -1){
                 fout.write(readBytes, 0, readed);

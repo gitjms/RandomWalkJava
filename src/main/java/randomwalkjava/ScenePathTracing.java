@@ -1,5 +1,6 @@
 
 package randomwalkjava;
+
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
@@ -20,6 +21,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+/**
+ * @author Jari Sunnari
+ * jari.sunnari@gmail.com
+ * 
+ * Class for Path Tracing
+ */
 public class ScenePathTracing extends Data {
     
     final int compwidth = 150;
@@ -65,7 +72,10 @@ public class ScenePathTracing extends Data {
         }
     }
 
-    // RANDOM WALK PATH TRACING
+    /**
+     * 
+     * @return PATH TRACING SCENE
+     */
     public Parent getScenePath(){
         GridPane asettelu = new GridPane();
         asettelu.setMaxWidth(paneWidth);
@@ -78,7 +88,9 @@ public class ScenePathTracing extends Data {
         
         DropShadow shadow = new DropShadow();
 
-        // COMPONENTS...
+        /**
+        * COMPONENTS...
+        */
         Label labNumParticles = new Label("number of particles:");
         TextField setNumParticles = new TextField("");
         setNumParticles.setOnKeyReleased(e -> {
@@ -253,7 +265,9 @@ public class ScenePathTracing extends Data {
 
         this.vars[5] = "-"; // mmc n/a
 
-        // ...THEIR PLACEMENTS
+        /**
+        * ...THEIR PLACEMENTS
+        */
         GridPane.setHalignment(labNumParticles, HPos.LEFT);
         asettelu.add(labNumParticles, 0, 0);
         GridPane.setHalignment(setNumParticles, HPos.CENTER);
@@ -289,7 +303,9 @@ public class ScenePathTracing extends Data {
         setDimension.setMaxWidth(compwidth);
         asettelu.add(setDimension, 0, 9);
 
-        // BUTTON: FIXED
+        /**
+        * BUTTON: FIXED
+        */
         this.nappiFixed.setMinWidth(compwidth);
         this.nappiFixed.setMaxWidth(compwidth);
         this.nappiFixed.setBackground(new Background(
@@ -306,7 +322,6 @@ public class ScenePathTracing extends Data {
         });
         this.nappiFixed.setOnMouseClicked((MouseEvent event) -> {
             if (this.nappiFixed.getText().equals("SPREAD")){
-                // BUTTON PRESSED ON
                 this.nappiFixed.setText("FIXED");
                 this.nappiFixed.setBackground(
                     new Background(
@@ -314,7 +329,6 @@ public class ScenePathTracing extends Data {
                             Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[6] = "f";
             } else if (this.nappiFixed.getText().equals("FIXED")){
-                // BUTTON PRESSED OFF
                 this.nappiFixed.setText("SPREAD");
                 this.nappiFixed.setBackground(
                     new Background(new BackgroundFill(
@@ -324,7 +338,9 @@ public class ScenePathTracing extends Data {
         });
         valikko.getChildren().add(this.nappiFixed);
 
-        // BUTTON: LATTICE
+        /**
+        * BUTTON: LATTICE
+        */
         this.nappiLattice.setMinWidth(compwidth);
         this.nappiLattice.setMaxWidth(compwidth);
         this.nappiLattice.setBackground(new Background(
@@ -341,7 +357,6 @@ public class ScenePathTracing extends Data {
         });
         this.nappiLattice.setOnMouseClicked((MouseEvent event) -> {
             if (this.nappiLattice.getText().equals("LATTICE")){
-                // BUTTON PRESSED ON
                 this.nappiLattice.setText("FREE");
                 this.nappiLattice.setBackground(
                     new Background(
@@ -349,7 +364,6 @@ public class ScenePathTracing extends Data {
                             Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[7] = "-";
             } else if (this.nappiLattice.getText().equals("FREE")){
-                // BUTTON PRESSED OFF
                 this.nappiLattice.setText("LATTICE");
                 this.nappiLattice.setBackground(
                     new Background(new BackgroundFill(

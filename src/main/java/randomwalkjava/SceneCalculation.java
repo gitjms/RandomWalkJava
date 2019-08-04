@@ -1,5 +1,6 @@
 
 package randomwalkjava;
+
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
@@ -20,6 +21,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+/**
+ * @author Jari Sunnari
+ * jari.sunnari@gmail.com
+ * 
+ * Class for Rms Calculation
+ */
 public class SceneCalculation extends Data {
 
     final int compwidth = 150;
@@ -63,7 +70,6 @@ public class SceneCalculation extends Data {
         }
     }
 
-    // R_RMS VS SQRT(N) CALCULATION
     public Parent getSceneCalc(){
         GridPane asettelu = new GridPane();
         asettelu.setMaxWidth(paneWidth);
@@ -76,7 +82,9 @@ public class SceneCalculation extends Data {
 
         DropShadow shadow = new DropShadow();
 
-        // COMPONENTS...
+        /**
+        * COMPONENTS...
+        */
         this.vars[0] = "0"; // (amount of particles)
         this.vars[1] = "0.1"; // (diameter of particl)
         this.vars[2] = "0"; // (charge of particles)
@@ -162,7 +170,9 @@ public class SceneCalculation extends Data {
 
         this.vars[5] = "-"; // mmc
 
-        // ...THEIR PLACEMENTS
+        /**
+        * ...THEIR PLACEMENTS
+        */
         GridPane.setHalignment(labNumSteps, HPos.LEFT);
         asettelu.add(labNumSteps, 0, 0);
         GridPane.setHalignment(setNumSteps, HPos.CENTER);
@@ -179,7 +189,9 @@ public class SceneCalculation extends Data {
 
         this.vars[6] = "f"; // fixed(/spread)
 
-        // BUTTON: LATTICE
+        /**
+        * BUTTON: LATTICE (TOGGLE)
+        */
         this.nappiLattice.setMinWidth(compwidth);
         this.nappiLattice.setMaxWidth(compwidth);
         this.nappiLattice.setBackground(new Background(
@@ -196,7 +208,6 @@ public class SceneCalculation extends Data {
         });
         this.nappiLattice.setOnMouseClicked((MouseEvent event) -> {
             if (this.nappiLattice.getText().equals("LATTICE")){
-                // BUTTON PRESSED ON
                 this.nappiLattice.setText("FREE");
                 this.nappiLattice.setBackground(
                     new Background(
@@ -204,7 +215,6 @@ public class SceneCalculation extends Data {
                             Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[7] = "-";
             } else if (this.nappiLattice.getText().equals("FREE")){
-                // BUTTON PRESSED OFF
                 this.nappiLattice.setText("LATTICE");
                 this.nappiLattice.setBackground(
                     new Background(new BackgroundFill(

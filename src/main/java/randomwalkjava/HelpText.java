@@ -1,11 +1,20 @@
 
 package randomwalkjava;
 
+/**
+ * @author Jari Sunnari
+ * jari.sunnari@gmail.com
+ * 
+ * Class for logo and helptexts
+ */
 public class HelpText {
 
     public HelpText() {
     }
 
+    /**
+    * @return MAIN STAGE HELP TEXT
+    */
     public String menu() {
         String text = " \nButton 'RMS vs SQRT(N)' shows a control panel with which you can\n"
                     + " calculate root mean square (rms) distances of random walk particles.\n\n"
@@ -41,7 +50,9 @@ public class HelpText {
     
         return text;
     }
-    // rms
+    /**
+    * @return RMS CALCULATION HELP TEXT
+    */
     public String calculation() {
         String text = "\n Number of Steps is a positive integer.\n\n"
                     + " Dimension is either 1, 2, or 3. One means moving along x-axis, two\n"
@@ -58,7 +69,9 @@ public class HelpText {
     
         return text;
     }
-    // path tracing
+    /**
+    * @return PATH TRACING HELP TEXT
+    */
     public String pathtracing() {
         String text = "\n Number of particles is a positive integer, at least 1.\n\n"
                     + " Diameter is a positive real number on the interval ]0.0, 1.0[.\n\n"
@@ -85,7 +98,9 @@ public class HelpText {
     
         return text;
     }
-    // real time rms
+    /**
+    * @return REAL TIME RMS HELP TEXT
+    */
     public String realtimerms() {
         String text = "\n Number of particles is a positive integer, at least 1.\n\n"
                     + " Number of steps is a positive integer. It means the cumulative random steps\n"
@@ -105,7 +120,9 @@ public class HelpText {
     
         return text;
     }
-    // MMC diffusion
+    /**
+    * @return MMC DIFFUSION HELP TEXT
+    */
     public String mmc() {
         String text = "\n Number of particles is a positive integer, at least 1.\n\n"
                     + " Diameter is a positive real number on the interval ]0.0, 1.0[.\n\n"
@@ -134,6 +151,9 @@ public class HelpText {
         return text;
     }
 
+    /**
+    * @return LOGO
+    */
     public String welcome() {
         String text = "\n"
                     + "        /////       ///       //    // ///        /////       //   //\n" 

@@ -3,15 +3,23 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>jaris</groupId>
-    <artifactId>RandomWalkJava</artifactId>
+    <artifactId>RandomWalk</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>RandomWalkJava</name>
+    <name>RandomWalk</name>
+
+    <developers>
+	<developer>
+            <id>jaris</id>
+            <name>Jari Sunnari</name>
+            <email>jari.sunnari@gmail.com</email>
+	</developer>
+    </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <mainClass>randomwalkjava.MainApp</mainClass>
+        <mainClass>randomwalkjava.RandomWalk</mainClass>
     </properties>
 
     <organization>
@@ -30,15 +38,28 @@
             <artifactId>xchart</artifactId>
             <version>3.5.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-deploy-plugin</artifactId>
+            <version>3.0.0-M1</version>
+        </dependency>
     </dependencies>
-
     <repositories>
         <repository>
             <id>sonatype-oss-snapshot</id>
             <snapshots/>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
-
     </repositories>
 
     <build>
@@ -109,12 +130,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.8.1</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
                     <compilerArguments>
-                        <bootclasspath>${sun.boot.class.path}${path.separator}${java.home}/lib/jfxrt.jar</bootclasspath>
+                        <bootclasspath>${sun.boot.class.path}${path.separator}${java.home}/../jre/lib/ext/jfxrt.jar</bootclasspath>
                     </compilerArguments>
                 </configuration>
             </plugin>
@@ -124,7 +145,7 @@
                 <version>2.16</version>
                 <configuration>
                     <additionalClasspathElements>
-                        <additionalClasspathElement>${java.home}/lib/jfxrt.jar</additionalClasspathElement>
+                        <additionalClasspathElement>${java.home}/../jre/lib/ext/jfxrt.jar</additionalClasspathElement>
                     </additionalClasspathElements>
                 </configuration>
             </plugin>

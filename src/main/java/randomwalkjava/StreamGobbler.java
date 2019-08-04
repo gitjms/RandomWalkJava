@@ -2,6 +2,12 @@ package randomwalkjava;
 
 import java.io.*;
 
+/**
+ * @author Jari Sunnari
+ * jari.sunnari@gmail.com
+ * 
+ * Class for Fortan code output reading
+ */
 public class StreamGobbler extends Thread {
 
     InputStream is;

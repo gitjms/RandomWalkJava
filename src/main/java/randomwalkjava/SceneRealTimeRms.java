@@ -1,9 +1,12 @@
 
 package randomwalkjava;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import static java.lang.Double.parseDouble;
+import static java.lang.Integer.parseInt;
 import java.util.Arrays;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -25,11 +28,17 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+/**
+ * @author Jari Sunnari
+ * jari.sunnari@gmail.com
+ * 
+ * Class for Real Time Rms
+ */
 public class SceneRealTimeRms extends Data {
 
-    final File folder = new File("C:\\DATA");
-    final int compwidth = 150;
-    final int paneWidth = 200;
+    static File folder = new File("C:\\DATA");
+    static int compwidth = 150;
+    static int paneWidth = 200;
     private double scalefactor;
     private double linewidth;
     private GraphicsContext piirturi;
@@ -129,10 +138,10 @@ public class SceneRealTimeRms extends Data {
         double centerX = width/2;
         double centerY = height/2;
 
-        int num_part = Integer.valueOf(this.vars[0]);
-        int num_steps = Integer.valueOf(this.vars[3]) + 1;
-        double steps = Double.valueOf(this.vars[3]);
-        int dim = Integer.valueOf(this.vars[4]);
+        int num_part = parseInt(this.vars[0]);
+        int num_steps = parseInt(this.vars[3]) + 1;
+        double steps = parseDouble(this.vars[3]);
+        int dim = parseInt(this.vars[4]);
         double expected = Math.sqrt(steps);
         this.greatest = expected;
 
@@ -226,7 +235,9 @@ public class SceneRealTimeRms extends Data {
                                     continue;
                                 }
                             }
-                            // RED SOURCE DOT
+                            /**
+                            * RED SOURCE DOT
+                            */
                             if ( j == 0 && i == 0 ) {
                                 this.piirturi.setFill(Color.RED);
                                 if (dim == 1) {
@@ -249,7 +260,9 @@ public class SceneRealTimeRms extends Data {
                                 this.piirturi.setStroke(Color.YELLOW);
                             }
 
-                            // YELLOW LINES
+                            /**
+                            * YELLOW LINES
+                            */
                             if ( j > 0){
                                 for (int k = 0; k < num_part; k++){
                                     if ( dim < 3 ) {
@@ -291,7 +304,9 @@ public class SceneRealTimeRms extends Data {
                             }
 
                         } else {
-                            // PLOTS
+                            /**
+                            * PLOTS
+                            */
                             try {
                                 plotData[j] = Double.parseDouble(line.split("(\\s+)")[1].trim());
                             } catch (NumberFormatException e) {
@@ -331,7 +346,9 @@ public class SceneRealTimeRms extends Data {
                                     yAxis = Arrays.copyOfRange(rms_runs, 0, 10);
                                 }
 
-                                // find greatest and smallest values for y-axis max limit
+                                /**
+                                * find greatest and smallest values for y-axis max limit
+                                */
                                 if ( rrms > this.greatest ) {
                                     this.greatest = rrms;
                                     this.smallest = this.greatest;
@@ -397,7 +414,10 @@ public class SceneRealTimeRms extends Data {
         }
     }
 
-    // RANDOM WALK REAL TIME RMS
+    /**
+     * 
+     * @return REAL TIME RMS SCENE
+     */
     public Parent getSceneReal(){
         GridPane asettelu = new GridPane();
         asettelu.setMaxWidth(paneWidth);
@@ -410,7 +430,9 @@ public class SceneRealTimeRms extends Data {
 
         DropShadow shadow = new DropShadow();
 
-        // COMPONENTS...
+        /**
+        * COMPONENTS...
+        */
         Label labNumParticles = new Label("number of particles:");
         TextField setNumParticles = new TextField("");
         setNumParticles.setOnKeyReleased(e -> {
@@ -512,7 +534,9 @@ public class SceneRealTimeRms extends Data {
         this.vars[7] = "-"; // (lattice/)free   n/a
         this.vars[8] = "-"; // save (off)       n/a
 
-        // ...THEIR PLACEMENTS
+        /**
+        * ...THEIR PLACEMENTS
+        */
         GridPane.setHalignment(labNumParticles, HPos.LEFT);
         asettelu.add(labNumParticles, 0, 0);
         GridPane.setHalignment(setNumParticles, HPos.CENTER);

@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -14,19 +15,30 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.util.Pair;
 
+/**
+ * @author Jari Sunnari
+ * jari.sunnari@gmail.com
+ * 
+ * Class for data handling:
+ * creates data folder and copies executales,
+ * reads data from file
+ */
 public class Data {
     
     public String[] vars;
-    
+
+    /**
+     * empty constructor
+     */
     public Data() {
     }
     
     public Data(String[] vars) {
-        this.vars = vars;
+        this.vars = vars.clone();
     }
 
     public void setVars(String[] vars) {
-        this.vars = vars;
+        this.vars = vars.clone();
     }
 
     public void setVar(Integer i, String var) {
@@ -34,7 +46,7 @@ public class Data {
     }
 
     public String[] getVars() {
-        return this.vars;
+        return this.vars.clone();
     }
 
     public String getVar(Integer i) {
@@ -46,16 +58,18 @@ public class Data {
         String[] command = null;
         boolean ok = true;
         String msg = "";
-        // vars from user:
-        // vars[0] = particles,
-        // vars[1] = diameter,
-        // vars[2] = charge,
-        // vars[3] = steps,
-        // vars[4] = dimension,
-        // vars[5] = mmc,
-        // vars[6] = fixed,
-        // vars[7] = lattice,
-        // vars[8] = save
+        /**
+        * vars from user:
+        * vars[0] = particles,
+        * vars[1] = diameter,
+        * vars[2] = charge,
+        * vars[3] = steps,
+        * vars[4] = dimension,
+        * vars[5] = mmc,
+        * vars[6] = fixed,
+        * vars[7] = lattice,
+        * vars[8] = save
+        */
         try {
             command = new String[]{"cmd","/c",executable,
                 this.vars[0], this.vars[1], this.vars[2], this.vars[3],
@@ -63,17 +77,20 @@ public class Data {
                 this.vars[8]};
 
             FileOutputStream fos = new FileOutputStream(command[0]);
+
             Runtime runtime = Runtime.getRuntime();
 
             if (save == true){
-                // print the state of the program
+                /**
+                * print the state of the program
+                */
                 System.out.println(" Fortran execution begins...");
             }
             Process process = runtime.exec(command, null, folderPath);
             
             int exitVal;
             try (BufferedReader input = new BufferedReader(new InputStreamReader(
-                process.getInputStream()))) {
+                process.getInputStream(), Charset.defaultCharset()))) {
 
                 StreamGobbler errorGobbler = new StreamGobbler(
                     process.getErrorStream(), "ERROR ");
@@ -138,7 +155,7 @@ public class Data {
                 dataList.add(values);
              }
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(RandomWalk.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return dataList;
