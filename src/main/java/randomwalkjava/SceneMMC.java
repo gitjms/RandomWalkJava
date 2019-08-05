@@ -49,9 +49,9 @@ import javafx.scene.text.FontWeight;
  */
 public class SceneMMC extends Data {
 
-    static File folder = new File("C:\\DATA");
-    static int compwidth = 150;
-    static int paneWidth = 200;
+    private final File folder = new File("C:\\DATA");
+    private final int compwidth = 150;
+    private final int paneWidth = 200;
     private ToggleButton setCharge0;
     private ToggleButton setCharge1;
     private ToggleButton setCharge2;
@@ -175,10 +175,7 @@ public class SceneMMC extends Data {
         this.animwidth = animwidth;
         this.scalefactor = scalefactor;
         this.center = (double) this.animwidth/2.0;
-        if ( this.vars[7].equals("l") )
-            this.lattice = true;
-        else
-            this.lattice = false;
+        this.lattice = this.vars[7].equals("l");
         barrierOn();
 
         int num_part = parseInt(this.vars[0]);
@@ -215,7 +212,7 @@ public class SceneMMC extends Data {
 
         piirturi.setLineWidth(linewidth);
 
-        String[] command = null;
+        String[] command;
 
         try
         {
@@ -279,7 +276,7 @@ public class SceneMMC extends Data {
 
                 try (BufferedReader input = new BufferedReader(new InputStreamReader(
                     process.getInputStream()))) {
-                    String line = null;
+                    String line;
 
                     while ((line = input.readLine()) != null){
                         if (line.trim().startsWith("S") || line.isEmpty()) {
@@ -313,24 +310,20 @@ public class SceneMMC extends Data {
                             }
 
                             platfStart();
-                            javafx.application.Platform.runLater(new Runnable() {
-                                @Override
-                                public void run() {
-
-                                    if ( !platfIsRunning()) return;
-
-                                    // DRAW
-                                    clearDots( dim );
-                                    if ( dim == 2 && lattice == true )
-                                        drawLattice( num_part, measure, diff );
-                                    for (int k = 0; k < num_part; k++){
-                                        if ( dim == 2 ) {
-                                            draw2Dots(values[0][k], values[1][k],
-                                                num_part, diam);
-                                        } else if ( dim == 3 ) {
-                                            draw3Dots(values[0][k], values[1][k],
-                                                values[2][k], num_part, diam);
-                                        }
+                            javafx.application.Platform.runLater(() -> {
+                                if ( !platfIsRunning()) return;
+                                
+                                // DRAW
+                                clearDots( dim );
+                                if ( dim == 2 && lattice == true )
+                                    drawLattice( num_part, measure, diff );
+                                for (int k = 0; k < num_part; k++){
+                                    if ( dim == 2 ) {
+                                        draw2Dots(values[0][k], values[1][k],
+                                            num_part, diam);
+                                    } else if ( dim == 3 ) {
+                                        draw3Dots(values[0][k], values[1][k],
+                                            values[2][k], num_part, diam);
                                     }
                                 }
                             });

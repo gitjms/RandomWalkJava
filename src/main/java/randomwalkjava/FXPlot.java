@@ -1,6 +1,7 @@
 
 package randomwalkjava;
 
+import com.sun.glass.ui.Screen;
 import java.awt.Color;
 import java.awt.BasicStroke; 
 import static java.awt.BasicStroke.CAP_SQUARE;
@@ -26,8 +27,14 @@ import org.knowm.xchart.style.Styler.ChartTheme;
  */
 public class FXPlot extends SceneRealTimeRms {
 
-    static int width = 800;
-    static int height = 1000;
+    private final int width = 800;
+    private final int height = 1000;
+    private final int a = 400
+        / (int) Screen.getMainScreen().getRenderScale();
+    private final int b = 100
+        / (int) Screen.getMainScreen().getRenderScale();
+    private final int c = 10
+        / (int) Screen.getMainScreen().getRenderScale();
     private final XYChart calcChartW;
     private final XYChart calcChartH;
     private final XYChart calcChartE;
@@ -95,7 +102,7 @@ public class FXPlot extends SceneRealTimeRms {
             this.frame.getContentPane().setLayout(new GridLayout(2,1));
         } else if (which.equals("E")) {
             this.frame.setLocation(0, (screenHeight-this.height/2)/2);
-            this.frame.setPreferredSize(new Dimension(this.width,this.height-400));
+            this.frame.setPreferredSize(new Dimension(this.width,this.height-this.a));
             this.frame.setTitle("Real Time MMC");
         }
         ImageIcon icon = new ImageIcon("src/main/resources/images/icon.png");
@@ -117,10 +124,10 @@ public class FXPlot extends SceneRealTimeRms {
         this.chartPanelE = new XChartPanel(this.calcChartE);
         
         if (which.equals("W&H")) {
-            this.chartPanelW.setBounds(0, 10, this.width, this.height/2-100);
+            this.chartPanelW.setBounds(0, this.c, this.width, this.height/2-this.b);
             this.chartPanelW.setVisible(true);
 
-            this.chartPanelH.setBounds(0, this.height/2, this.width, this.height/2-100);
+            this.chartPanelH.setBounds(0, this.height/2, this.width, this.height/2-this.b);
             this.chartPanelH.setVisible(true);
             /**
             * Upper XYChart calcChartW
@@ -159,7 +166,7 @@ public class FXPlot extends SceneRealTimeRms {
             this.calcChartH.getStyler().setToolTipsEnabled(true);
 
         } else if (which.equals("E")) {
-            this.chartPanelE.setBounds(0, 0, this.width, this.height-400);
+            this.chartPanelE.setBounds(0, 0, this.width, this.height-this.a);
             this.chartPanelE.setVisible(true);
             /**
             * XYChart calcChartE

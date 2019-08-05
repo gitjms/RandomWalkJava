@@ -36,9 +36,9 @@ import javafx.scene.text.FontWeight;
  */
 public class SceneRealTimeRms extends Data {
 
-    static File folder = new File("C:\\DATA");
-    static int compwidth = 150;
-    static int paneWidth = 200;
+    private final File folder = new File("C:\\DATA");
+    private final int compwidth = 150;
+    private final int paneWidth = 200;
     private double scalefactor;
     private double linewidth;
     private GraphicsContext piirturi;
@@ -154,8 +154,6 @@ public class SceneRealTimeRms extends Data {
         else
             values = new double[3][num_part];
 
-        String[] command = null;
-
         double[] plotData = new double[num_part];
 
         double[] xAxis = new double[10];
@@ -185,12 +183,14 @@ public class SceneRealTimeRms extends Data {
 
         this.piirturi.setLineWidth(this.linewidth);
 
-        try {
-            command = new String[]{"cmd","/c",executable,
-                this.vars[0], this.vars[1], this.vars[2], this.vars[3],
-                this.vars[4], this.vars[5], this.vars[6], this.vars[7],
-                this.vars[8]};
+        String[] command = null;
 
+        command = new String[]{"cmd","/c",executable,
+            this.vars[0], this.vars[1], this.vars[2], this.vars[3],
+            this.vars[4], this.vars[5], this.vars[6], this.vars[7],
+            this.vars[8]};
+
+        try {
             this.runtime = Runtime.getRuntime();
             runtimeStart();
 
@@ -199,7 +199,7 @@ public class SceneRealTimeRms extends Data {
             try (BufferedReader input = new BufferedReader(new InputStreamReader(
                 process.getInputStream()))) {
 
-                String line = null;
+                String line;
                 boolean failed = false;
 
                 while ((line = input.readLine()) != null){
@@ -210,52 +210,65 @@ public class SceneRealTimeRms extends Data {
                         if (!line.substring(0,1).matches("([0-9]|-|\\+)"))
                             continue;
                         if (!line.trim().split("(\\s+)")[0].trim().equals("+")) {
-                            if (dim == 1) {
-                                try {
-                                    values[0][i] = Double.parseDouble(line.trim()) + centerX/this.scalefactor;
-                                } catch (NumberFormatException e) {
-                                    continue;
-                                }
-                                values[1][i] = centerY;
-                            } else if (dim == 2) {
-                                String[] valStr = line.split("(\\s+)");
-                                try {
-                                    values[0][i] = Double.parseDouble(valStr[0].trim()) + centerX/this.scalefactor;
-                                    values[1][i] = Double.parseDouble(valStr[1].trim()) + centerX/this.scalefactor;
-                                } catch (NumberFormatException e) {
-                                    continue;
-                                }
-                            } else if (dim == 3) {
-                                String[] valStr = line.split("(\\s+)");
-                                try {
-                                    values[0][i] = Double.parseDouble(valStr[0].trim()) + centerX/this.scalefactor;
-                                    values[1][i] = Double.parseDouble(valStr[1].trim()) + centerX/this.scalefactor;
-                                    values[2][i] = Double.parseDouble(valStr[2].trim()) + 1.2*centerX/this.scalefactor;
-                                } catch (NumberFormatException e) {
-                                    continue;
-                                }
+                            switch (dim) {
+                                case 1:
+                                    try {
+                                        values[0][i] = Double.parseDouble(line.trim()) + centerX/this.scalefactor;
+                                    } catch (NumberFormatException e) {
+                                        continue;
+                                    }   values[1][i] = centerY;
+                                    break;
+                                case 2:
+                                    {
+                                        String[] valStr = line.split("(\\s+)");
+                                        try {
+                                            values[0][i] = Double.parseDouble(valStr[0].trim()) + centerX/this.scalefactor;
+                                            values[1][i] = Double.parseDouble(valStr[1].trim()) + centerX/this.scalefactor;
+                                        } catch (NumberFormatException e) {
+                                            continue;
+                                        }       break;
+                                    }
+                                case 3:
+                                    {
+                                        String[] valStr = line.split("(\\s+)");
+                                        try {
+                                            values[0][i] = Double.parseDouble(valStr[0].trim()) + centerX/this.scalefactor;
+                                            values[1][i] = Double.parseDouble(valStr[1].trim()) + centerX/this.scalefactor;
+                                            values[2][i] = Double.parseDouble(valStr[2].trim()) + 1.2*centerX/this.scalefactor;
+                                        } catch (NumberFormatException e) {
+                                            continue;
+                                        }       break;
+                                    }
+                                default:
+                                    break;
                             }
                             /**
                             * RED SOURCE DOT
                             */
                             if ( j == 0 && i == 0 ) {
                                 this.piirturi.setFill(Color.RED);
-                                if (dim == 1) {
-                                    this.piirturi.fillRect(
-                                        values[0][i], centerY,
-                                        expected / ( 10.0 * Math.sqrt(Math.log10(steps)) ),
-                                        Math.sqrt(centerY/2.0));
-                                } else if (dim == 2) {
-                                    this.piirturi.fillRect(
-                                        values[0][i], values[1][i],
-                                        expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ),
-                                        expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ));
-                                } else if (dim == 3) {
-                                    this.piirturi.fillRect(
-                                        values[0][i] + Math.cos(values[2][i]),
-                                        values[1][i] + Math.sin(values[2][i]),
-                                        expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ),
-                                        expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ));
+                                switch (dim) {
+                                    case 1:
+                                        this.piirturi.fillRect(
+                                            values[0][i], centerY,
+                                            expected / ( 10.0 * Math.sqrt(Math.log10(steps)) ),
+                                            Math.sqrt(centerY/2.0));
+                                        break;
+                                    case 2:
+                                        this.piirturi.fillRect(
+                                            values[0][i], values[1][i],
+                                            expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ),
+                                            expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ));
+                                        break;
+                                    case 3:
+                                        this.piirturi.fillRect(
+                                            values[0][i] + Math.cos(values[2][i]),
+                                            values[1][i] + Math.sin(values[2][i]),
+                                            expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ),
+                                            expected * Math.log10(steps) / ( Math.sqrt(steps) * dim ));
+                                        break;
+                                    default:
+                                        break;
                                 }
                                 this.piirturi.setStroke(Color.YELLOW);
                             }
@@ -365,8 +378,8 @@ public class SceneRealTimeRms extends Data {
                                 fxplot.updateWData("sqrt(N)", xAxis, y2Axis);
 
                                 double sigma2 = Math.pow(rrms - this.rms_sum/this.runs,2.0);
-                                double ynorm = 0.0;
-                                double mean = 0.0;
+                                double ynorm;
+                                double mean;
                                 
                                 if ( standnorm == true )
                                     mean = 0.0;
@@ -397,8 +410,6 @@ public class SceneRealTimeRms extends Data {
                 }
                 if ( failed == false )
                     this.runs++;
-                else
-                    failed = false;
 
                 this.exitVal = process.waitFor();
                 if (this.exitVal != 0) {

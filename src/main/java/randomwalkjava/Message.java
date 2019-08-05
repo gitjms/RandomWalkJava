@@ -8,6 +8,7 @@ package randomwalkjava;
  * Class for code thread failure message
  */
 public class Message extends Thread {
+    @Override
     public void run() {
          System.out.println(" Program is closing due to errors.");
       }

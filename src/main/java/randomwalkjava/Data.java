@@ -55,7 +55,7 @@ public class Data {
 
     public Pair< Boolean, String > createData(File folderPath, String executable, boolean save) {
         String teksti = "";
-        String[] command = null;
+        //String[] command = null;
         boolean ok = true;
         String msg = "";
         /**
@@ -70,16 +70,20 @@ public class Data {
         * vars[7] = lattice,
         * vars[8] = save
         */
+        String[] command = new String[]{"cmd","/c",executable,
+            this.vars[0], this.vars[1], this.vars[2], this.vars[3],
+            this.vars[4], this.vars[5], this.vars[6], this.vars[7],
+            this.vars[8]};
+ 
+        FileOutputStream fos = null;
         try {
-            command = new String[]{"cmd","/c",executable,
-                this.vars[0], this.vars[1], this.vars[2], this.vars[3],
-                this.vars[4], this.vars[5], this.vars[6], this.vars[7],
-                this.vars[8]};
+            fos = new FileOutputStream(command[0]);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Data.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        Runtime runtime = Runtime.getRuntime();
 
-            FileOutputStream fos = new FileOutputStream(command[0]);
-
-            Runtime runtime = Runtime.getRuntime();
-
+        try {
             if (save == true){
                 /**
                 * print the state of the program
@@ -95,7 +99,7 @@ public class Data {
                 StreamGobbler errorGobbler = new StreamGobbler(
                     process.getErrorStream(), "ERROR ");
                 errorGobbler.start();
-                String line = null;
+                String line;
 
                 StreamGobbler outputGobbler = new StreamGobbler(
                     process.getInputStream(), "", fos);
@@ -123,8 +127,7 @@ public class Data {
                     }
                     runtime.exit(exitVal);
                 }
-                fos.flush();
-                fos.close();
+                if ( fos != null ) fos.close();
             } catch (InterruptedException e) {
                 ok = false;
                 teksti = teksti + "\n" + msg + "\n" + e.getMessage();
@@ -134,6 +137,15 @@ public class Data {
             System.out.println(e.getMessage());
             ok = false;
             teksti = teksti + "\n" + e.getMessage();
+        }
+
+        try {
+            if ( fos != null ) {
+                fos.flush();
+                fos.close();
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Data.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return new Pair(ok,teksti);

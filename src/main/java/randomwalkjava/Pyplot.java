@@ -56,7 +56,7 @@ public class Pyplot {
                 StreamGobbler errorGobbler = new StreamGobbler(
                     process.getErrorStream(), "ERROR ");
                 errorGobbler.start();
-                String line = null;
+                String line;
 
                 StreamGobbler outputGobbler = new StreamGobbler(
                     process.getInputStream(), "", fos);

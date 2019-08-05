@@ -84,7 +84,7 @@ public class RandomWalk extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        this.fxplot = null;
+        //this.fxplot = null;
         /**
         * FILE AND FOLDER CHECK
         * creates a folder C:\DATA if not exist
@@ -160,8 +160,8 @@ public class RandomWalk extends Application {
         stage.setWidth(this.stageWidth);
         stage.setHeight(this.stageHeight);
         stage.setResizable(false);
-        stage.setX( (double) this.screenWidth/2.0);
-        stage.setY((double) (this.screenHeight-this.stageHeight)/2.0);
+        stage.setX( (double) (this.screenWidth-this.stageWidth) );
+        stage.setY( (double) (this.screenHeight-this.stageHeight) / 2.0 );
 
         DropShadow shadow = new DropShadow();
 
@@ -1162,6 +1162,7 @@ public class RandomWalk extends Application {
         */
         executeNappiCalc.setOnMouseClicked((MouseEvent event) -> {
             this.vars = getCalcScene.getVars();
+            getCalcScene.setVar(8, "s");
             Data data = new Data(this.vars);
             boolean fail = false;
 
@@ -1183,6 +1184,7 @@ public class RandomWalk extends Application {
         */
         executeNappiPath.setOnMouseClicked((MouseEvent event) -> {
             this.vars = getPathScene.getVars();
+            getMMCScene.setVar(8, "s");
             Data data = new Data(this.vars);
             boolean fail = false;
 
@@ -1289,6 +1291,7 @@ public class RandomWalk extends Application {
                 runReal.setText("RUN");
             } else {
                 this.vars = getRealScene.getVars();
+                getRealScene.setVar(8, "-");
                 boolean fail = false;
 
                 int particles = parseInt(vars[0]);
@@ -1545,8 +1548,8 @@ public class RandomWalk extends Application {
             System.out.println("Resource file " + sourceFile + " not copied into new folder\n"+e.getMessage());
         } finally {
             try {
-                fin.close();
-                fout.close();
+                if ( fin != null ) fin.close();
+                if ( fout != null ) fout.close();
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }

@@ -20,16 +20,27 @@ import javax.swing.WindowConstants;
  * 
  * Class for image file creation and preparing Python code executions
  */
-public class Execution {
+public class Execution extends Data {
 
-    static int chartWidth = 860;
-    static int chartHeight = 605;
-    static int mmcWidth = 400;
-    static int mmcHeight = 600;
-    static int screenHeight = Screen.getMainScreen().getHeight();
-    static String path = "C:\\DATA";
-    static String fexec = "walk.exe";
-    static File folder = new File("C:\\DATA");
+    private final int chartWidth = 860;
+    private final int chartHeight = 605;
+    private final int mmcWidth = 400;
+    private final int mmcHeight = 600;
+    private final int screenHeight = Screen.getMainScreen().getHeight();
+    private final int a = 200
+        / (int) Screen.getMainScreen().getRenderScale();
+    private final int b = 150
+        / (int) Screen.getMainScreen().getRenderScale();
+    private final int c = 60
+        / (int) Screen.getMainScreen().getRenderScale();
+    private final int d = 20
+        / (int) Screen.getMainScreen().getRenderScale();
+    private final int e = 5
+        / (int) Screen.getMainScreen().getRenderScale();
+    
+    private final String path = "C:\\DATA";
+    private final String fexec = "walk.exe";
+    private final File folder = new File("C:\\DATA");
 
     /**
      * empty constructor
@@ -141,7 +152,7 @@ public class Execution {
         java.awt.Font labelFont = titleLabel.getFont();
         int newFontSize = (int)(labelFont.getSize() * 1.5);
         titleLabel.setFont(new java.awt.Font(labelFont.getName(), java.awt.Font.PLAIN, newFontSize));
-        titleLabel.setBounds(this.chartWidth/2-200,0,this.chartWidth/2+150,newFontSize);
+        titleLabel.setBounds(this.chartWidth/2-this.a,0,this.chartWidth/2+this.b,newFontSize);
         /**
         * PLOT
         */
@@ -150,7 +161,7 @@ public class Execution {
         frame.add(titleLabel);
         frame.add(figLabel);
         frame.repaint();
-        frame.setBounds(20, (this.screenHeight-this.chartHeight)/2-60, this.chartWidth, this.chartHeight);
+        frame.setBounds(this.d, (this.screenHeight-this.chartHeight)/2-this.c, this.chartWidth, this.chartHeight);
         frame.pack();
         frame.setVisible(true);
     }
@@ -216,7 +227,7 @@ public class Execution {
         JLabel figLabel = new JLabel(figIcn);
         frame.add(figLabel);
         frame.repaint();
-        frame.setBounds(5, (this.mmcHeight-this.mmcHeight)/2, this.mmcWidth, this.mmcHeight);
+        frame.setBounds(this.e, (this.mmcHeight-this.mmcHeight)/2, this.mmcWidth, this.mmcHeight);
         frame.pack();
         frame.setVisible(true);
         valikkoMMC.setDisable(false);
@@ -280,14 +291,14 @@ public class Execution {
         java.awt.Font labelFont = titleLabel.getFont();
         int newFontSize = (int)(labelFont.getSize() * 1.5);
         titleLabel.setFont(new java.awt.Font(labelFont.getName(), java.awt.Font.PLAIN, newFontSize));
-        titleLabel.setBounds(this.chartWidth/2-150,0,this.chartWidth,newFontSize);
+        titleLabel.setBounds(this.chartWidth/2-this.b,0,this.chartWidth,newFontSize);
 
         ImageIcon figIcn = new ImageIcon(imagerms);
         JLabel figLabel = new JLabel(figIcn);
         frame.add(titleLabel);
         frame.add(figLabel);
         frame.repaint();
-        frame.setBounds(20, (this.screenHeight-this.chartHeight)/2-60, this.chartWidth, this.chartHeight);
+        frame.setBounds(this.d, (this.screenHeight-this.chartHeight)/2-this.c, this.chartWidth, this.chartHeight);
         frame.pack();
         frame.setVisible(true);
     }
