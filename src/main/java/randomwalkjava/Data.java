@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.util.Pair;
 
 /**
  * @author Jari Sunnari
@@ -53,9 +52,8 @@ public class Data {
         return this.vars[i];
     }
 
-    public Pair< Boolean, String > createData(File folderPath, String executable, boolean save) {
+    public Boolean createData(File folderPath, String executable, boolean save) {
         String teksti = "";
-        //String[] command = null;
         boolean ok = true;
         String msg = "";
         /**
@@ -131,12 +129,13 @@ public class Data {
             } catch (InterruptedException e) {
                 ok = false;
                 teksti = teksti + "\n" + msg + "\n" + e.getMessage();
+                System.out.println(teksti);
             }
 
         } catch (IOException e) {
-            System.out.println(e.getMessage());
             ok = false;
             teksti = teksti + "\n" + e.getMessage();
+            System.out.println(teksti);
         }
 
         try {
@@ -148,7 +147,7 @@ public class Data {
             Logger.getLogger(Data.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        return new Pair(ok,teksti);
+        return ok;
     }
 
     public static List<double[]> readDataMMC(File filePath, Integer dim){

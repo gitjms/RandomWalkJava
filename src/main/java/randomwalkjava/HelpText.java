@@ -22,7 +22,7 @@ public class HelpText {
                     + " Every run will save the data in a file replacing the previous one if\n"
                     + " the options are the same.\n\n"
                     + " One run produces a data file ending with '.xy', and an image file in\n"
-                    + " '.png' format. The files will be in the 'C:\\DATA' folder.\n\n"
+                    + " '.png' format. The files will be in the 'C:\\RWDATA' folder.\n\n"
                     + " ---------------------------------------------------------------------\n\n"
                     + " Button 'PATH TRACING' will show a control panel with which you can\n"
                     + " plot different random walk path simulations. One run produces an\n"

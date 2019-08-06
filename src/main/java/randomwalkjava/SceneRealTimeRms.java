@@ -36,7 +36,6 @@ import javafx.scene.text.FontWeight;
  */
 public class SceneRealTimeRms extends Data {
 
-    private final File folder = new File("C:\\DATA");
     private final int compwidth = 150;
     private final int paneWidth = 200;
     private double scalefactor;
@@ -113,10 +112,10 @@ public class SceneRealTimeRms extends Data {
         }
     }
 
-    public void refresh(String executable,
-        GraphicsContext piirturi, double scalefactor, int rtrmswidth, double linewidth,
-        FXPlot fxplot, double[] rms_runs, double[] rms_norm, boolean newdata,
-        double mincount, double maxcount, boolean standnorm) {
+    public void refresh(File folder, String executable,
+        GraphicsContext piirturi, double scalefactor, int rtrmswidth,
+        double linewidth, FXPlot fxplot, double[] rms_runs, double[] rms_norm,
+        boolean newdata, double mincount, double maxcount, boolean standnorm) {
 
         int i = 0;
         int j = 0;
@@ -194,7 +193,7 @@ public class SceneRealTimeRms extends Data {
             this.runtime = Runtime.getRuntime();
             runtimeStart();
 
-            Process process = this.runtime.exec(command, null, this.folder);
+            Process process = this.runtime.exec(command, null, folder);
 
             try (BufferedReader input = new BufferedReader(new InputStreamReader(
                 process.getInputStream()))) {

@@ -42,7 +42,7 @@ public class SceneCalculation extends Data {
         this.nappiLattice = new Button("FREE");
         this.vars = new String[]{
             "0",    // vars[0] particles        n/a
-            "0.1",  // vars[1] diameter         n/a
+            "0",    // vars[1] diameter         n/a
             "0",    // vars[2] charge           n/a
             "0",    // vars[3] steps            USER
             "0",    // vars[4] dimension        USER
@@ -86,7 +86,7 @@ public class SceneCalculation extends Data {
         * COMPONENTS...
         */
         this.vars[0] = "0"; // (amount of particles)
-        this.vars[1] = "0.1"; // (diameter of particl)
+        this.vars[1] = "0"; // (diameter of particl)
         this.vars[2] = "0"; // (charge of particles)
 
         Label labNumSteps = new Label("number of steps:");

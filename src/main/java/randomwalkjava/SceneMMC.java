@@ -49,7 +49,6 @@ import javafx.scene.text.FontWeight;
  */
 public class SceneMMC extends Data {
 
-    private final File folder = new File("C:\\DATA");
     private final int compwidth = 150;
     private final int paneWidth = 200;
     private ToggleButton setCharge0;
@@ -160,7 +159,7 @@ public class SceneMMC extends Data {
             "-"};   // vars[8] save (off)       n/a
     }
 
-     public void refresh(File initialDataFile, String executable,
+     public void refresh(File folder, File initialDataFile, String executable,
         GraphicsContext piirturi, double scalefactor, int animwidth,
         double linewidth, FXPlot fxplot, Button remBarNappiMMC, Button runMMC,
         Button plotMMC, Button closeNappiMMC, Button menuNappiMMC,
@@ -224,7 +223,7 @@ public class SceneMMC extends Data {
         this.runtime = Runtime.getRuntime();
         runtimeStart();
 
-        this.process = this.runtime.exec(command, null, this.folder);
+        this.process = this.runtime.exec(command, null, folder);
         walkStart();
 
         /**

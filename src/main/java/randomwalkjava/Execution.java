@@ -4,11 +4,13 @@ package randomwalkjava;
 import com.sun.glass.ui.Screen;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;
-import javafx.scene.control.TextArea;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.scene.layout.VBox;
-import javafx.util.Pair;
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -18,9 +20,9 @@ import javax.swing.WindowConstants;
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
  * 
- * Class for image file creation and preparing Python code executions
+ * Class for image file creation, Python code execution and image reading
  */
-public class Execution extends Data {
+public class Execution {
 
     private final int chartWidth = 860;
     private final int chartHeight = 605;
@@ -37,10 +39,20 @@ public class Execution extends Data {
         / (int) Screen.getMainScreen().getRenderScale();
     private final int e = 5
         / (int) Screen.getMainScreen().getRenderScale();
-    
-    private final String path = "C:\\DATA";
-    private final String fexec = "walk.exe";
-    private final File folder = new File("C:\\DATA");
+
+    private Runtime runtime;
+    private boolean running;
+
+    public void runtimeStart() {
+        this.running = true;
+    }
+    public boolean runtimeIsRunning() {
+        return this.running;
+    }
+    public void stopRuntime() {
+        this.running = false;
+        this.runtime.exit(0);
+    }
 
     /**
      * empty constructor
@@ -48,32 +60,34 @@ public class Execution extends Data {
     public Execution() {
     }
 
-    public void executePath(TextArea textArea, JFrame frame, Data data, String[] vars ) {
+    public void executePath(File folder, String path, String fexec,
+        String pyexec1d, String pyexec2d, String pyexec3d, JFrame frame,
+        Data data, String[] vars ) {
         /**
-        * FROM SCENENOCALCULATION
+        * FROM SCENEPATHTRACING
         * vars from user:
-        * vars[0] = particles,
-        * vars[1] = diameter,
-        * vars[2] = charge,
-        * vars[3] = steps,
-        * vars[4] = dimension,
-        * vars[5] = mmc,
-        * vars[6] = fixed,
-        * vars[7] = lattice,
-        * vars[8] = save       n/a
+        * vars[0] = particles,  USER
+        * vars[1] = diameter,   USER
+        * vars[2] = charge,     USER
+        * vars[3] = steps,      USER
+        * vars[4] = dimension,  USER
+        * vars[5] = mmc,        USER
+        * vars[6] = fixed,      USER
+        * vars[7] = lattice,    USER
+        * vars[8] = save        n/a
         */
-        String pyexec1d = "python plot1d.py";
-        String pyexec2d = "python plot2d.py";
-        String pyexec3d = "python plot3d.py";
+        pyexec1d = "python ".concat(pyexec1d);
+        pyexec2d = "python ".concat(pyexec2d);
+        pyexec3d = "python ".concat(pyexec3d);
         String xDataPath;
         String yDataPath = null;
         String zDataPath;
         String titletext = null;
         BufferedImage image = null;
+        String[] command = null;
 
-        Pair<Boolean, String> result = data.createData(this.folder, this.fexec, true);
-        textArea.setText(result.getValue());
-        if (result.getKey() == false)
+        Boolean result = data.createData(folder, fexec, true);
+        if (result == false)
             return;
 
         int particles = parseInt(vars[0]);
@@ -89,42 +103,30 @@ public class Execution extends Data {
         else if ( vars[6].equals("-") && vars[7].equals("-") )
             titletext = "Spread out free particles, ";
 
-        xDataPath = this.path + "\\" + "x_path"
+        xDataPath = "x_path"
             + dimension + "D_"
             + particles + "N_"
             + steps + "S.x";
 
-        String imgFile1d = "jpyplot" + dimension + "D_N" + particles + "_S" + steps + ".png";
+        File imgFile = new File(path + "\\" + "jpyplot" + dimension + "D_N" + particles + "_S" + steps + ".png");
 
         /**
         * 1D DATA
         */
         if ( dimension == 1 ) {
-            Pyplot pyplot1d = new Pyplot();
-            String[] files1d = new String[]{xDataPath};
-            textArea.setText(pyplot1d.createPlot(this.folder, files1d, dimension, pyexec1d, false, false));
-            /**
-            * GET IMAGE FROM PYDPLOT.READPYPLOT()
-            */
-            image = pyplot1d.readPyPlot(new File(this.path + "/" + imgFile1d));
+            command = new String[]{"cmd","/c", pyexec1d, xDataPath};
         }
 
         /**
         * 2D DATA
         */
         if ( dimension == 2 || dimension == 3 ) {
-            yDataPath = this.path + "\\" + "y_path"
+            yDataPath =  "y_path"
                 + dimension + "D_"
                 + particles + "N_"
                 + steps + "S.y";
             if ( dimension == 2 ) {
-                Pyplot pyplot2d = new Pyplot();
-                String[] files2d = new String[]{xDataPath, yDataPath};
-                textArea.setText(pyplot2d.createPlot(this.folder, files2d, dimension, pyexec2d, false, false));
-                /**
-                * GET IMAGE FROM PYDPLOT.READPYPLOT()
-                */
-                image = pyplot2d.readPyPlot(new File(this.path + "/" + imgFile1d));
+                command = new String[]{"cmd","/c", pyexec2d, xDataPath, yDataPath};
             }
         }
               
@@ -132,18 +134,34 @@ public class Execution extends Data {
         * 3D DATA
         */
         if ( dimension == 3 ) {
-            zDataPath = this.path + "\\" + "z_path"
+            zDataPath =  "z_path"
                 + dimension + "D_"
                 + particles + "N_"
                 + steps + "S.z";
-            Pyplot pyplot3d = new Pyplot();
-            String[] files3d = new String[]{xDataPath, yDataPath, zDataPath};
-            textArea.setText(pyplot3d.createPlot(this.folder, files3d, dimension, pyexec3d, false, false));
-            /**
-            * GET IMAGE FROM PYDPLOT.READPYPLOT()
-            */
-            image = pyplot3d.readPyPlot(new File(this.path + "/" + imgFile1d));
+            command = new String[]{"cmd","/c", pyexec3d, xDataPath, yDataPath, zDataPath};
         }
+
+        /**
+        * CREATE IMAGE
+        */
+        this.runtime = Runtime.getRuntime();
+        runtimeStart();
+        try {
+            this.runtime.exec(command, null, folder);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+        /**
+        * GET IMAGE
+        */
+        try {
+            Thread.sleep(1000*(int) Math.log10((double) particles));
+            image = ImageIO.read(imgFile);
+        } catch (IOException | InterruptedException ex) {
+            Logger.getLogger(Execution.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
 
         frame.getContentPane().removeAll();
         frame.setTitle("Random Walk - Path Tracing");
@@ -166,55 +184,64 @@ public class Execution extends Data {
         frame.setVisible(true);
     }
 
-    public void executeMMC(VBox valikkoMMC, TextArea textArea, JFrame frame, Data data, String[] vars ) {
+    public void executeMMC(File folder, String path, String fexec, String pyexecmmc2d,
+        String pyexecmmc3d, VBox valikkoMMC, JFrame frame, Data data, String[] vars ) {
         /**
-        * FROM SCENENOCALCULATION
+        * FROM SCENEMMC
         * vars from user:
-        * vars[0] = particles,
-        * vars[1] = diameter,
-        * vars[2] = charge,
+        * vars[0] = particles,     USER
+        * vars[1] = diameter,      USER
+        * vars[2] = charge,        USER
         * vars[3] = steps,         n/a
-        * vars[4] = dimension,
+        * vars[4] = dimension,     USER
         * vars[5] = mmc,           n/a
         * vars[6] = fixed,         n/a
-        * vars[7] = lattice,
+        * vars[7] = lattice,       USER
         * vars[8] = save           n/a
         */
-        String pyexec = "";
-        String imgFile1d = "";
-        BufferedImage image;
+        pyexecmmc2d = "python ".concat(pyexecmmc2d);
+        pyexecmmc3d = "python ".concat(pyexecmmc3d);
+        File imgFile = null;
+        BufferedImage image = null;
+        String[] command = null;
 
-        Pair<Boolean, String> result = data.createData(this.folder, this.fexec, true);
-        textArea.setText(result.getValue());
-        if (result.getKey() == false)
+        Boolean result = data.createData(folder, fexec, true);
+        if (result == false)
             return;
 
         int particles = parseInt(vars[0]);
         double diameter = parseDouble(vars[1]);
-        int dimension = parseInt(vars[4]);
+        final int dimension = parseInt(vars[4]);
 
-        String startDataMMC = this.path + "\\" + "startMMC_"
+        String startDataMMC = "startMMC_"
             + dimension + "D_"
             + particles + "N.xy";
-        String finalDataMMC = this.path + "\\" + "finalMMC_"
+        String finalDataMMC = "finalMMC_"
             + dimension + "D_"
             + particles + "N.xy";
 
         if ( dimension == 2 ) {
-            pyexec = "python plotmmc2d.py";
-            imgFile1d = "jpyplotmmc2D_N" + particles + "_diam" + diameter + ".png";
+            imgFile =  new File(path + "\\" + "jpyplotmmc2D_N" + particles + "_diam" + diameter + ".png");
+            command = new String[]{"cmd","/c", pyexecmmc2d, startDataMMC, finalDataMMC};
         } else if ( dimension == 3 ) {
-            pyexec = "python plotmmc3d.py";
-            imgFile1d = "jpyplotmmc3D_N" + particles + "_diam" + diameter + ".png";
+            imgFile =  new File(path + "\\" + "jpyplotmmc3D_N" + particles + "_diam" + diameter + ".png");
+            command = new String[]{"cmd","/c", pyexecmmc3d, startDataMMC, finalDataMMC};
         }
         
-        Pyplot pyplotmmc = new Pyplot();
-        String[] files = new String[]{startDataMMC, finalDataMMC};
-        textArea.setText(pyplotmmc.createPlot(this.folder, files, dimension, pyexec, false, true));
-        /**
-        * GET IMAGE FROM PYDPLOT.READPYPLOT()
-        */
-        image = pyplotmmc.readPyPlot(new File(this.path + "/" + imgFile1d));
+        this.runtime = Runtime.getRuntime();
+        runtimeStart();
+        try {
+            this.runtime.exec(command, null, folder);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+        try {
+            Thread.sleep(1000*(int) Math.log10((double) particles));
+            image = ImageIO.read(imgFile);
+        } catch (IOException | InterruptedException ex) {
+            Logger.getLogger(Execution.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         frame.getContentPane().removeAll();
         frame.setTitle("Random Walk - MMC Diffusion Plot");
@@ -233,9 +260,10 @@ public class Execution extends Data {
         valikkoMMC.setDisable(false);
     }
 
-    public void executeRms(TextArea textArea, JFrame frame, Data data, String[] vars ) {
+    public void executeRms(File folder, String path, String fexec,
+        String pyexecrms, JFrame frame, Data data, String[] vars ) {
         /**
-        * FROM SCENECALCULATION
+        * FROM SCENEREALTIMERMS
         * vars from user:
         * vars[0] = particles,     n/a
         * vars[1] = diameter,      n/a
@@ -247,15 +275,15 @@ public class Execution extends Data {
         * vars[7] = lattice,       USER
         * vars[8] = save           n/a
         */
-        String pyexecrms = "python plotrms.py";
-        String rmsDataPath;
+        pyexecrms = "python ".concat(pyexecrms);
+        String rmsDataPath = null;
         String titletext = null;
-        BufferedImage imagerms;
+        BufferedImage image = null;
+        File imgFile = null;
 
-        Pair<Boolean, String> result = data.createData(this.folder, this.fexec, true);
-        textArea.setText(result.getValue());
+        Boolean result = data.createData(folder, fexec, true);
 
-        if (result.getKey() == false)
+        if (result == false)
             return;
 
         int steps = parseInt(vars[3]);
@@ -270,19 +298,30 @@ public class Execution extends Data {
         else if ( vars[6].equals("-") && vars[7].equals("-") )
             titletext = "Spread out free particles, ";
                 
-        rmsDataPath = this.path
+        rmsDataPath = path
             + "\\" + "rms_"
             + dimension + "D_"
             + steps + "S.xy";
 
-        Pyplot pyplotrms = new Pyplot();
-        String[] filerms = new String[]{rmsDataPath};
-        textArea.setText(pyplotrms.createPlot(this.folder, filerms, dimension, pyexecrms, true, false));
-        String imgFile = "jpyplotRMS" + dimension + "D_" + steps + "S.png";
+        String[] command = new String[]{"cmd","/c", pyexecrms, rmsDataPath};
+        this.runtime = Runtime.getRuntime();
+        runtimeStart();
+        try {
+            this.runtime.exec(command, null, folder);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+        imgFile = new File(path + "\\" + "jpyplotRMS" + dimension + "D_" + steps + "S.png");
         /**
-        * GET IMAGE FROM PYDPLOT.READPYPLOT()
+        * GET IMAGE
         */
-        imagerms = pyplotrms.readPyPlot(new File(this.path + "/" + imgFile));
+        try {
+            Thread.sleep(1000*(int) Math.log10((double) steps));
+            image = ImageIO.read(imgFile);
+        } catch (IOException | InterruptedException ex) {
+            Logger.getLogger(Execution.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         frame.getContentPane().removeAll();
         frame.setTitle("Random Walk - R_rms Calculation");
@@ -293,7 +332,7 @@ public class Execution extends Data {
         titleLabel.setFont(new java.awt.Font(labelFont.getName(), java.awt.Font.PLAIN, newFontSize));
         titleLabel.setBounds(this.chartWidth/2-this.b,0,this.chartWidth,newFontSize);
 
-        ImageIcon figIcn = new ImageIcon(imagerms);
+        ImageIcon figIcn = new ImageIcon(image);
         JLabel figLabel = new JLabel(figIcn);
         frame.add(titleLabel);
         frame.add(figLabel);

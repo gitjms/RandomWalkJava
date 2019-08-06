@@ -84,14 +84,13 @@ public class RandomWalk extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        //this.fxplot = null;
         /**
         * FILE AND FOLDER CHECK
-        * creates a folder C:\DATA if not exist
+        * creates a folder C:\RWDATA if not exist
         * copies Fortran and Python executables from lib folder
-        * to DATA folder if not in DATA folder already
+        * to RWDATA folder if not in RWDATA folder already
         */
-        String datapath = "C:\\DATA";
+        String datapath = "C:\\RWDATA";
         String sourcepath = "src\\main\\resources\\lib\\";
         String fexec = "walk.exe";
         String pyexecrms = "plotrms.py";
@@ -1176,7 +1175,8 @@ public class RandomWalk extends Application {
 
             if ( fail == true ) return;
 
-            ex.executeRms(textAreaPath, this.frame, data, this.vars);
+            ex.executeRms(datafolder, datapath, fexec, pyexecrms,
+                this.frame, data, this.vars);
         });
 
         /**
@@ -1206,7 +1206,8 @@ public class RandomWalk extends Application {
 
             if ( fail == true ) return;
 
-            ex.executePath(textAreaPath, this.frame, data, this.vars);
+            ex.executePath(datafolder, datapath, fexec, pyexec1d, pyexec2d,
+                pyexec3d, this.frame, data, this.vars);
         });
 
         /**
@@ -1267,8 +1268,9 @@ public class RandomWalk extends Application {
                 * DRAW ANIMATION
                 */
                 getRealScene.refresh(
-                    fexec, piirturi, scalefactor, animwidth, linewidth, fxplot,
-                    rms_runs, rms_norm, newdata, mincount, maxcount, standnorm
+                    datafolder, fexec, piirturi, scalefactor, animwidth, linewidth,
+                    fxplot, rms_runs, rms_norm, newdata, mincount, maxcount,
+                    standnorm
                 );
                 newdata = false;
 
@@ -1387,7 +1389,8 @@ public class RandomWalk extends Application {
 
             if ( fail == true ) return;
 
-            ex.executeMMC(valikkoMMC, textAreaMMC, this.frame, data, this.vars);
+            ex.executeMMC(datafolder, datapath, fexec, pyexecmmc2d,
+                pyexecmmc3d, valikkoMMC, this.frame, data, this.vars);
         });
 
         /**
@@ -1480,7 +1483,7 @@ public class RandomWalk extends Application {
             * DRAW MMC ANIMATION
             */
             getMMCScene.refresh(
-                initialDataFile, fexec, mmcpiirturi, this.scalefactor,
+                datafolder, initialDataFile, fexec, mmcpiirturi, this.scalefactor,
                 this.animwidth, this.linewidth, this.fxplot, remBarNappiMMC,
                 runMMC, plotMMC, closeNappiMMC, menuNappiMMC, helpNappiMMC,
                 this.energy_x, this.energy_y, this.newdata, measure, diff
@@ -1505,6 +1508,9 @@ public class RandomWalk extends Application {
                     getMMCScene.stopRuntime();
                 if (getRealScene.runtimeIsRunning())
                     getRealScene.stopRuntime();
+                if (ex.runtimeIsRunning())
+                    ex.stopRuntime();
+                System.gc();
             });
         });
         stage.initStyle(StageStyle.UTILITY);
@@ -1559,8 +1565,6 @@ public class RandomWalk extends Application {
     }
 
     public static void main(String[] args) {
-
         launch(args);
-
     }
 }
