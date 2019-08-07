@@ -108,7 +108,7 @@ public class Execution {
             + particles + "N_"
             + steps + "S.x";
 
-        File imgFile = new File(path + "\\" + "jpyplot" + dimension + "D_N" + particles + "_S" + steps + ".png");
+        File imgFile = new File(path + "/" + "jpyplot" + dimension + "D_N" + particles + "_S" + steps + ".png");
 
         /**
         * 1D DATA
@@ -221,10 +221,10 @@ public class Execution {
             + particles + "N.xy";
 
         if ( dimension == 2 ) {
-            imgFile =  new File(path + "\\" + "jpyplotmmc2D_N" + particles + "_diam" + diameter + ".png");
+            imgFile =  new File(path + "/" + "jpyplotmmc2D_N" + particles + "_diam" + diameter + ".png");
             command = new String[]{"cmd","/c", pyexecmmc2d, startDataMMC, finalDataMMC};
         } else if ( dimension == 3 ) {
-            imgFile =  new File(path + "\\" + "jpyplotmmc3D_N" + particles + "_diam" + diameter + ".png");
+            imgFile =  new File(path + "/" + "jpyplotmmc3D_N" + particles + "_diam" + diameter + ".png");
             command = new String[]{"cmd","/c", pyexecmmc3d, startDataMMC, finalDataMMC};
         }
         
@@ -299,7 +299,7 @@ public class Execution {
             titletext = "Spread out free particles, ";
                 
         rmsDataPath = path
-            + "\\" + "rms_"
+            + "/" + "rms_"
             + dimension + "D_"
             + steps + "S.xy";
 
@@ -312,7 +312,7 @@ public class Execution {
             System.out.println(e.getMessage());
         }
 
-        imgFile = new File(path + "\\" + "jpyplotRMS" + dimension + "D_" + steps + "S.png");
+        imgFile = new File(path + "/" + "jpyplotRMS" + dimension + "D_" + steps + "S.png");
         /**
         * GET IMAGE
         */

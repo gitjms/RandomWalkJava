@@ -90,8 +90,8 @@ public class RandomWalk extends Application {
         * copies Fortran and Python executables from lib folder
         * to RWDATA folder if not in RWDATA folder already
         */
-        String datapath = "C:\\RWDATA";
-        String sourcepath = "src\\main\\resources\\lib\\";
+        String datapath = "C:/RWDATA";
+        String sourcepath = "src/main/resources/lib/";
         String fexec = "walk.exe";
         String pyexecrms = "plotrms.py";
         String pyexec1d = "plot1d.py";
@@ -100,7 +100,7 @@ public class RandomWalk extends Application {
         String pyexecmmc2d = "plotmmc2d.py";
         String pyexecmmc3d = "plotmmc3d.py";
         File datafolder = new File(datapath);
-        File sourceFile = new File(datapath + "\\" + fexec);
+        File sourceFile = new File(datapath + "/" + fexec);
 
         if (Files.notExists(datafolder.toPath())){
             if ( createFolder(sourcepath, datapath, fexec, true) == false )
@@ -120,32 +120,32 @@ public class RandomWalk extends Application {
         } else if (Files.notExists(sourceFile.toPath())) {
             if ( createFolder(sourcepath, datapath, fexec, false) == false )
                 this.stop();
-            sourceFile = new File(datapath + "\\" + pyexecrms);
+            sourceFile = new File(datapath + "/" + pyexecrms);
             if (Files.notExists(sourceFile.toPath())) {
                 if ( createFolder(sourcepath, datapath, pyexecrms, false) == false )
                     this.stop();
             }
-            sourceFile = new File(datapath + "\\" + pyexec1d);
+            sourceFile = new File(datapath + "/" + pyexec1d);
             if (Files.notExists(sourceFile.toPath())) {
                 if ( createFolder(sourcepath, datapath, pyexec1d, false) == false )
                     this.stop();
             }
-            sourceFile = new File(datapath + "\\" + pyexec2d);
+            sourceFile = new File(datapath + "/" + pyexec2d);
             if (Files.notExists(sourceFile.toPath())) {
                 if ( createFolder(sourcepath, datapath, pyexec2d, false) == false )
                     this.stop();
             }
-            sourceFile = new File(datapath + "\\" + pyexec3d);
+            sourceFile = new File(datapath + "/" + pyexec3d);
             if (Files.notExists(sourceFile.toPath())) {
                 if ( createFolder(sourcepath, datapath, pyexec3d, false) == false )
                     this.stop();
             }
-            sourceFile = new File(datapath + "\\" + pyexecmmc2d);
+            sourceFile = new File(datapath + "/" + pyexecmmc2d);
             if (Files.notExists(sourceFile.toPath())) {
                 if ( createFolder(sourcepath, datapath, pyexecmmc2d, false) == false )
                     this.stop();
             }
-            sourceFile = new File(datapath + "\\" + pyexecmmc3d);
+            sourceFile = new File(datapath + "/" + pyexecmmc3d);
             if (Files.notExists(sourceFile.toPath())) {
                 if ( createFolder(sourcepath, datapath, pyexecmmc3d, false) == false )
                     this.stop();
@@ -1477,7 +1477,7 @@ public class RandomWalk extends Application {
             * GET INITIAL DATA
             */
             File initialDataFile = new File(
-                datapath + "\\startMMC_" + dim + "D_" + particles + "N.xy");
+                datapath + "/startMMC_" + dim + "D_" + particles + "N.xy");
 
             /**
             * DRAW MMC ANIMATION
@@ -1535,8 +1535,8 @@ public class RandomWalk extends Application {
             return false;
         }
 
-        File sourceFile = new File(source + "\\" + executable);
-        File destinationFile = new File(destination + "\\" + executable);
+        File sourceFile = new File(source + "/" + executable);
+        File destinationFile = new File(destination + "/" + executable);
         InputStream fin = null;
         OutputStream fout = null;
         
