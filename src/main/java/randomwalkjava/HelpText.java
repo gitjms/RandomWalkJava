@@ -5,18 +5,16 @@ package randomwalkjava;
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
  * 
- * Class for logo and helptexts
+ * Class for GUI main view logo and helptexts
  */
-public class HelpText {
-
-    public HelpText() {
-    }
+class HelpText {
 
     /**
     * @return MAIN STAGE HELP TEXT
     */
-    public String menu() {
-        String text = " \nButton 'RMS vs SQRT(N)' shows a control panel with which you can\n"
+    String menu() {
+
+        return " \nButton 'RMS vs SQRT(N)' shows a control panel with which you can\n"
                     + " calculate root mean square (rms) distances of random walk particles.\n\n"
                     + " Program plots 'rms<dist>' versus 'sqrt(steps)'.\n\n"
                     + " Every run will save the data in a file replacing the previous one if\n"
@@ -47,14 +45,13 @@ public class HelpText {
                     + " data files; two ending with '.xy', and two or three ending with axis\n"
                     + " indication, i.e. '.x', '.y', or '.z', depending on dimension user\n"
                     + " chooses. The image will be saved in '.png' format.\n";
-    
-        return text;
     }
     /**
     * @return RMS CALCULATION HELP TEXT
     */
-    public String calculation() {
-        String text = "\n Number of Steps is a positive integer.\n\n"
+    String calculation() {
+
+        return "\n Number of Steps is a positive integer.\n\n"
                     + " Dimension is either 1, 2, or 3. One means moving along x-axis, two\n"
                     + " means moving on a plane with axes x and y, three means moving in a\n"
                     + " cube with axes x, y, and z.\n\n"
@@ -66,14 +63,13 @@ public class HelpText {
                     + " Program plots 'rms<distance>' versus 'sqrt(steps)'.\n\n"
                     + " Every run will save the data in '.xy' format and an image file in\n"
                     + " '.png' formata, replacing the previous ones.";
-    
-        return text;
     }
     /**
     * @return PATH TRACING HELP TEXT
     */
-    public String pathtracing() {
-        String text = "\n Number of particles is a positive integer, at least 1.\n\n"
+    String pathtracing() {
+
+        return "\n Number of particles is a positive integer, at least 1.\n\n"
                     + " Diameter is a positive real number on the interval ]0.0, 1.0[.\n\n"
                     + " Charge is either 1, 2, or 3. With 0 charge there is no charge, i.e.\n"
                     + " the particles may be deemed as 'neutral'. With 1 charge the particles\n"
@@ -95,14 +91,13 @@ public class HelpText {
                     + "    lattice form.\n\n"
                     + " Button 'EXECUTE' runs the code, and button 'CLOSE' safely closes the\n"
                     + " application.\n";
-    
-        return text;
     }
     /**
     * @return REAL TIME RMS HELP TEXT
     */
-    public String realtimerms() {
-        String text = "\n Number of particles is a positive integer, at least 1.\n\n"
+    String realtimerms() {
+
+        return "\n Number of particles is a positive integer, at least 1.\n\n"
                     + " Number of steps is a positive integer. It means the cumulative random steps\n"
                     + " the particles take while moving.\n\n"
                     + " Dimension is either 1, 2, or 3. One means moving along x-axis, two means moving on a\n"
@@ -117,14 +112,13 @@ public class HelpText {
                     + " 'Save' formats are: 'png', 'jpg', 'bmp', 'gif', 'svg', 'eps', and 'pdf'.\n\n"
                     + " 'Export' will save the both plot data in 'csv' format separately.\n\n"
                     + " Button 'RUN' runs the animation, and button 'CLOSE' safely closes the application.\n";
-    
-        return text;
     }
     /**
     * @return MMC DIFFUSION HELP TEXT
     */
-    public String mmc() {
-        String text = "\n Number of particles is a positive integer, at least 1.\n\n"
+    String mmc() {
+
+        return "\n Number of particles is a positive integer, at least 1.\n\n"
                     + " Diameter is a positive real number on the interval ]0.0, 1.0[.\n\n"
                     + " Charge is either 1, 2, or 3. With 0 charge there is no charge, i.e. the particles may\n"
                     + " be deemed as 'neutral'. With 1 charge the particles are all the same charge, i.e. they\n"
@@ -147,16 +141,15 @@ public class HelpText {
                     + " - 'PLOT' only creates an image of diffusion walk with two subplots: a start and final\n"
                     + "    positions of particles.\n\n"
                     + " Button 'CLOSE' safely closes the application.\n";
-    
-        return text;
     }
 
     /**
     * @return LOGO
     */
-    public String welcome() {
-        String text = "\n"
-                    + "        /////       ///       //    // ///        /////       //   //\n" 
+    String welcome() {
+
+        return "\n"
+                    + "        /////       ///       //    // ///        /////       //   //\n"
                     + "       ///  //     ////      ///   // //////    ///    //    ///  ///\n"
                     + "      ///    //   /////     ////  // ///   // ///      //   //// ////\n"
                     + "     ///   //    /// //    ///// // ///    /////       //  //////////\n"
@@ -174,7 +167,5 @@ public class HelpText {
                     + "       //// ////// ////  ////////////    ////       ////   ////      \n"
                     + "       /////// ///////  ////     ////   ////       ////    ////      \n"
                     + "       //////  //////  ////      ////  /////////  ////     /////       ";
-    
-        return text;
     }
 }

@@ -46,7 +46,7 @@ def main():
 	plt.gca().ticklabel_format(axis='both', style='plain', useOffset=False)
 #
 	plt.subplot(211)
-	plt.plot(xdata_start,ydata_start,'o',ms=1,mew=3,
+	plt.plot(xdata_start,ydata_start,'o',ms=1,mew=3,antialiased=True,
 		  label="Start configuration, N=%d"%particles)
 	plt.xlim(minx-abs(minx-maxx)/10,maxx+abs(minx-maxx)/10)
 	plt.ylim(miny-abs(miny-maxy)/10,maxy+abs(miny-maxy)/10)
@@ -54,7 +54,7 @@ def main():
 	plt.title(text,fontsize=15)
 
 	plt.subplot(212)
-	plt.plot(xdata_final,ydata_final,'o',ms=1,mew=3,
+	plt.plot(xdata_final,ydata_final,'o',ms=1,mew=3,antialiased=True,
 		  label="Final configuration, N=%d"%particles)
 	plt.xlim(minx-abs(minx-maxx)/10,maxx+abs(minx-maxx)/10)
 	plt.ylim(miny-abs(miny-maxy)/10,maxy+abs(miny-maxy)/10)

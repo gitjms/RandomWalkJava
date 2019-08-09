@@ -1,28 +1,29 @@
 package randomwalkjava;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
  * 
- * Class for Fortan code output reading
+ * Class for Fortan code error stream and input stream reading in Data class
  */
-public class StreamGobbler extends Thread {
+class StreamGobbler extends Thread {
 
-    InputStream is;
-    String type;
-    OutputStream os;
+    private final InputStream is;
+    private final String type;
+    private final OutputStream os;
     
-    StreamGobbler(InputStream is, String type) {
+    StreamGobbler(InputStream is) {
         this.is = is;
-        this.type = type;
+        this.type = "ERROR ";
         this.os = null;
     }
 
-    StreamGobbler(InputStream is, String type, OutputStream redirect) {
+    StreamGobbler(InputStream is, OutputStream redirect) {
         this.is = is;
-        this.type = type;
+        this.type = "";
         this.os = redirect;
     }
 
@@ -33,7 +34,7 @@ public class StreamGobbler extends Thread {
             if (os != null)
                 pw = new PrintWriter(os);
 
-            InputStreamReader isr = new InputStreamReader(is);
+            InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
             BufferedReader br = new BufferedReader(isr);
             String line;
             while ( (line = br.readLine()) != null){

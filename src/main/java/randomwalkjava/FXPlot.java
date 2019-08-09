@@ -1,17 +1,18 @@
 
 package randomwalkjava;
 
-import com.sun.glass.ui.Screen;
-import java.awt.Color;
-import java.awt.BasicStroke; 
+import java.awt.*;
+
 import static java.awt.BasicStroke.CAP_SQUARE;
 import static java.awt.BasicStroke.JOIN_MITER;
-import java.awt.Dimension;
-import java.awt.GridLayout;
+
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
+
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.XYChart;
 import org.knowm.xchart.XYChartBuilder;
@@ -25,273 +26,343 @@ import org.knowm.xchart.style.Styler.ChartTheme;
  * 
  * Class for ORG.KNOWM XCHART creation and handling
  */
-public class FXPlot extends SceneRealTimeRms {
+class FXPlot extends SceneRealTimeRms {
 
-    private final int width = 800;
-    private final int height = 1000;
-    private final int a = 400
-        / (int) Screen.getMainScreen().getRenderScale();
-    private final int b = 100
-        / (int) Screen.getMainScreen().getRenderScale();
-    private final int c = 10
-        / (int) Screen.getMainScreen().getRenderScale();
     private final XYChart calcChartW;
     private final XYChart calcChartH;
     private final XYChart calcChartE;
-    private final XChartPanel chartPanelW;
-    private final XChartPanel chartPanelH;
-    private final XChartPanel chartPanelE;
-    private final JFrame frame;
+    private final XChartPanel<XYChart> chartPanelW;
+    private final XChartPanel<XYChart> chartPanelH;
+    private final XChartPanel<XYChart> chartPanelE;
+    private JFrame frame;
 
-    public void setMinX(double minX) {
-        this.calcChartW.getStyler().setXAxisMin(minX);
-    }
-
-    public void setMaxX(double maxX) {
-       this.calcChartW.getStyler().setXAxisMax(maxX);
-    }
-
-    public void setMinY(double minY) {
-        this.calcChartW.getStyler().setYAxisMin(minY);
-    }
-
-    public void setMaxY(double maxY) {
-       this.calcChartW.getStyler().setYAxisMax(maxY);
-    }
-
-    public double getEMaxX() {
-        return this.calcChartE.getStyler().getXAxisMax();
-    }
-
-    public void setEMaxX(double maxX) {
-        this.calcChartE.getStyler().setXAxisMax(maxX);
-    }
-
-    public void setEMaxY(double maxY) {
-       this.calcChartE.getStyler().setYAxisMax(maxY);
-    }
-
-    public void setFrameVis(boolean fvis) {
-       this.frame.setVisible(fvis);
-    }
-
-    public void setHMinX(double minX) {
-        this.calcChartH.getStyler().setXAxisMin(minX);
-    }
-
-    public void setHMaxX(double maxX) {
-        this.calcChartH.getStyler().setXAxisMax(maxX);
-    }
-
-    public void setHMaxY(double maxY) {
-        this.calcChartH.getStyler().setYAxisMax(maxY);
-    }
-
-    public FXPlot(String which, Integer screenHeight) {
-        /**
+    /**
+     * method for creating a plotting element
+     * @param which Real Time plots and MMC plot
+     */
+    FXPlot(@NotNull String which) {
+        /*
         * JFrame
         */
-        this.frame = new JFrame();
-        this.frame.setBackground(Color.white);
-        this.frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        
+        this.setFrame(new JFrame());
+        this.getFrame().setBackground(Color.white);
+        this.getFrame().setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
         if (which.equals("W&H")) {
-            this.frame.setLocation(0, 0);
-            this.frame.setPreferredSize(new Dimension(this.width,this.height));
-            this.frame.setTitle("Real Time R_rms");
-            this.frame.getContentPane().setLayout(new GridLayout(2,1));
+            this.getFrame().setLocation(0, 100);
+            this.getFrame().setPreferredSize(new Dimension(this.getWidth(), this.getHeight()));
+            this.getFrame().setTitle("Real Time R_rms");
+            this.getFrame().getContentPane().setLayout(new GridLayout(2,1));
         } else if (which.equals("E")) {
-            this.frame.setLocation(0, (screenHeight-this.height/2)/2);
-            this.frame.setPreferredSize(new Dimension(this.width,this.height-this.a));
-            this.frame.setTitle("Real Time MMC");
+            this.getFrame().setLocation(0, 50);
+            this.getFrame().setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
+            this.getFrame().setTitle("Real Time MMC");
         }
         ImageIcon icon = new ImageIcon("src/main/resources/images/icon.png");
-        this.frame.setIconImage(icon.getImage());
-        /**
+        this.getFrame().setIconImage(icon.getImage());
+        /*
         * XYCharts
         */
-        this.calcChartW = new XYChartBuilder()
-            .theme(ChartTheme.Matlab).build();
-        this.calcChartH = new XYChartBuilder()
-            .theme(ChartTheme.Matlab).build();
-        this.calcChartE = new XYChartBuilder()
-            .theme(ChartTheme.Matlab).build();
-        /**
+        this.calcChartW = new XYChartBuilder().theme(ChartTheme.Matlab).build();
+        this.calcChartH = new XYChartBuilder().theme(ChartTheme.Matlab).build();
+        this.calcChartE = new XYChartBuilder().theme(ChartTheme.Matlab).build();
+        /*
         * XChartPanels
         */
-        this.chartPanelW = new XChartPanel(this.calcChartW);
-        this.chartPanelH = new XChartPanel(this.calcChartH);
-        this.chartPanelE = new XChartPanel(this.calcChartE);
-        
-        if (which.equals("W&H")) {
-            this.chartPanelW.setBounds(0, this.c, this.width, this.height/2-this.b);
-            this.chartPanelW.setVisible(true);
+        this.chartPanelW = new XChartPanel<>(this.getCalcChartW());
+        this.chartPanelH = new XChartPanel<>(this.getCalcChartH());
+        this.chartPanelE = new XChartPanel<>(this.getCalcChartE());
 
-            this.chartPanelH.setBounds(0, this.height/2, this.width, this.height/2-this.b);
-            this.chartPanelH.setVisible(true);
-            /**
+        if (which.equals("W&H")) {
+            this.getChartPanelW().setBounds(0, 10, this.getWidth(), this.getHeight()/2);
+            this.getChartPanelW().setVisible(true);
+
+            this.getChartPanelH().setBounds(0, this.getHeight()/2, this.getWidth(), this.getHeight()/2);
+            this.getChartPanelH().setVisible(true);
+            /*
             * Upper XYChart calcChartW
             */
-            this.calcChartW.getStyler().setXAxisTitleVisible(true);
-            this.calcChartW.getStyler().setYAxisTitleVisible(true);
-            this.calcChartW.setXAxisTitle("walks");
-            this.calcChartW.setYAxisTitle("<R_rms>");
-            this.calcChartW.getStyler().setLegendVisible(true);
-            this.calcChartW.getStyler().setMarkerSize(0);
-            this.calcChartW.getStyler().setXAxisDecimalPattern("0");
-            this.calcChartW.getStyler().setYAxisDecimalPattern("0.0");
-            this.calcChartW.getStyler().setAxisTickLabelsFont(new java.awt.Font(null,0,15));
-            this.calcChartW.getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
-            this.calcChartW.getStyler().setChartTitleFont(new java.awt.Font(null,0,20));
-            this.calcChartW.getStyler().setAxisTitleFont(new java.awt.Font(null,0,18));
-            this.calcChartW.getStyler().setLegendFont(new java.awt.Font(null,0,18));
-            this.calcChartW.getStyler().setChartTitlePadding(15);
-            this.calcChartW.getStyler().setToolTipsEnabled(false);
-            /**
+            this.getCalcChartW().getStyler().setXAxisTitleVisible(true);
+            this.getCalcChartW().getStyler().setYAxisTitleVisible(true);
+            this.getCalcChartW().setXAxisTitle("walks");
+            this.getCalcChartW().setYAxisTitle("<R_rms>");
+            this.getCalcChartW().getStyler().setLegendVisible(true);
+            this.getCalcChartW().getStyler().setMarkerSize(0);
+            this.getCalcChartW().getStyler().setXAxisDecimalPattern("0");
+            this.getCalcChartW().getStyler().setYAxisDecimalPattern("0.0");
+            this.getCalcChartW().getStyler().setAxisTickLabelsFont(new java.awt.Font(null, Font.PLAIN,15));
+            this.getCalcChartW().getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
+            this.getCalcChartW().getStyler().setChartTitleFont(new java.awt.Font(null, Font.PLAIN,20));
+            this.getCalcChartW().getStyler().setAxisTitleFont(new java.awt.Font(null, Font.PLAIN,18));
+            this.getCalcChartW().getStyler().setLegendFont(new java.awt.Font(null, Font.PLAIN,18));
+            this.getCalcChartW().getStyler().setChartTitlePadding(15);
+            this.getCalcChartW().getStyler().setToolTipsEnabled(false);
+            /*
             * Lower XYChart calcChartH
             */
-            this.calcChartH.getStyler().setLegendVisible(false);
-            this.calcChartH.setXAxisTitle("<R_rms>");
-            this.calcChartH.getStyler().setMarkerSize(0);
-            this.calcChartH.getStyler().setXAxisDecimalPattern("0.0");
-            this.calcChartH.getStyler().setYAxisDecimalPattern("0.0");
-            this.calcChartH.getStyler().setAxisTickLabelsFont(new java.awt.Font(null,0,15));
-            this.calcChartH.getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
-            this.calcChartH.getStyler().setChartTitleFont(new java.awt.Font(null,0,20));
-            this.calcChartH.getStyler().setAxisTitleFont(new java.awt.Font(null,0,18));
-            this.calcChartH.getStyler().setLegendFont(new java.awt.Font(null,0,18));
-            this.calcChartH.getStyler().setChartTitlePadding(15);
-            this.calcChartH.getStyler().setYAxisMin(0.0);
-            this.calcChartH.getStyler().setYAxisMax(10.0);
-            this.calcChartH.getStyler().setToolTipsEnabled(true);
+            this.getCalcChartH().getStyler().setLegendVisible(false);
+            this.getCalcChartH().setXAxisTitle("<R_rms>");
+            this.getCalcChartH().getStyler().setMarkerSize(0);
+            this.getCalcChartH().getStyler().setXAxisDecimalPattern("0.0");
+            this.getCalcChartH().getStyler().setYAxisDecimalPattern("0.0");
+            this.getCalcChartH().getStyler().setAxisTickLabelsFont(new java.awt.Font(null, Font.PLAIN,15));
+            this.getCalcChartH().getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
+            this.getCalcChartH().getStyler().setChartTitleFont(new java.awt.Font(null, Font.PLAIN,20));
+            this.getCalcChartH().getStyler().setAxisTitleFont(new java.awt.Font(null, Font.PLAIN,18));
+            this.getCalcChartH().getStyler().setLegendFont(new java.awt.Font(null, Font.PLAIN,18));
+            this.getCalcChartH().getStyler().setChartTitlePadding(15);
+            this.getCalcChartH().getStyler().setYAxisMin(0.0);
+            this.getCalcChartH().getStyler().setYAxisMax(10.0);
+            this.getCalcChartH().getStyler().setToolTipsEnabled(true);
 
         } else if (which.equals("E")) {
-            this.chartPanelE.setBounds(0, 0, this.width, this.height-this.a);
-            this.chartPanelE.setVisible(true);
-            /**
+            this.getChartPanelE().setBounds(0, 0, this.getWidth(), this.getHeight()-100);
+            this.getChartPanelE().setVisible(true);
+            /*
             * XYChart calcChartE
             */
-            this.calcChartE.getStyler().setLegendVisible(false);
-            this.calcChartE.setXAxisTitle("steps");
-            this.calcChartE.setYAxisTitle("Arbitrary Energy Unit");
-            this.calcChartE.getStyler().setMarkerSize(0);
-            this.calcChartE.getStyler().setXAxisDecimalPattern("0");
-            this.calcChartE.getStyler().setYAxisDecimalPattern("0.0");
-            this.calcChartE.getStyler().setAxisTickLabelsFont(new java.awt.Font(null,0,15));
-            this.calcChartE.getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
-            this.calcChartE.getStyler().setChartTitleFont(new java.awt.Font(null,0,20));
-            this.calcChartE.getStyler().setAxisTitleFont(new java.awt.Font(null,0,18));
-            this.calcChartE.getStyler().setLegendFont(new java.awt.Font(null,0,18));
-            this.calcChartE.getStyler().setChartTitlePadding(15);
-            this.calcChartE.getStyler().setXAxisMin(0.0);
-            this.calcChartE.getStyler().setYAxisMin(0.0);
-            this.calcChartE.getStyler().setToolTipsEnabled(true);
+            this.getCalcChartE().getStyler().setLegendVisible(false);
+            this.getCalcChartE().setXAxisTitle("steps");
+            this.getCalcChartE().setYAxisTitle("Arbitrary Energy Unit");
+            this.getCalcChartE().getStyler().setMarkerSize(0);
+            this.getCalcChartE().getStyler().setXAxisDecimalPattern("0");
+            this.getCalcChartE().getStyler().setYAxisDecimalPattern("0.0");
+            this.getCalcChartE().getStyler().setAxisTickLabelsFont(new java.awt.Font(null, Font.PLAIN,15));
+            this.getCalcChartE().getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
+            this.getCalcChartE().getStyler().setChartTitleFont(new java.awt.Font(null, Font.PLAIN,20));
+            this.getCalcChartE().getStyler().setAxisTitleFont(new java.awt.Font(null, Font.PLAIN,18));
+            this.getCalcChartE().getStyler().setLegendFont(new java.awt.Font(null, Font.PLAIN,18));
+            this.getCalcChartE().getStyler().setChartTitlePadding(15);
+            this.getCalcChartE().getStyler().setXAxisMin(0.0);
+            this.getCalcChartE().getStyler().setYAxisMin(0.0);
+            this.getCalcChartE().getStyler().setToolTipsEnabled(true);
         }
     }
 
-    public void setWData(String name1, String name2, double[] x, double[] y, double expected) {
-        this.calcChartW.getSeriesMap().clear();
-        this.chartPanelW.removeAll();
-        this.frame.getContentPane().remove(this.chartPanelW);
+    /**
+     * method for plotting R_rms and sqrt(N) vs. walks in Real Time Rms
+     * plot has two data lines: "R_rms" and "sqrt(N)"
+     * @param x x-axis data (rms_runs)
+     * @param y y-axis data (rms_runs)
+     * @param expected value of Math.sqrt((double) steps)
+     */
+    void setWData(double[] x, double[] y, double expected) {
+        this.getCalcChartW().getSeriesMap().clear();
+        this.getChartPanelW().removeAll();
+        this.getFrame().getContentPane().remove(this.getChartPanelW());
         BasicStroke[] BasicStroke = new BasicStroke[]{
                 new BasicStroke( 1.5f, CAP_SQUARE,
             		JOIN_MITER, 10.0f, null, 0.0f ),
                 new BasicStroke( 1.5f, CAP_SQUARE,
         			JOIN_MITER, 10.0f, new float[]{5, 5}, 2.0f )
         };
-        this.calcChartW.addSeries(String.valueOf(name1), x, y)
-            .setLineStyle(BasicStroke[0]).setLineColor(Color.red);
-        this.calcChartW.addSeries(String.valueOf(name2), x, y)
-            .setLineStyle(BasicStroke[1]).setLineColor(Color.blue);
+        this.getCalcChartW().addSeries("R_rms", x, y).setLineStyle(BasicStroke[0]).setLineColor(Color.red);
+        this.getCalcChartW().addSeries("sqrt(N)", x, y).setLineStyle(BasicStroke[1]).setLineColor(Color.blue);
 
-        this.calcChartW.setTitle("R_rms and sqrt(N) vs. walks, "+"sqrt(N) = "+String.format("%.2f",expected));
-        this.calcChartW.getStyler().setAntiAlias(true);
-        this.frame.getContentPane().add(this.chartPanelW);
-        this.frame.repaint();
-        this.frame.pack();
+        this.getCalcChartW().setTitle("R_rms and sqrt(N) vs. walks, "+"sqrt(N) = "+String.format("%.2f",expected));
+        this.getCalcChartW().getStyler().setAntiAlias(true);
+        this.getFrame().getContentPane().add(this.getChartPanelW());
+        this.getFrame().repaint();
+        this.getFrame().pack();
     }
 
-    public void setHData(String name, double[] x, double[] y, double minx,
-        double maxx, boolean standnorm) {
-        this.calcChartH.getSeriesMap().clear();
-        this.chartPanelH.removeAll();
-        this.frame.getContentPane().remove(this.chartPanelH);
+    /**
+     * method for plotting normal distribution in Real Time Rms
+     * @param x x-axis data (rms_norm)
+     * @param y y-axis data (rms_norm)
+     * @param minx x-axis min for normal distribution plot
+     * @param maxx x-axis max for normal distribution plot
+     * @param standnorm true if standard normal distribution, false otherwise
+     */
+    void setHData(double[] x, double[] y, double minx, double maxx, boolean standnorm) {
+        this.getCalcChartH().getSeriesMap().clear();
+        this.getChartPanelH().removeAll();
+        this.getFrame().getContentPane().remove(this.getChartPanelH());
         BasicStroke[] BasicStroke = new BasicStroke[]{
             new BasicStroke( 1.5f, CAP_SQUARE,
 				JOIN_MITER, 10.0f, null, 0.0f ),
         };
-        this.calcChartH.addSeries(String.valueOf(name), x, y)
+        this.getCalcChartH().addSeries("norm", x, y)
             .setLineStyle(BasicStroke[0]).setLineColor(Color.orange);
 
-        if ( standnorm == true ) {
-            this.calcChartH.setTitle("R_rms standard normal distribution");
+        if (standnorm) {
+            this.getCalcChartH().setTitle("R_rms standard normal distribution");
         } else {
-            this.calcChartH.setTitle("R_rms normal distribution");
+            this.getCalcChartH().setTitle("R_rms normal distribution");
         }
-        this.calcChartH.getStyler().setXAxisMin(minx);
-        this.calcChartH.getStyler().setXAxisMax(maxx);
-        this.calcChartH.getStyler().setYAxisMax( 1.05 );
-        this.calcChartH.getStyler().setAntiAlias(true);
-        this.frame.getContentPane().add(this.chartPanelH);
-        this.frame.repaint();
-        this.frame.pack();
+        this.getCalcChartH().getStyler().setXAxisMin(minx);
+        this.getCalcChartH().getStyler().setXAxisMax(maxx);
+        this.getCalcChartH().getStyler().setYAxisMax( 1.05 );
+        this.getCalcChartH().getStyler().setAntiAlias(true);
+        this.getFrame().getContentPane().add(this.getChartPanelH());
+        this.getFrame().repaint();
+        this.getFrame().pack();
     }
 
-    public void setEData(String name, List<Double> x, List<Double> y) {
-        this.calcChartE.getSeriesMap().clear();
-        this.chartPanelE.removeAll();
-        this.frame.getContentPane().remove(this.chartPanelE);
+    /**
+     * method for plotting energy minimization in MMC
+     * @param x x-axis data (energy_x)
+     * @param y y-axis data (energy_y)
+     */
+    void setEData(List<Double> x, List<Double> y) {
+        this.getCalcChartE().getSeriesMap().clear();
+        this.getChartPanelE().removeAll();
+        this.getFrame().getContentPane().remove(this.getChartPanelE());
         BasicStroke[] BasicStroke = new BasicStroke[]{
             new BasicStroke( 1.5f, CAP_SQUARE,
 				JOIN_MITER, 10.0f, null, 0.0f ),
         };
-        this.calcChartE.addSeries(String.valueOf(name), x, y)
+        this.getCalcChartE().addSeries("energy", x, y)
             .setLineStyle(BasicStroke[0]).setLineColor(Color.MAGENTA);
-        this.calcChartE.setTitle("MMC Diffusion Random Walk");
-        this.calcChartE.getStyler().setAntiAlias(true);
-        this.frame.getContentPane().add(this.chartPanelE);
-        this.frame.repaint();
-        this.frame.pack();
+        this.getCalcChartE().setTitle("MMC Diffusion Random Walk");
+        this.getCalcChartE().getStyler().setAntiAlias(true);
+        this.getFrame().getContentPane().add(this.getChartPanelE());
+        this.getFrame().repaint();
+        this.getFrame().pack();
     }
 
-    public void updateWData(String name, double[] x, double[] y) {
-        this.calcChartW.updateXYSeries(name, x, y, null);
-        this.frame.add(this.chartPanelW,0);
-        this.frame.repaint();
-        this.frame.pack();
+    /**
+     * method for updating R_rms and sqrt(N) vs. walks in Real Time Rms
+     * @param name name for "R_rms" or "sqrt(N)"
+     * @param x x-axis data (xAxis)
+     * @param y y-axis data (yAxis or y2Axis)
+     */
+    void updateWData(String name, double[] x, double[] y) {
+        this.getCalcChartW().updateXYSeries(name, x, y, null);
+        this.getFrame().add(this.getChartPanelW(),0);
+        this.getFrame().repaint();
+        this.getFrame().pack();
     }
 
-    public void updateHData(String name, double[] x, double[] y, double expected) {
-        this.calcChartH.updateXYSeries(name, x, y, null);
-        this.calcChartH.getStyler().setToolTipType(Styler.ToolTipType.xAndYLabels);
-        this.calcChartH.getStyler().setToolTipFont(new java.awt.Font(null,0,18));
-        this.frame.add(this.chartPanelH,1);
-        this.frame.repaint();
-        this.frame.pack();
+    /**
+     * method for updating normal distribution in Real Time Rms
+     * @param x x-axis data (xnormAxis)
+     * @param y y-axis data (ynormAxis)
+     */
+    void updateHData(double[] x, double[] y) {
+        this.getCalcChartH().updateXYSeries("norm", x, y, null);
+        this.getCalcChartH().getStyler().setToolTipType(Styler.ToolTipType.xAndYLabels);
+        this.getCalcChartH().getStyler().setToolTipFont(new java.awt.Font(null, Font.PLAIN,18));
+        this.getFrame().add(this.getChartPanelH(),1);
+        this.getFrame().repaint();
+        this.getFrame().pack();
     }
 
-    public void updateEData(String name, List<Double> x, List<Double> y) {
-        this.calcChartE.updateXYSeries(name, x, y, null);
-        this.calcChartE.getStyler().setToolTipType(Styler.ToolTipType.yLabels);
-        this.calcChartE.getStyler().setToolTipFont(new java.awt.Font(null,0,18));
-        this.frame.add(this.chartPanelE);
-        this.frame.repaint();
-        this.frame.pack();
+    /**
+     * method for updating energy minimization in MMC
+     * @param x x-axis data (energy_x)
+     * @param y y-axis data (energy_y)
+     */
+    void updateEData(List<Double> x, List<Double> y) {
+        this.getCalcChartE().updateXYSeries("energy", x, y, null);
+        this.getCalcChartE().getStyler().setToolTipType(Styler.ToolTipType.yLabels);
+        this.getCalcChartE().getStyler().setToolTipFont(new java.awt.Font(null, Font.PLAIN,18));
+        this.getFrame().add(this.getChartPanelE());
+        this.getFrame().repaint();
+        this.getFrame().pack();
     }
 
-    public XYChart getWChart() {
+    /**
+     * @param minY the y-axis min value to set
+     */
+    void setMinY(double minY) {
+        this.getCalcChartW().getStyler().setYAxisMin(minY);
+    }
+
+    /**
+     * @param maxY the y-axis max value to set
+     */
+    void setMaxY(double maxY) {
+        this.getCalcChartW().getStyler().setYAxisMax(maxY);
+    }
+
+    /**
+     * @param maxY the y-axis max value to set
+     */
+    void setEMaxY(double maxY) {
+        this.getCalcChartE().getStyler().setYAxisMax(maxY);
+    }
+
+    /**
+     */
+    void setFrameVis() {
+       this.getFrame().setVisible(true);
+    }
+
+    /**
+     * @param maxY the y-axis max value to set
+     */
+    void setHMaxY(double maxY) {
+        this.getCalcChartH().getStyler().setYAxisMax(maxY);
+    }
+
+    /**
+     * @param frame the frame to set
+     */
+    private void setFrame(JFrame frame) {
+        this.frame = frame;
+    }
+
+    /**
+     * @return the frame
+     */
+    JFrame getFrame() {
+        return frame;
+    }
+
+    /**
+     * @return the width
+     */
+    @Contract(pure = true)
+    private int getWidth() { return 900; }
+
+    /**
+     * @return the height
+     */
+    @Contract(pure = true)
+    private int getHeight() { return 800; }
+
+    /**
+     * @return the calcChartW
+     */
+    @Contract(pure = true)
+    private XYChart getCalcChartW() {
         return calcChartW;
     }
 
-    public XYChart getHChart() {
+    /**
+     * @return the calcChartH
+     */
+    @Contract(pure = true)
+    private XYChart getCalcChartH() {
         return calcChartH;
     }
 
-    public XYChart getEChart() {
+    /**
+     * @return the calcChartE
+     */
+    @Contract(pure = true)
+    private XYChart getCalcChartE() {
         return calcChartE;
     }
 
-    public JFrame getFrame() {
-        return frame;
-    }
+    /**
+     * @return the chartPanelW
+     */
+    @Contract(pure = true)
+    private XChartPanel<XYChart> getChartPanelW() { return chartPanelW; }
+
+    /**
+     * @return the chartPanelH
+     */
+    @Contract(pure = true)
+    private XChartPanel<XYChart> getChartPanelH() { return chartPanelH; }
+
+    /**
+     * @return the chartPanelE
+     */
+    @Contract(pure = true)
+    private XChartPanel<XYChart> getChartPanelE() { return chartPanelE; }
+
+
 }

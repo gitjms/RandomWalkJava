@@ -31,7 +31,7 @@ def main():
 	fig.set_figheight(7)
 	fig.set_figwidth(9)
 
-	plt.plot(x_data,y_data,'-',lw=1,label=r"R_rms, N=%d"%int(steps))
+	plt.plot(x_data,y_data,'-',lw=1,antialiased=True,label=r"R_rms, N=%d"%int(steps))
 	plt.xlim(0,maxx)
 	plt.ylim(0,maxy)
 	plt.xlabel(r"$\sqrt{N}$", fontsize=14)

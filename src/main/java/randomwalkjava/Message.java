@@ -5,9 +5,9 @@ package randomwalkjava;
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
  * 
- * Class for code thread failure message
+ * Class for thread failure message
  */
-public class Message extends Thread {
+class Message extends Thread {
     @Override
     public void run() {
          System.out.println(" Program is closing due to errors.");

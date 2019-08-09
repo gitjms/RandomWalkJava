@@ -15,6 +15,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -40,6 +41,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import org.jetbrains.annotations.Contract;
 
 /**
  * @author Jari Sunnari
@@ -47,10 +49,9 @@ import javafx.scene.text.FontWeight;
  * 
  * Class for MMC DIFFUSION
  */
-public class SceneMMC extends Data {
+@SuppressWarnings("SameReturnValue")
+class SceneMMC extends Data {
 
-    private final int compwidth = 150;
-    private final int paneWidth = 200;
     private ToggleButton setCharge0;
     private ToggleButton setCharge1;
     private ToggleButton setCharge2;
@@ -82,70 +83,17 @@ public class SceneMMC extends Data {
     private Image grayP;
     private BufferedWriter output;
 
-    @Override
-    public String[] getVars() {
-        return this.vars;
-    }
+    /**
+     * main class gets vars via this
+     * @return clone of vars array
+     */
+    String[] getVars() { return this.vars.clone(); }
 
-    public void barrierOn() {
-        this.barrier = true;
-    }
-    public void barrierOff() {
-        this.barrier = false;
-    }
-    public boolean barrierIsOn() {
-        return this.barrier;
-    }
-
-    public void walkStart() {
-        this.walk = true;
-    }
-    public void walkStop() {
-        this.walk = false;
-    }
-    public boolean walkState() {
-        return this.walk;
-    }
-
-    public void runtimeStart() {
-        this.running = true;
-    }
-    public boolean runtimeIsRunning() {
-        return this.running;
-    }
-    public void stopRuntime() {
-        this.running = false;
-        this.runtime.exit(this.exitVal);
-    }
-
-    public void timerStart() {
-        this.timerRunning = true;
-    }
-    public void timerStop() {
-        this.timer.cancel();
-        this.timer.purge();
-        this.timerRunning = false;
-    }
-    public boolean timerIsRunning() {
-        return this.timerRunning;
-    }
-
-    public BufferedWriter getProcOut() {
-        return this.output;
-    }
-
-    public void platfStart() {
-        this.platfRunning = true;
-    }
-    public void platfStop() {
-        this.process.destroyForcibly();
-        this.platfRunning = false;
-    }
-    public boolean platfIsRunning() {
-        return this.platfRunning;
-    }
-
-    public SceneMMC() {
+    /**
+     * initiating scene button and user variable array
+     */
+    SceneMMC() {
+        super();
         this.nappiLattice = new Button("FREE");
         this.vars = new String[]{
             "0",    // vars[0] particles        USER
@@ -159,31 +107,53 @@ public class SceneMMC extends Data {
             "-"};   // vars[8] save (off)       n/a
     }
 
-     public void refresh(File folder, File initialDataFile, String executable,
-        GraphicsContext piirturi, double scalefactor, int animwidth,
-        double linewidth, FXPlot fxplot, Button remBarNappiMMC, Button runMMC,
-        Button plotMMC, Button closeNappiMMC, Button menuNappiMMC,
-        Button helpNappiMMC, List<Double> energy_x, List<Double> energy_y,
-        boolean newdata, int measure, double diff) {
+    /**
+     * MMC execution, uses Timer
+     * @param folder datafolder C:/RWDATA
+     * @param initialDataFile initial particle data
+     * @param executable Fortran executable walk.exe
+     * @param piirturi GraphicsContext which draws the animation
+     * @param scalefactor scaling is used in different particle amounts
+     * @param animwidth drawing area width
+     * @param linewidth width for lines
+     * @param fxplot plotting element for graphs
+     * @param remBarNappiMMC removing barrier in animation
+     * @param runMMC run animation, no plot
+     * @param plotMMC plot initial and final particle configurations, no animation
+     * @param closeNappiMMC close button must be disabled during run
+     * @param menuNappiMMC menu button must be disabled during run
+     * @param helpNappiMMC help button must be disabled during run
+     * @param energy_x fxplot energy graph x-axis container
+     * @param energy_y fxplot energy graph y-axis container
+     * @param newdata if is a new run with new data
+     * @param measure area/volume size
+     * @param diff difference in between the lattice structure
+     */
+    void refresh(File folder, File initialDataFile, String executable,
+                 GraphicsContext piirturi, double scalefactor, int animwidth,
+                 double linewidth, FXPlot fxplot, Button remBarNappiMMC, Button runMMC,
+                 Button plotMMC, Button closeNappiMMC, Button menuNappiMMC,
+                 Button helpNappiMMC, List<Double> energy_x, List<Double> energy_y,
+                 boolean newdata, double measure, double diff) {
 
-        this.yellowP = new Image("images/Pyellow.png");
-        this.grayP = new Image("images/Pgray.png");
+         this.setYellowP(new Image("images/Pyellow.png"));
+         this.setGrayP(new Image("images/Pgray.png"));
 
-        this.piirturi = piirturi;
-        this.linewidth = linewidth;
-        this.animwidth = animwidth;
-        this.scalefactor = scalefactor;
-        this.center = (double) this.animwidth/2.0;
-        this.lattice = this.vars[7].equals("l");
-        barrierOn();
+         this.setPiirturi(piirturi);
+         this.setLinewidth(linewidth);
+         this.setAnimwidth(animwidth);
+         this.setScalefactor(scalefactor);
+         this.setCenter((double) this.getAnimwidth() / 2.0);
+         this.setLattice(this.vars[7].equals("l"));
+         barrierOn();
 
         int num_part = parseInt(this.vars[0]);
         double diam = parseDouble(this.vars[1]);
         int dim = parseInt(this.vars[4]);
 
-        if (newdata == true) {
-            this.phase = 0;
-            this.first = false;
+        if (newdata) {
+            this.setPhase(0);
+            this.setFirst(false);
             energy_x.clear();
             energy_y.clear();
             clearDots(dim);
@@ -195,19 +165,19 @@ public class SceneMMC extends Data {
             barrierOff();
             menuNappiMMC.setDisable(true);
             helpNappiMMC.setDisable(true);
-            this.setCharge0.setDisable(true);
-            this.setCharge1.setDisable(true);
-            this.setCharge2.setDisable(true);
-            this.setDim2.setDisable(true);
-            this.setDim3.setDisable(true);
-            this.nappiLattice.setDisable(true);
+            this.getSetCharge0().setDisable(true);
+            this.getSetCharge1().setDisable(true);
+            this.getSetCharge2().setDisable(true);
+            this.getSetDim2().setDisable(true);
+            this.getSetDim3().setDisable(true);
+            this.getNappiLattice().setDisable(true);
             closeNappiMMC.setDisable(true);
             remBarNappiMMC.setVisible(false);
             runMMC.setDisable(true);
-            fxplot.setFrameVis(true);
+            fxplot.setFrameVis();
         });
 
-        this.values = new double[dim][num_part];
+        this.setValues(new double[dim][num_part]);
 
         piirturi.setLineWidth(linewidth);
 
@@ -220,13 +190,13 @@ public class SceneMMC extends Data {
             this.vars[4], this.vars[5], this.vars[6], this.vars[7],
             this.vars[8]};
 
-        this.runtime = Runtime.getRuntime();
+        this.setRuntime(Runtime.getRuntime());
         runtimeStart();
 
-        this.process = this.runtime.exec(command, null, folder);
+        this.setProcess(this.getRuntime().exec(command, null, folder));
         walkStart();
 
-        /**
+        /*
         * DRAW INITIAL PARTICLES
         */
         try {
@@ -238,15 +208,15 @@ public class SceneMMC extends Data {
         }
 
         timerStart();
-        this.timer = new Timer();
-        this.timer.scheduleAtFixedRate(new TimerTask() {
+        this.setTimer(new Timer());
+        this.getTimer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 int i = 0;
 
                 if ( !timerIsRunning()) return;
 
-                while ( barrierIsOn() == true ) {
+                while ( barrierIsOn() ) {
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException ex) {
@@ -254,27 +224,25 @@ public class SceneMMC extends Data {
                     }
                 }
 
-                if ( barrierIsOn() == false ) {
-                    output = new BufferedWriter(new OutputStreamWriter(
-                        process.getOutputStream()));// {
-                        PrintWriter pw = null;
-                        if (output != null)
-                            pw = new PrintWriter(output);
-                        if (pw != null)
-                            pw.println("x");
-                        if (pw != null) {
-                            pw.flush();
-                            pw.close();
-                        }
+                if ( !barrierIsOn() ) {
+                    setOutput(new BufferedWriter(new OutputStreamWriter(getProcess().getOutputStream())));
+                    PrintWriter pw = null;
+                    if (getOutput() != null) pw = new PrintWriter(getOutput());
+                    if (pw != null) {
+                        pw.println("x");
+                        pw.flush();
+                        pw.close();
+                    }
                     try {
-                        output.close();
+                        assert getOutput() != null;
+                        getOutput().close();
                     } catch (IOException ex) {
                         Logger.getLogger(SceneMMC.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
 
                 try (BufferedReader input = new BufferedReader(new InputStreamReader(
-                    process.getInputStream()))) {
+                    getProcess().getInputStream()))) {
                     String line;
 
                     while ((line = input.readLine()) != null){
@@ -287,22 +255,22 @@ public class SceneMMC extends Data {
                             if (dim == 2) {
                                 String[] valStr = line.split("(\\s+)");
                                 try {
-                                    values[0][i] = Double.parseDouble(valStr[0].trim())
-                                        + center / scalefactor;
-                                    values[1][i] = Double.parseDouble(valStr[1].trim())
-                                        + center / scalefactor;
+                                        getValues()[0][i] = Double.parseDouble(valStr[0].trim())
+                                        + getCenter() / scalefactor;
+                                        getValues()[1][i] = Double.parseDouble(valStr[1].trim())
+                                        + getCenter() / scalefactor;
                                 } catch (NumberFormatException e) {
                                     continue;
                                 }
                             } else if (dim == 3) {
                                 String[] valStr = line.split("(\\s+)");
                                 try {
-                                    values[0][i] = Double.parseDouble(valStr[0].trim())
-                                        + center / scalefactor;
-                                    values[1][i] = Double.parseDouble(valStr[1].trim())
-                                        + center / scalefactor;
-                                    values[2][i] = Double.parseDouble(valStr[2].trim())
-                                        + center / scalefactor;
+                                        getValues()[0][i] = Double.parseDouble(valStr[0].trim())
+                                        + getCenter() / scalefactor;
+                                        getValues()[1][i] = Double.parseDouble(valStr[1].trim())
+                                        + getCenter() / scalefactor;
+                                        getValues()[2][i] = Double.parseDouble(valStr[2].trim())
+                                        + getCenter() / scalefactor;
                                 } catch (NumberFormatException e) {
                                     continue;
                                 }
@@ -314,15 +282,15 @@ public class SceneMMC extends Data {
                                 
                                 // DRAW
                                 clearDots( dim );
-                                if ( dim == 2 && lattice == true )
-                                    drawLattice( num_part, measure, diff );
+                                if ( dim == 2 && isLattice() )
+                                    drawLattice(measure, diff );
                                 for (int k = 0; k < num_part; k++){
                                     if ( dim == 2 ) {
-                                        draw2Dots(values[0][k], values[1][k],
-                                            num_part, diam);
+                                        draw2Dots(getValues()[0][k], getValues()[1][k],
+                                            diam);
                                     } else if ( dim == 3 ) {
-                                        draw3Dots(values[0][k], values[1][k],
-                                            values[2][k], num_part, diam);
+                                        draw3Dots(getValues()[0][k], getValues()[1][k],
+                                            getValues()[2][k], diam);
                                     }
                                 }
                             });
@@ -333,33 +301,33 @@ public class SceneMMC extends Data {
 
                         } else {
                             try {
-                                if ( first == false ) {
-                                    first = true;
+                                if ( !isFirst() ) {
+                                        setFirst(true);
                                     energy_y.add(Double.parseDouble(line.split("(\\s+)")[1].trim()));
-                                    energy_x.add((double) phase);
-                                    phase++;
-                                    greatest = energy_y.get(0);
-                                    fxplot.setEData("energy", energy_x, energy_y);
+                                    energy_x.add((double) getPhase());
+                                        setPhase(getPhase() + 1);
+                                        setGreatest(energy_y.get(0));
+                                    fxplot.setEData(energy_x, energy_y);
                                 } else {
                                     energy_y.add(Double.parseDouble(line.split("(\\s+)")[1].trim()));
-                                    energy_x.add((double) phase);
-                                    phase++;
+                                    energy_x.add((double) getPhase());
+                                        setPhase(getPhase() + 1);
                                 }
                             } catch (NumberFormatException e) {
                                 continue;
                             }
 
                             Thread.sleep(50);
-                            if ( energy_y.get((int) phase - 1) > greatest ) {
-                                greatest = energy_y.get((int) phase - 1);
-                                fxplot.setEMaxY(greatest);
+                            if ( energy_y.get((int) getPhase() - 1) > getGreatest() ) {
+                                    setGreatest(energy_y.get((int) getPhase() - 1));
+                                fxplot.setEMaxY(getGreatest());
                             }
-                            fxplot.updateEData("energy", energy_x, energy_y);
+                            fxplot.updateEData(energy_x, energy_y);
                         }
                     }
 
-                    exitVal = process.waitFor();
-                    if (exitVal != 0) {
+                        setExitVal(getProcess().waitFor());
+                    if (getExitVal() != 0) {
                         walkStop();
                         platfStop();
                         timerStop();
@@ -367,15 +335,15 @@ public class SceneMMC extends Data {
                         helpNappiMMC.setDisable(false);
                         runMMC.setDisable(false);
                         plotMMC.setVisible(true);
-                        setCharge0.setDisable(false);
-                        setCharge1.setDisable(false);
-                        setCharge2.setDisable(false);
-                        setDim2.setDisable(false);
-                        setDim3.setDisable(false);
-                        nappiLattice.setDisable(false);
+                            getSetCharge0().setDisable(false);
+                            getSetCharge1().setDisable(false);
+                            getSetCharge2().setDisable(false);
+                            getSetDim2().setDisable(false);
+                            getSetDim3().setDisable(false);
+                            getNappiLattice().setDisable(false);
                         closeNappiMMC.setDisable(false);
-                        runtime.gc();
-                        runtime.exit(exitVal);
+                            getRuntime().gc();
+                            getRuntime().exit(getExitVal());
                     }
                 } catch (IOException | InterruptedException e) {
                     platfStop();
@@ -384,14 +352,14 @@ public class SceneMMC extends Data {
                     helpNappiMMC.setDisable(false);
                     runMMC.setDisable(false);
                     plotMMC.setVisible(true);
-                    setCharge0.setDisable(false);
-                    setCharge1.setDisable(false);
-                    setCharge2.setDisable(false);
-                    setDim2.setDisable(false);
-                    setDim3.setDisable(false);
-                    nappiLattice.setDisable(false);
+                        getSetCharge0().setDisable(false);
+                        getSetCharge1().setDisable(false);
+                        getSetCharge2().setDisable(false);
+                        getSetDim2().setDisable(false);
+                        getSetDim3().setDisable(false);
+                        getNappiLattice().setDisable(false);
                     closeNappiMMC.setDisable(false);
-                    runtime.gc();
+                        getRuntime().gc();
                     Platform.runLater(() -> {
                         Alert alert = new Alert(AlertType.INFORMATION);
                         alert.setContentText("Walk finished.");
@@ -399,11 +367,11 @@ public class SceneMMC extends Data {
                         alert.show();
                     });
                 }
-            /**
+            /*
             * timer run ends
             */
             }
-        /**
+        /*
         * timer ends
         */
         }, 0, 50);
@@ -413,81 +381,112 @@ public class SceneMMC extends Data {
         }
     }
 
-    public void drawInitials( File initialDataFile,
-        int num_part, int dim, double diam, int measure, double diff ){
+     /**
+      * method for drawing the initial particles
+      * @param initialDataFile data from C:/RWDATA
+      * @param num_part number of particles
+      * @param dim dimension of particle field
+      * @param diam diameter of particle
+      * @param measure area/volume size of particle field
+      * @param diff difference in between the lattice structure
+      */
+     private void drawInitials(File initialDataFile,
+                               int num_part, int dim, double diam, double measure, double diff) throws IOException {
 
-        if ( dim == 2 && lattice == true )
-            drawLattice( num_part, measure, diff );
-        this.piirturi.setLineWidth(linewidth);
+        if ( dim == 2 && isLattice() )
+            drawLattice(measure, diff );
+        this.getPiirturi().setLineWidth(getLinewidth());
         List<double[]> initialData = readDataMMC(initialDataFile, dim);
 
-        this.piirturi.setGlobalAlpha(1.0);
+        this.getPiirturi().setGlobalAlpha(1.0);
         if ( num_part < 25 )
-            this.piirturi.setLineWidth(5.0 / (Math.log(num_part)*this.scalefactor));
+            this.getPiirturi().setLineWidth(5.0 / (Math.log(num_part)*this.getScalefactor()));
         else
-            this.piirturi.setLineWidth(10.0 / (Math.log(num_part)*this.scalefactor));
-        this.piirturi.setStroke(Color.RED);
-        this.piirturi.strokeLine(
-            this.center / this.scalefactor,
+            this.getPiirturi().setLineWidth(10.0 / (Math.log(num_part)*this.getScalefactor()));
+        this.getPiirturi().setStroke(Color.RED);
+        this.getPiirturi().strokeLine(this.getCenter() / this.getScalefactor(),
             0.0,
-            this.center / this.scalefactor,
-            2.0 * this.center / this.scalefactor);
+            this.getCenter() / this.getScalefactor(),
+            2.0 * this.getCenter() / this.getScalefactor());
 
-        /**
+        /*
         * Draw initial data spots
         */
         for (int k = 0; k < num_part; k++){
-            this.values[0][k] = initialData.get(k)[0]
-                + this.center / this.scalefactor;
-            this.values[1][k] = initialData.get(k)[1]
-                + this.center / this.scalefactor;
+            this.getValues()[0][k] = initialData.get(k)[0]
+                + this.getCenter() / this.getScalefactor();
+            this.getValues()[1][k] = initialData.get(k)[1]
+                + this.getCenter() / this.getScalefactor();
             if ( dim == 2 )
-                draw2Dots(this.values[0][k], this.values[1][k], num_part, diam);
+                draw2Dots(this.getValues()[0][k], this.getValues()[1][k], diam);
             else if ( dim == 3 ) {
-                this.values[2][k] = initialData.get(k)[2]
-                    + this.center / this.scalefactor;
-                draw3Dots(this.values[0][k], this.values[1][k],
-                    this.values[2][k], num_part, diam);
+                this.getValues()[2][k] = initialData.get(k)[2]
+                    + this.getCenter() / this.getScalefactor();
+                draw3Dots(this.getValues()[0][k], this.getValues()[1][k],
+                    this.getValues()[2][k], diam);
             }
         }
     }
 
-    public void clearDots( int dim ){
-        this.piirturi.setGlobalAlpha(1.0);
-        this.piirturi.setGlobalBlendMode(BlendMode.SRC_OVER);
-        this.piirturi.setFill(Color.BLACK);
+    /**
+     * method for clearing the animation area
+     * @param dim dimension of particle field
+     */
+    private void clearDots(int dim){
+        this.getPiirturi().setGlobalAlpha(1.0);
+        this.getPiirturi().setGlobalBlendMode(BlendMode.SRC_OVER);
+        this.getPiirturi().setFill(Color.BLACK);
         if ( dim == 2 )
-            this.piirturi.fillRect( 0, 0,
-                this.animwidth / this.scalefactor,
-                this.animwidth / this.scalefactor);
+            this.getPiirturi().fillRect(0, 0,
+                this.getAnimwidth() / this.getScalefactor(),
+                this.getAnimwidth() / this.getScalefactor());
         else if ( dim == 3 )
-            this.piirturi.fillRect(0, 0,
-                1.0/this.scalefactor*this.animwidth,
-                1.0/this.scalefactor*this.animwidth);
-        this.piirturi.fill();
+            this.getPiirturi().fillRect(0, 0,
+                1.0/this.getScalefactor()*this.getAnimwidth(),
+                1.0/this.getScalefactor()*this.getAnimwidth());
+        this.getPiirturi().fill();
     }
 
-    public void draw2Dots(double x, double y, int num_part, double diam){
-        this.piirturi.drawImage(this.yellowP, x - diam/2.0, y - diam/2.0, diam, diam);
+    /**
+     * method for drawing the 2D particles
+     * @param x x-coordinate of a particle
+     * @param y y-coordinate of a particle
+     * @param diam diameter of particle
+     */
+    private void draw2Dots(double x, double y, double diam){
+        this.getPiirturi().drawImage(this.getYellowP(), x - diam/2.0, y - diam/2.0, diam, diam);
     }
 
-    public void draw3Dots(double x, double y, double z, int num_part, double diam){
-        this.piirturi.setGlobalAlpha( 1.0 / ( Math.log(2.0 * z) ) );
-        this.piirturi.setLineWidth(this.linewidth);
-        this.piirturi.setGlobalBlendMode(BlendMode.LIGHTEN);
-        this.piirturi.setFill(Color.YELLOW);
-        this.piirturi.fillRoundRect(
+    /**
+     * method for drawing the 3D particles
+     * @param x x-coordinate of a particle
+     * @param y y-coordinate of a particle
+     * @param z z-coordinate of a particle
+     * @param diam diameter of particle
+     */
+    private void draw3Dots(double x, double y, double z, double diam){
+        this.getPiirturi().setGlobalAlpha( 1.0 / ( Math.log(2.0 * z) ) );
+        this.getPiirturi().setLineWidth(this.getLinewidth());
+        this.getPiirturi().setGlobalBlendMode(BlendMode.LIGHTEN);
+        this.getPiirturi().setFill(Color.YELLOW);
+        final double widthheight = 5.0 * diam / (2.0 * Math.log(2.0 * z));
+        this.getPiirturi().fillRoundRect(
             x - diam/( Math.log(2.0 * z) ),
             y - diam/( Math.log(2.0 * z) ),
-            5.0*diam/( 2.0*Math.log(2.0 * z)),  5.0*diam/( 2.0*Math.log(2.0 * z)),
-            5.0*diam/( 2.0*Math.log(2.0 * z)),  5.0*diam/( 2.0*Math.log(2.0 * z))
+                widthheight, widthheight,
+                widthheight, widthheight
         );
     }
  
-    public void drawLattice( int num_part, int measure, double diff ) {
-        for ( int i = 0; i < measure + 2; i+=2 ) {
-            for ( int j = 0; j < measure + 2; j+=2 ) {
-                this.piirturi.drawImage(this.grayP,
+    /**
+     * method for drawing the lattice structue (only in 2D)
+     * @param measure area/volume size of particle field
+     * @param diff difference in between the lattice structure
+     */
+    private void drawLattice(double measure, double diff) {
+        for ( int i = 0; i < (int) measure + 2; i+=2 ) {
+            for ( int j = 0; j < (int) measure + 2; j+=2 ) {
+                this.getPiirturi().drawImage(this.getGrayP(),
                     (double) i + diff,
                     (double) j + diff,
                     1.0, 1.0);
@@ -495,7 +494,12 @@ public class SceneMMC extends Data {
         }
     }
 
-    public static boolean isNumDouble(String str) {
+    /**
+     * method for checking if user input in GUI is a double
+     * @param str GUI input string
+     * @return true if input is a double, false otherwise
+     */
+    private static boolean isNumDouble(String str) {
         try {
             Double.parseDouble(str);
             return true;
@@ -504,7 +508,12 @@ public class SceneMMC extends Data {
         }
     }
 
-    public static boolean isNumInteger(String str) {
+    /**
+     * method for checking if user input in GUI is an integer
+     * @param str GUI input string
+     * @return true if input is an integer, false otherwise
+     */
+    private static boolean isNumInteger(String str) {
         try {
             Integer.parseInt(str);
             return true;
@@ -514,12 +523,12 @@ public class SceneMMC extends Data {
     }
 
     /**
-     * 
+     * Create GUI for MMC
      * @return MMC DIFFUSION SCENE
      */
-    public Parent getSceneMMC(){
+    Parent getSceneMMC(){
         GridPane asettelu = new GridPane();
-        asettelu.setMaxWidth(paneWidth);
+        asettelu.setMaxWidth(getPaneWidth());
         asettelu.setVgap(5);
         asettelu.setHgap(10);
         asettelu.setPadding(new Insets(0, 0, 0, 0));
@@ -529,7 +538,7 @@ public class SceneMMC extends Data {
         
         DropShadow shadow = new DropShadow();
 
-        /**
+        /*
         * COMPONENTS...
         */
         Label labNumParticles = new Label("number of particles:");
@@ -556,71 +565,53 @@ public class SceneMMC extends Data {
         });
 
         Label labCharge = new Label("charge of particles:");
-        this.setCharge0 = new ToggleButton("0");
-        this.setCharge0.setMinWidth(35);
-        this.setCharge0.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        this.setCharge0.setBackground(new Background(new BackgroundFill(
+        this.setSetCharge0(new ToggleButton("0"));
+        this.getSetCharge0().setMinWidth(35);
+        this.getSetCharge0().setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.getSetCharge0().setBackground(new Background(new BackgroundFill(
             Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.setCharge0.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                this.setCharge0.setEffect(shadow);
-        });
-        this.setCharge0.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                this.setCharge0.setEffect(null);
-        });
-        this.setCharge1 = new ToggleButton("1");
-        this.setCharge1.setMinWidth(35);
-        this.setCharge1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        this.setCharge1.setBackground(new Background(new BackgroundFill(
+        this.getSetCharge0().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getSetCharge0().setEffect(shadow));
+        this.getSetCharge0().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getSetCharge0().setEffect(null));
+        this.setSetCharge1(new ToggleButton("1"));
+        this.getSetCharge1().setMinWidth(35);
+        this.getSetCharge1().setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.getSetCharge1().setBackground(new Background(new BackgroundFill(
             Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.setCharge1.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                this.setCharge1.setEffect(shadow);
-        });
-        this.setCharge1.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                this.setCharge1.setEffect(null);
-        });
-        this.setCharge2 = new ToggleButton("2");
-        this.setCharge2.setMinWidth(35);
-        this.setCharge2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        this.setCharge2.setBackground(new Background(new BackgroundFill(
+        this.getSetCharge1().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getSetCharge1().setEffect(shadow));
+        this.getSetCharge1().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getSetCharge1().setEffect(null));
+        this.setSetCharge2(new ToggleButton("2"));
+        this.getSetCharge2().setMinWidth(35);
+        this.getSetCharge2().setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.getSetCharge2().setBackground(new Background(new BackgroundFill(
             Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.setCharge2.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                this.setCharge2.setEffect(shadow);
-        });
-        this.setCharge2.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                this.setCharge2.setEffect(null);
-        });
-        HBox setCharge = new HBox(setCharge0,setCharge1,setCharge2);
+        this.getSetCharge2().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getSetCharge2().setEffect(shadow));
+        this.getSetCharge2().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getSetCharge2().setEffect(null));
+        HBox setCharge = new HBox(getSetCharge0(), getSetCharge1(), getSetCharge2());
         setCharge.setSpacing(20);
-        this.setCharge0.setOnMouseClicked(f -> {
-            this.setCharge0.setBackground(new Background(new BackgroundFill(
+        this.getSetCharge0().setOnMouseClicked(f -> {
+            this.getSetCharge0().setBackground(new Background(new BackgroundFill(
                 Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.setCharge1.setBackground(new Background(new BackgroundFill(
+            this.getSetCharge1().setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.setCharge2.setBackground(new Background(new BackgroundFill(
+            this.getSetCharge2().setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[2] = "0";
         });
-        this.setCharge1.setOnMouseClicked(f -> {
-            this.setCharge0.setBackground(new Background(new BackgroundFill(
+        this.getSetCharge1().setOnMouseClicked(f -> {
+            this.getSetCharge0().setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.setCharge1.setBackground(new Background(new BackgroundFill(
+            this.getSetCharge1().setBackground(new Background(new BackgroundFill(
                 Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.setCharge2.setBackground(new Background(new BackgroundFill(
+            this.getSetCharge2().setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[2] = "1";
         });
-        this.setCharge2.setOnMouseClicked(f -> {
-            this.setCharge0.setBackground(new Background(new BackgroundFill(
+        this.getSetCharge2().setOnMouseClicked(f -> {
+            this.getSetCharge0().setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.setCharge1.setBackground(new Background(new BackgroundFill(
+            this.getSetCharge1().setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.setCharge2.setBackground(new Background(new BackgroundFill(
+            this.getSetCharge2().setBackground(new Background(new BackgroundFill(
                 Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[2] = "2";
         });
@@ -628,117 +619,99 @@ public class SceneMMC extends Data {
         this.vars[3] = "0";
 
         Label labNumDimensions = new Label("dimension:");
-        this.setDim2 = new ToggleButton("2");
-        this.setDim2.setMinWidth(55);
-        this.setDim2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        this.setDim2.setBackground(new Background(new BackgroundFill(
+        this.setSetDim2(new ToggleButton("2"));
+        this.getSetDim2().setMinWidth(55);
+        this.getSetDim2().setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.getSetDim2().setBackground(new Background(new BackgroundFill(
             Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.setDim2.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                this.setDim2.setEffect(shadow);
-        });
-        this.setDim2.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                this.setDim2.setEffect(null);
-        });
-        this.setDim3 = new ToggleButton("3");
-        this.setDim3.setMinWidth(55);
-        this.setDim3.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        this.setDim3.setBackground(new Background(new BackgroundFill(
+        this.getSetDim2().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getSetDim2().setEffect(shadow));
+        this.getSetDim2().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getSetDim2().setEffect(null));
+        this.setSetDim3(new ToggleButton("3"));
+        this.getSetDim3().setMinWidth(55);
+        this.getSetDim3().setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.getSetDim3().setBackground(new Background(new BackgroundFill(
             Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.setDim3.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                this.setDim3.setEffect(shadow);
-        });
-        this.setDim3.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                this.setDim3.setEffect(null);
-        });
-        HBox setDimension = new HBox(setDim2,setDim3);
+        this.getSetDim3().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getSetDim3().setEffect(shadow));
+        this.getSetDim3().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getSetDim3().setEffect(null));
+        HBox setDimension = new HBox(getSetDim2(), getSetDim3());
         setDimension.setSpacing(40);
-        this.setDim2.setOnMouseClicked(f -> {
-            this.setDim2.setBackground(new Background(new BackgroundFill(
+        this.getSetDim2().setOnMouseClicked(f -> {
+            this.getSetDim2().setBackground(new Background(new BackgroundFill(
                 Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.setDim3.setBackground(new Background(new BackgroundFill(
+            this.getSetDim3().setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[4] = "2";
         });
-        this.setDim3.setOnMouseClicked(f -> {
-            this.setDim2.setBackground(new Background(new BackgroundFill(
+        this.getSetDim3().setOnMouseClicked(f -> {
+            this.getSetDim2().setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.setDim3.setBackground(new Background(new BackgroundFill(
+            this.getSetDim3().setBackground(new Background(new BackgroundFill(
                 Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[4] = "3";
         });
 
-        /**
+        /*
         * ...THEIR PLACEMENTS
         */
         GridPane.setHalignment(labNumParticles, HPos.LEFT);
         asettelu.add(labNumParticles, 0, 0);
         GridPane.setHalignment(setNumParticles, HPos.CENTER);
-        setNumParticles.setMinWidth(this.compwidth);
-        setNumParticles.setMaxWidth(this.compwidth);
+        setNumParticles.setMinWidth(this.getCompwidth());
+        setNumParticles.setMaxWidth(this.getCompwidth());
         asettelu.add(setNumParticles, 0, 1);
         
         GridPane.setHalignment(labSizeParticles, HPos.LEFT);
         asettelu.add(labSizeParticles, 0, 2);
         GridPane.setHalignment(setSizeParticles, HPos.CENTER);
-        setSizeParticles.setMinWidth(this.compwidth);
-        setSizeParticles.setMaxWidth(this.compwidth);
+        setSizeParticles.setMinWidth(this.getCompwidth());
+        setSizeParticles.setMaxWidth(this.getCompwidth());
         asettelu.add(setSizeParticles, 0, 3);
 
         GridPane.setHalignment(labCharge, HPos.LEFT);
         asettelu.add(labCharge, 0, 4);
         GridPane.setHalignment(setCharge, HPos.CENTER);
-        setCharge.setMinWidth(this.compwidth);
-        setCharge.setMaxWidth(this.compwidth);
+        setCharge.setMinWidth(this.getCompwidth());
+        setCharge.setMaxWidth(this.getCompwidth());
         asettelu.add(setCharge, 0, 5);
 
         GridPane.setHalignment(labNumDimensions, HPos.LEFT);
         asettelu.add(labNumDimensions, 0, 6);
         GridPane.setHalignment(setDimension, HPos.CENTER);
-        setDimension.setMinWidth(this.compwidth);
-        setDimension.setMaxWidth(this.compwidth);
+        setDimension.setMinWidth(this.getCompwidth());
+        setDimension.setMaxWidth(this.getCompwidth());
         asettelu.add(setDimension, 0, 7);
 
         this.vars[5] = "m"; // mmc
         this.vars[6] = "-"; // spread out
 
-        /**
+        /*
         * BUTTON: LATTICE
         */
-        this.nappiLattice.setMinWidth(this.compwidth);
-        this.nappiLattice.setMaxWidth(this.compwidth);
-        this.nappiLattice.setBackground(new Background(
+        this.getNappiLattice().setMinWidth(this.getCompwidth());
+        this.getNappiLattice().setMaxWidth(this.getCompwidth());
+        this.getNappiLattice().setBackground(new Background(
             new BackgroundFill(
                 Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.nappiLattice.setId("lattice");
-        this.nappiLattice.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                this.nappiLattice.setEffect(shadow);
-        });
-        this.nappiLattice.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                this.nappiLattice.setEffect(null);
-        });
-        this.nappiLattice.setOnMouseClicked((MouseEvent event) -> {
-            if (this.nappiLattice.getText().equals("LATTICE")){
-                this.nappiLattice.setText("FREE");
-                this.nappiLattice.setBackground(
+        this.getNappiLattice().setId("lattice");
+        this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getNappiLattice().setEffect(shadow));
+        this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getNappiLattice().setEffect(null));
+        this.getNappiLattice().setOnMouseClicked((MouseEvent event) -> {
+            if (this.getNappiLattice().getText().equals("LATTICE")){
+                this.getNappiLattice().setText("FREE");
+                this.getNappiLattice().setBackground(
                     new Background(
                         new BackgroundFill(
                             Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[7] = "-";
-            } else if (this.nappiLattice.getText().equals("FREE")){
-                this.nappiLattice.setText("LATTICE");
-                this.nappiLattice.setBackground(
+            } else if (this.getNappiLattice().getText().equals("FREE")){
+                this.getNappiLattice().setText("LATTICE");
+                this.getNappiLattice().setBackground(
                     new Background(new BackgroundFill(
                         Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[7] = "l";
             }
         });
-        valikko.getChildren().add(this.nappiLattice);
+        valikko.getChildren().add(this.getNappiLattice());
 
         this.vars[8] = "-"; // save off
 
@@ -751,5 +724,415 @@ public class SceneMMC extends Data {
 
        return asettelu;
     }
+
+    /**
+     * sets setBarrier to true
+     */
+    private void barrierOn() { this.setBarrier(true); }
+
+    /**
+     * sets barrierOn to false
+     */
+    private void barrierOff() { this.setBarrier(false); }
+
+    /**
+     * @return isBarrier
+     */
+    boolean barrierIsOn() { return isBarrier(); }
+
+    /**
+     * sets setWalk to true
+     */
+    private void walkStart() { this.setWalk(true); }
+
+    /**
+     * sets setWalk to false
+     */
+    private void walkStop() { this.setWalk(false); }
+
+    /**
+     * @return isWalk
+     */
+    boolean walkState() { return isWalk(); }
+
+    /**
+     * sets setRunning to true
+     */
+    private void runtimeStart() { this.setRunning(true); }
+
+    /**
+     * @return isRunning
+     */
+    boolean runtimeIsRunning() { return isRunning(); }
+
+    /**
+     * sets setRunning to false,
+     * exits runtime
+     */
+    void stopRuntime() {
+        this.setRunning(false);
+        this.getRuntime().exit(this.getExitVal());
+    }
+
+    /**
+     * sets setTimerRunning to true
+     */
+    private void timerStart() { this.setTimerRunning(true); }
+
+    /**
+     * cancels Timer,
+     * purges Timer,
+     * sets setTimerRunning to false
+     */
+    private void timerStop() {
+        this.getTimer().cancel();
+        this.getTimer().purge();
+        this.setTimerRunning(false);
+    }
+
+    /**
+     * @return isTimerRunning
+     */
+    boolean timerIsRunning() { return isTimerRunning(); }
+
+    /**
+     * @return getOutput
+     */
+    BufferedWriter getProcOut() { return getOutput(); }
+
+    /**
+     * sets setPlatfRunning to true
+     */
+    private void platfStart() { this.setPlatfRunning(true); }
+
+    /**
+     * destroys process
+     * sets setPlatfRunning to false
+     */
+    private void platfStop() {
+        this.getProcess().destroyForcibly();
+        this.setPlatfRunning(false);
+    }
+
+    /**
+     * @return isPlatfRunning
+     */
+    @Contract(pure = true)
+    private boolean platfIsRunning() { return isPlatfRunning(); }
+
+    /**
+     * @return the compwidth
+     */
+    @Contract(pure = true)
+    private int getCompwidth() { return 150; }
+
+    /**
+     * @return the paneWidth
+     */
+    @Contract(pure = true)
+    private int getPaneWidth() { return 200; }
+
+    /**
+     * @return the setCharge0
+     */
+    @Contract(pure = true)
+    private ToggleButton getSetCharge0() { return setCharge0; }
+
+    /**
+     * @param setCharge0 the setCharge0 to set
+     */
+    private void setSetCharge0(ToggleButton setCharge0) { this.setCharge0 = setCharge0; }
+
+    /**
+     * @return the setCharge1
+     */
+    @Contract(pure = true)
+    private ToggleButton getSetCharge1() { return setCharge1; }
+
+    /**
+     * @param setCharge1 the setCharge1 to set
+     */
+    private void setSetCharge1(ToggleButton setCharge1) { this.setCharge1 = setCharge1; }
+
+    /**
+     * @return the setCharge2
+     */
+    @Contract(pure = true)
+    private ToggleButton getSetCharge2() { return setCharge2; }
+
+    /**
+     * @param setCharge2 the setCharge2 to set
+     */
+    private void setSetCharge2(ToggleButton setCharge2) { this.setCharge2 = setCharge2; }
+
+    /**
+     * @return the setDim2
+     */
+    @Contract(pure = true)
+    private ToggleButton getSetDim2() { return setDim2; }
+
+    /**
+     * @param setDim2 the setDim2 to set
+     */
+    private void setSetDim2(ToggleButton setDim2) { this.setDim2 = setDim2; }
+
+    /**
+     * @return the setDim3
+     */
+    @Contract(pure = true)
+    private ToggleButton getSetDim3() { return setDim3; }
+
+    /**
+     * @param setDim3 the setDim3 to set
+     */
+    private void setSetDim3(ToggleButton setDim3) { this.setDim3 = setDim3; }
+
+    /**
+     * @return the nappiLattice
+     */
+    @Contract(pure = true)
+    private Button getNappiLattice() { return nappiLattice; }
+
+    /**
+     * @return the phase
+     */
+    @Contract(pure = true)
+    private long getPhase() { return phase; }
+
+    /**
+     * @param phase the phase to set
+     */
+    private void setPhase(long phase) { this.phase = phase; }
+
+    /**
+     * @return the greatest
+     */
+    @Contract(pure = true)
+    private double getGreatest() { return greatest; }
+
+    /**
+     * @param greatest the greatest to set
+     */
+    private void setGreatest(double greatest) { this.greatest = greatest; }
+
+    /**
+     * @return the first
+     */
+    @Contract(pure = true)
+    private boolean isFirst() { return first; }
+
+    /**
+     * @param first the first to set
+     */
+    private void setFirst(boolean first) { this.first = first; }
+
+    /**
+     * @return the linewidth
+     */
+    @Contract(pure = true)
+    private double getLinewidth() { return linewidth; }
+
+    /**
+     * @param linewidth the linewidth to set
+     */
+    private void setLinewidth(double linewidth) { this.linewidth = linewidth; }
+
+    /**
+     * @return the scalefactor
+     */
+    @Contract(pure = true)
+    private double getScalefactor() { return scalefactor; }
+
+    /**
+     * @param scalefactor the scalefactor to set
+     */
+    private void setScalefactor(double scalefactor) { this.scalefactor = scalefactor; }
+
+    /**
+     * @return the timerRunning
+     */
+    @Contract(pure = true)
+    private boolean isTimerRunning() { return timerRunning; }
+
+    /**
+     * @param timerRunning the timerRunning to set
+     */
+    private void setTimerRunning(boolean timerRunning) { this.timerRunning = timerRunning; }
+
+    /**
+     * @return the animwidth
+     */
+    @Contract(pure = true)
+    private int getAnimwidth() { return animwidth; }
+
+    /**
+     * @param animwidth the animwidth to set
+     */
+    private void setAnimwidth(int animwidth) { this.animwidth = animwidth; }
+
+    /**
+     * @return the center
+     */
+    @Contract(pure = true)
+    private double getCenter() { return center; }
+
+    /**
+     * @param center the center to set
+     */
+    private void setCenter(double center) { this.center = center; }
+
+    /**
+     * @return the piirturi
+     */
+    @Contract(pure = true)
+    private GraphicsContext getPiirturi() { return piirturi; }
+
+    /**
+     * @param piirturi the piirturi to set
+     */
+    private void setPiirturi(GraphicsContext piirturi) { this.piirturi = piirturi; }
+
+    /**
+     * @return the platfRunning
+     */
+    @Contract(pure = true)
+    private boolean isPlatfRunning() { return platfRunning; }
+
+    /**
+     * @param platfRunning the platfRunning to set
+     */
+    private void setPlatfRunning(boolean platfRunning) { this.platfRunning = platfRunning; }
+
+    /**
+     * @return the process
+     */
+    @Contract(pure = true)
+    private Process getProcess() { return process; }
+
+    /**
+     * @param process the process to set
+     */
+    private void setProcess(Process process) { this.process = process; }
+
+    /**
+     * @return the runtime
+     */
+    @Contract(pure = true)
+    private Runtime getRuntime() { return runtime; }
+
+    /**
+     * @param runtime the runtime to set
+     */
+    private void setRuntime(Runtime runtime) { this.runtime = runtime; }
+
+    /**
+     * @return the exitVal
+     */
+    @Contract(pure = true)
+    private int getExitVal() { return exitVal; }
+
+    /**
+     * @param exitVal the exitVal to set
+     */
+    private void setExitVal(int exitVal) { this.exitVal = exitVal; }
+
+    /**
+     * @return the timer
+     */
+    @Contract(pure = true)
+    private Timer getTimer() { return timer; }
+
+    /**
+     * @param timer the timer to set
+     */
+    private void setTimer(Timer timer) { this.timer = timer; }
+
+    /**
+     * @return the values
+     */
+    @Contract(pure = true)
+    private double[][] getValues() { return values; }
+
+    /**
+     * @param values the values to set
+     */
+    private void setValues(double[][] values) { this.values = values; }
+
+    /**
+     * @return the running
+     */
+    @Contract(pure = true)
+    private boolean isRunning() { return running; }
+
+    /**
+     * @param running the running to set
+     */
+    private void setRunning(boolean running) { this.running = running; }
+
+    /**
+     * @return the barrier
+     */
+    @Contract(pure = true)
+    private boolean isBarrier() { return barrier; }
+
+    /**
+     * @param barrier the barrier to set
+     */
+    private void setBarrier(boolean barrier) { this.barrier = barrier; }
+
+    /**
+     * @return the walk
+     */
+    @Contract(pure = true)
+    private boolean isWalk() { return walk; }
+
+    /**
+     * @param walk the walk to set
+     */
+    private void setWalk(boolean walk) { this.walk = walk; }
+
+    /**
+     * @return the lattice
+     */
+    @Contract(pure = true)
+    private boolean isLattice() { return lattice; }
+
+    /**
+     * @param lattice the lattice to set
+     */
+    private void setLattice(boolean lattice) { this.lattice = lattice; }
+
+    /**
+     * @return the yellowP
+     */
+    @Contract(pure = true)
+    private Image getYellowP() { return yellowP; }
+
+    /**
+     * @param yellowP the yellowP to set
+     */
+    private void setYellowP(Image yellowP) { this.yellowP = yellowP; }
+
+    /**
+     * @return the grayP
+     */
+    @Contract(pure = true)
+    private Image getGrayP() { return grayP; }
+
+    /**
+     * @param grayP the grayP to set
+     */
+    private void setGrayP(Image grayP) { this.grayP = grayP; }
+
+    /**
+     * @return the output
+     */
+    @Contract(pure = true)
+    private BufferedWriter getOutput() { return output; }
+
+    /**
+     * @param output the output to set
+     */
+    private void setOutput(BufferedWriter output) { this.output = output; }
 
 }

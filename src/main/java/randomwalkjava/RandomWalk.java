@@ -1,25 +1,7 @@
 package randomwalkjava;
 
-import com.sun.glass.ui.Screen;
-import javafx.scene.image.Image;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import static java.lang.Double.parseDouble;
-import static java.lang.Integer.parseInt;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import static javafx.application.Application.launch;
 import javafx.event.EventType;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -32,49 +14,45 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javax.swing.JFrame;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static java.lang.Double.parseDouble;
+import static java.lang.Integer.parseInt;
 
 /**
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
- * 
- * TODO: javadocs
  */
+@SuppressWarnings("SameReturnValue")
 public class RandomWalk extends Application {
 
-    private final int stageWidth = 940;
-    private final int stageHeight = 660;
-    private final int buttonWidth = 150;
-    private final int textwidth = 740;
-    private final int textheight = 600;
-    private final int animwidth = 900;
-    private final int animheight = 900;
-    private final int pathheight = 660;
-    private final int paneWidth = 200;
-    private final int screenWidth = Screen.getMainScreen().getWidth();
-    private final int screenHeight = Screen.getMainScreen().getHeight();
+    private int screenWidth;
+    private int screenHeight;
     private FXPlot fxplot;
     private JFrame frame;
     private String[] vars;
-    private double scalefactor = 1.0;
-    private double linewidth = 1.0;
-    private boolean isscaled = false;
-    private boolean newdata = false;
-    private boolean standnorm = true;
+    private double scalefactor;
+    private double linewidth;
+    private boolean isscaled;
+    private boolean newdata;
+    private boolean standnorm;
     private double mincount;
     private double maxcount;
     private double[] rms_runs;
@@ -84,7 +62,18 @@ public class RandomWalk extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        /**
+        /*
+         * initiate parameters
+         */
+        setScreenWidth(Toolkit.getDefaultToolkit().getScreenSize().width);
+        setScreenHeight(Toolkit.getDefaultToolkit().getScreenSize().height);
+        setScalefactor(1.0);
+        setLinewidth(1.0);
+        setIsscaled(false);
+        setNewdata(false);
+        setStandnorm(true);
+
+        /*
         * FILE AND FOLDER CHECK
         * creates a folder C:\RWDATA if not exist
         * copies Fortran and Python executables from lib folder
@@ -103,95 +92,95 @@ public class RandomWalk extends Application {
         File sourceFile = new File(datapath + "/" + fexec);
 
         if (Files.notExists(datafolder.toPath())){
-            if ( createFolder(sourcepath, datapath, fexec, true) == false )
+            if (createFolder(sourcepath, datapath, fexec, true))
                 this.stop();
-            if ( createFolder(sourcepath, datapath, pyexecrms, false) == false )
+            if (createFolder(sourcepath, datapath, pyexecrms, false))
                 this.stop();
-            if ( createFolder(sourcepath, datapath, pyexec1d, false) == false )
+            if (createFolder(sourcepath, datapath, pyexec1d, false))
                 this.stop();
-            if ( createFolder(sourcepath, datapath, pyexec2d, false) == false )
+            if (createFolder(sourcepath, datapath, pyexec2d, false))
                 this.stop();
-            if ( createFolder(sourcepath, datapath, pyexec3d, false) == false )
+            if (createFolder(sourcepath, datapath, pyexec3d, false))
                 this.stop();
-            if ( createFolder(sourcepath, datapath, pyexecmmc2d, false) == false )
+            if (createFolder(sourcepath, datapath, pyexecmmc2d, false))
                 this.stop();
-            if ( createFolder(sourcepath, datapath, pyexecmmc3d, false) == false )
+            if (createFolder(sourcepath, datapath, pyexecmmc3d, false))
                 this.stop();
         } else if (Files.notExists(sourceFile.toPath())) {
-            if ( createFolder(sourcepath, datapath, fexec, false) == false )
+            if (createFolder(sourcepath, datapath, fexec, false))
                 this.stop();
             sourceFile = new File(datapath + "/" + pyexecrms);
             if (Files.notExists(sourceFile.toPath())) {
-                if ( createFolder(sourcepath, datapath, pyexecrms, false) == false )
+                if (createFolder(sourcepath, datapath, pyexecrms, false))
                     this.stop();
             }
             sourceFile = new File(datapath + "/" + pyexec1d);
             if (Files.notExists(sourceFile.toPath())) {
-                if ( createFolder(sourcepath, datapath, pyexec1d, false) == false )
+                if (createFolder(sourcepath, datapath, pyexec1d, false))
                     this.stop();
             }
             sourceFile = new File(datapath + "/" + pyexec2d);
             if (Files.notExists(sourceFile.toPath())) {
-                if ( createFolder(sourcepath, datapath, pyexec2d, false) == false )
+                if (createFolder(sourcepath, datapath, pyexec2d, false))
                     this.stop();
             }
             sourceFile = new File(datapath + "/" + pyexec3d);
             if (Files.notExists(sourceFile.toPath())) {
-                if ( createFolder(sourcepath, datapath, pyexec3d, false) == false )
+                if (createFolder(sourcepath, datapath, pyexec3d, false))
                     this.stop();
             }
             sourceFile = new File(datapath + "/" + pyexecmmc2d);
             if (Files.notExists(sourceFile.toPath())) {
-                if ( createFolder(sourcepath, datapath, pyexecmmc2d, false) == false )
+                if (createFolder(sourcepath, datapath, pyexecmmc2d, false))
                     this.stop();
             }
             sourceFile = new File(datapath + "/" + pyexecmmc3d);
             if (Files.notExists(sourceFile.toPath())) {
-                if ( createFolder(sourcepath, datapath, pyexecmmc3d, false) == false )
+                if (createFolder(sourcepath, datapath, pyexecmmc3d, false))
                     this.stop();
             }
         }
 
-        /**
+        /*
         * CREATE STAGE
         */
         stage.setTitle("Random Walk");
-        stage.setWidth(this.stageWidth);
-        stage.setHeight(this.stageHeight);
+        stage.setWidth(this.getStageWidth());
+        stage.setHeight(this.getStageHeight());
         stage.setResizable(false);
-        stage.setX( (double) (this.screenWidth-this.stageWidth) );
-        stage.setY( (double) (this.screenHeight-this.stageHeight) / 2.0 );
+        stage.setX(this.getScreenWidth()-this.getStageWidth()-10);
+        stage.setY((double) (this.getScreenHeight()-this.getStageHeight()) / 2.0);
 
         DropShadow shadow = new DropShadow();
 
-        /**
+        /*
         * SET FIRST VIEW BORDERPANE
         */
         GridPane asettelu = new GridPane();
-        asettelu.setMaxWidth(this.paneWidth);
+        asettelu.setMaxWidth(this.getPaneWidth());
         asettelu.setVgap(5);
         asettelu.setHgap(10);
         asettelu.setPadding(new Insets(0, 0, 0, 0));
 
-        /**
+        /*
         * FIRST VIEW BUTTONS
         */
         Button nappiScene1 = new Button("RMS vs SQRT(N)"); // SceneCalculation
         Button nappiScene2 = new Button("PATH TRACING"); // ScenePathTracing
         Button nappiScene3 = new Button("REAL TIME RMS"); // SceneRealTimeRms
         Button nappiScene4 = new Button("MMC DIFFUSION"); // SceneMMC
-        nappiScene1.setMinWidth(this.buttonWidth);
-        nappiScene1.setMaxWidth(this.buttonWidth);
-        nappiScene2.setMinWidth(this.buttonWidth);
-        nappiScene2.setMaxWidth(this.buttonWidth);
-        nappiScene3.setMinWidth(this.buttonWidth);
-        nappiScene3.setMaxWidth(this.buttonWidth);
-        nappiScene4.setMinWidth(this.buttonWidth);
-        nappiScene4.setMaxWidth(this.buttonWidth);
+        nappiScene1.setMinWidth(this.getButtonWidth());
+        nappiScene1.setMaxWidth(this.getButtonWidth());
+        nappiScene2.setMinWidth(this.getButtonWidth());
+        nappiScene2.setMaxWidth(this.getButtonWidth());
+        nappiScene3.setMinWidth(this.getButtonWidth());
+        nappiScene3.setMaxWidth(this.getButtonWidth());
+        nappiScene4.setMinWidth(this.getButtonWidth());
+        nappiScene4.setMaxWidth(this.getButtonWidth());
 
         Button nappiMenuHelp = new Button("HELP");
-        nappiMenuHelp.setMinWidth(this.buttonWidth);
-        nappiMenuHelp.setMaxWidth(this.buttonWidth);
+        nappiMenuHelp.setMinWidth(this.getButtonWidth());
+        nappiMenuHelp.setMaxWidth(this.getButtonWidth());
 
         GridPane.setHalignment(nappiScene1, HPos.LEFT);
         asettelu.add(nappiScene1, 0, 0, 2, 1);
@@ -199,13 +188,9 @@ public class RandomWalk extends Application {
             new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         nappiScene1.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                nappiScene1.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> nappiScene1.setEffect(shadow));
         nappiScene1.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                nappiScene1.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> nappiScene1.setEffect(null));
         nappiScene1.setVisible(true);
 
         final Pane empty1 = new Pane();
@@ -218,13 +203,9 @@ public class RandomWalk extends Application {
             new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         nappiScene2.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                nappiScene2.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> nappiScene2.setEffect(shadow));
         nappiScene2.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                nappiScene2.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> nappiScene2.setEffect(null));
         nappiScene2.setVisible(true);
 
         final Pane empty2 = new Pane();
@@ -237,13 +218,9 @@ public class RandomWalk extends Application {
             new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         nappiScene3.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                nappiScene3.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> nappiScene3.setEffect(shadow));
         nappiScene3.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                nappiScene3.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> nappiScene3.setEffect(null));
         nappiScene3.setVisible(true);
 
         final Pane empty3 = new Pane();
@@ -256,13 +233,9 @@ public class RandomWalk extends Application {
             new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         nappiScene4.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                nappiScene4.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> nappiScene4.setEffect(shadow));
         nappiScene4.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                nappiScene4.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> nappiScene4.setEffect(null));
         nappiScene4.setVisible(true);
 
         final Pane empty4 = new Pane();
@@ -275,7 +248,7 @@ public class RandomWalk extends Application {
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         nappiMenuHelp.setVisible(true);
 
-        /**
+        /*
         * OTHER COMPONENTS
         */
         BorderPane asetteluMenu = new BorderPane();
@@ -286,7 +259,7 @@ public class RandomWalk extends Application {
         valikkoMenu.setPadding(new Insets(10, 10, 10, 10));
         valikkoMenu.setSpacing(10);
 
-        /**
+        /*
         * OTHER VIEWS
         */
         SceneCalculation getCalcScene = new SceneCalculation();
@@ -331,18 +304,18 @@ public class RandomWalk extends Application {
         valikkoMMC.setPadding(new Insets(10, 10, 10, 10));
         valikkoMMC.setSpacing(20);
 
-        /**
+        /*
         * TEXT AREAS
         */
         HelpText helpText = new HelpText();
-        /**
+        /*
         * CALCULATION TEXT AREA
         */
         TextArea textAreaCalc = new TextArea();
-        textAreaCalc.setMinWidth(this.textwidth);
-        textAreaCalc.setMaxWidth(this.textwidth);
-        textAreaCalc.setMinHeight(this.textheight);
-        textAreaCalc.setMaxHeight(this.textheight);
+        textAreaCalc.setMinWidth(this.getTextWidth());
+        textAreaCalc.setMaxWidth(this.getTextWidth());
+        textAreaCalc.setMinHeight(this.getTextHeight());
+        textAreaCalc.setMaxHeight(this.getTextHeight());
         textAreaCalc.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
         textAreaCalc.setBorder(null);
         textAreaCalc.setEditable(false);
@@ -350,14 +323,14 @@ public class RandomWalk extends Application {
             new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         textAreaCalc.setBlendMode(BlendMode.DIFFERENCE);
-        /**
+        /*
         * PATH TRACING TEXT AREA
         */
         TextArea textAreaPath = new TextArea();
-        textAreaPath.setMinWidth(this.textwidth);
-        textAreaPath.setMaxWidth(this.textwidth);
-        textAreaPath.setMinHeight(this.pathheight);
-        textAreaPath.setMaxHeight(this.pathheight);
+        textAreaPath.setMinWidth(this.getTextWidth());
+        textAreaPath.setMaxWidth(this.getTextWidth());
+        textAreaPath.setMinHeight(this.getPathHeight());
+        textAreaPath.setMaxHeight(this.getPathHeight());
         textAreaPath.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
         textAreaPath.setBorder(null);
         textAreaPath.setEditable(false);
@@ -365,14 +338,14 @@ public class RandomWalk extends Application {
             new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         textAreaPath.setBlendMode(BlendMode.DIFFERENCE);
-        /**
+        /*
         * REAL TIME RMS TEXT AREA
         */
         TextArea textAreaReal = new TextArea();
-        textAreaReal.setMinWidth(this.animwidth);
-        textAreaReal.setMaxWidth(this.animwidth);
-        textAreaReal.setMinHeight(this.animheight);
-        textAreaReal.setMaxHeight(this.animheight);
+        textAreaReal.setMinWidth(this.getAnimWidth());
+        textAreaReal.setMaxWidth(this.getAnimWidth());
+        textAreaReal.setMinHeight(this.getAnimHeight());
+        textAreaReal.setMaxHeight(this.getAnimHeight());
         textAreaReal.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
         textAreaReal.setBorder(null);
         textAreaReal.setEditable(false);
@@ -380,14 +353,14 @@ public class RandomWalk extends Application {
             new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         textAreaReal.setBlendMode(BlendMode.DIFFERENCE);
-        /**
+        /*
         * MMC TEXT AREA
         */
         TextArea textAreaMMC = new TextArea();
-        textAreaMMC.setMinWidth(this.animwidth);
-        textAreaMMC.setMaxWidth(this.animwidth);
-        textAreaMMC.setMinHeight(this.animheight);
-        textAreaMMC.setMaxHeight(this.animheight);
+        textAreaMMC.setMinWidth(this.getAnimWidth());
+        textAreaMMC.setMaxWidth(this.getAnimWidth());
+        textAreaMMC.setMinHeight(this.getAnimHeight());
+        textAreaMMC.setMaxHeight(this.getAnimHeight());
         textAreaMMC.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
         textAreaMMC.setBorder(null);
         textAreaMMC.setEditable(false);
@@ -396,14 +369,14 @@ public class RandomWalk extends Application {
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         textAreaMMC.setBlendMode(BlendMode.DIFFERENCE);
 
-        /**
+        /*
         * TEXT AREA MENU
         */
         TextArea textAreaMenu = new TextArea(helpText.welcome());
-        textAreaMenu.setMinWidth(this.textwidth);
-        textAreaMenu.setMaxWidth(this.textwidth);
-        textAreaMenu.setMinHeight(this.textheight);
-        textAreaMenu.setMaxHeight(this.textheight);
+        textAreaMenu.setMinWidth(this.getTextWidth());
+        textAreaMenu.setMaxWidth(this.getTextWidth());
+        textAreaMenu.setMinHeight(this.getTextHeight());
+        textAreaMenu.setMaxHeight(this.getTextHeight());
         textAreaMenu.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
         textAreaMenu.setBorder(null);
         textAreaMenu.setEditable(false);
@@ -412,284 +385,228 @@ public class RandomWalk extends Application {
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         textAreaMenu.setBlendMode(BlendMode.DIFFERENCE);
         
-        /**
+        /*
         * REAL TIME RMS COMPONENTS
         */
-        Canvas rtrmsAlusta = new Canvas(this.animwidth, this.animheight);
+        Canvas rtrmsAlusta = new Canvas(this.getAnimWidth(), this.getAnimHeight());
         rtrmsAlusta.setVisible(true);
 
         GraphicsContext piirturi = rtrmsAlusta.getGraphicsContext2D();
         piirturi.setFill(Color.BLACK);
-        piirturi.fillRect(0, 0, this.animwidth, this.animheight);
+        piirturi.fillRect(0, 0, this.getAnimWidth(), this.getAnimHeight());
 
         Pane pane = new Pane();
-        pane.setPrefSize(this.animwidth, this.animheight);
+        pane.setPrefSize(this.getAnimWidth(), this.getAnimHeight());
         pane.getChildren().add(rtrmsAlusta);
         pane.setVisible(true);
         
-        /**
+        /*
         * MMC COMPONENTS
         */
-        Canvas mmcAlusta = new Canvas(this.animwidth, this.animheight);
+        Canvas mmcAlusta = new Canvas(this.getAnimWidth(), this.getAnimHeight());
         mmcAlusta.setVisible(true);
 
         GraphicsContext mmcpiirturi = mmcAlusta.getGraphicsContext2D();
         mmcpiirturi.setFill(Color.BLACK);
-        mmcpiirturi.fillRect(0, 0, this.animwidth, this.animheight);
+        mmcpiirturi.fillRect(0, 0, this.getAnimWidth(), this.getAnimHeight());
         mmcpiirturi.setStroke(Color.YELLOW);
 
         Pane mmcpane = new Pane();
-        mmcpane.setPrefSize(this.animwidth, this.animheight);
+        mmcpane.setPrefSize(this.getAnimWidth(), this.getAnimHeight());
         mmcpane.getChildren().add(mmcAlusta);
         mmcpane.setVisible(true);
 
-        /**
+        /*
         * FIRST VIEW BUTTON: HELP
         */
         nappiMenuHelp.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                nappiMenuHelp.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> nappiMenuHelp.setEffect(shadow));
         nappiMenuHelp.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                nappiMenuHelp.setEffect(null);
-        });
-        nappiMenuHelp.setOnAction(event -> {
-            textAreaMenu.setText(helpText.menu());
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> nappiMenuHelp.setEffect(null));
+        nappiMenuHelp.setOnAction(event -> textAreaMenu.setText(helpText.menu()));
 
-        /**
+        /*
         * FIRST VIEW BUTTON: CLOSE
         */
         Button closeNappiMenu = new Button("CLOSE");
-        closeNappiMenu.setMinWidth(this.buttonWidth);
-        closeNappiMenu.setMaxWidth(this.buttonWidth);
+        closeNappiMenu.setMinWidth(this.getButtonWidth());
+        closeNappiMenu.setMaxWidth(this.getButtonWidth());
         closeNappiMenu.setTextFill(Color.RED);
         closeNappiMenu.setBackground(new Background(
             new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         GridPane.setHalignment(closeNappiMenu, HPos.LEFT);
         closeNappiMenu.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                closeNappiMenu.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> closeNappiMenu.setEffect(shadow));
         closeNappiMenu.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                closeNappiMenu.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> closeNappiMenu.setEffect(null));
         closeNappiMenu.setOnAction(event -> {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+            Alert alert;
+            alert = new Alert(Alert.AlertType.CONFIRMATION,
                 "Close application?",
                 ButtonType.OK, ButtonType.CANCEL);
             alert.showAndWait();
-            if ( alert.getResult() == ButtonType.OK ) {
-                //System.gc();
-                stage.close();
-            }
+            if ( alert.getResult() == ButtonType.OK ) stage.close();
         });
         closeNappiMenu.setVisible(true);
 
-        /**
+        /*
         * OTHER VIEWS BUTTON: EXECUTE CALCULATION
         */
         Button executeNappiCalc = new Button("EXECUTE");
         executeNappiCalc.setDefaultButton(true);
-        executeNappiCalc.setMinWidth(this.buttonWidth);
-        executeNappiCalc.setMaxWidth(this.buttonWidth);
+        executeNappiCalc.setMinWidth(this.getButtonWidth());
+        executeNappiCalc.setMaxWidth(this.getButtonWidth());
         executeNappiCalc.setStyle("-fx-background-color: Red");
         executeNappiCalc.setTextFill(Color.WHITE);
         executeNappiCalc.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                executeNappiCalc.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> executeNappiCalc.setEffect(shadow));
         executeNappiCalc.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                executeNappiCalc.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> executeNappiCalc.setEffect(null));
         executeNappiCalc.setVisible(true);
 
-        /**
+        /*
         * OTHER VIEWS BUTTON: CALCULATION MENU
         */
         Button menuNappiCalc = new Button("BACK TO MENU");
-        menuNappiCalc.setMinWidth(this.buttonWidth);
-        menuNappiCalc.setMaxWidth(this.buttonWidth);
+        menuNappiCalc.setMinWidth(this.getButtonWidth());
+        menuNappiCalc.setMaxWidth(this.getButtonWidth());
         menuNappiCalc.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                menuNappiCalc.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> menuNappiCalc.setEffect(shadow));
         menuNappiCalc.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                menuNappiCalc.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> menuNappiCalc.setEffect(null));
         menuNappiCalc.setVisible(true);
 
-        /**
+        /*
         * OTHER VIEWS BUTTON: CALCULATION HELP
         */
         Button helpNappiCalc = new Button("HELP");
-        helpNappiCalc.setMinWidth(this.buttonWidth);
-        helpNappiCalc.setMaxWidth(this.buttonWidth);
+        helpNappiCalc.setMinWidth(this.getButtonWidth());
+        helpNappiCalc.setMaxWidth(this.getButtonWidth());
         GridPane.setHalignment(helpNappiCalc, HPos.LEFT);
         helpNappiCalc.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                helpNappiCalc.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> helpNappiCalc.setEffect(shadow));
         helpNappiCalc.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                helpNappiCalc.setEffect(null);
-        });
-        helpNappiCalc.setOnAction(event -> {
-            textAreaCalc.setText(helpText.calculation());
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> helpNappiCalc.setEffect(null));
+        helpNappiCalc.setOnAction(event -> textAreaCalc.setText(helpText.calculation()));
         helpNappiCalc.setVisible(true);
 
-        /**
+        /*
         * OTHER VIEWS BUTTON: CALCULATION CLOSE
         */
         Button closeNappiCalc = new Button("CLOSE");
-        closeNappiCalc.setMinWidth(this.buttonWidth);
-        closeNappiCalc.setMaxWidth(this.buttonWidth);
+        closeNappiCalc.setMinWidth(this.getButtonWidth());
+        closeNappiCalc.setMaxWidth(this.getButtonWidth());
         closeNappiCalc.setTextFill(Color.RED);
         closeNappiCalc.setBackground(new Background(
             new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         GridPane.setHalignment(closeNappiCalc, HPos.LEFT);
         closeNappiCalc.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                closeNappiCalc.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> closeNappiCalc.setEffect(shadow));
         closeNappiCalc.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                closeNappiCalc.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> closeNappiCalc.setEffect(null));
         closeNappiCalc.setOnAction(event -> {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+            Alert alert;
+            alert = new Alert(Alert.AlertType.CONFIRMATION,
                 "Close application?",
                 ButtonType.OK, ButtonType.CANCEL);
             alert.showAndWait();
             if ( alert.getResult() == ButtonType.OK ) {
-                if (this.frame != null) {
-                    if (this.frame.isShowing()
-                        || this.frame.isActive()
-                        || this.frame.isDisplayable())
-                        this.frame.dispose();
-                }
-                //System.gc();
+                if (this.getFrame() != null) if (this.getFrame().isShowing()
+                    || this.getFrame().isActive()
+                    || this.getFrame().isDisplayable())
+                    this.getFrame().dispose();
                 stage.close();
             }
         });
         closeNappiCalc.setVisible(true);
 
-        /**
+        /*
         * OTHER VIEWS BUTTON: EXECUTE PATH TRACING
         */
         Button executeNappiPath = new Button("EXECUTE");
         executeNappiPath.setDefaultButton(true);
-        executeNappiPath.setMinWidth(this.buttonWidth);
-        executeNappiPath.setMaxWidth(this.buttonWidth);
+        executeNappiPath.setMinWidth(this.getButtonWidth());
+        executeNappiPath.setMaxWidth(this.getButtonWidth());
         executeNappiPath.setStyle("-fx-background-color: Red");
         executeNappiPath.setTextFill(Color.WHITE);
         executeNappiPath.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                executeNappiPath.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> executeNappiPath.setEffect(shadow));
         executeNappiPath.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                executeNappiPath.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> executeNappiPath.setEffect(null));
         executeNappiPath.setVisible(true);
 
-        /**
+        /*
         * OTHER VIEWS BUTTON: PATH TRACING MENU
         */
         Button menuNappiPath = new Button("BACK TO MENU");
-        menuNappiPath.setMinWidth(this.buttonWidth);
-        menuNappiPath.setMaxWidth(this.buttonWidth);
+        menuNappiPath.setMinWidth(this.getButtonWidth());
+        menuNappiPath.setMaxWidth(this.getButtonWidth());
         menuNappiPath.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                menuNappiPath.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> menuNappiPath.setEffect(shadow));
         menuNappiPath.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                menuNappiPath.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> menuNappiPath.setEffect(null));
         menuNappiPath.setVisible(true);
 
-        /**
+        /*
         * OTHER VIEWS BUTTON: PATH TRACING HELP
         */
         Button helpNappiPath = new Button("HELP");
-        helpNappiPath.setMinWidth(this.buttonWidth);
-        helpNappiPath.setMaxWidth(this.buttonWidth);
+        helpNappiPath.setMinWidth(this.getButtonWidth());
+        helpNappiPath.setMaxWidth(this.getButtonWidth());
         helpNappiPath.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                helpNappiPath.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> helpNappiPath.setEffect(shadow));
         helpNappiPath.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                helpNappiPath.setEffect(null);
-        });
-        helpNappiPath.setOnAction(event -> {
-            textAreaPath.setText(helpText.pathtracing());
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> helpNappiPath.setEffect(null));
+        helpNappiPath.setOnAction(event -> textAreaPath.setText(helpText.pathtracing()));
         helpNappiPath.setVisible(true);
 
-        /**
+        /*
         * OTHER VIEWS BUTTON: PATH TRACING CLOSE
         */
         Button closeNappiPath = new Button("CLOSE");
-        closeNappiPath.setMinWidth(this.buttonWidth);
-        closeNappiPath.setMaxWidth(this.buttonWidth);
+        closeNappiPath.setMinWidth(this.getButtonWidth());
+        closeNappiPath.setMaxWidth(this.getButtonWidth());
         closeNappiPath.setTextFill(Color.RED);
         closeNappiPath.setBackground(new Background(
             new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         GridPane.setHalignment(closeNappiPath, HPos.LEFT);
         closeNappiPath.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                closeNappiPath.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> closeNappiPath.setEffect(shadow));
         closeNappiPath.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                closeNappiPath.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> closeNappiPath.setEffect(null));
         closeNappiPath.setOnAction(event -> {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+            Alert alert;
+            alert = new Alert(Alert.AlertType.CONFIRMATION,
                 "Close application?",
                 ButtonType.OK, ButtonType.CANCEL);
             alert.showAndWait();
             if ( alert.getResult() == ButtonType.OK ) {
-                if (this.frame != null) {
-                    if (this.frame.isShowing()
-                        || this.frame.isActive()
-                        || this.frame.isDisplayable())
-                        this.frame.dispose();
-                }
-                //System.gc();
+                if (this.getFrame() != null) if (this.getFrame().isShowing()
+                    || this.getFrame().isActive()
+                    || this.getFrame().isDisplayable())
+                    this.getFrame().dispose();
                 stage.close();
             }
         });
         closeNappiPath.setVisible(true);
 
-        /**
+        /*
         * OTHER VIEWS BUTTON: PLOT CHOICE REAL TIME RMS
         */
         Button standNorm = new Button("STD NORM");
-        standNorm.setMinWidth(this.buttonWidth);
-        standNorm.setMaxWidth(this.buttonWidth);
+        standNorm.setMinWidth(this.getButtonWidth());
+        standNorm.setMaxWidth(this.getButtonWidth());
         standNorm.setBackground(new Background(
             new BackgroundFill(
                 Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
         standNorm.setId("standnorm");
         standNorm.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                standNorm.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> standNorm.setEffect(shadow));
         standNorm.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                standNorm.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> standNorm.setEffect(null));
         standNorm.setOnMouseClicked((MouseEvent event) -> {
             if (standNorm.getText().equals("NORM")){
                 // BUTTON PRESSED ON
@@ -698,68 +615,56 @@ public class RandomWalk extends Application {
                     new Background(
                         new BackgroundFill(
                             Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.standnorm = true;
-            } else if (standNorm.getText().equals("STD NORM")){
+                this.setStandnorm(true);
+            } else if (standNorm.getText().equals("STD NORM")) {
                 // BUTTON PRESSED OFF
                 standNorm.setText("NORM");
                 standNorm.setBackground(
                     new Background(new BackgroundFill(
                         Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.standnorm = false;
+                this.setStandnorm(false);
             }
         });
         standNorm.setVisible(true);
 
-        /**
+        /*
         * OTHER VIEWS BUTTON: RUN REAL TIME RMS
         */
         Button runReal = new Button("RUN");
         runReal.setDefaultButton(true);
-        runReal.setMinWidth(this.buttonWidth);
-        runReal.setMaxWidth(this.buttonWidth);
+        runReal.setMinWidth(this.getButtonWidth());
+        runReal.setMaxWidth(this.getButtonWidth());
         runReal.setStyle("-fx-background-color: Red");
         runReal.setTextFill(Color.WHITE);
         runReal.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                runReal.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> runReal.setEffect(shadow));
         runReal.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                runReal.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> runReal.setEffect(null));
         runReal.setVisible(true);
 
-        /**
+        /*
         * OTHER VIEWS BUTTON: REAL TIME RMS MENU
         */
         Button menuNappiReal = new Button("BACK TO MENU");
-        menuNappiReal.setMinWidth(this.buttonWidth);
-        menuNappiReal.setMaxWidth(this.buttonWidth);
+        menuNappiReal.setMinWidth(this.getButtonWidth());
+        menuNappiReal.setMaxWidth(this.getButtonWidth());
         menuNappiReal.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                menuNappiReal.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> menuNappiReal.setEffect(shadow));
         menuNappiReal.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                menuNappiReal.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> menuNappiReal.setEffect(null));
         menuNappiReal.setVisible(true);
 
-        /**
+        /*
         * OTHER VIEWS BUTTON: REAL TIME RMS HELP
         */
         Button helpNappiReal = new Button("HELP");
-        helpNappiReal.setMinWidth(this.buttonWidth);
-        helpNappiReal.setMaxWidth(this.buttonWidth);
+        helpNappiReal.setMinWidth(this.getButtonWidth());
+        helpNappiReal.setMaxWidth(this.getButtonWidth());
         GridPane.setHalignment(helpNappiReal, HPos.LEFT);
         helpNappiReal.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                helpNappiReal.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> helpNappiReal.setEffect(shadow));
         helpNappiReal.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                helpNappiReal.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> helpNappiReal.setEffect(null));
         helpNappiReal.setOnAction(event -> {
             if (isovalikkoReal.getChildren().contains(pane)){
                 isovalikkoReal.getChildren().remove(pane);
@@ -769,108 +674,86 @@ public class RandomWalk extends Application {
         });
         helpNappiReal.setVisible(true);
 
-        /**
+        /*
         * OTHER VIEWS BUTTON: REAL TIME RMS CLOSE
         */
         Button closeNappiReal = new Button("CLOSE");
-        closeNappiReal.setMinWidth(this.buttonWidth);
-        closeNappiReal.setMaxWidth(this.buttonWidth);
+        closeNappiReal.setMinWidth(this.getButtonWidth());
+        closeNappiReal.setMaxWidth(this.getButtonWidth());
         closeNappiReal.setTextFill(Color.RED);
         closeNappiReal.setBackground(new Background(
             new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         GridPane.setHalignment(closeNappiReal, HPos.LEFT);
         closeNappiReal.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                closeNappiReal.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> closeNappiReal.setEffect(shadow));
         closeNappiReal.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                closeNappiReal.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> closeNappiReal.setEffect(null));
         closeNappiReal.setOnAction(event -> {
             if ( !getRealScene.isRunning() ) {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                Alert alert;
+                alert = new Alert(Alert.AlertType.CONFIRMATION,
                     "Close application?",
                     ButtonType.OK, ButtonType.CANCEL);
                 alert.showAndWait();
-                if ( alert.getResult() == ButtonType.OK ) {
-                    //System.gc();
-                    stage.close();
-                }
+                if ( alert.getResult() == ButtonType.OK ) stage.close();
             }
         });
         closeNappiReal.setVisible(true);
 
-        /**
+        /*
         * OTHER VIEWS BUTTON: EXECUTE MMC
         */
         Button runMMC = new Button("ANIMATION");
         runMMC.setDefaultButton(true);
-        runMMC.setMinWidth(this.buttonWidth);
-        runMMC.setMaxWidth(this.buttonWidth);
+        runMMC.setMinWidth(this.getButtonWidth());
+        runMMC.setMaxWidth(this.getButtonWidth());
         runMMC.setStyle("-fx-background-color: Red");
         runMMC.setTextFill(Color.WHITE);
         runMMC.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                runMMC.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> runMMC.setEffect(shadow));
         runMMC.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                runMMC.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> runMMC.setEffect(null));
         runMMC.setVisible(true);
 
-        /**
+        /*
         * OTHER VIEWS BUTTON: PLOT MMC
         */
         Button plotMMC = new Button("PLOT");
         plotMMC.setDefaultButton(true);
-        plotMMC.setMinWidth(this.buttonWidth);
-        plotMMC.setMaxWidth(this.buttonWidth);
+        plotMMC.setMinWidth(this.getButtonWidth());
+        plotMMC.setMaxWidth(this.getButtonWidth());
         plotMMC.setStyle("-fx-background-color: Blue");
         plotMMC.setTextFill(Color.WHITE);
         plotMMC.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                plotMMC.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> plotMMC.setEffect(shadow));
         plotMMC.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                plotMMC.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> plotMMC.setEffect(null));
         plotMMC.setVisible(true);
 
-        /**
+        /*
         * OTHER VIEWS BUTTON: MMC MENU
         */
         Button menuNappiMMC = new Button("BACK TO MENU");
-        menuNappiMMC.setMinWidth(this.buttonWidth);
-        menuNappiMMC.setMaxWidth(this.buttonWidth);
+        menuNappiMMC.setMinWidth(this.getButtonWidth());
+        menuNappiMMC.setMaxWidth(this.getButtonWidth());
         menuNappiMMC.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                menuNappiMMC.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> menuNappiMMC.setEffect(shadow));
         menuNappiMMC.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                menuNappiMMC.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> menuNappiMMC.setEffect(null));
         menuNappiMMC.setVisible(true);
 
-        /**
+        /*
         * OTHER VIEWS BUTTON: MMC HELP
         */
         Button helpNappiMMC = new Button("HELP");
-        helpNappiMMC.setMinWidth(this.buttonWidth);
-        helpNappiMMC.setMaxWidth(this.buttonWidth);
+        helpNappiMMC.setMinWidth(this.getButtonWidth());
+        helpNappiMMC.setMaxWidth(this.getButtonWidth());
         GridPane.setHalignment(helpNappiMMC, HPos.LEFT);
         helpNappiMMC.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                helpNappiMMC.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> helpNappiMMC.setEffect(shadow));
         helpNappiMMC.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                helpNappiMMC.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> helpNappiMMC.setEffect(null));
         helpNappiMMC.setOnAction(event -> {
             if (isovalikkoMMC.getChildren().contains(pane)){
                 isovalikkoMMC.getChildren().remove(pane);
@@ -880,88 +763,78 @@ public class RandomWalk extends Application {
         });
         helpNappiMMC.setVisible(true);
 
-        /**
+        /*
         * OTHER VIEWS BUTTON: MMC REMOVE BARRIER
         */
         Button remBarNappiMMC = new Button("CONTINUE");
-        remBarNappiMMC.setMinWidth(this.buttonWidth);
-        remBarNappiMMC.setMaxWidth(this.buttonWidth);
+        remBarNappiMMC.setMinWidth(this.getButtonWidth());
+        remBarNappiMMC.setMaxWidth(this.getButtonWidth());
         remBarNappiMMC.setTextFill(Color.BLACK);
         remBarNappiMMC.setBackground(new Background(
             new BackgroundFill(
                 Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
         GridPane.setHalignment(remBarNappiMMC, HPos.LEFT);
         remBarNappiMMC.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                remBarNappiMMC.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> remBarNappiMMC.setEffect(shadow));
         remBarNappiMMC.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                remBarNappiMMC.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> remBarNappiMMC.setEffect(null));
         remBarNappiMMC.setVisible(false);
 
-        /**
+        /*
         * OTHER VIEWS BUTTON: MMC CLOSE
         */
         Button closeNappiMMC = new Button("CLOSE");
-        closeNappiMMC.setMinWidth(this.buttonWidth);
-        closeNappiMMC.setMaxWidth(this.buttonWidth);
+        closeNappiMMC.setMinWidth(this.getButtonWidth());
+        closeNappiMMC.setMaxWidth(this.getButtonWidth());
         closeNappiMMC.setTextFill(Color.RED);
         closeNappiMMC.setBackground(new Background(
             new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         GridPane.setHalignment(closeNappiMMC, HPos.LEFT);
         closeNappiMMC.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> {
-                closeNappiMMC.setEffect(shadow);
-        });
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> closeNappiMMC.setEffect(shadow));
         closeNappiMMC.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> {
-                closeNappiMMC.setEffect(null);
-        });
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> closeNappiMMC.setEffect(null));
         closeNappiMMC.setOnAction(event -> {
             if ( getMMCScene.timerIsRunning() && getMMCScene.barrierIsOn() ) {
-                    if ( getMMCScene.walkState() == true ) {
-                        PrintWriter pw = null;
-                        if (getMMCScene.getProcOut() != null)
-                            pw = new PrintWriter(getMMCScene.getProcOut());
-                        if (pw != null) {
-                            pw.println("-");
-                            pw.flush();
-                            pw.close();
-                        }
+                if ( getMMCScene.walkState() ) {
+                    PrintWriter pw = null;
+                    if (getMMCScene.getProcOut() != null)
+                        pw = new PrintWriter(getMMCScene.getProcOut());
+                    if (pw != null) {
+                        pw.println("-");
+                        pw.flush();
+                        pw.close();
                     }
-                    Alert alert = new Alert(
-                        Alert.AlertType.CONFIRMATION,
-                        "Close application?",
-                        ButtonType.OK, ButtonType.CANCEL);
-                    alert.showAndWait();
-                    if ( alert.getResult() == ButtonType.OK ) {
-                        if (this.frame != null) {
-                            if (this.frame.isShowing()
-                                || this.frame.isActive()
-                                || this.frame.isDisplayable())
-                                this.frame.dispose();
-                        }
-                        //System.gc();
-                        stage.close();
-                    }
-            } else if ( !getMMCScene.timerIsRunning() && !getMMCScene.barrierIsOn() ) {
-                Alert alert = new Alert(
+                }
+                Alert alert;
+                alert = new Alert(
                     Alert.AlertType.CONFIRMATION,
                     "Close application?",
                     ButtonType.OK, ButtonType.CANCEL);
                 alert.showAndWait();
                 if ( alert.getResult() == ButtonType.OK ) {
-                    //System.gc();
+                    if (this.getFrame() != null) if (this.getFrame().isShowing()
+                        || this.getFrame().isActive()
+                        || this.getFrame().isDisplayable())
+                        this.getFrame().dispose();
+                    stage.close();
+                }
+            } else if ( !getMMCScene.timerIsRunning() && !getMMCScene.barrierIsOn() ) {
+                Alert alert;
+                alert = new Alert(
+                    Alert.AlertType.CONFIRMATION,
+                    "Close application?",
+                    ButtonType.OK, ButtonType.CANCEL);
+                alert.showAndWait();
+                if ( alert.getResult() == ButtonType.OK ) {
                     stage.close();
                 }
             }
         });
         closeNappiMMC.setVisible(true);
 
-        /**
+        /*
         * SET FIRST VIEW BORDERPANE
         */
         valikkoMenu.getChildren().addAll(
@@ -973,7 +846,7 @@ public class RandomWalk extends Application {
             textAreaMenu);
         asetteluMenu.setCenter(isovalikkoMenu);
 
-        /**
+        /*
         * SET CALCULATION BORDERPANE
         */
         valikkoCalc.getChildren().addAll(
@@ -987,7 +860,7 @@ public class RandomWalk extends Application {
             textAreaCalc);
         asetteluCalc.setCenter(isovalikkoCalc);
 
-        /**
+        /*
         * SET PATH TRACING BORDERPANE
         */
         valikkoPath.getChildren().addAll(
@@ -1001,7 +874,7 @@ public class RandomWalk extends Application {
             textAreaPath);
         asetteluPath.setCenter(isovalikkoPath);
 
-        /**
+        /*
         * SET REAL TIME RMS BORDERPANE
         */
         valikkoReal.getChildren().addAll(
@@ -1016,7 +889,7 @@ public class RandomWalk extends Application {
             textAreaReal);
         asetteluReal.setCenter(isovalikkoReal);
 
-        /**
+        /*
         * SET MMC BORDERPANE
         */
         valikkoMMC.getChildren().addAll(
@@ -1032,30 +905,30 @@ public class RandomWalk extends Application {
             textAreaMMC);
         asetteluMMC.setCenter(isovalikkoMMC);
 
-        /**
+        /*
         * SET SCENES
         */
-        Scene firstScene = new Scene(asetteluMenu,this.stageWidth,this.stageHeight);
+        Scene firstScene = new Scene(asetteluMenu, this.getStageWidth(), this.getStageHeight());
         firstScene.getStylesheets().add("/styles/Styles.css");
 
-        Scene calcScene = new Scene(asetteluCalc,this.stageWidth,this.stageHeight);
+        Scene calcScene = new Scene(asetteluCalc, this.getStageWidth(), this.getStageHeight());
         calcScene.getStylesheets().add("/styles/Styles.css");
 
-        Scene pathScene = new Scene(asetteluPath,this.stageWidth,this.stageHeight
-            + (this.pathheight-this.textheight));
+        Scene pathScene = new Scene(asetteluPath, this.getStageWidth(),this.getStageHeight()
+            + (this.getPathHeight()-this.getTextHeight()));
         pathScene.getStylesheets().add("/styles/Styles.css");
 
-        Scene animScene = new Scene(asetteluReal,
-            this.stageWidth + (this.animwidth-this.textwidth),
-            this.stageHeight + (this.animheight-this.textheight));
-        animScene.getStylesheets().add("/styles/Styles.css");
+        Scene realScene = new Scene(asetteluReal,
+            this.getStageWidth() + (this.getAnimWidth()-this.getTextWidth()),
+            this.getStageHeight() + (this.getAnimHeight()-this.getTextHeight()));
+        realScene.getStylesheets().add("/styles/Styles.css");
 
         Scene mmcScene = new Scene(asetteluMMC,
-            this.stageWidth + (this.animwidth-this.textwidth),
-            this.stageHeight + (this.animheight-this.textheight));
+            this.getStageWidth() + (this.getAnimWidth()-this.getTextWidth()),
+            this.getStageHeight() + (this.getAnimHeight()-this.getTextHeight()));
         mmcScene.getStylesheets().add("/styles/Styles.css");
 
-        /**
+        /*
         * SET SCENE CHOICE BUTTONS' EFFECTS
         * CALCULATION
         */
@@ -1072,14 +945,17 @@ public class RandomWalk extends Application {
                 textAreaMenu.setText(textAreaCalc.getText());
             stage.setScene(firstScene);
         });
-        /**
+        /*
         * PATH TRACING
         */
         nappiScene2.setOnMouseClicked(event -> {
             stage.setTitle("Path Tracing");
-            if ( stage.getHeight() == this.stageHeight ){
-                stage.setHeight(this.stageHeight+(this.pathheight-this.textheight));
-                stage.setY((this.screenHeight-this.stageHeight)/2-(this.pathheight-this.textheight)/2);
+            if ( stage.getHeight() == this.getStageHeight() ){
+                stage.setHeight(
+                    this.getStageHeight()+(this.getPathHeight()-this.getTextHeight()));
+                stage.setY(
+                    (this.getScreenHeight()-this.getStageHeight())/2
+                    - (this.getPathHeight()-this.getTextHeight())/2);
             }
             stage.setScene(pathScene);
         });
@@ -1089,23 +965,24 @@ public class RandomWalk extends Application {
                 textAreaMenu.setText(helpText.welcome());
             else
                 textAreaMenu.setText(textAreaPath.getText());
-            stage.setY((this.screenHeight-this.stageHeight)/2);
-            stage.setHeight(this.stageHeight);
+            //stage.setX(this.getScreenWidth()-this.getStageWidth()-10);
+            stage.setY((this.getScreenHeight()-this.getStageHeight())/2);
+            stage.setHeight(this.getStageHeight());
             stage.setScene(firstScene);
         });
-        /**
+        /*
         * REAL TIME RMS
         */
         nappiScene3.setOnMouseClicked(event -> {
             stage.setTitle("Real Time rms");
-            if ( stage.getWidth() == this.stageWidth ){
-                stage.setWidth(this.stageWidth+(this.animwidth-this.textwidth));
-                stage.setHeight(this.stageHeight+(this.animheight-this.textheight));
-                stage.setX(this.screenWidth/2-(this.animwidth-this.textwidth)+15);
-                stage.setY((this.screenHeight-this.stageHeight)/2
-                    -(this.animheight-this.textheight)/2-30);
+            if ( stage.getWidth() == this.getStageWidth() ){
+                stage.setWidth(this.getStageWidth()+(this.getAnimWidth()-this.getTextWidth()));
+                stage.setHeight(this.getStageHeight()+(this.getAnimHeight()-this.getTextHeight()));
+                stage.setX(this.getScreenWidth()-(this.getAnimWidth()+this.getPaneWidth()));
+                stage.setY(((double) this.getScreenHeight()-(double) this.getStageHeight())/2.0
+                    -((double) this.getAnimHeight()-(double) this.getTextHeight())/2.0-10);
             }
-            stage.setScene(animScene);
+            stage.setScene(realScene);
         });
         menuNappiReal.setOnAction(event -> {
             stage.setTitle("Random Walk");
@@ -1113,23 +990,23 @@ public class RandomWalk extends Application {
                 textAreaMenu.setText(helpText.welcome());
             else
                 textAreaMenu.clear();
-            stage.setX(this.screenWidth/2);
-            stage.setY((this.screenHeight-this.stageHeight)/2);
-            stage.setWidth(this.stageWidth);
-            stage.setHeight(this.stageHeight);
+            stage.setX(this.getScreenWidth()-this.getStageWidth());
+            stage.setY((this.getScreenHeight()-this.getStageHeight())/2);
+            stage.setWidth(this.getStageWidth());
+            stage.setHeight(this.getStageHeight());
             stage.setScene(firstScene);
         });
-        /**
+        /*
         * MMC
         */
         nappiScene4.setOnMouseClicked(event -> {
             stage.setTitle("MMC Diffusion");
-            if ( stage.getWidth() == this.stageWidth ){
-                stage.setWidth(this.stageWidth+(this.animwidth-this.textwidth));
-                stage.setHeight(this.stageHeight+(this.animheight-this.textheight));
-                stage.setX(this.screenWidth/2-(this.animwidth-this.textwidth)+15);
-                stage.setY((this.screenHeight-this.stageHeight)/2
-                    -(this.animheight-this.textheight)/2-30);
+            if ( stage.getWidth() == this.getStageWidth() ){
+                stage.setWidth(this.getStageWidth()+(this.getAnimWidth()-this.getTextWidth()));
+                stage.setHeight(this.getStageHeight()+(this.getAnimHeight()-this.getTextHeight()));
+                stage.setX(this.getScreenWidth()-(this.getAnimWidth()+this.getPaneWidth()));
+                stage.setY(((double) this.getScreenHeight()-(double) this.getStageHeight())/2.0
+                    -((double) this.getAnimHeight()-(double) this.getTextHeight())/2.0-10);
             }
             stage.setScene(mmcScene);
         });
@@ -1139,62 +1016,63 @@ public class RandomWalk extends Application {
                 textAreaMenu.setText(helpText.welcome());
             else
                 textAreaMenu.setText(textAreaMMC.getText());
-            stage.setX(this.screenWidth/2);
-            stage.setY((this.screenHeight-this.stageHeight)/2);
-            stage.setWidth(this.stageWidth);
-            stage.setHeight(this.stageHeight);
+            stage.setX(this.getScreenWidth()-this.getStageWidth());
+            stage.setY((this.getScreenHeight()-this.getStageHeight())/2);
+            stage.setWidth(this.getStageWidth());
+            stage.setHeight(this.getStageHeight());
             stage.setScene(firstScene);
         });
 
-        /**
+        /*
         * CREATE A FRAME FOR CALCULATION AND PATH TRACING PLOTS
         */
-        this.frame = new JFrame();
+        this.setFrame(new JFrame());
 
-        /**
+        /*
         * CREATE AN INSTANCE FOR CODE EXECUTIONS
         */
         Execution ex = new Execution();
 
-        /**
+        /*
         * EXECUTE BUTTON CALCULATION
         */
         executeNappiCalc.setOnMouseClicked((MouseEvent event) -> {
-            this.vars = getCalcScene.getVars();
-            getCalcScene.setVar(8, "s");
-            Data data = new Data(this.vars);
+            getCalcScene.setVar("s");
+            String[] vars = getCalcScene.getVars();
+            this.setVars(vars);
+            Data data = new Data(vars);
             boolean fail = false;
 
-            int steps = parseInt(vars[3]);
-            int dim = parseInt(this.vars[4]);
-            String lattice = this.vars[7];
+            int steps = parseInt(getVars()[3]);
+            int dim = parseInt(this.getVars()[4]);
+            String lattice = this.getVars()[7];
 
             if ( steps < 1 ) fail = true;
             if ( dim < 1 || dim > 3 ) fail = true;
             if ( !lattice.equals("l") && !lattice.equals("-") ) fail = true;
 
-            if ( fail == true ) return;
+            if ( fail ) return;
 
-            ex.executeRms(datafolder, datapath, fexec, pyexecrms,
-                this.frame, data, this.vars);
+            ex.executeRms(datafolder, datapath, fexec, pyexecrms, this.getFrame(), data, this.getVars());
         });
 
-        /**
+        /*
         * EXECUTE BUTTON PATH TRACING
         */
         executeNappiPath.setOnMouseClicked((MouseEvent event) -> {
-            this.vars = getPathScene.getVars();
-            getMMCScene.setVar(8, "s");
-            Data data = new Data(this.vars);
+            getMMCScene.setVar("s");
+            String[] vars = getPathScene.getVars();
+            this.setVars(vars);
+            Data data = new Data(vars);
             boolean fail = false;
 
-            int particles = parseInt(vars[0]);
-            double diam = parseDouble(vars[1]);
-            int charge = parseInt(vars[2]);
-            int steps = parseInt(vars[3]);
-            int dim = parseInt(this.vars[4]);
-            String fixed = this.vars[6];
-            String lattice = this.vars[7];
+            int particles = parseInt(getVars()[0]);
+            double diam = parseDouble(getVars()[1]);
+            int charge = parseInt(getVars()[2]);
+            int steps = parseInt(getVars()[3]);
+            int dim = parseInt(this.getVars()[4]);
+            String fixed = this.getVars()[6];
+            String lattice = this.getVars()[7];
 
             if ( particles < 0 ) fail = true;
             if ( diam <= 0.0 || diam >= 1.0 ) fail = true;
@@ -1204,28 +1082,26 @@ public class RandomWalk extends Application {
             if ( !fixed.equals("f") && !fixed.equals("-") ) fail = true;
             if ( !lattice.equals("l") && !lattice.equals("-") ) fail = true;
 
-            if ( fail == true ) return;
+            if ( fail ) return;
 
             ex.executePath(datafolder, datapath, fexec, pyexec1d, pyexec2d,
-                pyexec3d, this.frame, data, this.vars);
+                pyexec3d, this.getFrame(), data, this.getVars());
         });
 
-        /**
+        /*
         * ANIMATION TIMER FOR REAL TIME RMS ANIMATION
         */
         new AnimationTimer() {
-            /**
-            * REFESH ANIMATION IN ABOUT 100 MILLISECOND STEPS
-            */
-            private final long sleepNanoseconds = 100 * 1000000;
             private long prevTime = 0;
-            private int dim;
-            private String[] vars;
 
             @Override
             public void handle(long currentNanoTime) {
 
-                if ((currentNanoTime - this.prevTime) < this.sleepNanoseconds) {
+                /*
+                 * REFESH ANIMATION IN ABOUT 100 MILLISECOND STEPS
+                 */
+                long sleepNanoseconds = 100 * 1000000;
+                if ((currentNanoTime - this.prevTime) < sleepNanoseconds) {
                     return;
                 }
 
@@ -1238,8 +1114,8 @@ public class RandomWalk extends Application {
                     isovalikkoReal.getChildren().add(pane);
                 }
 
-                this.vars = getRealScene.getVars();
-                /**
+                String[] vars = getRealScene.getVars();
+                /*
                 * FROM SCENEREALTIMERMS
                 * vars from user:
                 * vars[0] = particles,     USER
@@ -1253,132 +1129,126 @@ public class RandomWalk extends Application {
                 * vars[8] = save           n/a
                 */
 
-                this.dim = parseInt(this.vars[4]);
+                int dim = parseInt(vars[4]);
 
                 piirturi.setGlobalAlpha(1.0);
                 piirturi.setFill(Color.BLACK);
-                if ( this.dim == 1 ) {
-                    piirturi.fillRect(0, 0, 1.0/scalefactor*animwidth, animheight);
+                if ( dim == 1 ) {
+                    piirturi.fillRect(0, 0, 1.0/getScalefactor()*getAnimWidth(), getAnimHeight());
                 } else {
-                    piirturi.fillRect(0, 0, 1.0/scalefactor*animwidth, 1.0/scalefactor*animheight);
+                    piirturi.fillRect(0, 0, 1.0/getScalefactor()*getAnimWidth(), 1.0/getScalefactor()*getAnimHeight());
                 }
                 piirturi.fill();
 
-                /**
+                /*
                 * DRAW ANIMATION
                 */
-                getRealScene.refresh(
-                    datafolder, fexec, piirturi, scalefactor, animwidth, linewidth,
-                    fxplot, rms_runs, rms_norm, newdata, mincount, maxcount,
-                    standnorm
-                );
-                newdata = false;
+                getRealScene.refresh(datafolder, fexec, piirturi, getScalefactor(), getLinewidth(), getFxplot(), getRms_runs(), isNewdata(), getMincount(), getMaxcount(), isStandnorm(), getAnimWidth());
+                setNewdata(false);
 
                 this.prevTime = currentNanoTime;
             }
         }.start();
 
-        /**
+        /*
         * RUN BUTTON REAL TIME RMS
         */
         runReal.setOnMouseClicked((MouseEvent event) -> {
             if (getRealScene.isRunning()) {
                 getRealScene.stop();
-                if ( this.isscaled == true ) {
-                    if ( this.vars[4].equals("1") )
-                        piirturi.scale(1.0/this.scalefactor, 1.0);
+                if ( this.isIsscaled() ) {
+                    if ( this.getVars()[4].equals("1") )
+                        piirturi.scale(1.0/this.getScalefactor(), 1.0);
                     else
-                        piirturi.scale(1.0/this.scalefactor, 1.0/this.scalefactor);
+                        piirturi.scale(1.0/this.getScalefactor(), 1.0/this.getScalefactor());
                 }
                 runReal.setText("RUN");
             } else {
-                this.vars = getRealScene.getVars();
-                getRealScene.setVar(8, "-");
+                this.setVars(getRealScene.getVars());
+                getRealScene.setVar("-");
                 boolean fail = false;
 
-                int particles = parseInt(vars[0]);
-                int dim = parseInt(this.vars[4]);
-                int steps = parseInt(vars[3]);
+                int particles = parseInt(getVars()[0]);
+                int dim = parseInt(this.getVars()[4]);
+                int steps = parseInt(getVars()[3]);
  
                 if ( particles < 0 ) fail = true;
                 if ( steps < 1 ) fail = true;
                 if ( dim < 1 || dim > 3 ) fail = true;
 
-                if ( fail == true ) return;
+                if ( fail ) return;
 
-                if (this.fxplot != null) {
-                if (this.fxplot.isRunning()) this.fxplot.stop();
-                if (this.fxplot.getFrame().isShowing()
-                    || this.fxplot.getFrame().isActive()
-                    || this.fxplot.getFrame().isDisplayable())
-                    this.fxplot.getFrame().dispose();
+                if (this.getFxplot() != null) {
+                if (this.getFxplot().isRunning()) this.getFxplot().stop();
+                if (this.getFxplot().getFrame().isShowing()
+                    || this.getFxplot().getFrame().isActive()
+                    || this.getFxplot().getFrame().isDisplayable())
+                    this.getFxplot().getFrame().dispose();
                 }
-                this.fxplot = new FXPlot("W&H", this.screenHeight);
+                this.setFxplot(new FXPlot("W&H"));
 
-                this.scalefactor = 
-                    Math.sqrt( this.animwidth + Math.pow(dim,2.0) * 100
-                    * Math.pow(Math.log10((double) steps),2.0) )
-                    / Math.pow(Math.log10((double) steps),2.0);
+                this.setScalefactor(Math.sqrt(this.getAnimWidth() + Math.pow(dim,2.0) * 100
+                    * Math.pow(Math.log10(steps),2.0) ) / Math.pow(Math.log10(steps),2.0));
  
                 switch (dim) {
                     case 1:
-                        this.linewidth = 1.0 / Math.log10((double) steps);
-                        piirturi.scale(this.scalefactor, 1.0);
+                        this.setLinewidth(1.0 / Math.log10(steps));
+                        piirturi.scale(this.getScalefactor(), 1.0);
                         break;
                     case 2:
-                        this.linewidth = 1.0 / ( this.scalefactor * Math.sqrt(Math.log10((double) steps)) );
-                        piirturi.scale(this.scalefactor, this.scalefactor);
+                        this.setLinewidth(1.0 / (this.getScalefactor() * Math.sqrt(Math.log10(steps))));
+                        piirturi.scale(this.getScalefactor(), this.getScalefactor());
                         break;
                     case 3:
-                        piirturi.scale(this.scalefactor, this.scalefactor);
+                        piirturi.scale(this.getScalefactor(), this.getScalefactor());
                         break;
                     default:
                         break;
                 }
-                this.isscaled = true;
-                piirturi.setGlobalAlpha(1.0 / this.scalefactor * Math.pow(Math.log10((double) steps),2.0));
+                this.setIsscaled(true);
+                piirturi.setGlobalAlpha(1.0 / this.getScalefactor() * Math.pow(Math.log10(steps),2.0));
 
-                this.newdata = true;
-                this.rms_runs = new double[10];
-                this.rms_norm = new double[10];
-                Arrays.fill(this.rms_runs, 0.0);
-                Arrays.fill(this.rms_norm, 0.0);
-                double expected = Math.sqrt((double) steps);
+                this.setNewdata(true);
+                this.setRms_runs(new double[10]);
+                this.setRms_norm(new double[10]);
+                Arrays.fill(this.getRms_runs(), 0.0);
+                Arrays.fill(this.getRms_norm(), 0.0);
+                double expected = Math.sqrt(steps);
 
-                if ( this.standnorm == false ) {
+                if ( !this.isStandnorm() ) {
                     if ( (int) expected < 5 ) {
-                        this.mincount = 0.0;
+                        this.setMincount(0.0);
                     } else {
-                        this.mincount = expected - 5.0;
+                        this.setMincount(expected - 5.0);
                     }
-                    this.maxcount = expected + 5.0;
+                    this.setMaxcount(expected + 5.0);
                 } else {
-                    this.mincount = -4.0;
-                    this.maxcount = 4.0;
+                    this.setMincount(-4.0);
+                    this.setMaxcount(4.0);
                 }
 
-                this.fxplot.setWData("R_rms", "sqrt(N)", this.rms_runs, this.rms_runs, expected);
-                this.fxplot.setHData("norm", this.rms_norm, this.rms_norm, this.mincount,
-                    this.maxcount, this.standnorm);
+                this.getFxplot().setWData(this.getRms_runs(), this.getRms_runs(), expected);
+                this.getFxplot().setHData(this.getRms_norm(), this.getRms_norm(), this.getMincount(), this.getMaxcount(), this.isStandnorm());
         
                 getRealScene.start();
                 runReal.setText("STOP");
             }
         });
 
-        /**
+        /*
         * PLOT BUTTON MMC
         */
         plotMMC.setOnMouseClicked((MouseEvent event) -> {
             valikkoMMC.setDisable(true);
-            this.vars = getMMCScene.getVars();
-            getMMCScene.setVar(8, "s");
-            Data data = new Data(this.vars);
-            int particles = parseInt(vars[0]);
-            double diam = parseDouble(vars[1]);
-            int charge = parseInt(vars[2]);
-            int dim = parseInt(vars[4]);
-            String lattice = this.vars[7];
+            getMMCScene.setVar("s");
+            String[] vars = getMMCScene.getVars();
+            this.setVars(vars);
+            Data data = new Data(vars);
+            int particles = parseInt(getVars()[0]);
+            double diam = parseDouble(getVars()[1]);
+            int charge = parseInt(getVars()[2]);
+            int dim = parseInt(getVars()[4]);
+            String lattice = this.getVars()[7];
             boolean fail = false;
 
             if ( particles < 0 ) fail = true;
@@ -1387,24 +1257,25 @@ public class RandomWalk extends Application {
             if ( dim < 2 || dim > 3 ) fail = true;
             if ( !lattice.equals("l") && !lattice.equals("-") ) fail = true;
 
-            if ( fail == true ) return;
+            if ( fail ) return;
 
             ex.executeMMC(datafolder, datapath, fexec, pyexecmmc2d,
-                pyexecmmc3d, valikkoMMC, this.frame, data, this.vars);
+                pyexecmmc3d, valikkoMMC, this.getFrame(), data, this.getVars());
         });
 
-        /**
+        /*
         * EXECUTE BUTTON MMC
         */
         runMMC.setOnMouseClicked((MouseEvent event) -> {
             if ( getMMCScene.timerIsRunning()) return;
-            this.vars = getMMCScene.getVars();
-            getMMCScene.setVar(8, "-");
-            int particles = parseInt(vars[0]);
-            double diam = parseDouble(vars[1]);
-            int charge = parseInt(vars[2]);
-            int dim = parseInt(vars[4]);
-            String lattice = this.vars[7];
+            getMMCScene.setVar("-");
+            String[] vars = getMMCScene.getVars();
+            this.setVars(vars);
+            int particles = parseInt(getVars()[0]);
+            double diam = parseDouble(getVars()[1]);
+            int charge = parseInt(getVars()[2]);
+            int dim = parseInt(getVars()[4]);
+            String lattice = this.getVars()[7];
             boolean fail = false;
 
             if ( particles < 0 ) fail = true;
@@ -1413,53 +1284,56 @@ public class RandomWalk extends Application {
             if ( dim < 2 || dim > 3 ) fail = true;
             if ( !lattice.equals("l") && !lattice.equals("-") ) fail = true;
 
-            if ( fail == true ) return;
+            if ( fail ) return;
 
-            if (this.fxplot != null) {
-                if (this.fxplot.isRunning()) this.fxplot.stop();
-                if (this.fxplot.getFrame().isShowing()
-                    || this.fxplot.getFrame().isActive()
-                    || this.fxplot.getFrame().isDisplayable())
-                    this.fxplot.getFrame().dispose();
+            if (this.getFxplot() != null) {
+                if (this.getFxplot().isRunning()) this.getFxplot().stop();
+                if (this.getFxplot().getFrame().isShowing()
+                    || this.getFxplot().getFrame().isActive()
+                    || this.getFxplot().getFrame().isDisplayable())
+                    this.getFxplot().getFrame().dispose();
             }
-            this.fxplot = new FXPlot("E", this.screenHeight);
+            this.setFxplot(new FXPlot("E"));
 
-            if ( this.isscaled == true ) {
-                mmcpiirturi.scale(1.0/this.scalefactor, 1.0/this.scalefactor);
+            if ( this.isIsscaled() ) {
+                mmcpiirturi.scale(1.0/this.getScalefactor(), 1.0/this.getScalefactor());
             }
-  
-            int measure;
-            double diff = 0.3;
+
+            double measure;
+            double diff = 0.0;
             if ( particles < 25 ) {
-                measure = 21;
+                diff = 0.3;
+                measure = 21.0;
             } else {
-                measure = (int)( 3.0 * Math.sqrt( 2.0 * (double) particles ) );
+                measure = 3.0 * Math.sqrt( 2.0 * (double) particles );
+                double diff1 = Math.sqrt(measure)/10.0 + measure/20.0 - 0.7;
+                double diff2 = measure/20.0 - 0.7;
 
-                if ( (measure+1)%4 == 0 || measure%2 == 0 ) {
-                    diff = diff + Math.sqrt(measure)/10.0 + measure/20.0 - 1.0;
-                    measure -= 1;
-                }else if ( measure%4 == 0 ) {
-                    diff = diff + Math.sqrt(measure)/10.0 + measure/20.0 - 1.0;
-                    measure -= 2;
-                } else if ( measure%2 != 0 ) {
-                    diff = diff + measure/20.0 - 1.0;
+                if ( (measure+1.0)%4.0 == 0.0 || measure%2.0 == 0.0 ) {
+                    diff = diff1;
+                    measure -= 1.0;
+                }else if ( measure%4.0 == 0.0 ) {
+                    diff = diff1;
+                    measure -= 2.0;
+                } else if ( measure%2.0 != 0.0 ) {
+                    diff = diff2;
                 }
             }
 
-            this.scalefactor = (this.animwidth - 100.0) / (double) measure;
+            this.setScalefactor((this.getAnimWidth() - 83.3) / measure);
             if ( dim == 2 )
-                this.linewidth = 1.0 / this.scalefactor;
+                this.setLinewidth(1.0 / this.getScalefactor());
             else
-                this.linewidth = diam / this.scalefactor;
+                this.setLinewidth(diam / this.getScalefactor());
 
-            mmcpiirturi.scale(this.scalefactor, this.scalefactor);
+            mmcpiirturi.scale(this.getScalefactor(), this.getScalefactor());
 
-            this.isscaled = true;
-            mmcpiirturi.setGlobalAlpha(1.0 / this.scalefactor );
+            this.setIsscaled(true);
+            mmcpiirturi.setGlobalAlpha(1.0 / this.getScalefactor() );
 
-            this.newdata = true;
-            this.energy_x = new ArrayList();
-            this.energy_y = new ArrayList();
+            this.setNewdata(true);
+            this.setEnergy_x(new ArrayList<>());
+            this.setEnergy_y(new ArrayList<>());
 
 			if ( isovalikkoMMC.getChildren().contains(textAreaMMC)) {
                 textAreaMMC.clear();
@@ -1469,70 +1343,75 @@ public class RandomWalk extends Application {
 
             mmcpiirturi.setGlobalAlpha(1.0);
             mmcpiirturi.setFill(Color.BLACK);
-            mmcpiirturi.fillRect(0, 0, 1.0/this.scalefactor*this.animwidth,
-                1.0/this.scalefactor*this.animheight);
+            mmcpiirturi.fillRect(0, 0, 1.0/this.getScalefactor()*this.getAnimWidth(),
+                1.0/this.getScalefactor()*this.getAnimHeight());
             mmcpiirturi.fill();
 
-            /**
+            /*
             * GET INITIAL DATA
             */
             File initialDataFile = new File(
                 datapath + "/startMMC_" + dim + "D_" + particles + "N.xy");
 
-            /**
+            /*
             * DRAW MMC ANIMATION
             */
-            getMMCScene.refresh(
-                datafolder, initialDataFile, fexec, mmcpiirturi, this.scalefactor,
-                this.animwidth, this.linewidth, this.fxplot, remBarNappiMMC,
-                runMMC, plotMMC, closeNappiMMC, menuNappiMMC, helpNappiMMC,
-                this.energy_x, this.energy_y, this.newdata, measure, diff
+            getMMCScene.refresh(datafolder, initialDataFile, fexec, mmcpiirturi, this.getScalefactor(),
+                    this.getAnimWidth(), this.getLinewidth(), this.getFxplot(), remBarNappiMMC, runMMC,
+                    plotMMC, closeNappiMMC, menuNappiMMC, helpNappiMMC, this.getEnergy_x(), this.getEnergy_y(),
+                    this.isNewdata(), measure, diff
             );
-            this.newdata = false;
+            this.setNewdata(false);
 
         });
 
         stage.setScene(firstScene);
         Image img = new Image("images/icon.png");
         stage.getIcons().add(img);
-        stage.addEventHandler(EventType.ROOT, e -> {
-            stage.setOnHiding(f-> {
-                if (this.fxplot != null) {
-                    if (this.fxplot.isRunning()) this.fxplot.stop();
-                    if (this.fxplot.getFrame().isShowing()
-                        || this.fxplot.getFrame().isActive()
-                        || this.fxplot.getFrame().isDisplayable())
-                        this.fxplot.getFrame().dispose();
-                }
-                if (getMMCScene.runtimeIsRunning())
-                    getMMCScene.stopRuntime();
-                if (getRealScene.runtimeIsRunning())
-                    getRealScene.stopRuntime();
-                if (ex.runtimeIsRunning())
-                    ex.stopRuntime();
-                System.gc();
-            });
-        });
+        stage.addEventHandler(EventType.ROOT, e -> stage.setOnHiding(f-> {
+            if (this.getFxplot() != null) {
+                if (this.getFxplot().isRunning()) this.getFxplot().stop();
+                if (this.getFxplot().getFrame().isShowing()
+                    || this.getFxplot().getFrame().isActive()
+                    || this.getFxplot().getFrame().isDisplayable())
+                    this.getFxplot().getFrame().dispose();
+            }
+            if (getMMCScene.runtimeIsRunning())
+                getMMCScene.stopRuntime();
+            if (getRealScene.runtimeIsRunning())
+                getRealScene.stopRuntime();
+            if (ex.runtimeIsRunning())
+                ex.stopRuntime();
+        }));
         stage.initStyle(StageStyle.UTILITY);
         stage.toFront();
         stage.show();
     }
 
-    public boolean createFolder(String source, String destination, String executable, boolean createDir){
-        if (createDir == true) {
+    /**
+     * method for creating a working directory C:/RWDATA if needed, and
+     * copies executables there from lib/.
+     * <p>
+     *     returns false if all goes well, true otherwise
+     * </p>
+     * @param source path for resource folder lib/
+     * @param destination path for working directory C:/RWDATA
+     * @param executable file to copy from lib/ to C:/RWDATA
+     * @param createDir true if has to create working directory
+     * @return false if all goes well, true otherwise
+     */
+    private boolean createFolder(String source, String destination, String executable, boolean createDir){
+        if ( createDir ) {
             File dataFile = new File(destination);
-            try {
-                System.out.println("creating directory: " + destination);
-                dataFile.mkdir();
-            } catch (SecurityException se) {
-                System.out.println("Could not create a new directory\n"+se.getMessage());
-            }
+            boolean mkdir = dataFile.mkdir();
+            if (mkdir) System.out.println("creating directory: " + destination);
+            else System.out.println("Could not create a new directory\n");
         }
 
         File sourceDir = new File(source);
         if (Files.notExists(sourceDir.toPath())) {
             System.out.println("Source file " + executable + " not found from " + source);
-            return false;
+            return true;
         }
 
         File sourceFile = new File(source + "/" + executable);
@@ -1544,14 +1423,15 @@ public class RandomWalk extends Application {
             fin = new BufferedInputStream(new FileInputStream(sourceFile));
             fout = new BufferedOutputStream(new FileOutputStream(destinationFile));
             byte[] readBytes = new byte[1024];
-            int readed;
             System.out.println("Copying resource file, please wait...");
+            int readed;
             while((readed = fin.read(readBytes)) != -1){
                 fout.write(readBytes, 0, readed);
             }
             System.out.println("Copying finished.");
         } catch (IOException e) {
             System.out.println("Resource file " + sourceFile + " not copied into new folder\n"+e.getMessage());
+            return true;
         } finally {
             try {
                 if ( fin != null ) fin.close();
@@ -1560,11 +1440,294 @@ public class RandomWalk extends Application {
                 System.out.println(e.getMessage());
             }
         }
-        
-        return true;
+        return false;
     }
 
-    public static void main(String[] args) {
-        launch(args);
+    public static void main(String[] args) { launch(args); }
+
+    /**
+     * @return the stageWidth
+     */
+    @Contract(pure = true)
+    private int getStageWidth() { return 940; }
+
+    /**
+     * @return the stageHeight
+     */
+    @Contract(pure = true)
+    private int getStageHeight() { return 660; }
+
+    /**
+     * @return the buttonWidth
+     */
+    @Contract(pure = true)
+    private int getButtonWidth() { return 150; }
+
+    /**
+     * @return the textwidth
+     */
+    @Contract(pure = true)
+    private int getTextWidth() { return 740; }
+
+    /**
+     * @return the textheight
+     */
+    @Contract(pure = true)
+    private int getTextHeight() { return 600; }
+
+    /**
+     * @return the animwidth
+     */
+    @Contract(pure = true)
+    private int getAnimWidth() { return 750; }
+
+    /**
+     * @return the animheight
+     */
+    @Contract(pure = true)
+    private int getAnimHeight() { return 750; }
+
+    /**
+     * @return the pathheight
+     */
+    @Contract(pure = true)
+    private int getPathHeight() { return 660; }
+
+    /**
+     * @return the paneWidth
+     */
+    @Contract(pure = true)
+    private int getPaneWidth() { return 200; }
+
+    /**
+     * @return the screenWidth
+     */
+    @Contract(pure = true)
+    private int getScreenWidth() { return screenWidth; }
+
+    /**
+     * @param screenWidth the screenWidth to set
+     */
+    private void setScreenWidth(int screenWidth) { this.screenWidth = screenWidth; }
+
+    /**
+     * @return the screenHeight
+     */
+    @Contract(pure = true)
+    private int getScreenHeight() {
+        return screenHeight;
+    }
+
+    /**
+     * @param screenHeight the screenHeight to set
+     */
+    private void setScreenHeight(int screenHeight) { this.screenHeight = screenHeight; }
+
+    /**
+     * @return the fxplot
+     */
+    @Contract(pure = true)
+    private FXPlot getFxplot() {
+        return fxplot;
+    }
+
+    /**
+     * @param fxplot the fxplot to set
+     */
+    private void setFxplot(FXPlot fxplot) {
+        this.fxplot = fxplot;
+    }
+
+    /**
+     * @return the frame
+     */
+    @Contract(pure = true)
+    private JFrame getFrame() {
+        return frame;
+    }
+
+    /**
+     * @param frame the frame to set
+     */
+    private void setFrame(JFrame frame) {
+        this.frame = frame;
+    }
+
+    /**
+     * @return the vars
+     */
+    private String[] getVars() {
+        return vars.clone();
+    }
+
+    /**
+     * @param vars the vars to set
+     */
+    private void setVars(@NotNull String[] vars) {
+        this.vars = vars.clone();
+    }
+
+    /**
+     * @return the scalefactor
+     */
+    @Contract(pure = true)
+    private double getScalefactor() {
+        return scalefactor;
+    }
+
+    /**
+     * @param scalefactor the scalefactor to set
+     */
+    private void setScalefactor(double scalefactor) {
+        this.scalefactor = scalefactor;
+    }
+
+    /**
+     * @return the linewidth
+     */
+    @Contract(pure = true)
+    private double getLinewidth() {
+        return linewidth;
+    }
+
+    /**
+     * @param linewidth the linewidth to set
+     */
+    private void setLinewidth(double linewidth) {
+        this.linewidth = linewidth;
+    }
+
+    /**
+     * @return the isscaled
+     */
+    @Contract(pure = true)
+    private boolean isIsscaled() {
+        return isscaled;
+    }
+
+    /**
+     * @param isscaled the isscaled to set
+     */
+    private void setIsscaled(boolean isscaled) {
+        this.isscaled = isscaled;
+    }
+
+    /**
+     * @return the newdata
+     */
+    @Contract(pure = true)
+    private boolean isNewdata() {
+        return newdata;
+    }
+
+    /**
+     * @param newdata the newdata to set
+     */
+    private void setNewdata(boolean newdata) {
+        this.newdata = newdata;
+    }
+
+    /**
+     * @return the standnorm
+     */
+
+    @Contract(pure = true)
+    private boolean isStandnorm() {
+        return standnorm;
+    }
+
+    /**
+     * @param standnorm the standnorm to set
+     */
+    private void setStandnorm(boolean standnorm) {
+        this.standnorm = standnorm;
+    }
+
+    /**
+     * @return the mincount
+     */
+    @Contract(pure = true)
+    private double getMincount() {
+        return mincount;
+    }
+
+    /**
+     * @param mincount the mincount to set
+     */
+    private void setMincount(double mincount) {
+        this.mincount = mincount;
+    }
+
+    /**
+     * @return the maxcount
+     */
+    @Contract(pure = true)
+    private double getMaxcount() {
+        return maxcount;
+    }
+
+    /**
+     * @param maxcount the maxcount to set
+     */
+    private void setMaxcount(double maxcount) {
+        this.maxcount = maxcount;
+    }
+
+    /**
+     * @return the rms_runs
+     */
+    private double[] getRms_runs() {
+        return rms_runs.clone();
+    }
+
+    /**
+     * @param rms_runs the rms_runs to set
+     */
+    private void setRms_runs(@NotNull double[] rms_runs) {
+        this.rms_runs = rms_runs.clone();
+    }
+
+    /**
+     * @return the rms_norm
+     */
+    private double[] getRms_norm() {
+        return rms_norm.clone();
+    }
+
+    /**
+     * @param rms_norm the rms_norm to set
+     */
+    private void setRms_norm(@NotNull double[] rms_norm) {
+        this.rms_norm = rms_norm.clone();
+    }
+
+    /**
+     * @return the energy_x
+     */
+    @Contract(pure = true)
+    private List <Double> getEnergy_x() {
+        return energy_x;
+    }
+
+    /**
+     * @param energy_x the energy_x to set
+     */
+    private void setEnergy_x(List<Double> energy_x) {
+        this.energy_x = energy_x;
+    }
+
+    /**
+     * @return the energy_y
+     */
+    @Contract(pure = true)
+    private List <Double> getEnergy_y() {
+        return energy_y;
+    }
+
+    /**
+     * @param energy_y the energy_y to set
+     */
+    private void setEnergy_y(List<Double> energy_y) {
+        this.energy_y = energy_y;
     }
 }

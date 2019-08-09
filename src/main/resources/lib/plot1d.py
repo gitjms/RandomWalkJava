@@ -33,7 +33,7 @@ def main():
 	fig.set_figwidth(9)
 	plt.gca().ticklabel_format(axis='both', style='plain', useOffset=False)
 
-	plt.plot(xdata_path,y,'-',lw=8,alpha=0.2,label="Path trace, N=%d"%int(particles))
+	plt.plot(xdata_path,y,'-',lw=8,alpha=0.2,antialiased=True,label="Path trace, N=%d"%int(particles))
 	plt.xlim(minx-10,maxx+10)
 	plt.ylim(0,2)
 	

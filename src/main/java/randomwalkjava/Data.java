@@ -1,13 +1,16 @@
 
 package randomwalkjava;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -19,44 +22,39 @@ import java.util.logging.Logger;
  * jari.sunnari@gmail.com
  * 
  * Class for data handling:
- * creates data folder and copies executales,
- * reads data from file
+ * executes Fortran code for all runs,
+ * reads initial particle data for MMC
  */
-public class Data {
-    
-    public String[] vars;
+class Data {
 
     /**
-     * empty constructor
+     * user variables from GUI
      */
+    String[] vars;
+
+    /*
+      initiating vars array
+     */
+    Data(@NotNull String[] vars) {
+        this.vars = vars.clone();
+    }
+
+    @Contract(pure = true)
     public Data() {
-    }
-    
-    public Data(String[] vars) {
-        this.vars = vars.clone();
+
     }
 
-    public void setVars(String[] vars) {
-        this.vars = vars.clone();
-    }
-
-    public void setVar(Integer i, String var) {
-        this.vars[i]=var;
-    }
-
-    public String[] getVars() {
-        return this.vars.clone();
-    }
-
-    public String getVar(Integer i) {
-        return this.vars[i];
-    }
-
-    public Boolean createData(File folderPath, String executable, boolean save) {
-        String teksti = "";
+    /**
+     * method executes Fortan code to get data
+     * @param folderPath datafolder c:/RWDATA
+     * @param executable Fortran executable walk.exe
+     * @return true if fortran execution succeeded, false otherwise
+     */
+    Boolean createData(File folderPath, String executable) {
+        StringBuilder teksti = new StringBuilder();
         boolean ok = true;
         String msg = "";
-        /**
+        /*
         * vars from user:
         * vars[0] = particles,
         * vars[1] = diameter,
@@ -72,77 +70,70 @@ public class Data {
             this.vars[0], this.vars[1], this.vars[2], this.vars[3],
             this.vars[4], this.vars[5], this.vars[6], this.vars[7],
             this.vars[8]};
- 
+
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(command[0]);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Data.class.getName()).log(Level.SEVERE, null, ex);
         }
+
         Runtime runtime = Runtime.getRuntime();
 
         try {
-            if (save == true){
-                /**
-                * print the state of the program
-                */
-                System.out.println(" Fortran execution begins...");
-            }
+            /*
+            * print the state of the program
+            */
+            System.out.println(" Fortran execution begins...");
             Process process = runtime.exec(command, null, folderPath);
             
             int exitVal;
             try (BufferedReader input = new BufferedReader(new InputStreamReader(
-                process.getInputStream(), Charset.defaultCharset()))) {
+                process.getInputStream(), StandardCharsets.UTF_8))) {
 
                 StreamGobbler errorGobbler = new StreamGobbler(
-                    process.getErrorStream(), "ERROR ");
+                    process.getErrorStream());
                 errorGobbler.start();
                 String line;
 
                 StreamGobbler outputGobbler = new StreamGobbler(
-                    process.getInputStream(), "", fos);
+                    process.getInputStream(), fos);
                 outputGobbler.start();
 
                 while ((line = input.readLine()) != null){
                     System.out.println(line);
-                    if (teksti.isEmpty())
-                        teksti = line;
+                    if (teksti.length() == 0)
+                        teksti = new StringBuilder(line);
                     else
-                        teksti = teksti + line + "\n";
+                        teksti.append(line).append("\n");
                 }
 
                 exitVal = process.waitFor();
                 if (exitVal == 0) {
-                    if (save == true) {
-                        msg = " Fortran execution ended with no errors";
-                        System.out.println(msg);
-                    }
+                    msg = " Fortran execution ended with no errors";
+                    System.out.println(msg);
                 } else {
-                    if (save == true) {
-                        msg = " Fortran execution ended with error code " + exitVal;
-                        System.out.println(msg);
-                        runtime.addShutdownHook(new Message());
-                    }
+                    msg = " Fortran execution ended with error code " + exitVal;
+                    System.out.println(msg);
+                    runtime.addShutdownHook(new Message());
                     runtime.exit(exitVal);
                 }
                 if ( fos != null ) fos.close();
             } catch (InterruptedException e) {
                 ok = false;
-                teksti = teksti + "\n" + msg + "\n" + e.getMessage();
+                teksti.append("\n").append(msg).append("\n").append(e.getMessage());
                 System.out.println(teksti);
             }
 
         } catch (IOException e) {
             ok = false;
-            teksti = teksti + "\n" + e.getMessage();
+            teksti.append("\n").append(e.getMessage());
             System.out.println(teksti);
         }
 
         try {
-            if ( fos != null ) {
-                fos.flush();
-                fos.close();
-            }
+            if ( fos != null ) fos.flush();
+            if ( fos != null ) fos.close();
         } catch (IOException ex) {
             Logger.getLogger(Data.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -150,19 +141,27 @@ public class Data {
         return ok;
     }
 
-    public static List<double[]> readDataMMC(File filePath, Integer dim){
+    /**
+     * method reads the initial data from file for MMC
+     * @param filePath datafolder c:/RWDATA
+     * @param dim particle field dimension, user choice
+     * @return list of initial particle configuration data
+     */
+    @NotNull
+    static List<double[]> readDataMMC(File filePath, Integer dim) throws IOException {
     
         double[] values;
         List<double[]> dataList = new ArrayList<>();
-
-        try (Scanner sc = new Scanner(filePath)) {
+        
+        try ( Scanner sc = new Scanner(filePath) ) {
             while (sc.hasNextLine()) {
                 values = new double[dim];
                 String data = sc.nextLine();
                 String[] osat;
                 osat = data.trim().split("(\\s+)");
-                for ( int i = 0; i < osat.length; i++)
-                    values[i] = Double.valueOf(osat[i]);
+                for ( int i = 0; i < osat.length; i++) {
+                    values[i] = Double.parseDouble(osat[i]);
+                }
                 dataList.add(values);
              }
         } catch (FileNotFoundException ex) {
@@ -171,4 +170,13 @@ public class Data {
 
         return dataList;
     }
+
+    /**
+     * method for setting the save parameter in vars array
+     * @param var the vars array to set
+     */
+    void setVar(String var) {
+        this.vars[8]=var;
+    }
+
 }
