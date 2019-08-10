@@ -16,7 +16,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -44,7 +43,6 @@ class SceneRealTimeRms extends Data {
     private boolean running;
     private boolean runtimeRunning;
     private long runs;
-    private double[] rms_runs;
     private double rms_sum;
     private double rms_data;
     private double smallest;
@@ -112,7 +110,6 @@ class SceneRealTimeRms extends Data {
         this.setPiirturi(piirturi);
         this.setLinewidth(linewidth);
         this.setScalefactor(scalefactor);
-        this.setRmsRuns(rms_runs);
 
         if (newdata) {
             this.setRuns(1);
@@ -336,14 +333,12 @@ class SceneRealTimeRms extends Data {
                                 this.setRms_sum(this.getRms_sum() + rrms);
 
                                 if ( this.getRuns() < 11 ) {
-                                    this.getRmsRuns()[(int) this.getRuns() - 1] = rrms;
-                                    yAxis = this.getRmsRuns();//Arrays.copyOfRange(rms_runs, 0, 10);
+                                    rms_runs[(int) this.getRuns() - 1] = rrms;
+                                    yAxis = rms_runs.clone();
                                 } else {
-                                    /*for (int h = 0; h < 9; h++)
-                                        rms_runs[h] = rms_runs[h+1];*/
-                                    arraycopy(this.getRmsRuns(), 1, this.getRmsRuns(), 0, 9);
-                                    this.getRmsRuns()[9] = rrms;
-                                    yAxis = this.getRmsRuns();//Arrays.copyOfRange(rms_runs, 0, 10);
+                                    arraycopy(rms_runs, 1, rms_runs, 0, 9);
+                                    rms_runs[9] = rrms;
+                                    yAxis = rms_runs.clone();
                                 }
 
                                 /*
@@ -555,18 +550,6 @@ class SceneRealTimeRms extends Data {
 
         return asettelu;
     }
-
-    /**
-     *
-     * @param rms_runs the rms_runs to set
-     */
-    private void setRmsRuns(@NotNull double[] rms_runs) { this.rms_runs = rms_runs.clone(); }
-
-    /**
-     * @return the rms_runs
-     */
-    @Contract(pure = true)
-    private double[] getRmsRuns() { return rms_runs.clone(); }
 
     /**
      * the setRunning to set to true

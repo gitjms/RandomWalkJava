@@ -25,7 +25,6 @@ import javafx.stage.StageStyle;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
@@ -1140,7 +1139,7 @@ public class RandomWalk extends Application {
                 /*
                 * DRAW ANIMATION
                 */
-                getRealScene.refresh(datafolder, fexec, piirturi, getScalefactor(), getLinewidth(), getFxplot(), getRms_runs(), isNewdata(), getMincount(), getMaxcount(), isStandnorm(), getAnimWidth());
+                getRealScene.refresh(datafolder, fexec, piirturi, getScalefactor(), getLinewidth(), getFxplot(), rms_runs, isNewdata(), getMincount(), getMaxcount(), isStandnorm(), getAnimWidth());
                 setNewdata(false);
 
                 this.prevTime = currentNanoTime;
@@ -1206,10 +1205,8 @@ public class RandomWalk extends Application {
                 piirturi.setGlobalAlpha(1.0 / this.getScalefactor() * Math.pow(Math.log10(steps),2.0));
 
                 this.setNewdata(true);
-                this.setRms_runs(new double[10]);
-                this.setRms_norm(new double[10]);
-                Arrays.fill(this.getRms_runs(), 0.0);
-                Arrays.fill(this.getRms_norm(), 0.0);
+                this.setRms_runs();
+                this.setRms_norm();
                 double expected = Math.sqrt(steps);
 
                 if ( !this.isStandnorm() ) {
@@ -1641,9 +1638,12 @@ public class RandomWalk extends Application {
     private double[] getRms_runs() { return rms_runs.clone(); }
 
     /**
-     * @param rms_runs the rms_runs to set
+     * rms_runs to fill with zeros
      */
-    private void setRms_runs(@NotNull double[] rms_runs) { this.rms_runs = rms_runs.clone(); }
+    private void setRms_runs() {
+        this.rms_runs = new double[10];
+        Arrays.fill(this.rms_runs, 0.0);
+    }
 
     /**
      * @return the rms_norm
@@ -1651,9 +1651,12 @@ public class RandomWalk extends Application {
     private double[] getRms_norm() { return rms_norm.clone(); }
 
     /**
-     * @param rms_norm the rms_norm to set
+     * rms_norm to fill with zeros
      */
-    private void setRms_norm(@NotNull double[] rms_norm) { this.rms_norm = rms_norm.clone(); }
+    private void setRms_norm() {
+        this.rms_norm = new double[10];
+        Arrays.fill(this.rms_norm, 0.0);
+    }
 
     /**
      * @return the energy_x
