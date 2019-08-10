@@ -38,7 +38,7 @@ def main():
 	plt.ylim(0,2)
 	
 	plt.tight_layout()
-	savename = "jpyplot1D_N" + str(particles) + "_S" + str(steps) + ".png"
+	savename = "jpyplot1D_N" + str(particles) + "_S" + str(steps) + ".pdf"
 	plt.savefig(savename)
 
 if __name__=="__main__":

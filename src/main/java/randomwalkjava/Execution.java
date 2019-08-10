@@ -1,31 +1,30 @@
 
 package randomwalkjava;
 
+import com.sun.glass.ui.Screen;
+import javafx.scene.layout.VBox;
+import org.jetbrains.annotations.Contract;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import static java.lang.Double.parseDouble;
-import static java.lang.Integer.parseInt;
-
 import java.nio.file.Files;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.scene.layout.VBox;
-import org.jetbrains.annotations.Contract;
 
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.WindowConstants;
+import static java.lang.Double.parseDouble;
+import static java.lang.Integer.parseInt;
 
 /**
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
  * 
- * Class for image file creation, Fortran and Python code
- * execution and image reading
+ * Class for Fortran and Python code execution,
+ * image file creation, image converting and reading
  */
 @SuppressWarnings("ALL")
 class Execution {
@@ -33,6 +32,8 @@ class Execution {
     private int screenHeight;
     private Runtime runtime;
     private boolean running;
+    private JFrame frame;
+    private Image iconImg;
 
     /**
      * Initiating variables
@@ -72,6 +73,7 @@ class Execution {
         pyexec1d = "python ".concat(pyexec1d);
         pyexec2d = "python ".concat(pyexec2d);
         pyexec3d = "python ".concat(pyexec3d);
+        this.setFrame(frame);
         String xDataPath;
         String yDataPath = null;
         String zDataPath;
@@ -107,7 +109,7 @@ class Execution {
             + particles + "N_"
             + steps + "S.x";
 
-        File imgFile = new File(path + "\\" + "jpyplot" + dimension + "D_N" + particles + "_S" + steps + ".png");
+        File pdfFile = new File(path + "\\" + "jpyplot" + dimension + "D_N" + particles + "_S" + steps + ".pdf");
 
         /*
         * 1D DATA
@@ -156,42 +158,47 @@ class Execution {
         * GET IMAGE
         */
         while (true) {
-            if (Files.notExists(imgFile.toPath())) {
+            if (Files.notExists(pdfFile.toPath())) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Execution.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            } else {
+            } else if (Files.exists(pdfFile.toPath())) {
                 try {
-                    image = ImageIO.read(imgFile);
+                    PDDocument document = PDDocument.load(pdfFile);
+                    PDFRenderer renderer = new PDFRenderer(document);
+                    image = renderer.renderImage(0);
+                    document.close();
                 } catch (IOException ex) {
-                    Logger.getLogger(Execution.class.getName()).log(Level.SEVERE, null, ex);
+                    System.out.println(ex.getMessage());
                 }
                 break;
             }
         }
 
-        frame.getContentPane().removeAll();
-        frame.setTitle("Random Walk - Path Tracing");
-        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        JLabel titleLabel = new JLabel(titletext + "N=" + particles + ", " + steps + " steps");
+        this.getFrame().getContentPane().removeAll();
+        this.getFrame().setTitle("Random Walk - Path Tracing");
+        this.getFrame().setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        JLabel titleLabel = new JLabel(titletext + "N=" + particles + ", " + steps + " steps\n");
         java.awt.Font labelFont = titleLabel.getFont();
         int newFontSize = (int)(labelFont.getSize() * 1.5);
         titleLabel.setFont(new java.awt.Font(labelFont.getName(), java.awt.Font.PLAIN, newFontSize));
-        titleLabel.setBounds(this.getChartWidth()/2-this.getA(),0, this.getChartWidth(),newFontSize);
+        titleLabel.setBounds(this.getChartWidth()/2-this.getXMarginBig(),0, this.getChartWidth(),newFontSize);
         /*
         * PLOT
         */
         assert image != null;
-        ImageIcon figIcn = new ImageIcon(image);
+        this.getFrame().setSize(this.getChartWidth(), this.getChartHeight());
+        this.getFrame().setLocation(0, (this.getScreenHeight()-this.getChartHeight())/2);
+        Image image2 = image.getScaledInstance(this.getChartWidth(), this.getChartHeight()-this.getYMargin(), Image.SCALE_AREA_AVERAGING);
+        ImageIcon figIcn = new ImageIcon(image2);
         JLabel figLabel = new JLabel(figIcn);
-        frame.add(titleLabel);
-        frame.add(figLabel);
-        frame.repaint();
-        frame.setLocation(0, (this.getScreenHeight()-this.getChartHeight())/2);
-        frame.pack();
-        frame.setVisible(true);
+        this.getFrame().add(titleLabel);
+        this.getFrame().add(figLabel);
+        this.getFrame().repaint();
+        this.getFrame().pack();
+        this.getFrame().setVisible(true);
     }
 
     /**
@@ -207,7 +214,7 @@ class Execution {
      * @param vars user data from GUI via
      */
     void executeMMC(File folder, String path, String fexec, String pyexecmmc2d,
-                    String pyexecmmc3d, VBox valikkoMMC, JFrame frame, Data data, String[] vars) {
+                    String pyexecmmc3d, JFrame frame, VBox valikkoMMC, Data data, String[] vars) {
         /*
         * FROM SCENEMMC
         * vars from user:
@@ -223,7 +230,8 @@ class Execution {
         */
         pyexecmmc2d = "python ".concat(pyexecmmc2d);
         pyexecmmc3d = "python ".concat(pyexecmmc3d);
-        File imgFile = null;
+        this.setFrame(frame);
+        File pdfFile = null;
         BufferedImage image = null;
         String[] command = null;
 
@@ -248,13 +256,13 @@ class Execution {
             + particles + "N.xy";
 
         if ( dimension == 2 ) {
-            imgFile =  new File(path + "\\" + "jpyplotmmc2D_N" + particles + "_diam" + diameter + ".png");
+            pdfFile = new File(path + "\\" + "jpyplotmmc2D_N" + particles + "_diam" + diameter + ".pdf");
             command = new String[]{"cmd","/c", pyexecmmc2d, startDataMMC, finalDataMMC};
         } else if ( dimension == 3 ) {
-            imgFile =  new File(path + "\\" + "jpyplotmmc3D_N" + particles + "_diam" + diameter + ".png");
+            pdfFile = new File(path + "\\" + "jpyplotmmc3D_N" + particles + "_diam" + diameter + ".pdf");
             command = new String[]{"cmd","/c", pyexecmmc3d, startDataMMC, finalDataMMC};
         }
-        
+
         this.setRuntime(Runtime.getRuntime());
         runtimeStart();
         try {
@@ -265,37 +273,42 @@ class Execution {
         }
 
         while (true) {
-            if (Files.notExists(imgFile.toPath())) {
+            if (Files.notExists(pdfFile.toPath())) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Execution.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            } else if (Files.exists(imgFile.toPath())) {
+            } else if (Files.exists(pdfFile.toPath())) {
                 try {
-                    image = ImageIO.read(imgFile);
+                    PDDocument document = PDDocument.load(pdfFile);
+                    PDFRenderer renderer = new PDFRenderer(document);
+                    image = renderer.renderImage(0);
+                    document.close();
                 } catch (IOException ex) {
-                    Logger.getLogger(Execution.class.getName()).log(Level.SEVERE, null, ex);
+                    System.out.println(ex.getMessage());
                 }
                 break;
             }
         }
 
-        frame.getContentPane().removeAll();
-        frame.setTitle("Random Walk - MMC Diffusion Plot");
-        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        this.getFrame().getContentPane().removeAll();
+        this.getFrame().setTitle("Random Walk - MMC Diffusion Plot");
+        this.getFrame().setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         /*
         * PLOT
         */
         assert image != null;
-        ImageIcon figIcn = new ImageIcon(image);
+        this.getFrame().setSize(this.getMmcWidth(), this.getMmcHeight());
+        this.getFrame().setLocation(this.getXMarginBig(), 0);
+        Image image2 = image.getScaledInstance(this.getMmcWidth(), this.getMmcHeight()-this.getYMargin(), Image.SCALE_AREA_AVERAGING);
+        ImageIcon figIcn = new ImageIcon(image2);
         JLabel figLabel = new JLabel(figIcn);
-        frame.add(figLabel);
-        frame.repaint();
-        frame.setLocation(100, 10);
-        frame.pack();
-        frame.setVisible(true);
+        this.getFrame().add(figLabel);
+        this.getFrame().repaint();
+        this.getFrame().pack();
+        this.getFrame().setVisible(true);
         valikkoMMC.setDisable(false);
     }
 
@@ -325,10 +338,10 @@ class Execution {
         * vars[8] = save           n/a
         */
         pyexecrms = "python ".concat(pyexecrms);
+        this.setFrame(frame);
         String rmsDataPath;
         String titletext = null;
         BufferedImage image = null;
-        File imgFile;
 
         Boolean result = false;
         try {
@@ -344,13 +357,13 @@ class Execution {
         int dimension = parseInt(vars[4]);
 
         if ( vars[6].equals("f") && vars[7].equals("l") ) {
-            titletext = "Fixed source lattice particles, ";
+            titletext = "Fixed source lattice particles";
         } else if ( vars[6].equals("f") && vars[7].equals("-") ) {
-            titletext = "Fixed source free particles, ";
+            titletext = "Fixed source free particles";
         } else if ( vars[6].equals("-") && vars[7].equals("l") ) {
-            titletext = "Spread out lattice particles, ";
+            titletext = "Spread out lattice particles";
         } else if ( vars[6].equals("-") && vars[7].equals("-") ) {
-            titletext = "Spread out free particles, ";
+            titletext = "Spread out free particles";
         }
                 
         rmsDataPath = path
@@ -367,60 +380,67 @@ class Execution {
             System.out.println(ex.getMessage());
         }
 
-        imgFile = new File(path + "\\" + "jpyplotRMS" + dimension + "D_" + steps + "S.png");
+        File pdfFile = new File(path + "\\" + "jpyplotRMS" + dimension + "D_" + steps + "S.pdf");
+
         /*
         * GET IMAGE
         */
         while (true) {
-            if (Files.notExists(imgFile.toPath())) {
+            if (Files.notExists(pdfFile.toPath())) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Execution.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            } else if (Files.exists(imgFile.toPath())) {
+            } else if (Files.exists(pdfFile.toPath())) {
                 try {
-                    image = ImageIO.read(imgFile);
+                    PDDocument document = PDDocument.load(pdfFile);
+                    PDFRenderer renderer = new PDFRenderer(document);
+                    image = renderer.renderImage(0);
+                    document.close();
                 } catch (IOException ex) {
-                    Logger.getLogger(Execution.class.getName()).log(Level.SEVERE, null, ex);
+                    System.out.println(ex.getMessage());
                 }
                 break;
             }
         }
 
-        frame.getContentPane().removeAll();
-        frame.setTitle("Random Walk - R_rms Calculation");
-        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        JLabel titleLabel = new JLabel(titletext + dimension + "D, " + steps + " steps");
-        java.awt.Font labelFont = titleLabel.getFont();
-        int newFontSize = (int)(labelFont.getSize() * 1.5);
-        titleLabel.setFont(new java.awt.Font(labelFont.getName(), java.awt.Font.PLAIN, newFontSize));
-        titleLabel.setBounds(this.getChartWidth()/2-this.getA(),0, this.getChartWidth(),newFontSize);
+
+        this.getFrame().getContentPane().removeAll();
+        this.getFrame().setTitle("Random Walk - R_rms Calculation - " + titletext);
+        this.getFrame().setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         assert image != null;
-        ImageIcon figIcn = new ImageIcon(image);
+        this.getFrame().setSize(this.getChartWidth(), this.getChartHeight());
+        this.getFrame().setLocation(0, (this.getScreenHeight()-this.getChartHeight())/2-getYMargin());
+        Image image2 = image.getScaledInstance(this.getChartWidth(), this.getChartHeight()+this.getYMargin(), Image.SCALE_AREA_AVERAGING);
+        ImageIcon figIcn = new ImageIcon(image2);
         JLabel figLabel = new JLabel(figIcn);
-        frame.add(titleLabel);
-        frame.add(figLabel);
-        frame.repaint();
-        frame.setLocation(0, (this.getScreenHeight()-this.getChartHeight())/2);
-        frame.pack();
-        frame.setVisible(true);
+        this.getFrame().add(figLabel);
+        this.getFrame().repaint();
+        this.getFrame().pack();
+        this.getFrame().setVisible(true);
     }
+
+    /**
+     * @param frame the frame to set
+     */
+    private void setFrame(JFrame frame) { this.frame = frame; }
+
+    /**
+     * @return the frame
+     */
+    JFrame getFrame() { return frame; }
 
     /**
      * sets runtime running to true
      */
-    private void runtimeStart() {
-        this.setRunning(true);
-    }
+    private void runtimeStart() { this.setRunning(true); }
 
     /**
      * @return isRunning
      */
-    boolean runtimeIsRunning() {
-        return isRunning();
-    }
+    boolean runtimeIsRunning() { return isRunning(); }
 
     /**
      * sets runtime running to false and
@@ -435,74 +455,74 @@ class Execution {
      * @return the chartWidth
      */
     @Contract(pure = true)
-    private int getChartWidth() {return 750; }
+    private int getChartWidth() {return 600 / (int) Screen.getMainScreen().getPlatformScaleX(); }
 
     /**
      * @return the chartHeight
      */
     @Contract(pure = true)
-    private int getChartHeight() { return 750; }
+    private int getChartHeight() { return 500 / (int) Screen.getMainScreen().getPlatformScaleY(); }
 
     /**
      * @return the mmcWidth
      */
     @Contract(pure = true)
-    private int getMmcWidth() { return 300; }
+    private int getMmcWidth() { return 450 / (int) Screen.getMainScreen().getPlatformScaleX(); }
 
     /**
      * @return the mmcHeight
      */
     @Contract(pure = true)
-    private int getMmcHeight() { return 500; }
+    private int getMmcHeight() { return 800 / (int) Screen.getMainScreen().getPlatformScaleY(); }
 
     /**
      * @return the screenHeight
      */
     @Contract(pure = true)
-    private int getScreenHeight() {
-        return screenHeight;
-    }
+    private int getScreenHeight() { return screenHeight; }
 
     /**
      * @param screenHeight the screenHeight to set
      */
-    private void setScreenHeight(int screenHeight) {
-        this.screenHeight = screenHeight;
-    }
+    private void setScreenHeight(int screenHeight) { this.screenHeight = screenHeight; }
 
     /**
-     * @return the a
+     * @return the XMarginSmall
      */
     @Contract(pure = true)
-    private int getA() { return 100; }
+    private int getXMarginSmall() { return 50 / (int) Screen.getMainScreen().getPlatformScaleX(); }
+
+    /**
+     * @return the XMarginBig
+     */
+    @Contract(pure = true)
+    private int getXMarginBig() { return 200 / (int) Screen.getMainScreen().getPlatformScaleX(); }
+
+    /**
+     * @return the YMarginSmall
+     */
+    @Contract(pure = true)
+    private int getYMargin() { return 10 / (int) Screen.getMainScreen().getPlatformScaleY(); }
 
     /**
      * @return the runtime
      */
     @Contract(pure = true)
-    private Runtime getRuntime() {
-        return runtime;
-    }
+    private Runtime getRuntime() { return runtime; }
 
     /**
      * @param runtime the runtime to set
      */
-    private void setRuntime(Runtime runtime) {
-        this.runtime = runtime;
-    }
+    private void setRuntime(Runtime runtime) { this.runtime = runtime; }
 
     /**
      * @return the running
      */
     @Contract(pure = true)
-    private boolean isRunning() {
-        return running;
-    }
+    private boolean isRunning() { return running; }
 
     /**
      * @param running the running to set
      */
-    private void setRunning(boolean running) {
-        this.running = running;
-    }
+    private void setRunning(boolean running) { this.running = running; }
 }

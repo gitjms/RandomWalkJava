@@ -40,12 +40,12 @@ def main():
 		for i in range(int(particles)):
 			ax.plot3D(xdata_path[:,i],ydata_path[:,i],zdata_path[:,i])
 
-	ax.set_xlabel('$X$', fontsize=14)
-	ax.set_ylabel('$Y$', fontsize=14)
-	ax.set_zlabel('$Z$', fontsize=14)
+	ax.set_xlabel('$X$', fontsize=16)
+	ax.set_ylabel('$Y$', fontsize=16)
+	ax.set_zlabel('$Z$', fontsize=16)
 
 	plt.tight_layout()
-	savename = "jpyplot3D_N" + str(particles) + "_S" + str(steps) + ".png"
+	savename = "jpyplot3D_N" + str(particles) + "_S" + str(steps) + ".pdf"
 	plt.savefig(savename)
 
 if __name__=="__main__":

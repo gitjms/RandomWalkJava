@@ -1,17 +1,7 @@
 
 package randomwalkjava;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import static java.lang.Double.parseDouble;
-import static java.lang.Integer.parseInt;
-import static java.lang.System.*;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-
+import com.sun.glass.ui.Screen;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
@@ -21,17 +11,23 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+
+import static java.lang.Double.parseDouble;
+import static java.lang.Integer.parseInt;
+import static java.lang.System.arraycopy;
 
 /**
  * @author Jari Sunnari
@@ -48,12 +44,18 @@ class SceneRealTimeRms extends Data {
     private boolean running;
     private boolean runtimeRunning;
     private long runs;
+    private double[] rms_runs;
     private double rms_sum;
     private double rms_data;
     private double smallest;
     private double greatest;
     private Runtime runtime;
     private int exitVal;
+    private ToggleButton setDim1;
+    private ToggleButton setDim2;
+    private ToggleButton setDim3;
+    private TextField setNumParticles;
+    private TextField setNumSteps;
 
     /**
      * main class gets vars via this
@@ -110,6 +112,7 @@ class SceneRealTimeRms extends Data {
         this.setPiirturi(piirturi);
         this.setLinewidth(linewidth);
         this.setScalefactor(scalefactor);
+        this.setRmsRuns(rms_runs);
 
         if (newdata) {
             this.setRuns(1);
@@ -333,12 +336,14 @@ class SceneRealTimeRms extends Data {
                                 this.setRms_sum(this.getRms_sum() + rrms);
 
                                 if ( this.getRuns() < 11 ) {
-                                    rms_runs[(int) this.getRuns() - 1] = rrms;
-                                    yAxis = Arrays.copyOfRange(rms_runs, 0, 10);
+                                    this.getRmsRuns()[(int) this.getRuns() - 1] = rrms;
+                                    yAxis = this.getRmsRuns();//Arrays.copyOfRange(rms_runs, 0, 10);
                                 } else {
-                                    arraycopy(rms_runs, 1, rms_runs, 0, 9);
-                                    rms_runs[9] = rrms;
-                                    yAxis = Arrays.copyOfRange(rms_runs, 0, 10);
+                                    /*for (int h = 0; h < 9; h++)
+                                        rms_runs[h] = rms_runs[h+1];*/
+                                    arraycopy(this.getRmsRuns(), 1, this.getRmsRuns(), 0, 9);
+                                    this.getRmsRuns()[9] = rrms;
+                                    yAxis = this.getRmsRuns();//Arrays.copyOfRange(rms_runs, 0, 10);
                                 }
 
                                 /*
@@ -402,7 +407,7 @@ class SceneRealTimeRms extends Data {
 
         } catch (IOException | InterruptedException e) {
             this.getRuntime().gc();
-            out.println(e.getMessage());
+            System.out.println(e.getMessage());
         }
     }
 
@@ -440,14 +445,14 @@ class SceneRealTimeRms extends Data {
         * COMPONENTS...
         */
         Label labNumParticles = new Label("number of particles:");
-        TextField setNumParticles = new TextField("");
-        setNumParticles.setOnKeyReleased(e -> {
-            if (isNumInteger(setNumParticles.getText().trim())){
-                if (setNumParticles.getText().trim().equals("0")){
-                    setNumParticles.setText("1");
+        this.setNumParticles = new TextField("");
+        this.setNumParticles.setOnKeyReleased(e -> {
+            if (isNumInteger(this.setNumParticles.getText().trim())){
+                if (this.setNumParticles.getText().trim().equals("0")){
+                    this.setNumParticles.setText("1");
                     this.vars[0] = "1";
                 } else {
-                    this.vars[0] = setNumParticles.getText().trim();
+                    this.vars[0] = this.setNumParticles.getText().trim();
                 }
             } else
                 this.vars[0] = "0";
@@ -457,69 +462,54 @@ class SceneRealTimeRms extends Data {
         this.vars[2] = "0"; // (charge of particles)
 
         Label labNumSteps = new Label("number of steps:");
-        TextField setNumSteps = new TextField("");
-        setNumSteps.setOnKeyReleased(e -> {
-            if (isNumInteger(setNumSteps.getText().trim())){
-                this.vars[3] = setNumSteps.getText().trim();
+        this.setNumSteps = new TextField("");
+        this.setNumSteps.setOnKeyReleased(e -> {
+            if (isNumInteger(this.setNumSteps.getText().trim())){
+                this.vars[3] = this.setNumSteps.getText().trim();
             } else
                 this.vars[3] = "0";
         });
 
         Label labNumDimensions = new Label("dimension:");
-        ToggleButton setDim1 = new ToggleButton("1");
-        setDim1.setMinWidth(35);
-        setDim1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        setDim1.setBackground(new Background(new BackgroundFill(
-            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        setDim1.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setDim1.setEffect(shadow));
-        setDim1.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setDim1.setEffect(null));
-        ToggleButton setDim2 = new ToggleButton("2");
-        setDim2.setMinWidth(35);
-        setDim2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        setDim2.setBackground(new Background(new BackgroundFill(
-            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        setDim2.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setDim2.setEffect(shadow));
-        setDim2.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setDim2.setEffect(null));
-        ToggleButton setDim3 = new ToggleButton("3");
-        setDim3.setMinWidth(35);
-        setDim3.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        setDim3.setBackground(new Background(new BackgroundFill(
-            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        setDim3.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setDim3.setEffect(shadow));
-        setDim3.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setDim3.setEffect(null));
-        HBox setDimension = new HBox(setDim1,setDim2,setDim3);
+        this.setDim1 = new ToggleButton("1");
+        this.setDim1.setMinWidth(35);
+        this.setDim1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setDim1.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setDim1.setEffect(shadow));
+        this.setDim1.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setDim1.setEffect(null));
+
+        this.setDim2 = new ToggleButton("2");
+        this.setDim2.setMinWidth(35);
+        this.setDim2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setDim2.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setDim2.setEffect(shadow));
+        this.setDim2.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setDim2.setEffect(null));
+
+        this.setDim3 = new ToggleButton("3");
+        this.setDim3.setMinWidth(35);
+        this.setDim3.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setDim3.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setDim3.setEffect(shadow));
+        this.setDim3.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setDim3.setEffect(null));
+
+        HBox setDimension = new HBox(this.setDim1,this.setDim2,this.setDim3);
         setDimension.setSpacing(20);
-        setDim1.setOnMouseClicked(f -> {
-            setDim1.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
-            setDim2.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            setDim3.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setDim1.setOnMouseClicked(f -> {
+            this.setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[4] = "1";
         });
-        setDim2.setOnMouseClicked(f -> {
-            setDim1.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            setDim2.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
-            setDim3.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setDim2.setOnMouseClicked(f -> {
+            this.setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[4] = "2";
         });
-        setDim3.setOnMouseClicked(f -> {
-            setDim1.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            setDim2.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            setDim3.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setDim3.setOnMouseClicked(f -> {
+            this.setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[4] = "3";
         });
 
@@ -533,17 +523,17 @@ class SceneRealTimeRms extends Data {
         */
         GridPane.setHalignment(labNumParticles, HPos.LEFT);
         asettelu.add(labNumParticles, 0, 0);
-        GridPane.setHalignment(setNumParticles, HPos.CENTER);
-        setNumParticles.setMinWidth(getCompwidth());
-        setNumParticles.setMaxWidth(getCompwidth());
-        asettelu.add(setNumParticles, 0, 1);
+        GridPane.setHalignment(this.setNumParticles, HPos.CENTER);
+        this.setNumParticles.setMinWidth(getCompwidth());
+        this.setNumParticles.setMaxWidth(getCompwidth());
+        asettelu.add(this.setNumParticles, 0, 1);
 
         GridPane.setHalignment(labNumSteps, HPos.LEFT);
         asettelu.add(labNumSteps, 0, 2);
-        GridPane.setHalignment(setNumSteps, HPos.CENTER);
-        setNumSteps.setMinWidth(getCompwidth());
-        setNumSteps.setMaxWidth(getCompwidth());
-        asettelu.add(setNumSteps, 0, 3);
+        GridPane.setHalignment(this.setNumSteps, HPos.CENTER);
+        this.setNumSteps.setMinWidth(getCompwidth());
+        this.setNumSteps.setMaxWidth(getCompwidth());
+        asettelu.add(this.setNumSteps, 0, 3);
         
         GridPane.setHalignment(labNumDimensions, HPos.LEFT);
         asettelu.add(labNumDimensions, 0, 4);
@@ -565,6 +555,18 @@ class SceneRealTimeRms extends Data {
 
         return asettelu;
     }
+
+    /**
+     *
+     * @param rms_runs the rms_runs to set
+     */
+    private void setRmsRuns(@NotNull double[] rms_runs) { this.rms_runs = rms_runs.clone(); }
+
+    /**
+     * @return the rms_runs
+     */
+    @Contract(pure = true)
+    private double[] getRmsRuns() { return rms_runs.clone(); }
 
     /**
      * the setRunning to set to true
@@ -610,13 +612,13 @@ class SceneRealTimeRms extends Data {
      * @return the compwidth
      */
     @Contract(pure = true)
-    private int getCompwidth() { return 150; }
+    private int getCompwidth() { return 150 / (int) Screen.getMainScreen().getPlatformScaleX(); }
 
     /**
      * @return the paneWidth
      */
     @Contract(pure = true)
-    private int getPaneWidth() { return 200; }
+    private int getPaneWidth() { return 200 / (int) Screen.getMainScreen().getPlatformScaleX(); }
 
     /**
      * @return the scalefactor

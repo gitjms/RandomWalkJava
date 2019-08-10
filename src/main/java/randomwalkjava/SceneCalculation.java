@@ -11,13 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -38,7 +32,7 @@ class SceneCalculation extends Data {
      * main class gets vars via this
      * @return clone of vars array
      */
-    public String[] getVars() {
+    String[] getVars() {
         return this.vars.clone();
     }
  
@@ -234,13 +228,13 @@ class SceneCalculation extends Data {
      * @return the compwidth
      */
     @Contract(pure = true)
-    private int getCompwidth() { return 150 / (int) Screen.getMainScreen().getRecommendedOutputScaleX(); }
+    private int getCompwidth() { return 150 / (int) Screen.getMainScreen().getPlatformScaleX(); }
 
     /**
      * @return the paneWidth
      */
     @Contract(pure = true)
-    private int getPaneWidth() { return 200 / (int) Screen.getMainScreen().getRecommendedOutputScaleX(); }
+    private int getPaneWidth() { return 200 / (int) Screen.getMainScreen().getPlatformScaleX(); }
 
     /**
      * @return the nappiLattice

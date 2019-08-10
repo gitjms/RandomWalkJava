@@ -4,12 +4,7 @@ package randomwalkjava;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +35,7 @@ class Data {
     }
 
     @Contract(pure = true)
-    public Data() {
+    Data() {
 
     }
 
@@ -71,12 +66,12 @@ class Data {
             this.vars[4], this.vars[5], this.vars[6], this.vars[7],
             this.vars[8]};
 
-        FileOutputStream fos = null;
+        /*FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(command[0]);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Data.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
 
         Runtime runtime = Runtime.getRuntime();
 
@@ -91,14 +86,12 @@ class Data {
             try (BufferedReader input = new BufferedReader(new InputStreamReader(
                 process.getInputStream(), StandardCharsets.UTF_8))) {
 
-                StreamGobbler errorGobbler = new StreamGobbler(
-                    process.getErrorStream());
+                StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream());
                 errorGobbler.start();
                 String line;
 
-                StreamGobbler outputGobbler = new StreamGobbler(
-                    process.getInputStream(), fos);
-                outputGobbler.start();
+                /*StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), fos);
+                outputGobbler.start();*/
 
                 while ((line = input.readLine()) != null){
                     System.out.println(line);
@@ -118,7 +111,7 @@ class Data {
                     runtime.addShutdownHook(new Message());
                     runtime.exit(exitVal);
                 }
-                if ( fos != null ) fos.close();
+//                if ( fos != null ) fos.close();
             } catch (InterruptedException e) {
                 ok = false;
                 teksti.append("\n").append(msg).append("\n").append(e.getMessage());
@@ -131,12 +124,12 @@ class Data {
             System.out.println(teksti);
         }
 
-        try {
+        /*try {
             if ( fos != null ) fos.flush();
             if ( fos != null ) fos.close();
         } catch (IOException ex) {
             Logger.getLogger(Data.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
 
         return ok;
     }
@@ -148,7 +141,7 @@ class Data {
      * @return list of initial particle configuration data
      */
     @NotNull
-    static List<double[]> readDataMMC(File filePath, Integer dim) throws IOException {
+    static List<double[]> readDataMMC(File filePath, Integer dim) {
     
         double[] values;
         List<double[]> dataList = new ArrayList<>();
@@ -159,13 +152,16 @@ class Data {
                 String data = sc.nextLine();
                 String[] osat;
                 osat = data.trim().split("(\\s+)");
-                for ( int i = 0; i < osat.length; i++) {
-                    values[i] = Double.parseDouble(osat[i]);
+                if (!osat[0].equals("Start")) {
+                    for (int i = 0; i < osat.length; i++) {
+                        values[i] = Double.parseDouble(osat[i]);
+                    }
+                    dataList.add(values);
                 }
-                dataList.add(values);
              }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(RandomWalk.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex.getMessage());
         }
 
         return dataList;

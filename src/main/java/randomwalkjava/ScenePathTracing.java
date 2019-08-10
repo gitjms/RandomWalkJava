@@ -11,13 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -34,12 +28,21 @@ class ScenePathTracing extends Data {
 
     private final Button nappiFixed;
     private final Button nappiLattice;
+    private ToggleButton setCharge0;
+    private ToggleButton setCharge1;
+    private ToggleButton setCharge2;
+    private ToggleButton setDim1;
+    private ToggleButton setDim2;
+    private ToggleButton setDim3;
+    private TextField setNumParticles;
+    private TextField setNumSteps;
+    private TextField setSizeParticles;
 
     /**
      * main class gets vars via this
      * @return clone of vars array
      */
-    public String[] getVars() {
+    String[] getVars() {
         return this.vars.clone();
     }
  
@@ -110,150 +113,120 @@ class ScenePathTracing extends Data {
         * COMPONENTS...
         */
         Label labNumParticles = new Label("number of particles:");
-        TextField setNumParticles = new TextField("");
-        setNumParticles.setOnKeyReleased(e -> {
-            if (isNumInteger(setNumParticles.getText().trim())){
-                if (setNumParticles.getText().trim().equals("0")){
-                    setNumParticles.setText("1");
+        this.setNumParticles = new TextField("");
+        this.setNumParticles.setOnKeyReleased(e -> {
+            if (isNumInteger(this.setNumParticles.getText().trim())){
+                if (this.setNumParticles.getText().trim().equals("0")){
+                    this.setNumParticles.setText("1");
                     this.vars[0] = "1";
                 } else {
-                    this.vars[0] = setNumParticles.getText().trim();
+                    this.vars[0] = this.setNumParticles.getText().trim();
                 }
             } else
                 this.vars[0] = "0";
         });
 
         Label labSizeParticles = new Label("diameter of particle:");
-        TextField setSizeParticles = new TextField("");
-        setSizeParticles.setOnKeyReleased(e -> {
-            if (isNumDouble(setSizeParticles.getText().trim()))
-                this.vars[1] = setSizeParticles.getText().trim();
+        this.setSizeParticles = new TextField("");
+        this.setSizeParticles.setOnKeyReleased(e -> {
+            if (isNumDouble(this.setSizeParticles.getText().trim()))
+                this.vars[1] = this.setSizeParticles.getText().trim();
             else
                 this.vars[1] = "0.0";
         });
 
         Label labCharge = new Label("charge of particles:");
-        ToggleButton setCharge0 = new ToggleButton("0");
-        setCharge0.setMinWidth(35);
-        setCharge0.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        setCharge0.setBackground(new Background(new BackgroundFill(
-            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        setCharge0.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setCharge0.setEffect(shadow));
-        setCharge0.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setCharge0.setEffect(null));
-        ToggleButton setCharge1 = new ToggleButton("1");
-        setCharge1.setMinWidth(35);
-        setCharge1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        setCharge1.setBackground(new Background(new BackgroundFill(
-            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        setCharge1.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setCharge1.setEffect(shadow));
-        setCharge1.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setCharge1.setEffect(null));
-        ToggleButton setCharge2 = new ToggleButton("2");
-        setCharge2.setMinWidth(35);
-        setCharge2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        setCharge2.setBackground(new Background(new BackgroundFill(
-            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        setCharge2.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setCharge2.setEffect(shadow));
-        setCharge2.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setCharge2.setEffect(null));
-        HBox setCharge = new HBox(setCharge0,setCharge1,setCharge2);
+        this.setCharge0 = new ToggleButton("0");
+        this.setCharge0.setMinWidth(35);
+        this.setCharge0.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.setCharge0.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setCharge0.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setCharge0.setEffect(shadow));
+        this.setCharge0.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setCharge0.setEffect(null));
+
+        this.setCharge1 = new ToggleButton("1");
+        this.setCharge1.setMinWidth(35);
+        this.setCharge1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.setCharge1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setCharge1.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setCharge1.setEffect(shadow));
+        this.setCharge1.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setCharge1.setEffect(null));
+
+        this.setCharge2 = new ToggleButton("2");
+        this.setCharge2.setMinWidth(35);
+        this.setCharge2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.setCharge2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setCharge2.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setCharge2.setEffect(shadow));
+        this.setCharge2.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setCharge2.setEffect(null));
+
+        HBox setCharge = new HBox(this.setCharge0,this.setCharge1,this.setCharge2);
         setCharge.setSpacing(20);
-        setCharge0.setOnMouseClicked(f -> {
-            setCharge0.setBackground(new Background(new BackgroundFill(
-                Color.CYAN,CornerRadii.EMPTY,Insets.EMPTY)));
-            setCharge1.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            setCharge2.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setCharge0.setOnMouseClicked(f -> {
+            this.setCharge0.setBackground(new Background(new BackgroundFill(Color.CYAN,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setCharge1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setCharge2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[2] = "0";
         });
-        setCharge1.setOnMouseClicked(f -> {
-            setCharge0.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            setCharge1.setBackground(new Background(new BackgroundFill(
-                Color.CYAN,CornerRadii.EMPTY,Insets.EMPTY)));
-            setCharge2.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setCharge1.setOnMouseClicked(f -> {
+            this.setCharge0.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setCharge1.setBackground(new Background(new BackgroundFill(Color.CYAN,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setCharge2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[2] = "1";
         });
-        setCharge2.setOnMouseClicked(f -> {
-            setCharge0.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            setCharge1.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            setCharge2.setBackground(new Background(new BackgroundFill(
-                Color.CYAN,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setCharge2.setOnMouseClicked(f -> {
+            this.setCharge0.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setCharge1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setCharge2.setBackground(new Background(new BackgroundFill(Color.CYAN,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[2] = "2";
         });
 
         Label labNumSteps = new Label("number of steps:");
-        TextField setNumSteps = new TextField("");
-        setNumSteps.setOnKeyReleased(e -> {
-            if (isNumInteger(setNumSteps.getText().trim())){
-                this.vars[3] = setNumSteps.getText().trim();
+        this.setNumSteps = new TextField("");
+        this.setNumSteps.setOnKeyReleased(e -> {
+            if (isNumInteger(this.setNumSteps.getText().trim())){
+                this.vars[3] = this.setNumSteps.getText().trim();
             } else
                 this.vars[3] = "0";
         });
 
         Label labNumDimensions = new Label("dimension:");
-        ToggleButton setDim1 = new ToggleButton("1");
-        setDim1.setMinWidth(35);
-        setDim1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        setDim1.setBackground(new Background(new BackgroundFill(
-            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        setDim1.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setDim1.setEffect(shadow));
-        setDim1.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setDim1.setEffect(null));
-        ToggleButton setDim2 = new ToggleButton("2");
-        setDim2.setMinWidth(35);
-        setDim2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        setDim2.setBackground(new Background(new BackgroundFill(
-            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        setDim2.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setDim2.setEffect(shadow));
-        setDim2.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setDim2.setEffect(null));
-        ToggleButton setDim3 = new ToggleButton("3");
-        setDim3.setMinWidth(35);
-        setDim3.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        setDim3.setBackground(new Background(new BackgroundFill(
-            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        setDim3.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setDim3.setEffect(shadow));
-        setDim3.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setDim3.setEffect(null));
-        HBox setDimension = new HBox(setDim1,setDim2,setDim3);
+        this.setDim1 = new ToggleButton("1");
+        this.setDim1.setMinWidth(35);
+        this.setDim1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setDim1.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setDim1.setEffect(shadow));
+        this.setDim1.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setDim1.setEffect(null));
+
+        this.setDim2 = new ToggleButton("2");
+        this.setDim2.setMinWidth(35);
+        this.setDim2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setDim2.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setDim2.setEffect(shadow));
+        this.setDim2.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setDim2.setEffect(null));
+
+        this.setDim3 = new ToggleButton("3");
+        this.setDim3.setMinWidth(35);
+        this.setDim3.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setDim3.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setDim3.setEffect(shadow));
+        this.setDim3.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setDim3.setEffect(null));
+
+        HBox setDimension = new HBox(this.setDim1,this.setDim2,this.setDim3);
         setDimension.setSpacing(20);
-        setDim1.setOnMouseClicked(f -> {
-            setDim1.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
-            setDim2.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            setDim3.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setDim1.setOnMouseClicked(f -> {
+            this.setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[4] = "1";
         });
-        setDim2.setOnMouseClicked(f -> {
-            setDim1.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            setDim2.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
-            setDim3.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setDim2.setOnMouseClicked(f -> {
+            this.setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[4] = "2";
         });
-        setDim3.setOnMouseClicked(f -> {
-            setDim1.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            setDim2.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            setDim3.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setDim3.setOnMouseClicked(f -> {
+            this.setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[4] = "3";
         });
 
@@ -264,17 +237,17 @@ class ScenePathTracing extends Data {
         */
         GridPane.setHalignment(labNumParticles, HPos.LEFT);
         asettelu.add(labNumParticles, 0, 0);
-        GridPane.setHalignment(setNumParticles, HPos.CENTER);
-        setNumParticles.setMinWidth(getCompwidth());
-        setNumParticles.setMaxWidth(getCompwidth());
-        asettelu.add(setNumParticles, 0, 1);
+        GridPane.setHalignment(this.setNumParticles, HPos.CENTER);
+        this.setNumParticles.setMinWidth(getCompwidth());
+        this.setNumParticles.setMaxWidth(getCompwidth());
+        asettelu.add(this.setNumParticles, 0, 1);
         
         GridPane.setHalignment(labSizeParticles, HPos.LEFT);
         asettelu.add(labSizeParticles, 0, 2);
-        GridPane.setHalignment(setSizeParticles, HPos.CENTER);
-        setSizeParticles.setMinWidth(getCompwidth());
-        setSizeParticles.setMaxWidth(getCompwidth());
-        asettelu.add(setSizeParticles, 0, 3);
+        GridPane.setHalignment(this.setSizeParticles, HPos.CENTER);
+        this.setSizeParticles.setMinWidth(getCompwidth());
+        this.setSizeParticles.setMaxWidth(getCompwidth());
+        asettelu.add(this.setSizeParticles, 0, 3);
 
         GridPane.setHalignment(labCharge, HPos.LEFT);
         asettelu.add(labCharge, 0, 4);
@@ -285,10 +258,10 @@ class ScenePathTracing extends Data {
 
         GridPane.setHalignment(labNumSteps, HPos.LEFT);
         asettelu.add(labNumSteps, 0, 6);
-        GridPane.setHalignment(setNumSteps, HPos.CENTER);
-        setNumSteps.setMinWidth(getCompwidth());
-        setNumSteps.setMaxWidth(getCompwidth());
-        asettelu.add(setNumSteps, 0, 7);
+        GridPane.setHalignment(this.setNumSteps, HPos.CENTER);
+        this.setNumSteps.setMinWidth(getCompwidth());
+        this.setNumSteps.setMaxWidth(getCompwidth());
+        asettelu.add(this.setNumSteps, 0, 7);
         
         GridPane.setHalignment(labNumDimensions, HPos.LEFT);
         asettelu.add(labNumDimensions, 0, 8);
@@ -302,25 +275,18 @@ class ScenePathTracing extends Data {
         */
         this.getNappiFixed().setMinWidth(getCompwidth());
         this.getNappiFixed().setMaxWidth(getCompwidth());
-        this.getNappiFixed().setBackground(new Background(
-            new BackgroundFill(
-                Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.getNappiFixed().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
         this.getNappiFixed().setId("fixed");
         this.getNappiFixed().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getNappiFixed().setEffect(shadow));
         this.getNappiFixed().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getNappiFixed().setEffect(null));
         this.getNappiFixed().setOnMouseClicked((MouseEvent event) -> {
             if (this.getNappiFixed().getText().equals("SPREAD")){
                 this.getNappiFixed().setText("FIXED");
-                this.getNappiFixed().setBackground(
-                    new Background(
-                        new BackgroundFill(
-                            Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.getNappiFixed().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[6] = "f";
             } else if (this.getNappiFixed().getText().equals("FIXED")){
                 this.getNappiFixed().setText("SPREAD");
-                this.getNappiFixed().setBackground(
-                    new Background(new BackgroundFill(
-                        Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.getNappiFixed().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[6] = "-";
             }
         });
@@ -331,25 +297,18 @@ class ScenePathTracing extends Data {
         */
         this.getNappiLattice().setMinWidth(getCompwidth());
         this.getNappiLattice().setMaxWidth(getCompwidth());
-        this.getNappiLattice().setBackground(new Background(
-            new BackgroundFill(
-                Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
         this.getNappiLattice().setId("lattice");
         this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getNappiLattice().setEffect(shadow));
         this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getNappiLattice().setEffect(null));
         this.getNappiLattice().setOnMouseClicked((MouseEvent event) -> {
             if (this.getNappiLattice().getText().equals("LATTICE")){
                 this.getNappiLattice().setText("FREE");
-                this.getNappiLattice().setBackground(
-                    new Background(
-                        new BackgroundFill(
-                            Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[7] = "-";
             } else if (this.getNappiLattice().getText().equals("FREE")){
                 this.getNappiLattice().setText("LATTICE");
-                this.getNappiLattice().setBackground(
-                    new Background(new BackgroundFill(
-                        Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[7] = "l";
             }
         });
@@ -371,13 +330,13 @@ class ScenePathTracing extends Data {
      * @return the compwidth
      */
     @Contract(pure = true)
-    private int getCompwidth() { return 150; }
+    private int getCompwidth() { return 150 / (int) Screen.getMainScreen().getPlatformScaleX(); }
 
     /**
      * @return the paneWidth
      */
     @Contract(pure = true)
-    private int getPaneWidth() { return 200; }
+    private int getPaneWidth() { return 200 / (int) Screen.getMainScreen().getPlatformScaleX(); }
 
     /**
      * @return the nappiFixed
@@ -394,4 +353,5 @@ class ScenePathTracing extends Data {
     private Button getNappiLattice() {
         return nappiLattice;
     }
+
 }

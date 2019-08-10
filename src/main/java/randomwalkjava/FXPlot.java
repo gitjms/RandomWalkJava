@@ -1,16 +1,7 @@
 
 package randomwalkjava;
 
-import java.awt.*;
-
-import static java.awt.BasicStroke.CAP_SQUARE;
-import static java.awt.BasicStroke.JOIN_MITER;
-
-import java.util.List;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.WindowConstants;
-
+import com.sun.glass.ui.Screen;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.knowm.xchart.XChartPanel;
@@ -19,6 +10,13 @@ import org.knowm.xchart.XYChartBuilder;
 import org.knowm.xchart.XYSeries.XYSeriesRenderStyle;
 import org.knowm.xchart.style.Styler;
 import org.knowm.xchart.style.Styler.ChartTheme;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
+
+import static java.awt.BasicStroke.CAP_SQUARE;
+import static java.awt.BasicStroke.JOIN_MITER;
 
 /**
  * @author Jari Sunnari
@@ -48,13 +46,13 @@ class FXPlot extends SceneRealTimeRms {
         this.getFrame().setBackground(Color.white);
         this.getFrame().setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
-        if (which.equals("W&H")) {
-            this.getFrame().setLocation(0, 100);
-            this.getFrame().setPreferredSize(new Dimension(this.getWidth(), this.getHeight()));
+        if (which.equals("Walks&norm")) {
+            this.getFrame().setLocation(0, this.getYMarginTiny());
+            this.getFrame().setPreferredSize(new Dimension(this.getWidth(), this.getWalkNormHeight()));
             this.getFrame().setTitle("Real Time R_rms");
             this.getFrame().getContentPane().setLayout(new GridLayout(2,1));
         } else if (which.equals("E")) {
-            this.getFrame().setLocation(0, 50);
+            this.getFrame().setLocation(0, this.getYMarginSmall());
             this.getFrame().setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
             this.getFrame().setTitle("Real Time MMC");
         }
@@ -73,8 +71,8 @@ class FXPlot extends SceneRealTimeRms {
         this.chartPanelH = new XChartPanel<>(this.getCalcChartH());
         this.chartPanelE = new XChartPanel<>(this.getCalcChartE());
 
-        if (which.equals("W&H")) {
-            this.getChartPanelW().setBounds(0, 10, this.getWidth(), this.getHeight()/2);
+        if (which.equals("Walks&norm")) {
+            this.getChartPanelW().setBounds(0, this.getYMarginTiny(), this.getWidth(), this.getHeight()/2);
             this.getChartPanelW().setVisible(true);
 
             this.getChartPanelH().setBounds(0, this.getHeight()/2, this.getWidth(), this.getHeight()/2);
@@ -116,7 +114,7 @@ class FXPlot extends SceneRealTimeRms {
             this.getCalcChartH().getStyler().setToolTipsEnabled(true);
 
         } else if (which.equals("E")) {
-            this.getChartPanelE().setBounds(0, 0, this.getWidth(), this.getHeight()-100);
+            this.getChartPanelE().setBounds(0, 0, this.getWidth(), this.getHeight()-this.getYMarginBig());
             this.getChartPanelE().setVisible(true);
             /*
             * XYChart calcChartE
@@ -301,6 +299,7 @@ class FXPlot extends SceneRealTimeRms {
      */
     private void setFrame(JFrame frame) {
         this.frame = frame;
+        this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     /**
@@ -314,13 +313,37 @@ class FXPlot extends SceneRealTimeRms {
      * @return the width
      */
     @Contract(pure = true)
-    private int getWidth() { return 900; }
+    private int getWidth() { return 600 / (int) Screen.getMainScreen().getPlatformScaleX(); }
 
     /**
      * @return the height
      */
     @Contract(pure = true)
-    private int getHeight() { return 800; }
+    private int getHeight() { return 600 / (int) Screen.getMainScreen().getPlatformScaleY(); }
+
+    /**
+     * @return the height
+     */
+    @Contract(pure = true)
+    private int getWalkNormHeight() { return 800 / (int) Screen.getMainScreen().getPlatformScaleY(); }
+
+    /**
+     * @return the YMarginTiny
+     */
+    @Contract(pure = true)
+    private int getYMarginTiny() { return 10 / (int) Screen.getMainScreen().getPlatformScaleY(); }
+
+    /**
+     * @return the YMarginSmall
+     */
+    @Contract(pure = true)
+    private int getYMarginSmall() { return 50 / (int) Screen.getMainScreen().getPlatformScaleY(); }
+
+    /**
+     * @return the YMarginBig
+     */
+    @Contract(pure = true)
+    private int getYMarginBig() { return 100 / (int) Screen.getMainScreen().getPlatformScaleY(); }
 
     /**
      * @return the calcChartW

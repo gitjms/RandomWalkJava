@@ -1,5 +1,6 @@
 package randomwalkjava;
 
+import com.sun.glass.ui.Screen;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.event.EventType;
@@ -14,7 +15,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -25,6 +25,7 @@ import javafx.stage.StageStyle;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
@@ -65,8 +66,8 @@ public class RandomWalk extends Application {
         /*
          * initiate parameters
          */
-        setScreenWidth(Toolkit.getDefaultToolkit().getScreenSize().width);
-        setScreenHeight(Toolkit.getDefaultToolkit().getScreenSize().height);
+        setScreenWidth(Toolkit.getDefaultToolkit().getScreenSize().width/(int) Screen.getMainScreen().getPlatformScaleX());
+        setScreenHeight(Toolkit.getDefaultToolkit().getScreenSize().height/(int) Screen.getMainScreen().getPlatformScaleY());
         setScalefactor(1.0);
         setLinewidth(1.0);
         setIsscaled(false);
@@ -319,10 +320,10 @@ public class RandomWalk extends Application {
         textAreaCalc.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
         textAreaCalc.setBorder(null);
         textAreaCalc.setEditable(false);
-        textAreaCalc.setBackground(
-            new Background(new BackgroundFill(
+        textAreaCalc.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         textAreaCalc.setBlendMode(BlendMode.DIFFERENCE);
+
         /*
         * PATH TRACING TEXT AREA
         */
@@ -334,8 +335,7 @@ public class RandomWalk extends Application {
         textAreaPath.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
         textAreaPath.setBorder(null);
         textAreaPath.setEditable(false);
-        textAreaPath.setBackground(
-            new Background(new BackgroundFill(
+        textAreaPath.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         textAreaPath.setBlendMode(BlendMode.DIFFERENCE);
         /*
@@ -349,8 +349,7 @@ public class RandomWalk extends Application {
         textAreaReal.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
         textAreaReal.setBorder(null);
         textAreaReal.setEditable(false);
-        textAreaReal.setBackground(
-            new Background(new BackgroundFill(
+        textAreaReal.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         textAreaReal.setBlendMode(BlendMode.DIFFERENCE);
         /*
@@ -364,8 +363,7 @@ public class RandomWalk extends Application {
         textAreaMMC.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
         textAreaMMC.setBorder(null);
         textAreaMMC.setEditable(false);
-        textAreaMMC.setBackground(
-            new Background(new BackgroundFill(
+        textAreaMMC.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         textAreaMMC.setBlendMode(BlendMode.DIFFERENCE);
 
@@ -380,8 +378,7 @@ public class RandomWalk extends Application {
         textAreaMenu.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
         textAreaMenu.setBorder(null);
         textAreaMenu.setEditable(false);
-        textAreaMenu.setBackground(
-            new Background(new BackgroundFill(
+        textAreaMenu.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         textAreaMenu.setBlendMode(BlendMode.DIFFERENCE);
         
@@ -1185,7 +1182,7 @@ public class RandomWalk extends Application {
                     || this.getFxplot().getFrame().isDisplayable())
                     this.getFxplot().getFrame().dispose();
                 }
-                this.setFxplot(new FXPlot("W&H"));
+                this.setFxplot(new FXPlot("Walks&norm"));
 
                 this.setScalefactor(Math.sqrt(this.getAnimWidth() + Math.pow(dim,2.0) * 100
                     * Math.pow(Math.log10(steps),2.0) ) / Math.pow(Math.log10(steps),2.0));
@@ -1260,7 +1257,7 @@ public class RandomWalk extends Application {
             if ( fail ) return;
 
             ex.executeMMC(datafolder, datapath, fexec, pyexecmmc2d,
-                pyexecmmc3d, valikkoMMC, this.getFrame(), data, this.getVars());
+                pyexecmmc3d, this.getFrame(), valikkoMMC, data, this.getVars());
         });
 
         /*
@@ -1366,8 +1363,6 @@ public class RandomWalk extends Application {
         });
 
         stage.setScene(firstScene);
-        Image img = new Image("images/icon.png");
-        stage.getIcons().add(img);
         stage.addEventHandler(EventType.ROOT, e -> stage.setOnHiding(f-> {
             if (this.getFxplot() != null) {
                 if (this.getFxplot().isRunning()) this.getFxplot().stop();
@@ -1449,55 +1444,55 @@ public class RandomWalk extends Application {
      * @return the stageWidth
      */
     @Contract(pure = true)
-    private int getStageWidth() { return 940; }
+    private int getStageWidth() { return 940/(int) Screen.getMainScreen().getPlatformScaleX(); }
 
     /**
      * @return the stageHeight
      */
     @Contract(pure = true)
-    private int getStageHeight() { return 660; }
+    private int getStageHeight() { return 660/(int) Screen.getMainScreen().getPlatformScaleY(); }
 
     /**
      * @return the buttonWidth
      */
     @Contract(pure = true)
-    private int getButtonWidth() { return 150; }
+    private int getButtonWidth() { return 150/(int) Screen.getMainScreen().getPlatformScaleX(); }
 
     /**
      * @return the textwidth
      */
     @Contract(pure = true)
-    private int getTextWidth() { return 740; }
+    private int getTextWidth() { return 740/(int) Screen.getMainScreen().getPlatformScaleX(); }
 
     /**
      * @return the textheight
      */
     @Contract(pure = true)
-    private int getTextHeight() { return 600; }
+    private int getTextHeight() { return 600/(int) Screen.getMainScreen().getPlatformScaleY(); }
 
     /**
      * @return the animwidth
      */
     @Contract(pure = true)
-    private int getAnimWidth() { return 750; }
+    private int getAnimWidth() { return 750/(int) Screen.getMainScreen().getPlatformScaleX(); }
 
     /**
      * @return the animheight
      */
     @Contract(pure = true)
-    private int getAnimHeight() { return 750; }
-
-    /**
-     * @return the pathheight
-     */
-    @Contract(pure = true)
-    private int getPathHeight() { return 660; }
+    private int getAnimHeight() { return 750/(int) Screen.getMainScreen().getPlatformScaleY(); }
 
     /**
      * @return the paneWidth
      */
     @Contract(pure = true)
-    private int getPaneWidth() { return 200; }
+    private int getPaneWidth() { return 200/(int) Screen.getMainScreen().getPlatformScaleX(); }
+
+    /**
+     * @return the pathheight
+     */
+    @Contract(pure = true)
+    private int getPathHeight() { return 660/(int) Screen.getMainScreen().getPlatformScaleY(); }
 
     /**
      * @return the screenWidth
@@ -1536,6 +1531,7 @@ public class RandomWalk extends Application {
      */
     private void setFxplot(FXPlot fxplot) {
         this.fxplot = fxplot;
+        this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     /**
@@ -1549,185 +1545,135 @@ public class RandomWalk extends Application {
     /**
      * @param frame the frame to set
      */
-    private void setFrame(JFrame frame) {
-        this.frame = frame;
-    }
+    private void setFrame(JFrame frame) { this.frame = frame; }
 
     /**
      * @return the vars
      */
-    private String[] getVars() {
-        return vars.clone();
-    }
+    private String[] getVars() { return vars.clone(); }
 
     /**
      * @param vars the vars to set
      */
-    private void setVars(@NotNull String[] vars) {
-        this.vars = vars.clone();
-    }
+    private void setVars(@NotNull String[] vars) { this.vars = vars.clone(); }
 
     /**
      * @return the scalefactor
      */
     @Contract(pure = true)
-    private double getScalefactor() {
-        return scalefactor;
-    }
+    private double getScalefactor() { return scalefactor; }
 
     /**
      * @param scalefactor the scalefactor to set
      */
-    private void setScalefactor(double scalefactor) {
-        this.scalefactor = scalefactor;
-    }
+    private void setScalefactor(double scalefactor) { this.scalefactor = scalefactor; }
 
     /**
      * @return the linewidth
      */
     @Contract(pure = true)
-    private double getLinewidth() {
-        return linewidth;
-    }
+    private double getLinewidth() { return linewidth; }
 
     /**
      * @param linewidth the linewidth to set
      */
-    private void setLinewidth(double linewidth) {
-        this.linewidth = linewidth;
-    }
+    private void setLinewidth(double linewidth) { this.linewidth = linewidth; }
 
     /**
      * @return the isscaled
      */
     @Contract(pure = true)
-    private boolean isIsscaled() {
-        return isscaled;
-    }
+    private boolean isIsscaled() { return isscaled; }
 
     /**
      * @param isscaled the isscaled to set
      */
-    private void setIsscaled(boolean isscaled) {
-        this.isscaled = isscaled;
-    }
+    private void setIsscaled(boolean isscaled) { this.isscaled = isscaled; }
 
     /**
      * @return the newdata
      */
     @Contract(pure = true)
-    private boolean isNewdata() {
-        return newdata;
-    }
+    private boolean isNewdata() { return newdata; }
 
     /**
      * @param newdata the newdata to set
      */
-    private void setNewdata(boolean newdata) {
-        this.newdata = newdata;
-    }
+    private void setNewdata(boolean newdata) { this.newdata = newdata; }
 
     /**
      * @return the standnorm
      */
 
     @Contract(pure = true)
-    private boolean isStandnorm() {
-        return standnorm;
-    }
+    private boolean isStandnorm() { return standnorm; }
 
     /**
      * @param standnorm the standnorm to set
      */
-    private void setStandnorm(boolean standnorm) {
-        this.standnorm = standnorm;
-    }
+    private void setStandnorm(boolean standnorm) { this.standnorm = standnorm; }
 
     /**
      * @return the mincount
      */
     @Contract(pure = true)
-    private double getMincount() {
-        return mincount;
-    }
+    private double getMincount() { return mincount; }
 
     /**
      * @param mincount the mincount to set
      */
-    private void setMincount(double mincount) {
-        this.mincount = mincount;
-    }
+    private void setMincount(double mincount) { this.mincount = mincount; }
 
     /**
      * @return the maxcount
      */
     @Contract(pure = true)
-    private double getMaxcount() {
-        return maxcount;
-    }
+    private double getMaxcount() { return maxcount; }
 
     /**
      * @param maxcount the maxcount to set
      */
-    private void setMaxcount(double maxcount) {
-        this.maxcount = maxcount;
-    }
+    private void setMaxcount(double maxcount) { this.maxcount = maxcount; }
 
     /**
      * @return the rms_runs
      */
-    private double[] getRms_runs() {
-        return rms_runs.clone();
-    }
+    private double[] getRms_runs() { return rms_runs.clone(); }
 
     /**
      * @param rms_runs the rms_runs to set
      */
-    private void setRms_runs(@NotNull double[] rms_runs) {
-        this.rms_runs = rms_runs.clone();
-    }
+    private void setRms_runs(@NotNull double[] rms_runs) { this.rms_runs = rms_runs.clone(); }
 
     /**
      * @return the rms_norm
      */
-    private double[] getRms_norm() {
-        return rms_norm.clone();
-    }
+    private double[] getRms_norm() { return rms_norm.clone(); }
 
     /**
      * @param rms_norm the rms_norm to set
      */
-    private void setRms_norm(@NotNull double[] rms_norm) {
-        this.rms_norm = rms_norm.clone();
-    }
+    private void setRms_norm(@NotNull double[] rms_norm) { this.rms_norm = rms_norm.clone(); }
 
     /**
      * @return the energy_x
      */
     @Contract(pure = true)
-    private List <Double> getEnergy_x() {
-        return energy_x;
-    }
+    private List <Double> getEnergy_x() { return energy_x; }
 
     /**
      * @param energy_x the energy_x to set
      */
-    private void setEnergy_x(List<Double> energy_x) {
-        this.energy_x = energy_x;
-    }
+    private void setEnergy_x(List<Double> energy_x) { this.energy_x = energy_x; }
 
     /**
      * @return the energy_y
      */
     @Contract(pure = true)
-    private List <Double> getEnergy_y() {
-        return energy_y;
-    }
+    private List <Double> getEnergy_y() { return energy_y; }
 
     /**
      * @param energy_y the energy_y to set
      */
-    private void setEnergy_y(List<Double> energy_y) {
-        this.energy_y = energy_y;
-    }
+    private void setEnergy_y(List<Double> energy_y) { this.energy_y = energy_y; }
 }

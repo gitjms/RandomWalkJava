@@ -36,10 +36,12 @@ def main():
 	plt.ylim(0,maxy)
 	plt.xlabel(r"$\sqrt{N}$", fontsize=14)
 	plt.ylabel(r"$R_{rms}$", fontsize=14)
+	text=r"$R_{rms}$ vs. $\sqrt{N}$ (%dD), steps=%d"%(int(dimension),int(steps))
+	plt.title(text,fontsize=16)
 
 	plt.grid()
 	plt.tight_layout()
-	savename = "jpyplotRMS" + dimension + "D_" + steps + "S.png"
+	savename = "jpyplotRMS" + dimension + "D_" + steps + "S.pdf"
 	plt.savefig(savename)
 
 if __name__=="__main__":

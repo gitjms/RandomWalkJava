@@ -40,7 +40,7 @@ def main():
 	plt.ylim(miny-10,maxy+10)
 
 	plt.tight_layout()
-	savename = "jpyplot2D_N" + str(particles) + "_S" + str(steps) + ".png"
+	savename = "jpyplot2D_N" + str(particles) + "_S" + str(steps) + ".pdf"
 	plt.savefig(savename)
 
 if __name__=="__main__":

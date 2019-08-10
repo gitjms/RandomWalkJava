@@ -50,19 +50,19 @@ def main():
 		  label="Start configuration, N=%d"%particles)
 	plt.xlim(minx-abs(minx-maxx)/10,maxx+abs(minx-maxx)/10)
 	plt.ylim(miny-abs(miny-maxy)/10,maxy+abs(miny-maxy)/10)
-	text="N="+str(particles)+", Initial configuration"
-	plt.title(text,fontsize=15)
+	text=r"Initial configuration, N=%d, diam=%.2f"%(int(particles),float(diameter))
+	plt.title(text,fontsize=16)
 
 	plt.subplot(212)
 	plt.plot(xdata_final,ydata_final,'o',ms=1,mew=3,antialiased=True,
 		  label="Final configuration, N=%d"%particles)
 	plt.xlim(minx-abs(minx-maxx)/10,maxx+abs(minx-maxx)/10)
 	plt.ylim(miny-abs(miny-maxy)/10,maxy+abs(miny-maxy)/10)
-	text="Final configuration"
-	plt.title(text,fontsize=15)
+	text=r"Final configuration, N=%d, diam=%.2f"%(int(particles),float(diameter))
+	plt.title(text,fontsize=16)
 
 	plt.tight_layout()
-	savename = "jpyplotmmc2D_N" + str(particles) + "_diam" + str(diameter) + ".png"
+	savename = "jpyplotmmc2D_N" + str(particles) + "_diam" + str(diameter) + ".pdf"
 	plt.savefig(savename)
 
 if __name__=="__main__":
