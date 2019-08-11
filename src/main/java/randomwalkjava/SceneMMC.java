@@ -176,20 +176,20 @@ class SceneMMC extends Data {
 
         this.getRemBarNappiMMC().setVisible(true);
         this.getPlotMMC().setVisible(false);
+        this.getFxplot().setFrameVis();
+        this.getMenuNappiMMC().setDisable(true);
+        this.getHelpNappiMMC().setDisable(true);
+        this.getCharge0().setDisable(true);
+        this.getCharge1().setDisable(true);
+        this.getCharge2().setDisable(true);
+        this.getDim2().setDisable(true);
+        this.getDim3().setDisable(true);
+        this.getNappiLattice().setDisable(true);
+        this.getRunMMC().setDisable(true);
         this.getRemBarNappiMMC().setOnMouseClicked(event -> {
             barrierOff();
-            this.getMenuNappiMMC().setDisable(true);
-            this.getHelpNappiMMC().setDisable(true);
-            this.getCharge0().setDisable(true);
-            this.getCharge1().setDisable(true);
-            this.getCharge2().setDisable(true);
-            this.getDim2().setDisable(true);
-            this.getDim3().setDisable(true);
-            this.getNappiLattice().setDisable(true);
-            this.getCloseNappiMMC().setDisable(true);
             this.getRemBarNappiMMC().setVisible(false);
-            this.getRunMMC().setDisable(true);
-            this.getFxplot().setFrameVis();
+            this.getCloseNappiMMC().setDisable(true);
         });
 
         this.setValues(new double[dim][this.getNumPart()]);
@@ -278,16 +278,16 @@ class SceneMMC extends Data {
                             if (getDim() == 2) {
                                 String[] valStr = line.split("(\\s+)");
                                 try {
-                                    getValues()[0][i] = Double.parseDouble(valStr[0].trim()) + getCenter() / getScalefactor() / (int) Screen.getMainScreen().getPlatformScaleX();
-                                    getValues()[1][i] = Double.parseDouble(valStr[1].trim()) + getCenter() / getScalefactor() / (int) Screen.getMainScreen().getPlatformScaleY();
+                                    getValues()[0][i] = Double.parseDouble(valStr[0].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getPlatformScaleX());
+                                    getValues()[1][i] = Double.parseDouble(valStr[1].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getPlatformScaleY());
                                 } catch (NumberFormatException e) {
                                     continue;
                                 }
                             } else if (getDim() == 3) {
                                 String[] valStr = line.split("(\\s+)");
                                 try {
-                                    getValues()[0][i] = Double.parseDouble(valStr[0].trim()) + getCenter() / getScalefactor() / (int) Screen.getMainScreen().getPlatformScaleX();
-                                    getValues()[1][i] = Double.parseDouble(valStr[1].trim()) + getCenter() / getScalefactor() / (int) Screen.getMainScreen().getPlatformScaleY();
+                                    getValues()[0][i] = Double.parseDouble(valStr[0].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getPlatformScaleX());
+                                    getValues()[1][i] = Double.parseDouble(valStr[1].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getPlatformScaleY());
                                     getValues()[2][i] = Double.parseDouble(valStr[2].trim()) + getCenter() / getScalefactor();
                                 } catch (NumberFormatException e) {
                                     continue;
@@ -300,8 +300,7 @@ class SceneMMC extends Data {
                                 
                                 // DRAW
                                 clearDots( getDim() );
-                                if ( getDim() == 2 && isLattice() )
-                                    drawLattice(getMeasure(), getDiff() );
+                                if ( getDim() == 2 && isLattice() ) drawLattice(getMeasure(), getDiff() );
                                 for (int k = 0; k < getNumPart(); k++){
                                     if ( getDim() == 2 ) {
                                         draw2Dots(getValues()[0][k], getValues()[1][k], getDiam());
@@ -429,8 +428,8 @@ class SceneMMC extends Data {
         * Draw initial data spots
         */
         for (int k = 0; k < num_part; k++){
-            this.getValues()[0][k] = initialData.get(k)[0] + this.getCenter() / this.getScalefactor() / (int) Screen.getMainScreen().getPlatformScaleX();
-            this.getValues()[1][k] = initialData.get(k)[1] + this.getCenter() / this.getScalefactor() / (int) Screen.getMainScreen().getPlatformScaleY();
+            this.getValues()[0][k] = initialData.get(k)[0] + this.getCenter() / (this.getScalefactor() * (int) Screen.getMainScreen().getPlatformScaleX());
+            this.getValues()[1][k] = initialData.get(k)[1] + this.getCenter() / (this.getScalefactor() * (int) Screen.getMainScreen().getPlatformScaleY());
             if ( dim == 2 )
                 draw2Dots(this.getValues()[0][k], this.getValues()[1][k], diam);
             else if ( dim == 3 ) {

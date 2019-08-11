@@ -27,10 +27,10 @@ def main():
 #!----------------------------------------------------------------------
 #!	PLOT
 #!----------------------------------------------------------------------
-#	kuvan koko
 	fig = plt.figure()
 	fig.set_figheight(7)
 	fig.set_figwidth(9)
+
 	plt.gca().ticklabel_format(axis='both', style='plain', useOffset=False)
 
 	plt.plot(xdata_path,y,'-',lw=8,alpha=0.2,antialiased=True,label="Path trace, N=%d"%int(particles))

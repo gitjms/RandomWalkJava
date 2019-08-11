@@ -1294,22 +1294,24 @@ public class RandomWalk extends Application {
             }
 
             double measure;
-            double diff = 0.0;
+            double diff;
             if ( particles < 25 ) {
                 diff = 0.3;
                 measure = 21.0;
             } else {
-                measure = 3.0 * Math.sqrt( 2.0 * (double) particles );
+                measure = Math.round(3.0 * Math.sqrt( 2.0 * (double) particles ));
                 double diff1 = Math.sqrt(measure)/10.0 + measure/20.0 - 0.7;
                 double diff2 = measure/20.0 - 0.7;
 
-                if ( (measure+1.0)%4.0 == 0.0 || measure%2.0 == 0.0 ) {
+                if ( (measure+1.0)%4.0 == 0.0 ) {
                     diff = diff1;
                     measure -= 1.0;
-                }else if ( measure%4.0 == 0.0 ) {
+                } else if ( measure%4.0 == 0.0 ) {
                     diff = diff1;
                     measure -= 2.0;
-                } else if ( measure%2.0 != 0.0 ) {
+                } else if ( measure%2.0 == 0.0 ) {
+                    diff = diff1;
+                } else {
                     diff = diff2;
                 }
             }

@@ -10,7 +10,6 @@ def main():
 #!----------------------------------------------------------------------
 #!	DATA
 #!----------------------------------------------------------------------
-
 	xdata_start 	= np.genfromtxt(start_file,dtype='float',usecols=(0,),skip_header=1)
 	ydata_start 	= np.genfromtxt(start_file,dtype='float',usecols=(1,),skip_header=1)
 
@@ -38,13 +37,12 @@ def main():
 #!----------------------------------------------------------------------
 #!	PLOT
 #!----------------------------------------------------------------------
-	#! kuvan koko
 	fig = plt.figure()
 	fig.set_figheight(10)
 	fig.set_figwidth(6)
 
 	plt.gca().ticklabel_format(axis='both', style='plain', useOffset=False)
-#
+
 	plt.subplot(211)
 	plt.plot(xdata_start,ydata_start,'o',ms=1,mew=3,antialiased=True,
 		  label="Start configuration, N=%d"%particles)

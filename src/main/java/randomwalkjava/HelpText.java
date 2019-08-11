@@ -20,13 +20,13 @@ class HelpText {
                     + " Every run will save the data in a file replacing the previous one if\n"
                     + " the options are the same.\n\n"
                     + " One run produces a data file ending with '.xy', and an image file in\n"
-                    + " '.png' format. The files will be in the 'C:/RWDATA' folder.\n\n"
+                    + " '.pdf' format. The files will be in the 'C:/RWDATA' folder.\n\n"
                     + " ---------------------------------------------------------------------\n\n"
                     + " Button 'PATH TRACING' will show a control panel with which you can\n"
                     + " plot different random walk path simulations. One run produces an\n"
                     + " image file and four or five data files; two ending with '.xy', and\n"
                     + " two or three ending with axis indication, i.e. '.x', '.y', or '.z',\n"
-                    + " depending on dimension user chooses. The image is in '.png' format.\n\n"
+                    + " depending on dimension user chooses. The image is in '.pdf' format.\n\n"
                     + " ---------------------------------------------------------------------\n\n"
                     + " Button 'REAL TIME RMS' opens a bigger window in which will be an\n"
                     + " animation of fixed source random walk. Program loops the number of\n"
@@ -44,7 +44,7 @@ class HelpText {
                     + " final positions of particles. In that case there will be four or five\n"
                     + " data files; two ending with '.xy', and two or three ending with axis\n"
                     + " indication, i.e. '.x', '.y', or '.z', depending on dimension user\n"
-                    + " chooses. The image will be saved in '.png' format.\n";
+                    + " chooses. The image will be saved in '.pdf' format.\n";
     }
     /**
     * @return RMS CALCULATION HELP TEXT
@@ -148,7 +148,7 @@ class HelpText {
     */
     String welcome() {
 
-        return "\n"
+        return "\n\n"
                     + "        /////       ///       //    // ///        /////       //   //\n"
                     + "       ///  //     ////      ///   // //////    ///    //    ///  ///\n"
                     + "      ///    //   /////     ////  // ///   // ///      //   //// ////\n"
@@ -159,6 +159,7 @@ class HelpText {
                     + " ///     /// /// |           Jari Sunnari           |  ///         //\n"
                     + "                 |       Kandidaatintutkielma       |                \n"
                     + "                 |                                  |                \n"
+                    + "                 |       Helsingin  yliopisto       |                \n"
                     + "       ////      |               2019               |    ////  ////  \n"
                     + "       ////      |                                  |   ////  ////   \n"
                     + "       ////       ----------------------------------   //// ////     \n"

@@ -110,6 +110,7 @@ class Execution {
             + steps + "S.x";
 
         File pdfFile = new File(path + "\\" + "jpyplot" + dimension + "D_N" + particles + "_S" + steps + ".pdf");
+        if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
 
         /*
         * 1D DATA
@@ -182,7 +183,7 @@ class Execution {
         this.getFrame().setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         JLabel titleLabel = new JLabel(titletext + "N=" + particles + ", " + steps + " steps\n");
         java.awt.Font labelFont = titleLabel.getFont();
-        int newFontSize = (int)(labelFont.getSize() * 1.5);
+        int newFontSize = (int)(labelFont.getSize() * 1.3);
         titleLabel.setFont(new java.awt.Font(labelFont.getName(), java.awt.Font.PLAIN, newFontSize));
         titleLabel.setBounds(this.getChartWidth()/2-this.getXMarginBig(),0, this.getChartWidth(),newFontSize);
         /*
@@ -257,9 +258,11 @@ class Execution {
 
         if ( dimension == 2 ) {
             pdfFile = new File(path + "\\" + "jpyplotmmc2D_N" + particles + "_diam" + diameter + ".pdf");
+            if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
             command = new String[]{"cmd","/c", pyexecmmc2d, startDataMMC, finalDataMMC};
         } else if ( dimension == 3 ) {
             pdfFile = new File(path + "\\" + "jpyplotmmc3D_N" + particles + "_diam" + diameter + ".pdf");
+            if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
             command = new String[]{"cmd","/c", pyexecmmc3d, startDataMMC, finalDataMMC};
         }
 
@@ -301,7 +304,7 @@ class Execution {
         */
         assert image != null;
         this.getFrame().setSize(this.getMmcWidth(), this.getMmcHeight());
-        this.getFrame().setLocation(this.getXMarginBig(), 0);
+        this.getFrame().setLocation(this.getXMarginSmall(), 0);
         Image image2 = image.getScaledInstance(this.getMmcWidth(), this.getMmcHeight()-this.getYMargin(), Image.SCALE_AREA_AVERAGING);
         ImageIcon figIcn = new ImageIcon(image2);
         JLabel figLabel = new JLabel(figIcn);
@@ -371,6 +374,9 @@ class Execution {
             + dimension + "D_"
             + steps + "S.xy";
 
+        File pdfFile = new File(path + "\\" + "jpyplotRMS" + dimension + "D_" + steps + "S.pdf");
+        if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
+
         String[] command = new String[]{"cmd","/c", pyexecrms, rmsDataPath};
         this.setRuntime(Runtime.getRuntime());
         runtimeStart();
@@ -379,8 +385,6 @@ class Execution {
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
-
-        File pdfFile = new File(path + "\\" + "jpyplotRMS" + dimension + "D_" + steps + "S.pdf");
 
         /*
         * GET IMAGE
@@ -496,7 +500,7 @@ class Execution {
      * @return the XMarginBig
      */
     @Contract(pure = true)
-    private int getXMarginBig() { return 200 / (int) Screen.getMainScreen().getPlatformScaleX(); }
+    private int getXMarginBig() { return 150 / (int) Screen.getMainScreen().getPlatformScaleX(); }
 
     /**
      * @return the YMarginSmall

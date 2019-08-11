@@ -12,7 +12,6 @@ def main():
 #!----------------------------------------------------------------------
 #!	DATA
 #!----------------------------------------------------------------------
-
 	xdata_start 	= np.genfromtxt(start_file,dtype='float',usecols=(0,),skip_header=1)
 	ydata_start 	= np.genfromtxt(start_file,dtype='float',usecols=(1,),skip_header=1)
 	zdata_start 	= np.genfromtxt(start_file,dtype='float',usecols=(2,),skip_header=1)
@@ -46,7 +45,6 @@ def main():
 #!----------------------------------------------------------------------
 #!	PLOT
 #!----------------------------------------------------------------------
-	#! kuvan koko
 	fig = plt.figure()
 	fig.set_figheight(10)
 	fig.set_figwidth(6)
