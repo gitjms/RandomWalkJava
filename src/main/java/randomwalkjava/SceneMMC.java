@@ -176,7 +176,6 @@ class SceneMMC extends Data {
 
         this.getRemBarNappiMMC().setVisible(true);
         this.getPlotMMC().setVisible(false);
-        this.getFxplot().setFrameVis();
         this.getMenuNappiMMC().setDisable(true);
         this.getHelpNappiMMC().setDisable(true);
         this.getCharge0().setDisable(true);
@@ -190,6 +189,7 @@ class SceneMMC extends Data {
             barrierOff();
             this.getRemBarNappiMMC().setVisible(false);
             this.getCloseNappiMMC().setDisable(true);
+            this.getFxplot().setFrameVis();
         });
 
         this.setValues(new double[dim][this.getNumPart()]);

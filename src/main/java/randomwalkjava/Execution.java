@@ -7,6 +7,8 @@ import org.jetbrains.annotations.Contract;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
+import sun.tools.jconsole.inspector.IconManager;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -429,7 +431,10 @@ class Execution {
     /**
      * @param frame the frame to set
      */
-    private void setFrame(JFrame frame) { this.frame = frame; }
+    private void setFrame(JFrame frame) {
+        this.frame = frame;
+        this.frame.setIconImage(Toolkit.getDefaultToolkit().getImage("images/icon.png"));
+    }
 
     /**
      * @return the frame
