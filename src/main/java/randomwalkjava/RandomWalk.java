@@ -80,7 +80,6 @@ public class RandomWalk extends Application {
         * to RWDATA folder if not in RWDATA folder already
         */
         String datapath = "C:/RWDATA";
-        String sourcepath = "src/main/resources/lib/";
         String fexec = "walk.exe";
         String pyexecrms = "plotrms.py";
         String pyexec1d = "plot1d.py";
@@ -92,52 +91,66 @@ public class RandomWalk extends Application {
         File sourceFile = new File(datapath + "/" + fexec);
 
         if (Files.notExists(datafolder.toPath())){
-            if (createFolder(sourcepath, datapath, fexec, true))
+            if (createFolder(datapath, fexec, true)) {
                 this.stop();
-            if (createFolder(sourcepath, datapath, pyexecrms, false))
+            }
+            if (createFolder(datapath, pyexecrms, false)) {
                 this.stop();
-            if (createFolder(sourcepath, datapath, pyexec1d, false))
+            }
+            if (createFolder(datapath, pyexec1d, false)) {
                 this.stop();
-            if (createFolder(sourcepath, datapath, pyexec2d, false))
+            }
+            if (createFolder(datapath, pyexec2d, false)) {
                 this.stop();
-            if (createFolder(sourcepath, datapath, pyexec3d, false))
+            }
+            if (createFolder(datapath, pyexec3d, false)) {
                 this.stop();
-            if (createFolder(sourcepath, datapath, pyexecmmc2d, false))
+            }
+            if (createFolder(datapath, pyexecmmc2d, false)) {
                 this.stop();
-            if (createFolder(sourcepath, datapath, pyexecmmc3d, false))
+            }
+            if (createFolder(datapath, pyexecmmc3d, false)) {
                 this.stop();
+            }
         } else if (Files.notExists(sourceFile.toPath())) {
-            if (createFolder(sourcepath, datapath, fexec, false))
+            if (createFolder(datapath, fexec, false)) {
                 this.stop();
+            }
             sourceFile = new File(datapath + "/" + pyexecrms);
             if (Files.notExists(sourceFile.toPath())) {
-                if (createFolder(sourcepath, datapath, pyexecrms, false))
+                if (createFolder(datapath, pyexecrms, false)) {
                     this.stop();
+                }
             }
             sourceFile = new File(datapath + "/" + pyexec1d);
             if (Files.notExists(sourceFile.toPath())) {
-                if (createFolder(sourcepath, datapath, pyexec1d, false))
+                if (createFolder(datapath, pyexec1d, false)) {
                     this.stop();
+                }
             }
             sourceFile = new File(datapath + "/" + pyexec2d);
             if (Files.notExists(sourceFile.toPath())) {
-                if (createFolder(sourcepath, datapath, pyexec2d, false))
+                if (createFolder(datapath, pyexec2d, false)) {
                     this.stop();
+                }
             }
             sourceFile = new File(datapath + "/" + pyexec3d);
             if (Files.notExists(sourceFile.toPath())) {
-                if (createFolder(sourcepath, datapath, pyexec3d, false))
+                if (createFolder(datapath, pyexec3d, false)) {
                     this.stop();
+                }
             }
             sourceFile = new File(datapath + "/" + pyexecmmc2d);
             if (Files.notExists(sourceFile.toPath())) {
-                if (createFolder(sourcepath, datapath, pyexecmmc2d, false))
+                if (createFolder(datapath, pyexecmmc2d, false)) {
                     this.stop();
+                }
             }
             sourceFile = new File(datapath + "/" + pyexecmmc3d);
             if (Files.notExists(sourceFile.toPath())) {
-                if (createFolder(sourcepath, datapath, pyexecmmc3d, false))
+                if (createFolder(datapath, pyexecmmc3d, false)) {
                     this.stop();
+                }
             }
         }
 
@@ -1388,13 +1401,12 @@ public class RandomWalk extends Application {
      * <p>
      *     returns false if all goes well, true otherwise
      * </p>
-     * @param source path for resource folder lib/
      * @param destination path for working directory C:/RWDATA
      * @param executable file to copy from lib/ to C:/RWDATA
      * @param createDir true if has to create working directory
      * @return false if all goes well, true otherwise
      */
-    private boolean createFolder(String source, String destination, String executable, boolean createDir){
+    private boolean createFolder(String destination, String executable, boolean createDir){
         if ( createDir ) {
             File dataFile = new File(destination);
             boolean mkdir = dataFile.mkdir();
@@ -1402,29 +1414,23 @@ public class RandomWalk extends Application {
             else System.out.println("Could not create a new directory\n");
         }
 
-        File sourceDir = new File(source);
-        if (Files.notExists(sourceDir.toPath())) {
-            System.out.println("Source file " + executable + " not found from " + source);
-            return true;
-        }
-
-        File sourceFile = new File(source + "/" + executable);
+        File sourceFile = new File(executable);
         File destinationFile = new File(destination + "/" + executable);
         InputStream fin = null;
         OutputStream fout = null;
         
         try {
-            fin = new BufferedInputStream(new FileInputStream(sourceFile));
+            fin = new BufferedInputStream(new FileInputStream(sourceFile.getAbsoluteFile()));
             fout = new BufferedOutputStream(new FileOutputStream(destinationFile));
             byte[] readBytes = new byte[1024];
-            System.out.println("Copying resource file, please wait...");
+            System.out.println("Copying resource file '"+executable+"' into folder 'C:/RWDATA', please wait...");
             int readed;
             while((readed = fin.read(readBytes)) != -1){
                 fout.write(readBytes, 0, readed);
             }
             System.out.println("Copying finished.");
         } catch (IOException e) {
-            System.out.println("Resource file " + sourceFile + " not copied into new folder\n"+e.getMessage());
+            System.out.println("Resource file '" + executable + "' not copied into new folder\n"+e.getMessage());
             return true;
         } finally {
             try {
