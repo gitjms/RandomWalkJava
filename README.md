@@ -31,5 +31,6 @@ Asennustyökalussa voi olla paljon turhiakin kirjastoja.
 
 ## TODO
 
-MMC diffuusio -animaatioon 3D-hilarakenne.
-Skaalaukset paremmiksi.
+* Item MMC diffuusio -animaatioon 3D-hilarakenne.
+* Item Skaalaukset paremmiksi.
+* Ehkä muitakin hilarakenteita.
