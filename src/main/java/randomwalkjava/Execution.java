@@ -1,8 +1,9 @@
 
 package randomwalkjava;
 
-import com.sun.glass.ui.Screen;
 import javafx.scene.layout.VBox;
+import com.sun.glass.ui.Screen;
+import org.apache.pdfbox.rendering.ImageType;
 import org.jetbrains.annotations.Contract;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -170,7 +171,7 @@ class Execution {
                 try {
                     PDDocument document = PDDocument.load(pdfFile);
                     PDFRenderer renderer = new PDFRenderer(document);
-                    image = renderer.renderImage(0);
+                    image = renderer.renderImageWithDPI(0,600, ImageType.RGB);
                     document.close();
                 } catch (IOException ex) {
                     System.out.println(ex.getMessage());
@@ -287,7 +288,7 @@ class Execution {
                 try {
                     PDDocument document = PDDocument.load(pdfFile);
                     PDFRenderer renderer = new PDFRenderer(document);
-                    image = renderer.renderImage(0);
+                    image = renderer.renderImageWithDPI(0,600, ImageType.RGB);
                     document.close();
                 } catch (IOException ex) {
                     System.out.println(ex.getMessage());
@@ -401,7 +402,7 @@ class Execution {
                 try {
                     PDDocument document = PDDocument.load(pdfFile);
                     PDFRenderer renderer = new PDFRenderer(document);
-                    image = renderer.renderImage(0);
+                    image = renderer.renderImageWithDPI(0,600, ImageType.RGB);
                     document.close();
                 } catch (IOException ex) {
                     System.out.println(ex.getMessage());
@@ -432,7 +433,7 @@ class Execution {
      */
     private void setFrame(JFrame frame) {
         this.frame = frame;
-        this.frame.setIconImage(Toolkit.getDefaultToolkit().getImage("icon.png"));
+        this.frame.setIconImage(Toolkit.getDefaultToolkit().getImage("images/icon.png"));
     }
 
     /**

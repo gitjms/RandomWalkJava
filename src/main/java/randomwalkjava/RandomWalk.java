@@ -15,6 +15,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -62,11 +63,12 @@ public class RandomWalk extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+
         /*
          * initiate parameters
          */
-        setScreenWidth(Toolkit.getDefaultToolkit().getScreenSize().width/(int) Screen.getMainScreen().getPlatformScaleX());
-        setScreenHeight(Toolkit.getDefaultToolkit().getScreenSize().height/(int) Screen.getMainScreen().getPlatformScaleY());
+        setScreenWidth(Toolkit.getDefaultToolkit().getScreenSize().width / (int) Screen.getMainScreen().getPlatformScaleX());
+        setScreenHeight(Toolkit.getDefaultToolkit().getScreenSize().height / (int) Screen.getMainScreen().getPlatformScaleY());
         setScalefactor(1.0);
         setLinewidth(1.0);
         setIsscaled(false);
@@ -158,6 +160,8 @@ public class RandomWalk extends Application {
         * CREATE STAGE
         */
         stage.setTitle("Random Walk");
+        Image icon = new Image("/images/icon.png");
+        stage.getIcons().add(icon);
         stage.setWidth(this.getStageWidth());
         stage.setHeight(this.getStageHeight());
         stage.setResizable(false);
@@ -1414,7 +1418,7 @@ public class RandomWalk extends Application {
             else System.out.println("Could not create a new directory\n");
         }
 
-        File sourceFile = new File(executable);
+        File sourceFile = new File("lib/"+executable);
         File destinationFile = new File(destination + "/" + executable);
         InputStream fin = null;
         OutputStream fout = null;
@@ -1449,55 +1453,55 @@ public class RandomWalk extends Application {
      * @return the stageWidth
      */
     @Contract(pure = true)
-    private int getStageWidth() { return 940/(int) Screen.getMainScreen().getPlatformScaleX(); }
+    private int getStageWidth() { return 940 / (int) Screen.getMainScreen().getPlatformScaleX(); }
 
     /**
      * @return the stageHeight
      */
     @Contract(pure = true)
-    private int getStageHeight() { return 660/(int) Screen.getMainScreen().getPlatformScaleY(); }
+    private int getStageHeight() { return 660 / (int) Screen.getMainScreen().getPlatformScaleY(); }
 
     /**
      * @return the buttonWidth
      */
     @Contract(pure = true)
-    private int getButtonWidth() { return 150/(int) Screen.getMainScreen().getPlatformScaleX(); }
+    private int getButtonWidth() { return 150 / (int) Screen.getMainScreen().getPlatformScaleX(); }
 
     /**
      * @return the textwidth
      */
     @Contract(pure = true)
-    private int getTextWidth() { return 740/(int) Screen.getMainScreen().getPlatformScaleX(); }
+    private int getTextWidth() { return 740 / (int) Screen.getMainScreen().getPlatformScaleX(); }
 
     /**
      * @return the textheight
      */
     @Contract(pure = true)
-    private int getTextHeight() { return 600/(int) Screen.getMainScreen().getPlatformScaleY(); }
+    private int getTextHeight() { return 600 / (int) Screen.getMainScreen().getPlatformScaleY(); }
 
     /**
      * @return the animwidth
      */
     @Contract(pure = true)
-    private int getAnimWidth() { return 750/(int) Screen.getMainScreen().getPlatformScaleX(); }
+    private int getAnimWidth() { return 750 / (int) Screen.getMainScreen().getPlatformScaleX(); }
 
     /**
      * @return the animheight
      */
     @Contract(pure = true)
-    private int getAnimHeight() { return 750/(int) Screen.getMainScreen().getPlatformScaleY(); }
+    private int getAnimHeight() { return 750 / (int) Screen.getMainScreen().getPlatformScaleY(); }
 
     /**
      * @return the paneWidth
      */
     @Contract(pure = true)
-    private int getPaneWidth() { return 200/(int) Screen.getMainScreen().getPlatformScaleX(); }
+    private int getPaneWidth() { return 200 / (int) Screen.getMainScreen().getPlatformScaleX(); }
 
     /**
      * @return the pathheight
      */
     @Contract(pure = true)
-    private int getPathHeight() { return 660/(int) Screen.getMainScreen().getPlatformScaleY(); }
+    private int getPathHeight() { return 660 / (int) Screen.getMainScreen().getPlatformScaleY(); }
 
     /**
      * @return the screenWidth

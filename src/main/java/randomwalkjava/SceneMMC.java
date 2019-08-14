@@ -9,6 +9,9 @@ import javafx.scene.Parent;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -140,8 +143,8 @@ class SceneMMC extends Data {
                  Button helpNappiMMC, List<Double> energy_x, List<Double> energy_y,
                  boolean newdata, double measure, double diff) {
 
-         this.setYellowP(new Image("images/Pyellow.png"));
-         this.setGrayP(new Image("images/Pgray.png"));
+         this.setYellowP(new Image("/images/Pyellow.png"));
+         this.setGrayP(new Image("/images/Pgray.png"));
 
          this.setPiirturi(piirturi);
          this.setLinewidth(linewidth);
@@ -286,7 +289,7 @@ class SceneMMC extends Data {
                             } else if (getDim() == 3) {
                                 String[] valStr = line.split("(\\s+)");
                                 try {
-                                    getValues()[0][i] = Double.parseDouble(valStr[0].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getPlatformScaleX());
+                                    getValues()[0][i] = Double.parseDouble(valStr[0].trim()) + getCenter() / (getScalefactor()* (int) Screen.getMainScreen().getPlatformScaleX());
                                     getValues()[1][i] = Double.parseDouble(valStr[1].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getPlatformScaleY());
                                     getValues()[2][i] = Double.parseDouble(valStr[2].trim()) + getCenter() / getScalefactor();
                                 } catch (NumberFormatException e) {
