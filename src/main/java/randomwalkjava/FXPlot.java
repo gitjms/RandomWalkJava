@@ -56,7 +56,7 @@ class FXPlot extends SceneRealTimeRms {
             this.getFrame().setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
             this.getFrame().setTitle("Real Time MMC");
         }
-        ImageIcon icon = new ImageIcon("images/icon.png");
+        ImageIcon icon = new ImageIcon("/images/icon.png");
         this.getFrame().setIconImage(icon.getImage());
         /*
         * XYCharts
@@ -299,6 +299,8 @@ class FXPlot extends SceneRealTimeRms {
      */
     private void setFrame(JFrame frame) {
         this.frame = frame;
+        Image icn = Toolkit.getDefaultToolkit().getImage("icon.png");
+        this.frame.setIconImage(icn);
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 

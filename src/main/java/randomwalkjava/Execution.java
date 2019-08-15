@@ -433,7 +433,8 @@ class Execution {
      */
     private void setFrame(JFrame frame) {
         this.frame = frame;
-        this.frame.setIconImage(Toolkit.getDefaultToolkit().getImage("images/icon.png"));
+        Image icn = Toolkit.getDefaultToolkit().getImage("icon.png");
+        this.frame.setIconImage(icn);
     }
 
     /**

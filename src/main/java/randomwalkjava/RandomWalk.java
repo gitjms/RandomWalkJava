@@ -46,7 +46,7 @@ public class RandomWalk extends Application {
 
     private int screenWidth;
     private int screenHeight;
-    private FXPlot fxplot;
+    private randomwalkjava.FXPlot fxplot;
     private JFrame frame;
     private String[] vars;
     private double scalefactor;
@@ -160,8 +160,8 @@ public class RandomWalk extends Application {
         * CREATE STAGE
         */
         stage.setTitle("Random Walk");
-        Image icon = new Image("/images/icon.png");
-        stage.getIcons().add(icon);
+        Image icn = new Image("images/icon.png");
+        stage.getIcons().add(icn);
         stage.setWidth(this.getStageWidth());
         stage.setHeight(this.getStageHeight());
         stage.setResizable(false);
@@ -922,24 +922,24 @@ public class RandomWalk extends Application {
         * SET SCENES
         */
         Scene firstScene = new Scene(asetteluMenu, this.getStageWidth(), this.getStageHeight());
-        firstScene.getStylesheets().add("/styles/Styles.css");
+        firstScene.getStylesheets().add("/css/Styles.css");
 
         Scene calcScene = new Scene(asetteluCalc, this.getStageWidth(), this.getStageHeight());
-        calcScene.getStylesheets().add("/styles/Styles.css");
+        calcScene.getStylesheets().add("/css/Styles.css");
 
         Scene pathScene = new Scene(asetteluPath, this.getStageWidth(),this.getStageHeight()
             + (this.getPathHeight()-this.getTextHeight()));
-        pathScene.getStylesheets().add("/styles/Styles.css");
+        pathScene.getStylesheets().add("/css/Styles.css");
 
         Scene realScene = new Scene(asetteluReal,
             this.getStageWidth() + (this.getAnimWidth()-this.getTextWidth()),
             this.getStageHeight() + (this.getAnimHeight()-this.getTextHeight()));
-        realScene.getStylesheets().add("/styles/Styles.css");
+        realScene.getStylesheets().add("/css/Styles.css");
 
         Scene mmcScene = new Scene(asetteluMMC,
             this.getStageWidth() + (this.getAnimWidth()-this.getTextWidth()),
             this.getStageHeight() + (this.getAnimHeight()-this.getTextHeight()));
-        mmcScene.getStylesheets().add("/styles/Styles.css");
+        mmcScene.getStylesheets().add("/css/Styles.css");
 
         /*
         * SET SCENE CHOICE BUTTONS' EFFECTS
@@ -1418,13 +1418,13 @@ public class RandomWalk extends Application {
             else System.out.println("Could not create a new directory\n");
         }
 
-        File sourceFile = new File("lib/"+executable);
+        File sourceFile = new File("src/main/resources/scripts/".concat(executable)).getAbsoluteFile();
         File destinationFile = new File(destination + "/" + executable);
         InputStream fin = null;
         OutputStream fout = null;
         
         try {
-            fin = new BufferedInputStream(new FileInputStream(sourceFile.getAbsoluteFile()));
+            fin = new BufferedInputStream(new FileInputStream(sourceFile));
             fout = new BufferedOutputStream(new FileOutputStream(destinationFile));
             byte[] readBytes = new byte[1024];
             System.out.println("Copying resource file '"+executable+"' into folder 'C:/RWDATA', please wait...");
