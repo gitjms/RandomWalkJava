@@ -180,6 +180,9 @@
                         <dropinResourcesRoot>${project.basedir}/src/main/resources</dropinResourcesRoot>
                         <jnlp.includeDT>true</jnlp.includeDT>
                         <jnlp.outfile>randomwalkjava.RandomWalk</jnlp.outfile>
+						<includes>
+							<include>**/*.dll</include>
+						</includes>
                         <excludes>
                             <exclude>**/*.zip</exclude>
                         </excludes>

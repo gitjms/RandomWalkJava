@@ -24,17 +24,11 @@ Ohjelma luo työkansion **C:/RWDATA**, johon tallentuvat niin *Fortran*- ja *Pyt
 
 Nämä ohjeet ovat myös saatavilla itse ohjelmassa painamalla *HELP*-nappia päämenussa (ensimmäinen näkymä). Kullekin ohjelman suoritusvaihtoehdolle on lisäksi oma *HELP*-nappinsa ja oma ohjeensa. Ohjeet ovat vain englanniksi.
 
-## Asennusohjeet ladattaville asennustyökaluille
+## Asennustyökalu
 
-Asennustyökalut löytyvät linkin *release* takaa:
+Asennustyökalu *RandomWalk-1.0.msi* löytyy linkin *release* takaa:
 
-![release_link](https://user-images.githubusercontent.com/46410240/62998769-33249f80-be75-11e9-9512-b0081174ec47.png)
-
-Exe-päätteinen asennustyökalu tuottaa ohjatun asennuksen, jonka avulla voi itse
-päättää esim. mihin ohjelma asennetaan.
-
-Msi-loppuinen asennusväline puolestaan asentaa ohjelman mitään kysymättä suoraan
-C-aseman Program Files -kansioon samalla nimellä, kuin itse työkalukin.
+![release](https://user-images.githubusercontent.com/46410240/63167309-952e0200-c039-11e9-9d65-571ce3170085.png)
 
 ## Ongelmia
 
