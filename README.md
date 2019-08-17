@@ -32,7 +32,6 @@ Asennustyökalu *RandomWalk-1.0.msi* löytyy linkin *release* takaa:
 
 ## Ongelmia
 
-* Ikkunoiden kuvakkeet/kulmaikonit eivät toimi.
 * Asennustyökalussa voi olla paljon turhiakin kirjastoja.
 
 ## TODO

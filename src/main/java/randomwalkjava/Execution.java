@@ -35,7 +35,6 @@ class Execution {
     private Runtime runtime;
     private boolean running;
     private JFrame frame;
-    private Image iconImg;
 
     /**
      * Initiating variables
@@ -429,12 +428,12 @@ class Execution {
     }
 
     /**
-     * @param frame the frame to set
+     *
+     * @param frame the JFrame to set
      */
     private void setFrame(JFrame frame) {
         this.frame = frame;
-        Image icn = Toolkit.getDefaultToolkit().getImage("icon.png");
-        this.frame.setIconImage(icn);
+        this.frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Execution.class.getResource("/icon64.png")));
     }
 
     /**
