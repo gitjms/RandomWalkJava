@@ -3,6 +3,7 @@ package randomwalkjava;
 import com.sun.glass.ui.Screen;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.EventType;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -23,6 +24,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,6 +32,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -62,7 +65,7 @@ public class RandomWalk extends Application {
     private List <Double> energy_y;
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
 
         /*
          * initiate parameters
@@ -94,64 +97,64 @@ public class RandomWalk extends Application {
 
         if (Files.notExists(datafolder.toPath())){
             if (createFolder(datapath, fexec, true)) {
-                this.stop();
+                Platform.exit();
             }
             if (createFolder(datapath, pyexecrms, false)) {
-                this.stop();
+                Platform.exit();
             }
             if (createFolder(datapath, pyexec1d, false)) {
-                this.stop();
+                Platform.exit();
             }
             if (createFolder(datapath, pyexec2d, false)) {
-                this.stop();
+                Platform.exit();
             }
             if (createFolder(datapath, pyexec3d, false)) {
-                this.stop();
+                Platform.exit();
             }
             if (createFolder(datapath, pyexecmmc2d, false)) {
-                this.stop();
+                Platform.exit();
             }
             if (createFolder(datapath, pyexecmmc3d, false)) {
-                this.stop();
+                Platform.exit();
             }
         } else if (Files.notExists(sourceFile.toPath())) {
             if (createFolder(datapath, fexec, false)) {
-                this.stop();
+                Platform.exit();
             }
             sourceFile = new File(datapath + "/" + pyexecrms);
             if (Files.notExists(sourceFile.toPath())) {
                 if (createFolder(datapath, pyexecrms, false)) {
-                    this.stop();
+                    Platform.exit();
                 }
             }
             sourceFile = new File(datapath + "/" + pyexec1d);
             if (Files.notExists(sourceFile.toPath())) {
                 if (createFolder(datapath, pyexec1d, false)) {
-                    this.stop();
+                    Platform.exit();
                 }
             }
             sourceFile = new File(datapath + "/" + pyexec2d);
             if (Files.notExists(sourceFile.toPath())) {
                 if (createFolder(datapath, pyexec2d, false)) {
-                    this.stop();
+                    Platform.exit();
                 }
             }
             sourceFile = new File(datapath + "/" + pyexec3d);
             if (Files.notExists(sourceFile.toPath())) {
                 if (createFolder(datapath, pyexec3d, false)) {
-                    this.stop();
+                    Platform.exit();
                 }
             }
             sourceFile = new File(datapath + "/" + pyexecmmc2d);
             if (Files.notExists(sourceFile.toPath())) {
                 if (createFolder(datapath, pyexecmmc2d, false)) {
-                    this.stop();
+                    Platform.exit();
                 }
             }
             sourceFile = new File(datapath + "/" + pyexecmmc3d);
             if (Files.notExists(sourceFile.toPath())) {
                 if (createFolder(datapath, pyexecmmc3d, false)) {
-                    this.stop();
+                    Platform.exit();
                 }
             }
         }
@@ -160,8 +163,6 @@ public class RandomWalk extends Application {
         * CREATE STAGE
         */
         stage.setTitle("Random Walk");
-        Image icn = new Image("images/icon.png");
-        stage.getIcons().add(icn);
         stage.setWidth(this.getStageWidth());
         stage.setHeight(this.getStageHeight());
         stage.setResizable(false);
@@ -922,24 +923,24 @@ public class RandomWalk extends Application {
         * SET SCENES
         */
         Scene firstScene = new Scene(asetteluMenu, this.getStageWidth(), this.getStageHeight());
-        firstScene.getStylesheets().add("/css/Styles.css");
+        firstScene.getStylesheets().add("/Styles.css");
 
         Scene calcScene = new Scene(asetteluCalc, this.getStageWidth(), this.getStageHeight());
-        calcScene.getStylesheets().add("/css/Styles.css");
+        calcScene.getStylesheets().add("/Styles.css");
 
         Scene pathScene = new Scene(asetteluPath, this.getStageWidth(),this.getStageHeight()
             + (this.getPathHeight()-this.getTextHeight()));
-        pathScene.getStylesheets().add("/css/Styles.css");
+        pathScene.getStylesheets().add("/Styles.css");
 
         Scene realScene = new Scene(asetteluReal,
             this.getStageWidth() + (this.getAnimWidth()-this.getTextWidth()),
             this.getStageHeight() + (this.getAnimHeight()-this.getTextHeight()));
-        realScene.getStylesheets().add("/css/Styles.css");
+        realScene.getStylesheets().add("/Styles.css");
 
         Scene mmcScene = new Scene(asetteluMMC,
             this.getStageWidth() + (this.getAnimWidth()-this.getTextWidth()),
             this.getStageHeight() + (this.getAnimHeight()-this.getTextHeight()));
-        mmcScene.getStylesheets().add("/css/Styles.css");
+        mmcScene.getStylesheets().add("/Styles.css");
 
         /*
         * SET SCENE CHOICE BUTTONS' EFFECTS
@@ -1378,7 +1379,6 @@ public class RandomWalk extends Application {
 
         });
 
-        stage.setScene(firstScene);
         stage.addEventHandler(EventType.ROOT, e -> stage.setOnHiding(f-> {
             if (this.getFxplot() != null) {
                 if (this.getFxplot().isRunning()) this.getFxplot().stop();
@@ -1394,7 +1394,18 @@ public class RandomWalk extends Application {
             if (ex.runtimeIsRunning())
                 ex.stopRuntime();
         }));
-        stage.initStyle(StageStyle.UTILITY);
+        stage.setOnCloseRequest((WindowEvent e) -> {
+            Platform.exit();
+            System.exit(0);
+        });
+        stage.setScene(firstScene);
+        stage.initStyle(StageStyle.DECORATED);
+        Image icn64 = new Image("icon64.png");
+        Image icn48 = new Image("icon48.png");
+        Image icn32 = new Image("icon32.png");
+        Image icn24 = new Image("icon24.png");
+        Image icn16 = new Image("icon16.png");
+        stage.getIcons().addAll(icn64,icn48,icn32,icn24,icn16);
         stage.toFront();
         stage.show();
     }
@@ -1411,38 +1422,58 @@ public class RandomWalk extends Application {
      * @return false if all goes well, true otherwise
      */
     private boolean createFolder(String destination, String executable, boolean createDir){
+
+        File dataFolder = new File(destination);
+        Path dataPath = dataFolder.toPath();
+
         if ( createDir ) {
-            File dataFile = new File(destination);
-            boolean mkdir = dataFile.mkdir();
-            if (mkdir) System.out.println("creating directory: " + destination);
+            if(!Files.exists(dataPath)) {
+                try {
+                    Files.createDirectory(dataPath);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return true;
+                }
+                System.out.println("creating directory: " + destination);
+            }
             else System.out.println("Could not create a new directory\n");
         }
 
-        File sourceFile = new File("src/main/resources/scripts/".concat(executable)).getAbsoluteFile();
         File destinationFile = new File(destination + "/" + executable);
+        boolean createdNewFile;
+        try {
+            createdNewFile = destinationFile.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return true;
+        }
+
         InputStream fin = null;
         OutputStream fout = null;
-        
-        try {
-            fin = new BufferedInputStream(new FileInputStream(sourceFile));
-            fout = new BufferedOutputStream(new FileOutputStream(destinationFile));
-            byte[] readBytes = new byte[1024];
-            System.out.println("Copying resource file '"+executable+"' into folder 'C:/RWDATA', please wait...");
-            int readed;
-            while((readed = fin.read(readBytes)) != -1){
-                fout.write(readBytes, 0, readed);
-            }
-            System.out.println("Copying finished.");
-        } catch (IOException e) {
-            System.out.println("Resource file '" + executable + "' not copied into new folder\n"+e.getMessage());
-            return true;
-        } finally {
+
+        if (createdNewFile) {
             try {
-                if ( fin != null ) fin.close();
-                if ( fout != null ) fout.close();
+                System.out.println("Copying resource file '" + executable + "' into folder '" + destination + "', please wait...");
+                fin = new BufferedInputStream(RandomWalk.class.getResourceAsStream("/"+executable));
+                fout = new BufferedOutputStream(new FileOutputStream(destinationFile, false));
+                byte[] buffer = new byte[1024];
+                int read;
+                while ((read = fin.read(buffer)) != -1) {
+                    fout.write(buffer, 0, read);
+                }
+                System.out.println("Copying finished.");
             } catch (IOException e) {
-                System.out.println(e.getMessage());
+                System.out.println("Resource file '" + executable + "' not copied into folder '" + destination + "'.\n" + e.getMessage());
+                return true;
+            } finally {
+                try {
+                    if (fin != null) fin.close();
+                    if (fout != null) fout.close();
+                } catch (IOException e) {
+                    System.out.println(e.getMessage());
+                }
             }
+
         }
         return false;
     }

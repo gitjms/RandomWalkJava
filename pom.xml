@@ -119,7 +119,22 @@
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
-        <scriptSourceDirectory>src/main/resources/scripts</scriptSourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.png</include>
+                    <include>**/*.css</include>
+                    <include>**/*.py</include>
+                    <include>**/*.exe</include>
+                </includes>
+                <excludes>
+                    <exclude>**/*.fxml</exclude>
+                </excludes>
+            </resource>
+        </resources>
+
+        <finalName>RandomWalk-1.0</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -167,8 +182,8 @@
                             <skip>true</skip>
                             <executable>${java.home}/bin/java</executable>
                             <!--suppress UnresolvedMavenProperty -->
-                        <commandlineArgs>${runfx.args}</commandlineArgs>
-                    </configuration>
+                            <commandlineArgs>${runfx.args}</commandlineArgs>
+                        </configuration>
                 </execution>
             </executions>
             </plugin>
@@ -196,15 +211,35 @@
                     <bundleArguments>
                         <dropinResourcesRoot>${project.basedir}/src/main/resources</dropinResourcesRoot>
                         <jnlp.includeDT>true</jnlp.includeDT>
-                        <jnlp.outfile>randomwalkjava.RandomWalk</jnlp.outfile>
-						<includes>
-							<include>**/*.dll</include>
-						</includes>
+                        <jnlp.outfile>randomwalkjava.Main</jnlp.outfile>
+                        <includes>
+                            <include>**/*.dll</include>
+                            <include>**/*.py</include>
+                            <include>**/*.png</include>
+                            <include>**/*.exe</include>
+                        </includes>
                         <excludes>
                             <exclude>**/*.zip</exclude>
                         </excludes>
                     </bundleArguments>
                 </configuration>
+                <executions>
+                    <execution>
+                        <!-- required before build-native -->
+                    <id>create-jfxjar</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>build-jar</goal>
+                    </goals>
+                </execution>
+                <execution>
+                    <id>create-native</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>build-native</goal>
+                    </goals>
+                </execution>
+            </executions>
             </plugin>
         </plugins>
     </build>

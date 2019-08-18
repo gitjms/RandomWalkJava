@@ -143,8 +143,8 @@ class SceneMMC extends Data {
                  Button helpNappiMMC, List<Double> energy_x, List<Double> energy_y,
                  boolean newdata, double measure, double diff) {
 
-         this.setYellowP(new Image("/images/Pyellow.png"));
-         this.setGrayP(new Image("/images/Pgray.png"));
+         this.setYellowP(new Image("Pyellow.png"));
+         this.setGrayP(new Image("Pgray.png"));
 
          this.setPiirturi(piirturi);
          this.setLinewidth(linewidth);
@@ -431,8 +431,8 @@ class SceneMMC extends Data {
         * Draw initial data spots
         */
         for (int k = 0; k < num_part; k++){
-            this.getValues()[0][k] = initialData.get(k)[0] + this.getCenter() / (this.getScalefactor() * (int) Screen.getMainScreen().getPlatformScaleX());
-            this.getValues()[1][k] = initialData.get(k)[1] + this.getCenter() / (this.getScalefactor() * (int) Screen.getMainScreen().getPlatformScaleY());
+            this.getValues()[0][k] = diff/10.0 + initialData.get(k)[0] + this.getCenter() / (this.getScalefactor() * (int) Screen.getMainScreen().getPlatformScaleX());
+            this.getValues()[1][k] = diff/10.0 + initialData.get(k)[1] + this.getCenter() / (this.getScalefactor() * (int) Screen.getMainScreen().getPlatformScaleY());
             if ( dim == 2 )
                 draw2Dots(this.getValues()[0][k], this.getValues()[1][k], diam);
             else if ( dim == 3 ) {

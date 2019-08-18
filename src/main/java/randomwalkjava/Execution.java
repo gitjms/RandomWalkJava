@@ -110,7 +110,7 @@ class Execution {
             + particles + "N_"
             + steps + "S.x";
 
-        File pdfFile = new File(path + "\\" + "jpyplot" + dimension + "D_N" + particles + "_S" + steps + ".pdf");
+        File pdfFile = new File(path + "/jpyplot" + dimension + "D_N" + particles + "_S" + steps + ".pdf");
         if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
 
         /*
@@ -258,11 +258,11 @@ class Execution {
             + particles + "N.xy";
 
         if ( dimension == 2 ) {
-            pdfFile = new File(path + "\\" + "jpyplotmmc2D_N" + particles + "_diam" + diameter + ".pdf");
+            pdfFile = new File(path + "/jpyplotmmc2D_N" + particles + "_diam" + diameter + ".pdf");
             if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
             command = new String[]{"cmd","/c", pyexecmmc2d, startDataMMC, finalDataMMC};
         } else if ( dimension == 3 ) {
-            pdfFile = new File(path + "\\" + "jpyplotmmc3D_N" + particles + "_diam" + diameter + ".pdf");
+            pdfFile = new File(path + "/jpyplotmmc3D_N" + particles + "_diam" + diameter + ".pdf");
             if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
             command = new String[]{"cmd","/c", pyexecmmc3d, startDataMMC, finalDataMMC};
         }
@@ -371,11 +371,11 @@ class Execution {
         }
                 
         rmsDataPath = path
-            + "/" + "rms_"
+            + "/rms_"
             + dimension + "D_"
             + steps + "S.xy";
 
-        File pdfFile = new File(path + "\\" + "jpyplotRMS" + dimension + "D_" + steps + "S.pdf");
+        File pdfFile = new File(path + "/jpyplotRMS" + dimension + "D_" + steps + "S.pdf");
         if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
 
         String[] command = new String[]{"cmd","/c", pyexecrms, rmsDataPath};
@@ -433,7 +433,8 @@ class Execution {
      */
     private void setFrame(JFrame frame) {
         this.frame = frame;
-        this.frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Execution.class.getResource("/icon64.png")));
+        this.frame.setIconImage(new ImageIcon(Execution.class.getResource("/icon64.png")).getImage());
+       // this.frame.setIconImage(new ImageIcon(Execution.class.getResource("icon64.png")).getImage());
     }
 
     /**
