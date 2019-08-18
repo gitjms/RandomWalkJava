@@ -46,7 +46,7 @@ Asennustyökalu *RandomWalk-1.0.msi* löytyy linkin *release* takaa:
 
 ## Kuvia
 
-<img src="https://user-images.githubusercontent.com/46410240/62991754-956fa700-be59-11e9-8d28-224e2acffe00.png" alt="main_view" width="587" height="417" >
+<img src="https://user-images.githubusercontent.com/46410240/62991754-956fa700-be59-11e9-8d28-224e2acffe00.png" alt="main_view" width="480" height="341" >
 <img src="https://user-images.githubusercontent.com/46410240/62991788-ba641a00-be59-11e9-92d6-d47989631952.png" alt="rms_calc" width="480" height="270" >
 <img src="https://user-images.githubusercontent.com/46410240/62991794-c0f29180-be59-11e9-8424-9cd9abd8bc4c.png" alt="path_trac" width="480" height="270" >
 <img src="https://user-images.githubusercontent.com/46410240/62991808-ca7bf980-be59-11e9-9253-d177dc285eac.png" alt="real_rms" width="480" height="270" >
