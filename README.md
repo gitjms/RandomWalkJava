@@ -46,13 +46,13 @@ Asennustyökalu *RandomWalk-1.0.msi* löytyy linkin *release* takaa:
 
 ## Kuvia
 
-![main_view](https://user-images.githubusercontent.com/46410240/62991754-956fa700-be59-11e9-8d28-224e2acffe00.png)
+![main_view](https://user-images.githubusercontent.com/46410240/62991754-956fa700-be59-11e9-8d28-224e2acffe00.png =587x417)
 
-![rms_calc](https://user-images.githubusercontent.com/46410240/62991788-ba641a00-be59-11e9-92d6-d47989631952.png)
+![rms_calc](https://user-images.githubusercontent.com/46410240/62991788-ba641a00-be59-11e9-92d6-d47989631952.png =960x540)
 
-![path_trac](https://user-images.githubusercontent.com/46410240/62991794-c0f29180-be59-11e9-8424-9cd9abd8bc4c.png)
+![path_trac](https://user-images.githubusercontent.com/46410240/62991794-c0f29180-be59-11e9-8424-9cd9abd8bc4c.png =960x540)
 
-![real_rms](https://user-images.githubusercontent.com/46410240/62991808-ca7bf980-be59-11e9-9253-d177dc285eac.png)
+![real_rms](https://user-images.githubusercontent.com/46410240/62991808-ca7bf980-be59-11e9-9253-d177dc285eac.png =960x540)
 
-![mmc_diff](https://user-images.githubusercontent.com/46410240/62991812-cea81700-be59-11e9-9726-770193265ce8.png)
+![mmc_diff](https://user-images.githubusercontent.com/46410240/62991812-cea81700-be59-11e9-9726-770193265ce8.png =957x511)
 
