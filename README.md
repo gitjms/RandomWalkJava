@@ -28,7 +28,7 @@ Nämä ohjeet ovat myös saatavilla itse ohjelmassa painamalla *HELP*-nappia pä
 
 Asennustyökalu *RandomWalk-1.0.msi* löytyy linkin *release* takaa:
 
-![release](https://user-images.githubusercontent.com/46410240/63167309-952e0200-c039-11e9-9d65-571ce3170085.png)
+<img src="https://user-images.githubusercontent.com/46410240/63167309-952e0200-c039-11e9-9d65-571ce3170085.png" alt="release" width="612" height="180" >
 
 ## Ongelmia
 
