@@ -42,8 +42,7 @@ Asennustyökalu *RandomWalk-1.0.msi* löytyy linkin *release* takaa:
 
 ## Kaavio ohjelmarakenteesta
 
-![Lopullinen_kaavio](https://user-images.githubusercontent.com/46410240/63222643-4c01bd80-c1b3-11e9-8e8f-b23150579889.png)
-
+![Lopullinen_kaavio](https://user-images.githubusercontent.com/46410240/63222695-b61a6280-c1b3-11e9-9646-2faca39e54e2.png)
 
 ## Kuvia
 
