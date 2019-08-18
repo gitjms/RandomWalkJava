@@ -40,7 +40,11 @@ Asennustyökalu *RandomWalk-1.0.msi* löytyy linkin *release* takaa:
 * Skaalaukset paremmiksi.
 * Ehkä muitakin hilarakenteita.
 
-# Kuvia
+## Kaavio ohjelmarakenteesta
+
+![Lopullinen_kaavio](https://user-images.githubusercontent.com/46410240/63222380-a7ca4780-c1af-11e9-9dd2-c5ab944d7be5.png)
+
+## Kuvia
 
 ![main_view](https://user-images.githubusercontent.com/46410240/62991754-956fa700-be59-11e9-8d28-224e2acffe00.png)
 
