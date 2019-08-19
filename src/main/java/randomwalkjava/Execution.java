@@ -56,7 +56,7 @@ class Execution {
      * @param vars user data from GUI via
      */
     void executePath(File folder, String path, String fexec,
-                     String pyexec1d, String pyexec2d, String pyexec3d, JFrame frame,
+                     String pyexec1d, String pyexec2d, String pyexec3d,
                      Data data, String[] vars) {
         /*
         * FROM SCENEPATHTRACING
@@ -74,7 +74,7 @@ class Execution {
         pyexec1d = "python ".concat(pyexec1d);
         pyexec2d = "python ".concat(pyexec2d);
         pyexec3d = "python ".concat(pyexec3d);
-        this.setFrame(frame);
+        this.setFrame();
         String xDataPath;
         String yDataPath = null;
         String zDataPath;
@@ -216,7 +216,7 @@ class Execution {
      * @param vars user data from GUI via
      */
     void executeMMC(File folder, String path, String fexec, String pyexecmmc2d,
-                    String pyexecmmc3d, JFrame frame, VBox valikkoMMC, Data data, String[] vars) {
+                    String pyexecmmc3d, VBox valikkoMMC, Data data, String[] vars) {
         /*
         * FROM SCENEMMC
         * vars from user:
@@ -232,7 +232,7 @@ class Execution {
         */
         pyexecmmc2d = "python ".concat(pyexecmmc2d);
         pyexecmmc3d = "python ".concat(pyexecmmc3d);
-        this.setFrame(frame);
+        this.setFrame();
         File pdfFile = null;
         BufferedImage image = null;
         String[] command = null;
@@ -327,7 +327,7 @@ class Execution {
      * @param vars user data from GUI via
      */
     void executeRms(File folder, String path, String fexec,
-                    String pyexecrms, JFrame frame, Data data, String[] vars) {
+                    String pyexecrms, Data data, String[] vars) {
         /*
         * FROM SCENEREALTIMERMS
         * vars from user:
@@ -342,7 +342,7 @@ class Execution {
         * vars[8] = save           n/a
         */
         pyexecrms = "python ".concat(pyexecrms);
-        this.setFrame(frame);
+        this.setFrame();
         String rmsDataPath;
         String titletext = null;
         BufferedImage image = null;
@@ -431,10 +431,9 @@ class Execution {
      *
      * @param frame the JFrame to set
      */
-    private void setFrame(JFrame frame) {
-        this.frame = frame;
+    private void setFrame() {
+        this.frame = new JFrame();
         this.frame.setIconImage(new ImageIcon(Execution.class.getResource("/icon64.png")).getImage());
-       // this.frame.setIconImage(new ImageIcon(Execution.class.getResource("icon64.png")).getImage());
     }
 
     /**

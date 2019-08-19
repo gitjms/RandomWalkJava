@@ -1067,7 +1067,7 @@ public class RandomWalk extends Application {
 
             if ( fail ) return;
 
-            ex.executeRms(datafolder, datapath, fexec, pyexecrms, this.getFrame(), data, this.getVars());
+            ex.executeRms(datafolder, datapath, fexec, pyexecrms, data, this.getVars());
         });
 
         /*
@@ -1099,7 +1099,7 @@ public class RandomWalk extends Application {
             if ( fail ) return;
 
             ex.executePath(datafolder, datapath, fexec, pyexec1d, pyexec2d,
-                pyexec3d, this.getFrame(), data, this.getVars());
+                pyexec3d, data, this.getVars());
         });
 
         /*
@@ -1272,7 +1272,7 @@ public class RandomWalk extends Application {
             if ( fail ) return;
 
             ex.executeMMC(datafolder, datapath, fexec, pyexecmmc2d,
-                pyexecmmc3d, this.getFrame(), valikkoMMC, data, this.getVars());
+                pyexecmmc3d, valikkoMMC, data, this.getVars());
         });
 
         /*
