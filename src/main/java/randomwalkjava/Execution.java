@@ -179,9 +179,7 @@ class Execution {
             }
         }
 
-        this.getFrame().getContentPane().removeAll();
         this.getFrame().setTitle("Random Walk - Path Tracing");
-        this.getFrame().setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         JLabel titleLabel = new JLabel(titletext + "N=" + particles + ", " + steps + " steps\n");
         java.awt.Font labelFont = titleLabel.getFont();
         int newFontSize = (int)(labelFont.getSize() * 1.3);
@@ -296,9 +294,7 @@ class Execution {
             }
         }
 
-        this.getFrame().getContentPane().removeAll();
         this.getFrame().setTitle("Random Walk - MMC Diffusion Plot");
-        this.getFrame().setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         /*
         * PLOT
@@ -411,9 +407,7 @@ class Execution {
         }
 
 
-        this.getFrame().getContentPane().removeAll();
         this.getFrame().setTitle("Random Walk - R_rms Calculation - " + titletext);
-        this.getFrame().setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         assert image != null;
         this.getFrame().setSize(this.getChartWidth(), this.getChartHeight());
@@ -433,6 +427,7 @@ class Execution {
      */
     private void setFrame() {
         this.frame = new JFrame();
+        this.getFrame().setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.frame.setIconImage(new ImageIcon(Execution.class.getResource("/icon64.png")).getImage());
     }
 
