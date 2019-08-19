@@ -134,7 +134,7 @@
             </resource>
         </resources>
 
-        <finalName>RandomWalk-1.0</finalName>
+        <finalName>RandomWalk</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

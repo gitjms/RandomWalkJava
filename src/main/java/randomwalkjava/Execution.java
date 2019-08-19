@@ -427,7 +427,7 @@ class Execution {
      */
     private void setFrame() {
         this.frame = new JFrame();
-        this.getFrame().setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        this.frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.frame.setIconImage(new ImageIcon(Execution.class.getResource("/icon64.png")).getImage());
     }
 
