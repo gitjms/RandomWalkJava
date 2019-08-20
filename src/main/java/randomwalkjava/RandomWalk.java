@@ -1412,7 +1412,7 @@ public class RandomWalk extends Application {
 
     /**
      * method for creating a working directory C:/RWDATA if needed, and
-     * copies executables there from lib/.
+     * copies executables there from resources/.
      * <p>
      *     returns false if all goes well, true otherwise
      * </p>
