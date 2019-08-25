@@ -223,7 +223,6 @@ class SceneMMC extends Data {
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {
                     System.out.println(ex.getMessage());
-                    Logger.getLogger(Execution.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else if (Files.exists(initialDataFile.toPath())) {
                 clearDots( this.getDim() );
@@ -263,7 +262,6 @@ class SceneMMC extends Data {
                         getOutput().close();
                     } catch (IOException ex) {
                         System.out.println(ex.getMessage());
-                        Logger.getLogger(SceneMMC.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
 

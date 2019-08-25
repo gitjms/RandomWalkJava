@@ -76,31 +76,9 @@
             <version>2.0.16</version>
         </dependency>
         <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>debugger-app</artifactId>
             <version>2.0.16</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>2.0.0-alpha0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>2.0.0-alpha0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-nop</artifactId>
-            <version>2.0.0-alpha0</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.zenjava</groupId>
@@ -206,7 +184,7 @@
                 <configuration>
                     <vendor>Jari Sunnari</vendor>
                     <mainClass>randomwalkjava.Main</mainClass>
-                    <bundler>exe</bundler>
+                    <bundler>msi</bundler>
                     <bundleArguments>
                         <dropinResourcesRoot>${project.basedir}/src/main/resources</dropinResourcesRoot>
                         <jnlp.includeDT>true</jnlp.includeDT>

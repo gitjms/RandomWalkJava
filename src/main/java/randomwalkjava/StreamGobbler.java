@@ -21,12 +21,6 @@ class StreamGobbler extends Thread {
         this.os = null;
     }
 
- /*   StreamGobbler(InputStream is, OutputStream redirect) {
-        this.is = is;
-        this.type = "";
-        this.os = redirect;
-    }*/
-
     @Override
     public void run() {
         try {

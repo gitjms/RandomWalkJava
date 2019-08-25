@@ -1,6 +1,9 @@
 
 package randomwalkjava;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+
 /**
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
@@ -9,7 +12,13 @@ package randomwalkjava;
  */
 class Message extends Thread {
     @Override
-    public void run() {
-         System.out.println(" Program is closing due to errors.");
-      }
+    public void run()
+    {
+        Alert alert;
+        alert = new Alert(
+                Alert.AlertType.ERROR,
+                "Program is closing due to errors.",
+                ButtonType.OK);
+        alert.showAndWait();
+    }
 }

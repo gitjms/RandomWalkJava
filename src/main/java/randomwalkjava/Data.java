@@ -142,7 +142,6 @@ class Data {
                 }
              }
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(RandomWalk.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println(ex.getMessage());
         }
 

@@ -86,7 +86,7 @@ class Execution {
         try {
             result = data.createData(folder, fexec);
         } catch (Throwable ex) {
-            Logger.getLogger(Execution.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex.getMessage());
         }
         if (!result)
             return;
@@ -164,16 +164,28 @@ class Execution {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(Execution.class.getName()).log(Level.SEVERE, null, ex);
+                    System.out.println(ex.getMessage());
                 }
             } else if (Files.exists(pdfFile.toPath())) {
-                try {
-                    PDDocument document = PDDocument.load(pdfFile);
-                    PDFRenderer renderer = new PDFRenderer(document);
-                    image = renderer.renderImageWithDPI(0,600, ImageType.RGB);
-                    document.close();
-                } catch (IOException ex) {
-                    System.out.println(ex.getMessage());
+                PDDocument document = null;
+                while (true) {
+                    if (!pdfFile.exists()) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ex) {
+                            System.out.println(ex.getMessage());
+                        }
+                    } else if (pdfFile.exists()) {
+                        try {
+                            document = PDDocument.load(pdfFile);
+                            PDFRenderer renderer = new PDFRenderer(document);
+                            image = renderer.renderImageWithDPI(0, 600, ImageType.RGB);
+                            document.close();
+                            break;
+                        } catch (IOException ex) {
+                            //System.out.println(ex.getMessage());
+                        }
+                    }
                 }
                 break;
             }
@@ -239,7 +251,7 @@ class Execution {
         try {
             result = data.createData(folder, fexec);
         } catch (Throwable ex) {
-            Logger.getLogger(Execution.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex.getMessage());
         }
         if (!result)
             return;
@@ -279,16 +291,28 @@ class Execution {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(Execution.class.getName()).log(Level.SEVERE, null, ex);
+                    System.out.println(ex.getMessage());
                 }
             } else if (Files.exists(pdfFile.toPath())) {
-                try {
-                    PDDocument document = PDDocument.load(pdfFile);
-                    PDFRenderer renderer = new PDFRenderer(document);
-                    image = renderer.renderImageWithDPI(0,600, ImageType.RGB);
-                    document.close();
-                } catch (IOException ex) {
-                    System.out.println(ex.getMessage());
+                PDDocument document = null;
+                while (true) {
+                    if (!pdfFile.exists()) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ex) {
+                            System.out.println(ex.getMessage());
+                        }
+                    } else if (pdfFile.exists()) {
+                        try {
+                            document = PDDocument.load(pdfFile);
+                            PDFRenderer renderer = new PDFRenderer(document);
+                            image = renderer.renderImageWithDPI(0, 600, ImageType.RGB);
+                            document.close();
+                            break;
+                        } catch (IOException ex) {
+                            //System.out.println(ex.getMessage());
+                        }
+                    }
                 }
                 break;
             }
@@ -347,7 +371,7 @@ class Execution {
         try {
             result = data.createData(folder, fexec);
         } catch (Throwable ex) {
-            Logger.getLogger(Execution.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex.getMessage());
         }
 
         if (!result)
@@ -390,16 +414,28 @@ class Execution {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(Execution.class.getName()).log(Level.SEVERE, null, ex);
+                    System.out.println(ex.getMessage());
                 }
             } else if (Files.exists(pdfFile.toPath())) {
-                try {
-                    PDDocument document = PDDocument.load(pdfFile);
-                    PDFRenderer renderer = new PDFRenderer(document);
-                    image = renderer.renderImageWithDPI(0,600, ImageType.RGB);
-                    document.close();
-                } catch (IOException ex) {
-                    System.out.println(ex.getMessage());
+                PDDocument document = null;
+                while (true) {
+                    if (!pdfFile.exists()) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ex) {
+                            System.out.println(ex.getMessage());
+                        }
+                    } else if (pdfFile.exists()) {
+                        try {
+                            document = PDDocument.load(pdfFile);
+                            PDFRenderer renderer = new PDFRenderer(document);
+                            image = renderer.renderImageWithDPI(0, 600, ImageType.RGB);
+                            document.close();
+                            break;
+                        } catch (IOException ex) {
+                            //System.out.println(ex.getMessage());
+                        }
+                    }
                 }
                 break;
             }
