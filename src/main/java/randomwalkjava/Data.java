@@ -66,13 +66,6 @@ class Data {
             this.vars[4], this.vars[5], this.vars[6], this.vars[7],
             this.vars[8]};
 
-        /*FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(command[0]);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Data.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
-
         Runtime runtime = Runtime.getRuntime();
 
         try {
@@ -89,9 +82,6 @@ class Data {
                 StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream());
                 errorGobbler.start();
                 String line;
-
-                /*StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), fos);
-                outputGobbler.start();*/
 
                 while ((line = input.readLine()) != null){
                     System.out.println(line);
@@ -111,7 +101,6 @@ class Data {
                     runtime.addShutdownHook(new Message());
                     runtime.exit(exitVal);
                 }
-//                if ( fos != null ) fos.close();
             } catch (InterruptedException e) {
                 ok = false;
                 teksti.append("\n").append(msg).append("\n").append(e.getMessage());
@@ -123,13 +112,6 @@ class Data {
             teksti.append("\n").append(e.getMessage());
             System.out.println(teksti);
         }
-
-        /*try {
-            if ( fos != null ) fos.flush();
-            if ( fos != null ) fos.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Data.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
 
         return ok;
     }

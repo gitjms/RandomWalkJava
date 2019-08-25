@@ -86,11 +86,6 @@
             <version>2.0.16</version>
         </dependency>
         <dependency>
-            <groupId>com.github.wix-maven</groupId>
-            <artifactId>wix-maven-plugin</artifactId>
-            <version>0.3.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>2.0.0-alpha0</version>
@@ -106,6 +101,11 @@
             <artifactId>slf4j-nop</artifactId>
             <version>2.0.0-alpha0</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zenjava</groupId>
+            <artifactId>javafx-maven-plugin</artifactId>
+            <version>8.8.3</version>
         </dependency>
     </dependencies>
 
@@ -127,10 +127,8 @@
                     <include>**/*.css</include>
                     <include>**/*.py</include>
                     <include>**/*.exe</include>
+                    <include>**/*.fxml</include>
                 </includes>
-                <excludes>
-                    <exclude>**/*.fxml</exclude>
-                </excludes>
             </resource>
         </resources>
 
@@ -208,6 +206,7 @@
                 <configuration>
                     <vendor>Jari Sunnari</vendor>
                     <mainClass>randomwalkjava.Main</mainClass>
+                    <bundler>exe</bundler>
                     <bundleArguments>
                         <dropinResourcesRoot>${project.basedir}/src/main/resources</dropinResourcesRoot>
                         <jnlp.includeDT>true</jnlp.includeDT>
@@ -217,6 +216,7 @@
                             <include>**/*.py</include>
                             <include>**/*.png</include>
                             <include>**/*.exe</include>
+                            <include>**/*.fxml</include>
                         </includes>
                         <excludes>
                             <exclude>**/*.zip</exclude>

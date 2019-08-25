@@ -595,13 +595,13 @@ class SceneRealTimeRms extends Data {
      * @return the compwidth
      */
     @Contract(pure = true)
-    private int getCompwidth() { return 150 / (int) Screen.getMainScreen().getPlatformScaleX(); }
+    private double getCompwidth() { return 150.0 / Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the paneWidth
      */
     @Contract(pure = true)
-    private int getPaneWidth() { return 200 / (int) Screen.getMainScreen().getPlatformScaleX(); }
+    private double getPaneWidth() { return 200.0 / Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the scalefactor

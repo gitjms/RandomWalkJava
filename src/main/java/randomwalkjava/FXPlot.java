@@ -315,37 +315,37 @@ class FXPlot extends SceneRealTimeRms {
      * @return the width
      */
     @Contract(pure = true)
-    private int getWidth() { return 600 / (int) Screen.getMainScreen().getPlatformScaleX(); }
+    private int getWidth() { return 600 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the height
      */
     @Contract(pure = true)
-    private int getHeight() { return 600 / (int) Screen.getMainScreen().getPlatformScaleY(); }
+    private int getHeight() { return 600 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the height
      */
     @Contract(pure = true)
-    private int getWalkNormHeight() { return 800 / (int) Screen.getMainScreen().getPlatformScaleY(); }
+    private int getWalkNormHeight() { return 800 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the YMarginTiny
      */
     @Contract(pure = true)
-    private int getYMarginTiny() { return 10 / (int) Screen.getMainScreen().getPlatformScaleY(); }
+    private int getYMarginTiny() { return 10 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the YMarginSmall
      */
     @Contract(pure = true)
-    private int getYMarginSmall() { return 50 / (int) Screen.getMainScreen().getPlatformScaleY(); }
+    private int getYMarginSmall() { return 50 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the YMarginBig
      */
     @Contract(pure = true)
-    private int getYMarginBig() { return 100 / (int) Screen.getMainScreen().getPlatformScaleY(); }
+    private int getYMarginBig() { return 100 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the calcChartW

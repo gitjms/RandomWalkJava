@@ -190,7 +190,7 @@ class Execution {
         */
         assert image != null;
         this.getFrame().setSize(this.getChartWidth(), this.getChartHeight());
-        this.getFrame().setLocation(0, (this.getScreenHeight()-this.getChartHeight())/2);
+        this.getFrame().setLocation(0, (int) ((this.getScreenHeight()-this.getChartHeight())/2.0));
         Image image2 = image.getScaledInstance(this.getChartWidth(), this.getChartHeight()-this.getYMargin(), Image.SCALE_AREA_AVERAGING);
         ImageIcon figIcn = new ImageIcon(image2);
         JLabel figLabel = new JLabel(figIcn);
@@ -366,8 +366,7 @@ class Execution {
             titletext = "Spread out free particles";
         }
                 
-        rmsDataPath = path
-            + "/rms_"
+        rmsDataPath = "rms_"
             + dimension + "D_"
             + steps + "S.xy";
 
@@ -411,7 +410,7 @@ class Execution {
 
         assert image != null;
         this.getFrame().setSize(this.getChartWidth(), this.getChartHeight());
-        this.getFrame().setLocation(0, (this.getScreenHeight()-this.getChartHeight())/2-getYMargin());
+        this.getFrame().setLocation(0, (int) ((this.getScreenHeight()-this.getChartHeight())/2.0)-getYMargin());
         Image image2 = image.getScaledInstance(this.getChartWidth(), this.getChartHeight()+this.getYMargin(), Image.SCALE_AREA_AVERAGING);
         ImageIcon figIcn = new ImageIcon(image2);
         JLabel figLabel = new JLabel(figIcn);
@@ -459,25 +458,25 @@ class Execution {
      * @return the chartWidth
      */
     @Contract(pure = true)
-    private int getChartWidth() {return 600 / (int) Screen.getMainScreen().getPlatformScaleX(); }
+    private int getChartWidth() {return 600 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the chartHeight
      */
     @Contract(pure = true)
-    private int getChartHeight() { return 500 / (int) Screen.getMainScreen().getPlatformScaleY(); }
+    private int getChartHeight() { return 500 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the mmcWidth
      */
     @Contract(pure = true)
-    private int getMmcWidth() { return 450 / (int) Screen.getMainScreen().getPlatformScaleX(); }
+    private int getMmcWidth() { return 450 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the mmcHeight
      */
     @Contract(pure = true)
-    private int getMmcHeight() { return 800 / (int) Screen.getMainScreen().getPlatformScaleY(); }
+    private int getMmcHeight() { return 800 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the screenHeight
@@ -494,19 +493,19 @@ class Execution {
      * @return the XMarginSmall
      */
     @Contract(pure = true)
-    private int getXMarginSmall() { return 50 / (int) Screen.getMainScreen().getPlatformScaleX(); }
+    private int getXMarginSmall() { return 50 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the XMarginBig
      */
     @Contract(pure = true)
-    private int getXMarginBig() { return 150 / (int) Screen.getMainScreen().getPlatformScaleX(); }
+    private int getXMarginBig() { return 150 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the YMarginSmall
      */
     @Contract(pure = true)
-    private int getYMargin() { return 10 / (int) Screen.getMainScreen().getPlatformScaleY(); }
+    private int getYMargin() { return 10 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the runtime

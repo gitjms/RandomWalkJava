@@ -47,8 +47,8 @@ import static java.lang.Integer.parseInt;
 @SuppressWarnings("SameReturnValue")
 public class RandomWalk extends Application {
 
-    private int screenWidth;
-    private int screenHeight;
+    private double screenWidth;
+    private double screenHeight;
     private randomwalkjava.FXPlot fxplot;
     private JFrame frame;
     private String[] vars;
@@ -70,8 +70,8 @@ public class RandomWalk extends Application {
         /*
          * initiate parameters
          */
-        setScreenWidth(Toolkit.getDefaultToolkit().getScreenSize().width / (int) Screen.getMainScreen().getPlatformScaleX());
-        setScreenHeight(Toolkit.getDefaultToolkit().getScreenSize().height / (int) Screen.getMainScreen().getPlatformScaleY());
+        setScreenWidth(Toolkit.getDefaultToolkit().getScreenSize().width / (int) Screen.getMainScreen().getRenderScale());
+        setScreenHeight(Toolkit.getDefaultToolkit().getScreenSize().height / (int) Screen.getMainScreen().getRenderScale());
         setScalefactor(1.0);
         setLinewidth(1.0);
         setIsscaled(false);
@@ -80,9 +80,9 @@ public class RandomWalk extends Application {
 
         /*
         * FILE AND FOLDER CHECK
-        * creates a folder C:\RWDATA if not exist
-        * copies Fortran and Python executables from lib folder
-        * to RWDATA folder if not in RWDATA folder already
+        * creates a folder C:/RWDATA if not exist
+        * copies Fortran and Python executables from resources/ folder
+        * to RWDATA folder if not in there already
         */
         String datapath = "C:/RWDATA";
         String fexec = "walk.exe";
@@ -97,64 +97,64 @@ public class RandomWalk extends Application {
 
         if (Files.notExists(datafolder.toPath())){
             if (createFolder(datapath, fexec, true)) {
-                Platform.exit();
+                Platform.exit(); return;
             }
             if (createFolder(datapath, pyexecrms, false)) {
-                Platform.exit();
+                Platform.exit(); return;
             }
             if (createFolder(datapath, pyexec1d, false)) {
-                Platform.exit();
+                Platform.exit(); return;
             }
             if (createFolder(datapath, pyexec2d, false)) {
-                Platform.exit();
+                Platform.exit(); return;
             }
             if (createFolder(datapath, pyexec3d, false)) {
-                Platform.exit();
+                Platform.exit(); return;
             }
             if (createFolder(datapath, pyexecmmc2d, false)) {
-                Platform.exit();
+                Platform.exit(); return;
             }
             if (createFolder(datapath, pyexecmmc3d, false)) {
-                Platform.exit();
+                Platform.exit(); return;
             }
         } else if (Files.notExists(sourceFile.toPath())) {
             if (createFolder(datapath, fexec, false)) {
-                Platform.exit();
+                Platform.exit(); return;
             }
             sourceFile = new File(datapath + "/" + pyexecrms);
             if (Files.notExists(sourceFile.toPath())) {
                 if (createFolder(datapath, pyexecrms, false)) {
-                    Platform.exit();
+                    Platform.exit(); return;
                 }
             }
             sourceFile = new File(datapath + "/" + pyexec1d);
             if (Files.notExists(sourceFile.toPath())) {
                 if (createFolder(datapath, pyexec1d, false)) {
-                    Platform.exit();
+                    Platform.exit(); return;
                 }
             }
             sourceFile = new File(datapath + "/" + pyexec2d);
             if (Files.notExists(sourceFile.toPath())) {
                 if (createFolder(datapath, pyexec2d, false)) {
-                    Platform.exit();
+                    Platform.exit(); return;
                 }
             }
             sourceFile = new File(datapath + "/" + pyexec3d);
             if (Files.notExists(sourceFile.toPath())) {
                 if (createFolder(datapath, pyexec3d, false)) {
-                    Platform.exit();
+                    Platform.exit(); return;
                 }
             }
             sourceFile = new File(datapath + "/" + pyexecmmc2d);
             if (Files.notExists(sourceFile.toPath())) {
                 if (createFolder(datapath, pyexecmmc2d, false)) {
-                    Platform.exit();
+                    Platform.exit(); return;
                 }
             }
             sourceFile = new File(datapath + "/" + pyexecmmc3d);
             if (Files.notExists(sourceFile.toPath())) {
                 if (createFolder(datapath, pyexecmmc3d, false)) {
-                    Platform.exit();
+                    Platform.exit(); return;
                 }
             }
         }
@@ -166,8 +166,8 @@ public class RandomWalk extends Application {
         stage.setWidth(this.getStageWidth());
         stage.setHeight(this.getStageHeight());
         stage.setResizable(false);
-        stage.setX(this.getScreenWidth()-this.getStageWidth()-10);
-        stage.setY((double) (this.getScreenHeight()-this.getStageHeight()) / 2.0);
+        stage.setX(this.getScreenWidth()-this.getStageWidth()-10.0);
+        stage.setY((this.getScreenHeight()-this.getStageHeight()) / 2.0);
 
         DropShadow shadow = new DropShadow();
 
@@ -968,8 +968,8 @@ public class RandomWalk extends Application {
                 stage.setHeight(
                     this.getStageHeight()+(this.getPathHeight()-this.getTextHeight()));
                 stage.setY(
-                    (this.getScreenHeight()-this.getStageHeight())/2
-                    - (this.getPathHeight()-this.getTextHeight())/2);
+                    (this.getScreenHeight()-this.getStageHeight())/2.0
+                    - (this.getPathHeight()-this.getTextHeight())/2.0);
             }
             stage.setScene(pathScene);
         });
@@ -979,8 +979,7 @@ public class RandomWalk extends Application {
                 textAreaMenu.setText(helpText.welcome());
             else
                 textAreaMenu.setText(textAreaPath.getText());
-            //stage.setX(this.getScreenWidth()-this.getStageWidth()-10);
-            stage.setY((this.getScreenHeight()-this.getStageHeight())/2);
+            stage.setY((this.getScreenHeight()-this.getStageHeight())/2.0);
             stage.setHeight(this.getStageHeight());
             stage.setScene(firstScene);
         });
@@ -993,8 +992,8 @@ public class RandomWalk extends Application {
                 stage.setWidth(this.getStageWidth()+(this.getAnimWidth()-this.getTextWidth()));
                 stage.setHeight(this.getStageHeight()+(this.getAnimHeight()-this.getTextHeight()));
                 stage.setX(this.getScreenWidth()-(this.getAnimWidth()+this.getPaneWidth()));
-                stage.setY(((double) this.getScreenHeight()-(double) this.getStageHeight())/2.0
-                    -((double) this.getAnimHeight()-(double) this.getTextHeight())/2.0-10);
+                stage.setY((this.getScreenHeight() -this.getStageHeight())/2.0
+                    -(this.getAnimHeight() -this.getTextHeight())/2.0-10.0);
             }
             stage.setScene(realScene);
         });
@@ -1005,7 +1004,7 @@ public class RandomWalk extends Application {
             else
                 textAreaMenu.clear();
             stage.setX(this.getScreenWidth()-this.getStageWidth());
-            stage.setY((this.getScreenHeight()-this.getStageHeight())/2);
+            stage.setY((this.getScreenHeight()-this.getStageHeight())/2.0);
             stage.setWidth(this.getStageWidth());
             stage.setHeight(this.getStageHeight());
             stage.setScene(firstScene);
@@ -1019,8 +1018,8 @@ public class RandomWalk extends Application {
                 stage.setWidth(this.getStageWidth()+(this.getAnimWidth()-this.getTextWidth()));
                 stage.setHeight(this.getStageHeight()+(this.getAnimHeight()-this.getTextHeight()));
                 stage.setX(this.getScreenWidth()-(this.getAnimWidth()+this.getPaneWidth()));
-                stage.setY(((double) this.getScreenHeight()-(double) this.getStageHeight())/2.0
-                    -((double) this.getAnimHeight()-(double) this.getTextHeight())/2.0-10);
+                stage.setY((this.getScreenHeight() -this.getStageHeight())/2.0
+                    -(this.getAnimHeight()-this.getTextHeight())/2.0-10.0);
             }
             stage.setScene(mmcScene);
         });
@@ -1031,7 +1030,7 @@ public class RandomWalk extends Application {
             else
                 textAreaMenu.setText(textAreaMMC.getText());
             stage.setX(this.getScreenWidth()-this.getStageWidth());
-            stage.setY((this.getScreenHeight()-this.getStageHeight())/2);
+            stage.setY((this.getScreenHeight()-this.getStageHeight())/2.0);
             stage.setWidth(this.getStageWidth());
             stage.setHeight(this.getStageHeight());
             stage.setScene(firstScene);
@@ -1417,7 +1416,7 @@ public class RandomWalk extends Application {
      *     returns false if all goes well, true otherwise
      * </p>
      * @param destination path for working directory C:/RWDATA
-     * @param executable file to copy from lib/ to C:/RWDATA
+     * @param executable file to copy from resources/ to C:/RWDATA
      * @param createDir true if has to create working directory
      * @return false if all goes well, true otherwise
      */
@@ -1484,103 +1483,98 @@ public class RandomWalk extends Application {
      * @return the stageWidth
      */
     @Contract(pure = true)
-    private int getStageWidth() { return 940 / (int) Screen.getMainScreen().getPlatformScaleX(); }
+    private double getStageWidth() { return 940.0 / Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the stageHeight
      */
     @Contract(pure = true)
-    private int getStageHeight() { return 660 / (int) Screen.getMainScreen().getPlatformScaleY(); }
+    private double getStageHeight() { return 660.0 / Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the buttonWidth
      */
     @Contract(pure = true)
-    private int getButtonWidth() { return 150 / (int) Screen.getMainScreen().getPlatformScaleX(); }
+    private double getButtonWidth() { return 150.0 /Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the textwidth
      */
     @Contract(pure = true)
-    private int getTextWidth() { return 740 / (int) Screen.getMainScreen().getPlatformScaleX(); }
+    private double getTextWidth() { return 740.0 / Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the textheight
      */
     @Contract(pure = true)
-    private int getTextHeight() { return 600 / (int) Screen.getMainScreen().getPlatformScaleY(); }
+    private double getTextHeight() { return 600.0 / Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the animwidth
      */
     @Contract(pure = true)
-    private int getAnimWidth() { return 750 / (int) Screen.getMainScreen().getPlatformScaleX(); }
+    private double getAnimWidth() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the animheight
      */
     @Contract(pure = true)
-    private int getAnimHeight() { return 750 / (int) Screen.getMainScreen().getPlatformScaleY(); }
+    private double getAnimHeight() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the paneWidth
      */
     @Contract(pure = true)
-    private int getPaneWidth() { return 200 / (int) Screen.getMainScreen().getPlatformScaleX(); }
+    private double getPaneWidth() { return 200.0 / Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the pathheight
      */
     @Contract(pure = true)
-    private int getPathHeight() { return 660 / (int) Screen.getMainScreen().getPlatformScaleY(); }
+    private double getPathHeight() { return 660.0 / Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the screenWidth
      */
     @Contract(pure = true)
-    private int getScreenWidth() { return screenWidth; }
+    private double getScreenWidth() { return screenWidth; }
 
     /**
      * @param screenWidth the screenWidth to set
      */
-    private void setScreenWidth(int screenWidth) { this.screenWidth = screenWidth; }
+    private void setScreenWidth(double screenWidth) { this.screenWidth = screenWidth; }
 
     /**
      * @return the screenHeight
      */
     @Contract(pure = true)
-    private int getScreenHeight() {
-        return screenHeight;
-    }
+    private double getScreenHeight() { return screenHeight; }
 
     /**
      * @param screenHeight the screenHeight to set
      */
-    private void setScreenHeight(int screenHeight) { this.screenHeight = screenHeight; }
+    private void setScreenHeight(double screenHeight) { this.screenHeight = screenHeight; }
 
     /**
      * @return the fxplot
      */
     @Contract(pure = true)
-    private FXPlot getFxplot() {
-        return fxplot;
-    }
+    private FXPlot getFxplot() { return fxplot; }
 
     /**
      * @param fxplot the fxplot to set
      */
     private void setFxplot(FXPlot fxplot) {
         this.fxplot = fxplot;
-        this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
+
 
     /**
      * @return the frame
      */
     @Contract(pure = true)
-    private JFrame getFrame() {
-        return frame;
-    }
+    private JFrame getFrame() { return frame; }
 
     /**
      * @param frame the frame to set

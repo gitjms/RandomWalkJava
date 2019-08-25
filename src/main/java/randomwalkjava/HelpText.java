@@ -14,7 +14,7 @@ class HelpText {
     */
     String menu() {
 
-        return " \nButton 'RMS vs SQRT(N)' shows a control panel with which you can\n"
+        return " \n Button 'RMS vs SQRT(N)' shows a control panel with which you can\n"
                     + " calculate root mean square (rms) distances of random walk particles.\n\n"
                     + " Program plots 'rms<dist>' versus 'sqrt(steps)'.\n\n"
                     + " Every run will save the data in a file replacing the previous one if\n"

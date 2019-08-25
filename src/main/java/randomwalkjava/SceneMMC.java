@@ -57,7 +57,7 @@ class SceneMMC extends Data {
     private double linewidth;
     private double scalefactor;
     private boolean timerRunning;
-    private int animwidth;
+    private double animwidth;
     private double center;
     private GraphicsContext piirturi;
     private FXPlot fxplot;
@@ -137,29 +137,29 @@ class SceneMMC extends Data {
      * @param diff difference in between the lattice structure
      */
     void refresh(File folder, File initialDataFile, String executable,
-                 GraphicsContext piirturi, double scalefactor, int animwidth,
+                 GraphicsContext piirturi, double scalefactor, double animwidth,
                  double linewidth, FXPlot fxplot, Button remBarNappiMMC, Button runMMC,
                  Button plotMMC, Button closeNappiMMC, Button menuNappiMMC,
                  Button helpNappiMMC, List<Double> energy_x, List<Double> energy_y,
                  boolean newdata, double measure, double diff) {
 
-         this.setYellowP(new Image("Pyellow.png"));
-         this.setGrayP(new Image("Pgray.png"));
+        this.setYellowP(new Image("Pyellow.png"));
+        this.setGrayP(new Image("Pgray.png"));
 
-         this.setPiirturi(piirturi);
-         this.setLinewidth(linewidth);
-         this.setAnimwidth(animwidth);
-         this.setScalefactor(scalefactor);
-         this.setFxplot(fxplot);
-         this.setRemBarNappiMMC(remBarNappiMMC);
-         this.setRunMMC(runMMC);
-         this.setPlotMMC(plotMMC);
-         this.setCloseNappiMMC(closeNappiMMC);
-         this.setMenuNappiMMC(menuNappiMMC);
-         this.setHelpNappiMMC(helpNappiMMC);
-         this.setCenter((double) this.getAnimwidth() / 2.0);
-         this.setLattice(this.vars[7].equals("l"));
-         barrierOn();
+        this.setPiirturi(piirturi);
+        this.setLinewidth(linewidth);
+        this.setAnimwidth(animwidth);
+        this.setScalefactor(scalefactor);
+        this.setFxplot(fxplot);
+        this.setRemBarNappiMMC(remBarNappiMMC);
+        this.setRunMMC(runMMC);
+        this.setPlotMMC(plotMMC);
+        this.setCloseNappiMMC(closeNappiMMC);
+        this.setMenuNappiMMC(menuNappiMMC);
+        this.setHelpNappiMMC(helpNappiMMC);
+        this.setCenter(this.getAnimwidth()/2.0);
+        this.setLattice(this.vars[7].equals("l"));
+        barrierOn();
 
         this.setNumPart(parseInt(this.vars[0]));
         this.setDiam(parseDouble(this.vars[1]));
@@ -281,16 +281,16 @@ class SceneMMC extends Data {
                             if (getDim() == 2) {
                                 String[] valStr = line.split("(\\s+)");
                                 try {
-                                    getValues()[0][i] = Double.parseDouble(valStr[0].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getPlatformScaleX());
-                                    getValues()[1][i] = Double.parseDouble(valStr[1].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getPlatformScaleY());
+                                    getValues()[0][i] = Double.parseDouble(valStr[0].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
+                                    getValues()[1][i] = Double.parseDouble(valStr[1].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
                                 } catch (NumberFormatException e) {
                                     continue;
                                 }
                             } else if (getDim() == 3) {
                                 String[] valStr = line.split("(\\s+)");
                                 try {
-                                    getValues()[0][i] = Double.parseDouble(valStr[0].trim()) + getCenter() / (getScalefactor()* (int) Screen.getMainScreen().getPlatformScaleX());
-                                    getValues()[1][i] = Double.parseDouble(valStr[1].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getPlatformScaleY());
+                                    getValues()[0][i] = Double.parseDouble(valStr[0].trim()) + getCenter() / (getScalefactor()* (int) Screen.getMainScreen().getRenderScale());
+                                    getValues()[1][i] = Double.parseDouble(valStr[1].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
                                     getValues()[2][i] = Double.parseDouble(valStr[2].trim()) + getCenter() / getScalefactor();
                                 } catch (NumberFormatException e) {
                                     continue;
@@ -431,8 +431,8 @@ class SceneMMC extends Data {
         * Draw initial data spots
         */
         for (int k = 0; k < num_part; k++){
-            this.getValues()[0][k] = diff/10.0 + initialData.get(k)[0] + this.getCenter() / (this.getScalefactor() * (int) Screen.getMainScreen().getPlatformScaleX());
-            this.getValues()[1][k] = diff/10.0 + initialData.get(k)[1] + this.getCenter() / (this.getScalefactor() * (int) Screen.getMainScreen().getPlatformScaleY());
+            this.getValues()[0][k] = diff/10.0 + initialData.get(k)[0] + this.getCenter() / (this.getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
+            this.getValues()[1][k] = diff/10.0 + initialData.get(k)[1] + this.getCenter() / (this.getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
             if ( dim == 2 )
                 draw2Dots(this.getValues()[0][k], this.getValues()[1][k], diam);
             else if ( dim == 3 ) {
@@ -903,13 +903,13 @@ class SceneMMC extends Data {
      * @return the compwidth
      */
     @Contract(pure = true)
-    private int getCompwidth() { return 150 / (int) Screen.getMainScreen().getPlatformScaleX(); }
+    private double getCompwidth() { return 150.0 / Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the paneWidth
      */
     @Contract(pure = true)
-    private int getPaneWidth() { return 200 / (int) Screen.getMainScreen().getPlatformScaleX(); }
+    private double getPaneWidth() { return 200.0 / Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the Charge0
@@ -1094,12 +1094,12 @@ class SceneMMC extends Data {
      * @return the animwidth
      */
     @Contract(pure = true)
-    private int getAnimwidth() { return animwidth; }
+    private double getAnimwidth() { return animwidth; }
 
     /**
      * @param animwidth the animwidth to set
      */
-    private void setAnimwidth(int animwidth) { this.animwidth = animwidth; }
+    private void setAnimwidth(double animwidth) { this.animwidth = animwidth; }
 
     /**
      * @return the center
