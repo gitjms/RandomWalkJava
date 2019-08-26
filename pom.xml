@@ -184,6 +184,7 @@
                 <configuration>
                     <vendor>Jari Sunnari</vendor>
                     <mainClass>randomwalkjava.Main</mainClass>
+                    <!-- bundler can be msi, exe, or windows.app -->
                     <bundler>msi</bundler>
                     <bundleArguments>
                         <dropinResourcesRoot>${project.basedir}/src/main/resources</dropinResourcesRoot>

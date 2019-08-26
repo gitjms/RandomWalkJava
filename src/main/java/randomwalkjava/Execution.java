@@ -15,8 +15,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;

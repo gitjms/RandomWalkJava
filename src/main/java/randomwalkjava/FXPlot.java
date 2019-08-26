@@ -275,6 +275,13 @@ class FXPlot extends SceneRealTimeRms {
     }
 
     /**
+     * @param minY the y-axis min value to set
+     */
+    void setEMinY(double minY) {
+        this.getCalcChartE().getStyler().setYAxisMin(minY);
+    }
+
+    /**
      * @param maxY the y-axis max value to set
      */
     void setEMaxY(double maxY) {
@@ -299,9 +306,7 @@ class FXPlot extends SceneRealTimeRms {
      */
     private void setFrame(JFrame frame) {
         this.frame = frame;
-        Image icn = Toolkit.getDefaultToolkit().getImage("icon.png");
-        this.frame.setIconImage(icn);
-        this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
     /**

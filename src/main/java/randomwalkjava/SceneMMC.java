@@ -27,8 +27,6 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;
@@ -52,6 +50,7 @@ class SceneMMC extends Data {
     private TextField setSizeParticles;
 
     private long phase;
+    private double smallest;
     private double greatest;
     private boolean first;
     private double linewidth;
@@ -85,6 +84,7 @@ class SceneMMC extends Data {
     private int num_part;
     private double diam;
     private int dim;
+    private int charge;
     private List<Double> energy_x;
     private List<Double> energy_y;
     private double measure;
@@ -163,6 +163,7 @@ class SceneMMC extends Data {
 
         this.setNumPart(parseInt(this.vars[0]));
         this.setDiam(parseDouble(this.vars[1]));
+        this.setCharge(parseInt(this.vars[2]));
         this.setDim(parseInt(this.vars[4]));
         this.setEnergyX(energy_x);
         this.setEnergyY(energy_y);
@@ -322,6 +323,7 @@ class SceneMMC extends Data {
                                     getEnergyY().add(Double.parseDouble(line.split("(\\s+)")[1].trim()));
                                     getEnergyX().add((double) getPhase());
                                     setPhase(getPhase() + 1);
+                                    setSmallest(0.0);
                                     setGreatest(getEnergyY().get(0));
                                     getFxplot().setEData(getEnergyX(), getEnergyY());
                                 } else {
@@ -337,6 +339,12 @@ class SceneMMC extends Data {
                             if ( getEnergyY().get((int) getPhase() - 1) > getGreatest() ) {
                                 setGreatest(getEnergyY().get((int) getPhase() - 1));
                                 getFxplot().setEMaxY(getGreatest());
+                            }
+                            if ( getCharge() == 2 ) {
+                                if (getEnergyY().get((int) getPhase() - 1) < getSmallest()) {
+                                    setSmallest(getEnergyY().get((int) getPhase() - 1));
+                                    getFxplot().setEMinY(getSmallest());
+                                }
                             }
                             getFxplot().updateEData(getEnergyX(), getEnergyY());
                         }
@@ -755,6 +763,18 @@ class SceneMMC extends Data {
     private int getDim() { return dim; }
 
     /**
+     * @param charge the charge to set
+     */
+    @Contract(pure = true)
+    private void setCharge(int charge){ this.charge = charge; }
+
+    /**
+     * @return the charge
+     */
+    @Contract(pure = true)
+    private int getCharge() { return charge; }
+
+    /**
      *
      * @param energy_x the energy_x to set
      */
@@ -1034,15 +1054,27 @@ class SceneMMC extends Data {
     private void setPhase(long phase) { this.phase = phase; }
 
     /**
-     * @return the greatest
+     * @param smallest the smallest to set
+     */
+    private void setSmallest(double smallest) { this.smallest = smallest; }
+
+    /**
+     * @return the smallest
      */
     @Contract(pure = true)
-    private double getGreatest() { return greatest; }
+    private double getSmallest() { return smallest; }
+
 
     /**
      * @param greatest the greatest to set
      */
     private void setGreatest(double greatest) { this.greatest = greatest; }
+
+    /**
+     * @return the greatest
+     */
+    @Contract(pure = true)
+    private double getGreatest() { return greatest; }
 
     /**
      * @return the first
