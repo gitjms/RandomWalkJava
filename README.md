@@ -30,6 +30,10 @@ Asennustyökalu *RandomWalk-1.0.msi* löytyy linkin *release* takaa:
 
 <img src="https://user-images.githubusercontent.com/46410240/63167309-952e0200-c039-11e9-9d65-571ce3170085.png" alt="release" width="612" height="180" >
 
+## Ongelmia
+
+Valinnassa *MMC Diffusion* hiukkasten alkuasetelma on toisinaan hieman syrjässä siitä, missä niiden pitäisi olla. Kun liike alkaa, asemoituvat ne kuitenkin taas hyvin. En ole vielä löytänyt syytä alkuasetelman poikkeamiin.
+
 ## TODO
 
 * MMC diffuusio -animaatioon 3D-hilarakenne.
