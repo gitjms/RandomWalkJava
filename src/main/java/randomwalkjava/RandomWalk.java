@@ -1560,7 +1560,6 @@ public class RandomWalk extends Application {
          * EXECUTE BUTTON 1D DISTANCE
          */
         executeNappi1Ddist.setOnMouseClicked((MouseEvent event) -> {
-            get1DdistScene.setVar("s");
             String[] vars = get1DdistScene.getVars();
             this.setVars(vars);
             Data data = new Data(vars);

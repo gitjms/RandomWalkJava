@@ -439,7 +439,6 @@ class Execution {
             }
         }
 
-
         this.getFrame().setTitle("Random Walk - R_rms Calculation - " + titletext);
 
         assert image != null;
@@ -563,7 +562,6 @@ class Execution {
                 break;
             }
         }
-
 
         this.getFrame().setTitle("Random Walk - 1D Distance - " + titletext);
 

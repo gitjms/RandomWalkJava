@@ -52,5 +52,4 @@ Valinnassa *MMC Diffusion* hiukkasten alkuasetelma on toisinaan hieman syrj√§ss√
 <img src="https://user-images.githubusercontent.com/46410240/62991794-c0f29180-be59-11e9-8424-9cd9abd8bc4c.png" alt="path_trac" width="480" height="270" >
 <img src="https://user-images.githubusercontent.com/46410240/62991808-ca7bf980-be59-11e9-9253-d177dc285eac.png" alt="real_rms" width="480" height="270" >
 <img src="https://user-images.githubusercontent.com/46410240/62991812-cea81700-be59-11e9-9726-770193265ce8.png" alt="mmc_diff" width="478" height="255" >
-<img src="https://user-images.githubusercontent.com/46410240/63797704-432a8d80-c911-11e9-93d2-3ec16e83902c.png" alt="1D_dist" width="480" height="208" >
-
+<img src="https://user-images.githubusercontent.com/46410240/63804122-1da48080-c91f-11e9-8b65-371fac5a9bba.png" alt="1D_dist" width="480" height="238" >
