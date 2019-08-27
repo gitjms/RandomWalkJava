@@ -143,8 +143,8 @@ class SceneMMC extends Data {
                  Button helpNappiMMC, List<Double> energy_x, List<Double> energy_y,
                  boolean newdata, double measure, double diff) {
 
-        this.setYellowP(new Image("Pyellow.png"));
-        this.setGrayP(new Image("Pgray.png"));
+        this.setYellowP(new Image("/Pyellow.png"));
+        this.setGrayP(new Image("/Pgray.png"));
 
         this.setPiirturi(piirturi);
         this.setLinewidth(linewidth);
@@ -1063,7 +1063,6 @@ class SceneMMC extends Data {
      */
     @Contract(pure = true)
     private double getSmallest() { return smallest; }
-
 
     /**
      * @param greatest the greatest to set

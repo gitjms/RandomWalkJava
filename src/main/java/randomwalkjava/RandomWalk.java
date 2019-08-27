@@ -1156,7 +1156,8 @@ public class RandomWalk extends Application {
                 /*
                 * DRAW ANIMATION
                 */
-                getRealScene.refresh(datafolder, fexec, piirturi, getScalefactor(), getLinewidth(), getFxplot(), rms_runs, isNewdata(), getMincount(), getMaxcount(), isStandnorm(), getAnimWidth());
+                getRealScene.refresh(datafolder, fexec, piirturi, getScalefactor(), getLinewidth(), getFxplot(),
+                    rms_runs, isNewdata(), getMincount(), getMaxcount(), isStandnorm(), getAnimWidth());
                 setNewdata(false);
 
                 this.prevTime = currentNanoTime;
@@ -1175,6 +1176,10 @@ public class RandomWalk extends Application {
                     else
                         piirturi.scale(1.0/this.getScalefactor(), 1.0/this.getScalefactor());
                 }
+                menuNappiReal.setDisable(false);
+                helpNappiReal.setDisable(false);
+                closeNappiReal.setDisable(false);
+                standNorm.setDisable(false);
                 runReal.setText("RUN");
             } else {
                 this.setVars(getRealScene.getVars());
@@ -1243,6 +1248,10 @@ public class RandomWalk extends Application {
         
                 getRealScene.start();
                 runReal.setText("STOP");
+                menuNappiReal.setDisable(true);
+                helpNappiReal.setDisable(true);
+                closeNappiReal.setDisable(true);
+                standNorm.setDisable(true);
             }
         });
 

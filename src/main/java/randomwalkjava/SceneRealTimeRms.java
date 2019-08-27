@@ -766,5 +766,4 @@ class SceneRealTimeRms extends Data {
     private void setExitVal(int exitVal) {
         this.exitVal = exitVal;
     }
-
 }
