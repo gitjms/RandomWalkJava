@@ -21,6 +21,7 @@ Ohjelma luo työkansion **C:/RWDATA**, johon tallentuvat niin *Fortran*- ja *Pyt
  **PATH TRACING**   | piirtää satunnaisliikepolut kuvina *pdf*-muodossa. Yksi ajo tuottaa myös kaksi *.xy*-päätteistä datatiedostoa sekä lisäksi kaksi tai kolme tiedostoa päätteillä *.x*, *.y* ja *.z*, riippuen käyttäjän dimensiovalinnasta.
  **REAL TIME RMS**  | esittää reaaliaikaisen animaation satunnaiskulkijoista, jotka luodaan yhdestä pisteestä (fixed source). Ohjelma silmukoi kulkijoita halutulla askelmäärällä, laskien samalla neliöllistä keskiarvoetäisyyttä, jonka normaalijakauma esitetään grafiikkana. Toinen grafiikka esittää sekä neliökeskiarvoetäisyyden että odotusarvoetäisyyden sqrt(N). Mitään tiedostoja ei tallennu automaattisesti, mutta käyttäjä voi halutesaan tallentaa kuvan eri muodoissa klikkaamalla kuvaa hiiren oikeallakorvalla. Tallennusvaihtoehtoja ovat *png*, *jpg*, *bmp*, *gif*, *svg*, *eps* ja *pdf*.
  **MMC DIFFUSION**  | esittää vaihtoehtoisesti joko animaation satunnaiskulkijoiden diffuusioliikkeestä tai kuvan kulkijoiden aloitus- ja loppukonfiguraatioista. Animaatio tuottaa ajoa varten tarvittavan datatiedoston aloituskonfiguraatiosta *.xy*-päätteellä. Kuvia eitallennu. Kuvan suorittaminen sen sijaan tuottaa kaksi *.xy*-päätteistä datatiedostoa sekä lisäksi kaksi tai kolme tiedostoa päätteillä *.x*, *.y* ja *.z*, riippuen käyttäjän dimensiovalinnasta. Kuva tallentuu *pdf*-muodossa automaattisesti.
+ **1D DISTANCE**    | esittää satunnaiskulkijoiden etäisyydet askelten suhteen. Yksi ajo tuottaa kaksi (tarpeetonta) datatiedostoa päätteellä on *.xy*, yhden tiedoston päätteellä *.x*, sekä kaaviokuvan pdf-muodossa.
 
 Nämä ohjeet ovat myös saatavilla itse ohjelmassa painamalla *HELP*-nappia päämenussa (ensimmäinen näkymä). Kullekin ohjelman suoritusvaihtoehdolle on lisäksi oma *HELP*-nappinsa ja oma ohjeensa. Ohjeet ovat vain englanniksi.
 
@@ -51,4 +52,5 @@ Valinnassa *MMC Diffusion* hiukkasten alkuasetelma on toisinaan hieman syrjäss�
 <img src="https://user-images.githubusercontent.com/46410240/62991794-c0f29180-be59-11e9-8424-9cd9abd8bc4c.png" alt="path_trac" width="480" height="270" >
 <img src="https://user-images.githubusercontent.com/46410240/62991808-ca7bf980-be59-11e9-9253-d177dc285eac.png" alt="real_rms" width="480" height="270" >
 <img src="https://user-images.githubusercontent.com/46410240/62991812-cea81700-be59-11e9-9726-770193265ce8.png" alt="mmc_diff" width="478" height="255" >
+<img src="https://user-images.githubusercontent.com/46410240/63797704-432a8d80-c911-11e9-93d2-3ec16e83902c.png" alt="1D_dist" width="480" height="208" >
 

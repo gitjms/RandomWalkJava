@@ -455,6 +455,131 @@ class Execution {
     }
 
     /**
+     * method for 1D distance Fortran and Python execution and image creation
+     * @param folder datafolder C:/RWDATA
+     * @param path datapath C:/RWDATA
+     * @param fexec Fortran executable walk.exe
+     * @param pyexecrms Python executable plotrms.py
+     * @param frame JFrame for image
+     * @param data instance of Data class
+     * @param vars user data from GUI via
+     */
+    void execute1Ddist(File folder, String path, String fexec,
+                       String pyexec1d, Data data, String[] vars) {
+        /*
+         * FROM SCENE1Ddist
+         * vars from user:
+         * vars[0] = particles,     USER
+         * vars[1] = diameter,      n/a
+         * vars[2] = charge,        n/a
+         * vars[3] = steps,         USER
+         * vars[4] = dimension,     n/a
+         * vars[5] = mmc,           n/a
+         * vars[6] = fixed,         n/a
+         * vars[7] = lattice,       USER
+         * vars[8] = save           n/a
+         */
+        pyexec1d = "python ".concat(pyexec1d);
+        this.setFrame();
+        String xDataPath;
+        String titletext = null;
+        BufferedImage image = null;
+        String[] command = null;
+
+        Boolean result = false;
+        try {
+            result = data.createData(folder, fexec);
+        } catch (Throwable ex) {
+            System.out.println(ex.getMessage());
+        }
+        if (!result)
+            return;
+
+        int particles = parseInt(vars[0]);
+        int steps = parseInt(vars[3]);
+
+        if ( vars[7].equals("l") ) {
+            titletext = "Lattice particles";
+        } else if ( vars[7].equals("-") ) {
+            titletext = "Free particles";
+        }
+
+        xDataPath = "x_path"
+            + "1D_"
+            + particles + "N_"
+            + steps + "S.x";
+
+        File pdfFile = new File(path + "/jpyplot1Ddist_N" + particles + "_S" + steps + ".pdf");
+        if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
+
+        /*
+         * 1D DATA
+         */
+        command = new String[]{"cmd","/c", pyexec1d, xDataPath};
+
+        /*
+         * CREATE IMAGE
+         */
+        this.setRuntime(Runtime.getRuntime());
+        runtimeStart();
+        try {
+            assert command != null;
+            this.getRuntime().exec(command, null, folder);
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+
+        /*
+         * GET IMAGE
+         */
+        while (true) {
+            if (Files.notExists(pdfFile.toPath())) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            } else if (Files.exists(pdfFile.toPath())) {
+                PDDocument document = null;
+                while (true) {
+                    if (!pdfFile.exists()) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ex) {
+                            System.out.println(ex.getMessage());
+                        }
+                    } else if (pdfFile.exists()) {
+                        try {
+                            document = PDDocument.load(pdfFile);
+                            PDFRenderer renderer = new PDFRenderer(document);
+                            image = renderer.renderImageWithDPI(0, 600, ImageType.RGB);
+                            document.close();
+                            break;
+                        } catch (IOException ex) {
+                            //System.out.println(ex.getMessage());
+                        }
+                    }
+                }
+                break;
+            }
+        }
+
+
+        this.getFrame().setTitle("Random Walk - 1D Distance - " + titletext);
+
+        assert image != null;
+        this.getFrame().setSize(this.getChartWidth(), this.getChartHeight());
+        this.getFrame().setLocation(0, (int) ((this.getScreenHeight()-this.getChartHeight())/2.0)-getYMargin());
+        Image image2 = image.getScaledInstance(this.getChartWidth(), this.getChartHeight()+this.getYMargin(), Image.SCALE_AREA_AVERAGING);
+        ImageIcon figIcn = new ImageIcon(image2);
+        JLabel figLabel = new JLabel(figIcn);
+        this.getFrame().add(figLabel);
+        this.getFrame().repaint();
+        this.getFrame().pack();
+        this.getFrame().setVisible(true);
+    }
+
+    /**
      *
      * @param frame the JFrame to set
      */

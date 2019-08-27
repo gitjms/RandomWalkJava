@@ -92,6 +92,7 @@ public class RandomWalk extends Application {
         String pyexec3d = "plot3d.py";
         String pyexecmmc2d = "plotmmc2d.py";
         String pyexecmmc3d = "plotmmc3d.py";
+        String pyexec1Ddist = "plot1Ddist.py";
         File datafolder = new File(datapath);
         File sourceFile = new File(datapath + "/" + fexec);
 
@@ -115,6 +116,9 @@ public class RandomWalk extends Application {
                 Platform.exit(); return;
             }
             if (createFolder(datapath, pyexecmmc3d, false)) {
+                Platform.exit(); return;
+            }
+            if (createFolder(datapath, pyexec1Ddist, false)) {
                 Platform.exit(); return;
             }
         } else if (Files.notExists(sourceFile.toPath())) {
@@ -157,6 +161,12 @@ public class RandomWalk extends Application {
                     Platform.exit(); return;
                 }
             }
+            sourceFile = new File(datapath + "/" + pyexec1Ddist);
+            if (Files.notExists(sourceFile.toPath())) {
+                if (createFolder(datapath, pyexec1Ddist, false)) {
+                    Platform.exit(); return;
+                }
+            }
         }
 
         /*
@@ -187,6 +197,7 @@ public class RandomWalk extends Application {
         Button nappiScene2 = new Button("PATH TRACING"); // ScenePathTracing
         Button nappiScene3 = new Button("REAL TIME RMS"); // SceneRealTimeRms
         Button nappiScene4 = new Button("MMC DIFFUSION"); // SceneMMC
+        Button nappiScene5 = new Button("1D DISTANCE"); // Scene1Ddist
         nappiScene1.setMinWidth(this.getButtonWidth());
         nappiScene1.setMaxWidth(this.getButtonWidth());
         nappiScene2.setMinWidth(this.getButtonWidth());
@@ -195,11 +206,16 @@ public class RandomWalk extends Application {
         nappiScene3.setMaxWidth(this.getButtonWidth());
         nappiScene4.setMinWidth(this.getButtonWidth());
         nappiScene4.setMaxWidth(this.getButtonWidth());
+        nappiScene5.setMinWidth(this.getButtonWidth());
+        nappiScene5.setMaxWidth(this.getButtonWidth());
 
         Button nappiMenuHelp = new Button("HELP");
         nappiMenuHelp.setMinWidth(this.getButtonWidth());
         nappiMenuHelp.setMaxWidth(this.getButtonWidth());
 
+        /*
+        * GRIDPANES: SceneCalculation
+         */
         GridPane.setHalignment(nappiScene1, HPos.LEFT);
         asettelu.add(nappiScene1, 0, 0, 2, 1);
         nappiScene1.setBackground(new Background(
@@ -215,6 +231,9 @@ public class RandomWalk extends Application {
         GridPane.setHalignment(empty1, HPos.LEFT);
         asettelu.add(empty1, 0, 1, 2, 1);
 
+        /*
+         * GRIDPANES: ScenePathTracing
+         */
         GridPane.setHalignment(nappiScene2, HPos.LEFT);
         asettelu.add(nappiScene2, 0, 2, 2, 1);
         nappiScene2.setBackground(new Background(
@@ -230,6 +249,9 @@ public class RandomWalk extends Application {
         GridPane.setHalignment(empty2, HPos.LEFT);
         asettelu.add(empty2, 0, 3, 2, 1);
 
+        /*
+         * GRIDPANES: SceneRealTimeRms
+         */
         GridPane.setHalignment(nappiScene3, HPos.LEFT);
         asettelu.add(nappiScene3, 0, 4, 2, 1);
         nappiScene3.setBackground(new Background(
@@ -245,6 +267,9 @@ public class RandomWalk extends Application {
         GridPane.setHalignment(empty3, HPos.LEFT);
         asettelu.add(empty3, 0, 5, 2, 1);
 
+        /*
+         * GRIDPANES: SceneMMC
+         */
         GridPane.setHalignment(nappiScene4, HPos.LEFT);
         asettelu.add(nappiScene4, 0, 6, 2, 1);
         nappiScene4.setBackground(new Background(
@@ -260,7 +285,25 @@ public class RandomWalk extends Application {
         GridPane.setHalignment(empty4, HPos.LEFT);
         asettelu.add(empty4, 0, 7, 2, 1);
 
-        asettelu.add(nappiMenuHelp, 0, 8, 2, 1);
+        /*
+         * GRIDPANES: Scene1Ddist
+         */
+        GridPane.setHalignment(nappiScene5, HPos.LEFT);
+        asettelu.add(nappiScene5, 0, 8, 2, 1);
+        nappiScene5.setBackground(new Background(
+            new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        nappiScene5.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> nappiScene5.setEffect(shadow));
+        nappiScene5.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> nappiScene5.setEffect(null));
+        nappiScene5.setVisible(true);
+
+        final Pane empty5 = new Pane();
+        GridPane.setHalignment(empty5, HPos.LEFT);
+        asettelu.add(empty5, 0, 9, 2, 1);
+
+        asettelu.add(nappiMenuHelp, 0, 10, 2, 1);
         nappiMenuHelp.setBackground(new Background(
             new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
@@ -284,11 +327,13 @@ public class RandomWalk extends Application {
         ScenePathTracing getPathScene = new ScenePathTracing();
         SceneRealTimeRms getRealScene = new SceneRealTimeRms();
         SceneMMC getMMCScene = new SceneMMC();
+        Scene1Ddist get1DdistScene = new Scene1Ddist();
 
         BorderPane asetteluCalc = new BorderPane();
         BorderPane asetteluPath = new BorderPane();
         BorderPane asetteluReal = new BorderPane();
         BorderPane asetteluMMC = new BorderPane();
+        BorderPane asettelu1Ddist = new BorderPane();
 
         HBox isovalikkoCalc = new HBox();
         isovalikkoCalc.setPadding(new Insets(0, 0, 0, 0));
@@ -306,6 +351,10 @@ public class RandomWalk extends Application {
         isovalikkoMMC.setPadding(new Insets(0, 0, 0, 0));
         isovalikkoMMC.setSpacing(0);
 
+        HBox isovalikko1Ddist = new HBox();
+        isovalikko1Ddist.setPadding(new Insets(0, 0, 0, 0));
+        isovalikko1Ddist.setSpacing(0);
+
         VBox valikkoCalc = new VBox();
         valikkoCalc.setPadding(new Insets(10, 10, 10, 10));
         valikkoCalc.setSpacing(20);
@@ -321,6 +370,10 @@ public class RandomWalk extends Application {
         VBox valikkoMMC = new VBox();
         valikkoMMC.setPadding(new Insets(10, 10, 10, 10));
         valikkoMMC.setSpacing(20);
+
+        VBox valikko1Ddist = new VBox();
+        valikko1Ddist.setPadding(new Insets(10, 10, 10, 10));
+        valikko1Ddist.setSpacing(20);
 
         /*
         * TEXT AREAS
@@ -383,6 +436,20 @@ public class RandomWalk extends Application {
         textAreaMMC.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         textAreaMMC.setBlendMode(BlendMode.DIFFERENCE);
+        /*
+         * 1D DISTANCE TEXT AREA
+         */
+        TextArea textArea1Ddist = new TextArea();
+        textArea1Ddist.setMinWidth(this.getTextWidth());
+        textArea1Ddist.setMaxWidth(this.getTextWidth());
+        textArea1Ddist.setMinHeight(this.getTextHeight());
+        textArea1Ddist.setMaxHeight(this.getTextHeight());
+        textArea1Ddist.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
+        textArea1Ddist.setBorder(null);
+        textArea1Ddist.setEditable(false);
+        textArea1Ddist.setBackground(new Background(new BackgroundFill(
+            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        textArea1Ddist.setBlendMode(BlendMode.DIFFERENCE);
 
         /*
         * TEXT AREA MENU
@@ -849,6 +916,77 @@ public class RandomWalk extends Application {
         closeNappiMMC.setVisible(true);
 
         /*
+         * OTHER VIEWS BUTTON: EXECUTE 1D DISTANCE
+         */
+        Button executeNappi1Ddist = new Button("EXECUTE");
+        executeNappi1Ddist.setDefaultButton(true);
+        executeNappi1Ddist.setMinWidth(this.getButtonWidth());
+        executeNappi1Ddist.setMaxWidth(this.getButtonWidth());
+        executeNappi1Ddist.setStyle("-fx-background-color: Red");
+        executeNappi1Ddist.setTextFill(Color.WHITE);
+        executeNappi1Ddist.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> executeNappi1Ddist.setEffect(shadow));
+        executeNappi1Ddist.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> executeNappi1Ddist.setEffect(null));
+        executeNappi1Ddist.setVisible(true);
+
+        /*
+         * OTHER VIEWS BUTTON: 1D DISTANCE MENU
+         */
+        Button menuNappi1Ddist = new Button("BACK TO MENU");
+        menuNappi1Ddist.setMinWidth(this.getButtonWidth());
+        menuNappi1Ddist.setMaxWidth(this.getButtonWidth());
+        menuNappi1Ddist.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> menuNappi1Ddist.setEffect(shadow));
+        menuNappi1Ddist.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> menuNappi1Ddist.setEffect(null));
+        menuNappi1Ddist.setVisible(true);
+
+        /*
+         * OTHER VIEWS BUTTON: 1D DISTANCE HELP
+         */
+        Button helpNappi1Ddist = new Button("HELP");
+        helpNappi1Ddist.setMinWidth(this.getButtonWidth());
+        helpNappi1Ddist.setMaxWidth(this.getButtonWidth());
+        helpNappi1Ddist.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> helpNappi1Ddist.setEffect(shadow));
+        helpNappi1Ddist.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> helpNappi1Ddist.setEffect(null));
+        helpNappi1Ddist.setOnAction(event -> textArea1Ddist.setText(helpText.distance1D()));
+        helpNappi1Ddist.setVisible(true);
+
+        /*
+         * OTHER VIEWS BUTTON: 1D DISTANCE CLOSE
+         */
+        Button closeNappi1Ddist = new Button("CLOSE");
+        closeNappi1Ddist.setMinWidth(this.getButtonWidth());
+        closeNappi1Ddist.setMaxWidth(this.getButtonWidth());
+        closeNappi1Ddist.setTextFill(Color.RED);
+        closeNappi1Ddist.setBackground(new Background(
+            new BackgroundFill(
+                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        GridPane.setHalignment(closeNappi1Ddist, HPos.LEFT);
+        closeNappi1Ddist.addEventHandler(
+            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> closeNappi1Ddist.setEffect(shadow));
+        closeNappi1Ddist.addEventHandler(
+            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> closeNappi1Ddist.setEffect(null));
+        closeNappi1Ddist.setOnAction(event -> {
+            Alert alert;
+            alert = new Alert(Alert.AlertType.CONFIRMATION,
+                "Close application?",
+                ButtonType.OK, ButtonType.CANCEL);
+            alert.showAndWait();
+            if ( alert.getResult() == ButtonType.OK ) {
+                if (this.getFrame() != null) if (this.getFrame().isShowing()
+                    || this.getFrame().isActive()
+                    || this.getFrame().isDisplayable())
+                    this.getFrame().dispose();
+                stage.close();
+            }
+        });
+        closeNappi1Ddist.setVisible(true);
+
+        /*
         * SET FIRST VIEW BORDERPANE
         */
         valikkoMenu.getChildren().addAll(
@@ -920,6 +1058,20 @@ public class RandomWalk extends Application {
         asetteluMMC.setCenter(isovalikkoMMC);
 
         /*
+         * SET 1D DISTANCE BORDERPANE
+         */
+        valikko1Ddist.getChildren().addAll(
+            menuNappi1Ddist,
+            helpNappi1Ddist,
+            get1DdistScene.getScene1Ddist(),
+            executeNappi1Ddist,
+            closeNappi1Ddist);
+        isovalikko1Ddist.getChildren().addAll(
+            valikko1Ddist,
+            textArea1Ddist);
+        asettelu1Ddist.setCenter(isovalikko1Ddist);
+
+        /*
         * SET SCENES
         */
         Scene firstScene = new Scene(asetteluMenu, this.getStageWidth(), this.getStageHeight());
@@ -942,6 +1094,9 @@ public class RandomWalk extends Application {
             this.getStageHeight() + (this.getAnimHeight()-this.getTextHeight()));
         mmcScene.getStylesheets().add("/Styles.css");
 
+        Scene dist1DScene = new Scene(asettelu1Ddist, this.getStageWidth(), this.getStageHeight());
+        dist1DScene.getStylesheets().add("/Styles.css");
+
         /*
         * SET SCENE CHOICE BUTTONS' EFFECTS
         * CALCULATION
@@ -949,7 +1104,6 @@ public class RandomWalk extends Application {
         nappiScene1.setOnMouseClicked(event -> {
             stage.setTitle("R_rms calculation");
             stage.setScene(calcScene);
-            
         });
         menuNappiCalc.setOnMouseClicked(event -> {
             stage.setTitle("Random Walk");
@@ -1033,6 +1187,21 @@ public class RandomWalk extends Application {
             stage.setY((this.getScreenHeight()-this.getStageHeight())/2.0);
             stage.setWidth(this.getStageWidth());
             stage.setHeight(this.getStageHeight());
+            stage.setScene(firstScene);
+        });
+        /*
+         * 1D DISTANCE
+         */
+        nappiScene5.setOnMouseClicked(event -> {
+            stage.setTitle("1D Distance");
+            stage.setScene(dist1DScene);
+        });
+        menuNappi1Ddist.setOnAction(event -> {
+            stage.setTitle("Random Walk");
+            if (textArea1Ddist.getText().equals(helpText.distance1D()))
+                textAreaMenu.setText(helpText.welcome());
+            else
+                textAreaMenu.setText(textArea1Ddist.getText());
             stage.setScene(firstScene);
         });
 
@@ -1387,6 +1556,29 @@ public class RandomWalk extends Application {
 
         });
 
+        /*
+         * EXECUTE BUTTON 1D DISTANCE
+         */
+        executeNappi1Ddist.setOnMouseClicked((MouseEvent event) -> {
+            get1DdistScene.setVar("s");
+            String[] vars = get1DdistScene.getVars();
+            this.setVars(vars);
+            Data data = new Data(vars);
+            boolean fail = false;
+
+            int steps = parseInt(getVars()[3]);
+            int dim = parseInt(this.getVars()[4]);
+            String lattice = this.getVars()[7];
+
+            if ( steps < 1 ) fail = true;
+            if ( dim != 1 ) fail = true;
+            if ( !lattice.equals("l") && !lattice.equals("-") ) fail = true;
+
+            if ( fail ) return;
+
+            ex.execute1Ddist(datafolder, datapath, fexec, pyexec1Ddist, data, this.getVars());
+        });
+
         stage.addEventHandler(EventType.ROOT, e -> stage.setOnHiding(f-> {
             if (this.getFxplot() != null) {
                 if (this.getFxplot().isRunning()) this.getFxplot().stop();
@@ -1577,7 +1769,6 @@ public class RandomWalk extends Application {
         this.fxplot = fxplot;
         this.frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
-
 
     /**
      * @return the frame
