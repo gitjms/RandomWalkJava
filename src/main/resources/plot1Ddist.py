@@ -44,7 +44,7 @@ def main():
 		for i in range(0,particles):
 				plt.plot(x_data,y_data[:,i],'-',lw=linew,antialiased=True)
 
-	plt.plot(x_data,y2_data,'k-',lw=2,antialiased=True,label=r"Expected value, $\sqrt{N}$")
+	plt.plot(x_data,y2_data,'k-',lw=2,antialiased=True,label=r"Expected value, $\sqrt{steps}$")
 	plt.plot(x_data,-y2_data,'k-',lw=2,antialiased=True)
 
 	plt.xlim(0,steps)

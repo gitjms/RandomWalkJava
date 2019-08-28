@@ -149,17 +149,22 @@ class Execution {
         runtimeStart();
 
         /*
-        * GET IMAGE
-        */
+         * WAIT FOR THE DATA FILES
+         */
+        try {
+            Thread.sleep((long) Math.log10(particles*steps)*dimension*5000);
+        } catch (InterruptedException ex) {
+            System.out.println(ex.getMessage());
+        }
+        /*
+         * CREATE IMAGE
+         */
+        try {
+            this.getRuntime().exec(command, null, folder);
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
         while (true) {
-            /*
-             * CREATE IMAGE
-             */
-            try {
-                this.getRuntime().exec(command, null, folder);
-            } catch (IOException ex) {
-                System.out.println(ex.getMessage());
-            }
             if (Files.notExists(pdfFile.toPath())) {
                 try {
                     Thread.sleep(1000);
@@ -176,10 +181,18 @@ class Execution {
                             System.out.println(ex.getMessage());
                         }
                     } else if (pdfFile.canRead()) {
+                        /*
+                         * WAIT FOR THE PDF FILE
+                         */
+                        try {
+                            Thread.sleep((long) Math.log10(particles*steps)*dimension*5000);
+                        } catch (InterruptedException ex) {
+                            System.out.println(ex.getMessage());
+                        }
                         try {
                             PDDocument document = PDDocument.load(pdfFile);
                             PDFRenderer renderer = new PDFRenderer(document);
-                            image = renderer.renderImageWithDPI(0, 600, ImageType.RGB);
+                            image = renderer.renderImageWithDPI(0, 300, ImageType.RGB);
                             document.close();
                         } catch (IOException ex) {
                             //System.out.println(ex.getMessage());
@@ -258,6 +271,7 @@ class Execution {
 
         int particles = parseInt(vars[0]);
         double diameter = parseDouble(vars[1]);
+        int steps = parseInt(vars[3]);
         final int dimension = parseInt(vars[4]);
 
         String startDataMMC = "startMMC_"
@@ -280,15 +294,23 @@ class Execution {
         this.setRuntime(Runtime.getRuntime());
         runtimeStart();
 
+        /*
+         * WAIT FOR THE DATA FILES
+         */
+        try {
+            Thread.sleep((long) Math.log10(particles*steps)*dimension*5000);
+        } catch (InterruptedException ex) {
+            System.out.println(ex.getMessage());
+        }
+        /*
+         * CREATE IMAGE
+         */
+        try {
+            this.getRuntime().exec(command, null, folder);
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
         while (true) {
-            /*
-             * CREATE IMAGE
-             */
-            try {
-                this.getRuntime().exec(command, null, folder);
-            } catch (IOException ex) {
-                System.out.println(ex.getMessage());
-            }
             if (Files.notExists(pdfFile.toPath())) {
                 try {
                     Thread.sleep(1000);
@@ -305,10 +327,18 @@ class Execution {
                             System.out.println(ex.getMessage());
                         }
                     } else if (pdfFile.canRead()) {
+                        /*
+                         * WAIT FOR THE PDF FILE
+                         */
+                        try {
+                            Thread.sleep((long) Math.log10(particles*steps)*dimension*5000);
+                        } catch (InterruptedException ex) {
+                            System.out.println(ex.getMessage());
+                        }
                         try {
                             PDDocument document = PDDocument.load(pdfFile);
                             PDFRenderer renderer = new PDFRenderer(document);
-                            image = renderer.renderImageWithDPI(0, 600, ImageType.RGB);
+                            image = renderer.renderImageWithDPI(0, 300, ImageType.RGB);
                             document.close();
                         } catch (IOException ex) {
                             //System.out.println(ex.getMessage());
@@ -379,6 +409,7 @@ class Execution {
         if (!result)
             return;
 
+        int particles = parseInt(vars[0]);
         int steps = parseInt(vars[3]);
         int dimension = parseInt(vars[4]);
 
@@ -404,17 +435,22 @@ class Execution {
         runtimeStart();
 
         /*
-        * GET IMAGE
-        */
+         * WAIT FOR THE DATA FILES
+         */
+        try {
+            Thread.sleep((long) Math.log10(particles*steps)*dimension*5000);
+        } catch (InterruptedException ex) {
+            System.out.println(ex.getMessage());
+        }
+        /*
+         * CREATE IMAGE
+         */
+        try {
+            this.getRuntime().exec(command, null, folder);
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
         while (true) {
-            /*
-             * CREATE IMAGE
-             */
-            try {
-                this.getRuntime().exec(command, null, folder);
-            } catch (IOException ex) {
-                System.out.println(ex.getMessage());
-            }
             if (Files.notExists(pdfFile.toPath())) {
                 try {
                     Thread.sleep(1000);
@@ -431,10 +467,18 @@ class Execution {
                             System.out.println(ex.getMessage());
                         }
                     } else if (pdfFile.canRead()) {
+                        /*
+                         * WAIT FOR THE PDF FILE
+                         */
+                        try {
+                            Thread.sleep((long) Math.log10(particles*steps)*dimension*5000);
+                        } catch (InterruptedException ex) {
+                            System.out.println(ex.getMessage());
+                        }
                         try {
                             PDDocument document = PDDocument.load(pdfFile);
                             PDFRenderer renderer = new PDFRenderer(document);
-                            image = renderer.renderImageWithDPI(0, 600, ImageType.RGB);
+                            image = renderer.renderImageWithDPI(0, 300, ImageType.RGB);
                             document.close();
                         } catch (IOException ex) {
                             //System.out.println(ex.getMessage());
@@ -503,6 +547,7 @@ class Execution {
 
         int particles = parseInt(vars[0]);
         int steps = parseInt(vars[3]);
+        int dimension = parseInt(vars[4]);
 
         if ( vars[7].equals("l") ) {
             titletext = "Lattice particles";
@@ -527,17 +572,22 @@ class Execution {
         runtimeStart();
 
         /*
-         * GET IMAGE
+         * WAIT FOR THE DATA FILES
          */
+        try {
+            Thread.sleep((long) Math.log10(particles*steps)*dimension*5000);
+        } catch (InterruptedException ex) {
+            System.out.println(ex.getMessage());
+        }
+        /*
+         * CREATE IMAGE
+         */
+        try {
+            this.getRuntime().exec(command, null, folder);
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
         while (true) {
-            /*
-             * CREATE IMAGE
-             */
-            try {
-                this.getRuntime().exec(command, null, folder);
-            } catch (IOException ex) {
-                System.out.println(ex.getMessage());
-            }
             if (Files.notExists(pdfFile.toPath())) {
                 try {
                     Thread.sleep(1000);
@@ -554,10 +604,18 @@ class Execution {
                             System.out.println(ex.getMessage());
                         }
                     } else if (pdfFile.canRead()) {
+                        /*
+                        * WAIT FOR THE PDF FILE
+                         */
+                        try {
+                            Thread.sleep((long) Math.log10(particles*steps)*dimension*5000);
+                        } catch (InterruptedException ex) {
+                            System.out.println(ex.getMessage());
+                        }
                         try {
                             PDDocument document = PDDocument.load(pdfFile);
                             PDFRenderer renderer = new PDFRenderer(document);
-                            image = renderer.renderImageWithDPI(0, 600, ImageType.RGB);
+                            image = renderer.renderImageWithDPI(0, 300, ImageType.RGB);
                             document.close();
                         } catch (IOException ex) {
                             //System.out.println(ex.getMessage());
