@@ -147,17 +147,17 @@ class Execution {
         */
         this.setRuntime(Runtime.getRuntime());
         runtimeStart();
-        try {
-            assert command != null;
-            this.getRuntime().exec(command, null, folder);
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
 
         /*
         * GET IMAGE
         */
         while (true) {
+            try {
+                assert command != null;
+                this.getRuntime().exec(command, null, folder);
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+            }
             if (Files.notExists(pdfFile.toPath())) {
                 try {
                     Thread.sleep(1000);
@@ -165,27 +165,26 @@ class Execution {
                     System.out.println(ex.getMessage());
                 }
             } else if (Files.exists(pdfFile.toPath())) {
-                PDDocument document = null;
                 while (true) {
-                    if (!pdfFile.exists()) {
+                        if (!pdfFile.exists()) {
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException ex) {
+                                System.out.println(ex.getMessage());
+                            }
+                        } else if (pdfFile.exists()) {
                         try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException ex) {
-                            System.out.println(ex.getMessage());
-                        }
-                    } else if (pdfFile.exists()) {
-                        try {
-                            document = PDDocument.load(pdfFile);
+                            PDDocument document = PDDocument.load(pdfFile);
                             PDFRenderer renderer = new PDFRenderer(document);
                             image = renderer.renderImageWithDPI(0, 600, ImageType.RGB);
                             document.close();
-                            break;
+                            if (image != null) break;
                         } catch (IOException ex) {
                             //System.out.println(ex.getMessage());
                         }
                     }
                 }
-                break;
+                if (image != null) break;
             }
         }
 
@@ -277,14 +276,14 @@ class Execution {
 
         this.setRuntime(Runtime.getRuntime());
         runtimeStart();
-        try {
-            assert command != null;
-            this.getRuntime().exec(command, null, folder);
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
 
         while (true) {
+            try {
+                assert command != null;
+                this.getRuntime().exec(command, null, folder);
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+            }
             if (Files.notExists(pdfFile.toPath())) {
                 try {
                     Thread.sleep(1000);
@@ -292,7 +291,6 @@ class Execution {
                     System.out.println(ex.getMessage());
                 }
             } else if (Files.exists(pdfFile.toPath())) {
-                PDDocument document = null;
                 while (true) {
                     if (!pdfFile.exists()) {
                         try {
@@ -302,17 +300,17 @@ class Execution {
                         }
                     } else if (pdfFile.exists()) {
                         try {
-                            document = PDDocument.load(pdfFile);
+                            PDDocument document = PDDocument.load(pdfFile);
                             PDFRenderer renderer = new PDFRenderer(document);
                             image = renderer.renderImageWithDPI(0, 600, ImageType.RGB);
                             document.close();
-                            break;
+                            if (image != null) break;
                         } catch (IOException ex) {
                             //System.out.println(ex.getMessage());
                         }
                     }
                 }
-                break;
+                if (image != null) break;
             }
         }
 
@@ -398,16 +396,16 @@ class Execution {
         String[] command = new String[]{"cmd","/c", pyexecrms, rmsDataPath};
         this.setRuntime(Runtime.getRuntime());
         runtimeStart();
-        try {
-            this.getRuntime().exec(command, null, folder);
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
 
         /*
         * GET IMAGE
         */
         while (true) {
+            try {
+                this.getRuntime().exec(command, null, folder);
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+            }
             if (Files.notExists(pdfFile.toPath())) {
                 try {
                     Thread.sleep(1000);
@@ -415,7 +413,6 @@ class Execution {
                     System.out.println(ex.getMessage());
                 }
             } else if (Files.exists(pdfFile.toPath())) {
-                PDDocument document = null;
                 while (true) {
                     if (!pdfFile.exists()) {
                         try {
@@ -425,17 +422,17 @@ class Execution {
                         }
                     } else if (pdfFile.exists()) {
                         try {
-                            document = PDDocument.load(pdfFile);
+                            PDDocument document = PDDocument.load(pdfFile);
                             PDFRenderer renderer = new PDFRenderer(document);
                             image = renderer.renderImageWithDPI(0, 600, ImageType.RGB);
                             document.close();
-                            break;
+                            if (image != null) break;
                         } catch (IOException ex) {
                             //System.out.println(ex.getMessage());
                         }
                     }
                 }
-                break;
+                if (image != null) break;
             }
         }
 
@@ -516,22 +513,21 @@ class Execution {
          */
         command = new String[]{"cmd","/c", pyexec1d, xDataPath};
 
-        /*
-         * CREATE IMAGE
-         */
         this.setRuntime(Runtime.getRuntime());
         runtimeStart();
-        try {
-            assert command != null;
-            this.getRuntime().exec(command, null, folder);
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
 
         /*
          * GET IMAGE
          */
         while (true) {
+            /*
+             * CREATE IMAGE
+             */
+            try {
+                this.getRuntime().exec(command, null, folder);
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+            }
             if (Files.notExists(pdfFile.toPath())) {
                 try {
                     Thread.sleep(1000);
@@ -539,36 +535,35 @@ class Execution {
                     System.out.println(ex.getMessage());
                 }
             } else if (Files.exists(pdfFile.toPath())) {
-                PDDocument document = null;
                 while (true) {
-                    if (!pdfFile.exists()) {
+                    if (!pdfFile.canRead()) {
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException ex) {
                             System.out.println(ex.getMessage());
                         }
-                    } else if (pdfFile.exists()) {
+                    } else if (pdfFile.canRead()) {
                         try {
-                            document = PDDocument.load(pdfFile);
+                            PDDocument document = PDDocument.load(pdfFile);
                             PDFRenderer renderer = new PDFRenderer(document);
                             image = renderer.renderImageWithDPI(0, 600, ImageType.RGB);
                             document.close();
-                            break;
+                            if (image != null) break;
                         } catch (IOException ex) {
                             //System.out.println(ex.getMessage());
                         }
                     }
                 }
-                break;
+                if (image != null) break;
             }
         }
 
         this.getFrame().setTitle("Random Walk - 1D Distance - " + titletext);
 
         assert image != null;
-        this.getFrame().setSize(this.getChartWidth(), this.getChartHeight());
-        this.getFrame().setLocation(0, (int) ((this.getScreenHeight()-this.getChartHeight())/2.0)-getYMargin());
-        Image image2 = image.getScaledInstance(this.getChartWidth(), this.getChartHeight()+this.getYMargin(), Image.SCALE_AREA_AVERAGING);
+        this.getFrame().setSize(this.getBigChartWidth(), this.getBigChartHeight());
+        this.getFrame().setLocation(0, (int) ((this.getScreenHeight()-this.getBigChartHeight())/2.0)-getYMargin());
+        Image image2 = image.getScaledInstance(this.getBigChartWidth(), this.getBigChartHeight()+this.getYMargin(), Image.SCALE_AREA_AVERAGING);
         ImageIcon figIcn = new ImageIcon(image2);
         JLabel figLabel = new JLabel(figIcn);
         this.getFrame().add(figLabel);
@@ -615,13 +610,25 @@ class Execution {
      * @return the chartWidth
      */
     @Contract(pure = true)
-    private int getChartWidth() {return 600 / (int) Screen.getMainScreen().getRenderScale(); }
+    private int getBigChartWidth() {return 900 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the chartHeight
      */
     @Contract(pure = true)
-    private int getChartHeight() { return 500 / (int) Screen.getMainScreen().getRenderScale(); }
+    private int getBigChartHeight() { return 650 / (int) Screen.getMainScreen().getRenderScale(); }
+
+    /**
+     * @return the chartWidth
+     */
+    @Contract(pure = true)
+    private int getChartWidth() {return 800 / (int) Screen.getMainScreen().getRenderScale(); }
+
+    /**
+     * @return the chartHeight
+     */
+    @Contract(pure = true)
+    private int getChartHeight() { return 700 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the mmcWidth
