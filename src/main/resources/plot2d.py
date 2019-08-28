@@ -20,11 +20,6 @@ def main():
 	particles = int(facts[3].split('=')[1].replace(',',''))
 	steps = int(facts[4].split('=')[1])
 
-	minx = np.min(xdata_path)
-	maxx = np.max(xdata_path)
-	miny = np.min(ydata_path)
-	maxy = np.max(ydata_path)
-
 #!----------------------------------------------------------------------
 #!	PLOT
 #!----------------------------------------------------------------------
@@ -35,9 +30,6 @@ def main():
 	plt.gca().ticklabel_format(axis='both', style='plain', useOffset=False)
 	
 	plt.plot(xdata_path,ydata_path,'-',lw=0.5,antialiased=True,label="Path trace, N=%d"%int(particles))
-
-	plt.xlim(minx-10,maxx+10)
-	plt.ylim(miny-10,maxy+10)
 
 	plt.tight_layout()
 	savename = "jpyplot2D_N" + str(particles) + "_S" + str(steps) + ".pdf"

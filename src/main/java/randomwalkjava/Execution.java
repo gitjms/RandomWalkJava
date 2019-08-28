@@ -77,7 +77,7 @@ class Execution {
         String yDataPath = null;
         String zDataPath;
         String titletext = null;
-        BufferedImage image = null;
+        BufferedImage image;
         String[] command = null;
 
         Boolean result = false;
@@ -106,7 +106,7 @@ class Execution {
         xDataPath = "x_path"
             + dimension + "D_"
             + particles + "N_"
-            + steps + "S.x";
+            + steps + "S.xy";
 
         File pdfFile = new File(path + "/jpyplot" + dimension + "D_N" + particles + "_S" + steps + ".pdf");
         if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
@@ -125,7 +125,7 @@ class Execution {
             yDataPath =  "y_path"
                 + dimension + "D_"
                 + particles + "N_"
-                + steps + "S.y";
+                + steps + "S.xy";
             if ( dimension == 2 ) {
                 command = new String[]{"cmd","/c", pyexec2d, xDataPath, yDataPath};
             }
@@ -138,7 +138,7 @@ class Execution {
             zDataPath =  "z_path"
                 + dimension + "D_"
                 + particles + "N_"
-                + steps + "S.z";
+                + steps + "S.xy";
             command = new String[]{"cmd","/c", pyexec3d, xDataPath, yDataPath, zDataPath};
         }
 
@@ -152,8 +152,10 @@ class Execution {
         * GET IMAGE
         */
         while (true) {
+            /*
+             * CREATE IMAGE
+             */
             try {
-                assert command != null;
                 this.getRuntime().exec(command, null, folder);
             } catch (IOException ex) {
                 System.out.println(ex.getMessage());
@@ -166,23 +168,24 @@ class Execution {
                 }
             } else if (Files.exists(pdfFile.toPath())) {
                 while (true) {
-                        if (!pdfFile.exists()) {
-                            try {
-                                Thread.sleep(1000);
-                            } catch (InterruptedException ex) {
-                                System.out.println(ex.getMessage());
-                            }
-                        } else if (pdfFile.exists()) {
+                    image = null;
+                    if (!pdfFile.canRead()) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ex) {
+                            System.out.println(ex.getMessage());
+                        }
+                    } else if (pdfFile.canRead()) {
                         try {
                             PDDocument document = PDDocument.load(pdfFile);
                             PDFRenderer renderer = new PDFRenderer(document);
                             image = renderer.renderImageWithDPI(0, 600, ImageType.RGB);
                             document.close();
-                            if (image != null) break;
                         } catch (IOException ex) {
                             //System.out.println(ex.getMessage());
                         }
                     }
+                    if (image != null) break;
                 }
                 if (image != null) break;
             }
@@ -241,7 +244,7 @@ class Execution {
         pyexecmmc3d = "python ".concat(pyexecmmc3d);
         this.setFrame();
         File pdfFile = null;
-        BufferedImage image = null;
+        BufferedImage image;
         String[] command = null;
 
         Boolean result = false;
@@ -278,8 +281,10 @@ class Execution {
         runtimeStart();
 
         while (true) {
+            /*
+             * CREATE IMAGE
+             */
             try {
-                assert command != null;
                 this.getRuntime().exec(command, null, folder);
             } catch (IOException ex) {
                 System.out.println(ex.getMessage());
@@ -292,23 +297,24 @@ class Execution {
                 }
             } else if (Files.exists(pdfFile.toPath())) {
                 while (true) {
-                    if (!pdfFile.exists()) {
+                    image = null;
+                    if (!pdfFile.canRead()) {
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException ex) {
                             System.out.println(ex.getMessage());
                         }
-                    } else if (pdfFile.exists()) {
+                    } else if (pdfFile.canRead()) {
                         try {
                             PDDocument document = PDDocument.load(pdfFile);
                             PDFRenderer renderer = new PDFRenderer(document);
                             image = renderer.renderImageWithDPI(0, 600, ImageType.RGB);
                             document.close();
-                            if (image != null) break;
                         } catch (IOException ex) {
                             //System.out.println(ex.getMessage());
                         }
                     }
+                    if (image != null) break;
                 }
                 if (image != null) break;
             }
@@ -361,7 +367,7 @@ class Execution {
         this.setFrame();
         String rmsDataPath;
         String titletext = null;
-        BufferedImage image = null;
+        BufferedImage image;
 
         Boolean result = false;
         try {
@@ -401,6 +407,9 @@ class Execution {
         * GET IMAGE
         */
         while (true) {
+            /*
+             * CREATE IMAGE
+             */
             try {
                 this.getRuntime().exec(command, null, folder);
             } catch (IOException ex) {
@@ -414,23 +423,24 @@ class Execution {
                 }
             } else if (Files.exists(pdfFile.toPath())) {
                 while (true) {
-                    if (!pdfFile.exists()) {
+                    image = null;
+                    if (!pdfFile.canRead()) {
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException ex) {
                             System.out.println(ex.getMessage());
                         }
-                    } else if (pdfFile.exists()) {
+                    } else if (pdfFile.canRead()) {
                         try {
                             PDDocument document = PDDocument.load(pdfFile);
                             PDFRenderer renderer = new PDFRenderer(document);
                             image = renderer.renderImageWithDPI(0, 600, ImageType.RGB);
                             document.close();
-                            if (image != null) break;
                         } catch (IOException ex) {
                             //System.out.println(ex.getMessage());
                         }
                     }
+                    if (image != null) break;
                 }
                 if (image != null) break;
             }
@@ -479,7 +489,7 @@ class Execution {
         this.setFrame();
         String xDataPath;
         String titletext = null;
-        BufferedImage image = null;
+        BufferedImage image;
         String[] command = null;
 
         Boolean result = false;
@@ -503,7 +513,7 @@ class Execution {
         xDataPath = "x_path"
             + "1D_"
             + particles + "N_"
-            + steps + "S.x";
+            + steps + "S.xy";
 
         File pdfFile = new File(path + "/jpyplot1Ddist_N" + particles + "_S" + steps + ".pdf");
         if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
@@ -536,6 +546,7 @@ class Execution {
                 }
             } else if (Files.exists(pdfFile.toPath())) {
                 while (true) {
+                    image = null;
                     if (!pdfFile.canRead()) {
                         try {
                             Thread.sleep(1000);
@@ -548,11 +559,11 @@ class Execution {
                             PDFRenderer renderer = new PDFRenderer(document);
                             image = renderer.renderImageWithDPI(0, 600, ImageType.RGB);
                             document.close();
-                            if (image != null) break;
                         } catch (IOException ex) {
                             //System.out.println(ex.getMessage());
                         }
                     }
+                    if (image != null) break;
                 }
                 if (image != null) break;
             }
