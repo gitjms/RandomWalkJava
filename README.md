@@ -47,9 +47,9 @@ Valinnassa *MMC Diffusion* hiukkasten alkuasetelma on toisinaan hieman syrj√§ss√
 
 ## Kuvia
 
-<img src="https://user-images.githubusercontent.com/46410240/62991754-956fa700-be59-11e9-8d28-224e2acffe00.png" alt="main_view" width="480" height="341" >
-<img src="https://user-images.githubusercontent.com/46410240/62991788-ba641a00-be59-11e9-92d6-d47989631952.png" alt="rms_calc" width="480" height="270" >
-<img src="https://user-images.githubusercontent.com/46410240/62991794-c0f29180-be59-11e9-8424-9cd9abd8bc4c.png" alt="path_trac" width="480" height="270" >
-<img src="https://user-images.githubusercontent.com/46410240/62991808-ca7bf980-be59-11e9-9253-d177dc285eac.png" alt="real_rms" width="480" height="270" >
-<img src="https://user-images.githubusercontent.com/46410240/62991812-cea81700-be59-11e9-9726-770193265ce8.png" alt="mmc_diff" width="478" height="255" >
-<img src="https://user-images.githubusercontent.com/46410240/63804122-1da48080-c91f-11e9-8b65-371fac5a9bba.png" alt="1D_dist" width="480" height="238" >
+<img src="https://user-images.githubusercontent.com/46410240/63885060-3163eb80-c9e0-11e9-8cde-8af7e0b3a310.png" alt="main_view" width="480" height="321" >
+<img src="https://user-images.githubusercontent.com/46410240/63885067-35900900-c9e0-11e9-8cb4-150413e834e5.png" alt="main_view" width="480" height="232" >
+<img src="https://user-images.githubusercontent.com/46410240/63885078-388af980-c9e0-11e9-8d04-9126a3b30383.png" alt="main_view" width="480" height="227" >
+<img src="https://user-images.githubusercontent.com/46410240/63885082-3c1e8080-c9e0-11e9-8193-86061f718e98.png" alt="main_view" width="480" height="270" >
+<img src="https://user-images.githubusercontent.com/46410240/63885086-3fb20780-c9e0-11e9-984d-a2a815602d41.png" alt="main_view" width="480" height="265" >
+<img src="https://user-images.githubusercontent.com/46410240/63885091-42acf800-c9e0-11e9-8388-0a421dc705b5.png" alt="main_view" width="480" height="200" >
