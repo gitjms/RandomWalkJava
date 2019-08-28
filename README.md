@@ -43,7 +43,7 @@ Valinnassa *MMC Diffusion* hiukkasten alkuasetelma on toisinaan hieman syrj√§ss√
 
 ## Kaavio ohjelmarakenteesta
 
-![Lopullinen_kaavio](https://user-images.githubusercontent.com/46410240/63222695-b61a6280-c1b3-11e9-9646-2faca39e54e2.png)
+![tree](https://user-images.githubusercontent.com/46410240/63843911-db675780-c98f-11e9-8b2f-8a39ec67fe21.png)
 
 ## Kuvia
 
