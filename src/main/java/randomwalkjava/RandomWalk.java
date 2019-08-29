@@ -197,7 +197,7 @@ public class RandomWalk extends Application {
         /*
         * FIRST VIEW BUTTONS
         */
-        Button nappiScene1 = new Button("RMS vs SQRT(S"); // SceneCalculation
+        Button nappiScene1 = new Button("RMS vs SQRT(S)"); // SceneCalculation
         Button nappiScene2 = new Button("PATH TRACING"); // ScenePathTracing
         Button nappiScene3 = new Button("REAL TIME RMS"); // SceneRealTimeRms
         Button nappiScene4 = new Button("MMC DIFFUSION"); // SceneMMC
