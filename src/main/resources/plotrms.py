@@ -34,9 +34,9 @@ def main():
 	plt.plot(x_data,y_data,'-',lw=1,antialiased=True,label=r"R_rms, N=%d"%int(steps))
 	plt.xlim(0,maxx)
 	plt.ylim(0,maxy)
-	plt.xlabel(r"$\sqrt{N}$", fontsize=14)
+	plt.xlabel(r"$\sqrt{steps}$", fontsize=14)
 	plt.ylabel(r"$R_{rms}$", fontsize=14)
-	text=r"$R_{rms}$ vs. $\sqrt{N}$ (%dD), steps=%d"%(int(dimension),int(steps))
+	text=r"$R_{rms}$ vs. $\sqrt{steps}$ (%dD), steps=%d"%(int(dimension),int(steps))
 	plt.title(text,fontsize=16)
 
 	plt.grid()

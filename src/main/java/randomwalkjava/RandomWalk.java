@@ -52,9 +52,11 @@ public class RandomWalk extends Application {
     private randomwalkjava.FXPlot fxplot;
     private JFrame frame;
     private String[] vars;
-    private double scalefactor;
+    private double realscalefactor;
+    private double mmcscalefactor;
     private double linewidth;
-    private boolean isscaled;
+    private boolean isrealscaled;
+    private boolean ismmcscaled;
     private boolean newdata;
     private boolean standnorm;
     private double mincount;
@@ -70,11 +72,13 @@ public class RandomWalk extends Application {
         /*
          * initiate parameters
          */
-        setScreenWidth(Toolkit.getDefaultToolkit().getScreenSize().width / (int) Screen.getMainScreen().getRenderScale());
-        setScreenHeight(Toolkit.getDefaultToolkit().getScreenSize().height / (int) Screen.getMainScreen().getRenderScale());
-        setScalefactor(1.0);
+        setScreenWidth(Toolkit.getDefaultToolkit().getScreenSize().width / Screen.getMainScreen().getRenderScale());
+        setScreenHeight(Toolkit.getDefaultToolkit().getScreenSize().height / Screen.getMainScreen().getRenderScale());
+        setRealScalefactor(1.0);
+        setMmcScalefactor(1.0);
         setLinewidth(1.0);
-        setIsscaled(false);
+        setRealScaled(false);
+        setMmcScaled(false);
         setNewdata(false);
         setStandnorm(true);
 
@@ -1316,16 +1320,16 @@ public class RandomWalk extends Application {
                 piirturi.setGlobalAlpha(1.0);
                 piirturi.setFill(Color.BLACK);
                 if ( dim == 1 ) {
-                    piirturi.fillRect(0, 0, 1.0/getScalefactor()*getAnimWidth(), getAnimHeight());
+                    piirturi.fillRect(0, 0, 1.0/getRealScalefactor()*getAnimWidth(), getAnimHeight());
                 } else {
-                    piirturi.fillRect(0, 0, 1.0/getScalefactor()*getAnimWidth(), 1.0/getScalefactor()*getAnimHeight());
+                    piirturi.fillRect(0, 0, 1.0/getRealScalefactor()*getAnimWidth(), 1.0/getRealScalefactor()*getAnimHeight());
                 }
                 piirturi.fill();
 
                 /*
                 * DRAW ANIMATION
                 */
-                getRealScene.refresh(datafolder, fexec, piirturi, getScalefactor(), getLinewidth(), getFxplot(),
+                getRealScene.refresh(datafolder, fexec, piirturi, getRealScalefactor(), getLinewidth(), getFxplot(),
                     rms_runs, isNewdata(), getMincount(), getMaxcount(), isStandnorm(), getAnimWidth());
                 setNewdata(false);
 
@@ -1339,11 +1343,11 @@ public class RandomWalk extends Application {
         runReal.setOnMouseClicked((MouseEvent event) -> {
             if (getRealScene.isRunning()) {
                 getRealScene.stop();
-                if ( this.isIsscaled() ) {
+                if ( this.isRealScaled() ) {
                     if ( this.getVars()[4].equals("1") )
-                        piirturi.scale(1.0/this.getScalefactor(), 1.0);
+                        piirturi.scale(1.0/this.getRealScalefactor(), 1.0);
                     else
-                        piirturi.scale(1.0/this.getScalefactor(), 1.0/this.getScalefactor());
+                        piirturi.scale(1.0/this.getRealScalefactor(), 1.0/this.getRealScalefactor());
                 }
                 menuNappiReal.setDisable(false);
                 helpNappiReal.setDisable(false);
@@ -1374,26 +1378,26 @@ public class RandomWalk extends Application {
                 }
                 this.setFxplot(new FXPlot("Walks&norm"));
 
-                this.setScalefactor(Math.sqrt(this.getAnimWidth() + Math.pow(dim,2.0) * 100
+                this.setRealScalefactor(Math.sqrt(this.getAnimWidth() + Math.pow(dim,2.0) * 100
                     * Math.pow(Math.log10(steps),2.0) ) / Math.pow(Math.log10(steps),2.0));
  
                 switch (dim) {
                     case 1:
                         this.setLinewidth(1.0 / Math.log10(steps));
-                        piirturi.scale(this.getScalefactor(), 1.0);
+                        piirturi.scale(this.getRealScalefactor(), 1.0);
                         break;
                     case 2:
-                        this.setLinewidth(1.0 / (this.getScalefactor() * Math.sqrt(Math.log10(steps))));
-                        piirturi.scale(this.getScalefactor(), this.getScalefactor());
+                        this.setLinewidth(1.0 / (this.getRealScalefactor() * Math.sqrt(Math.log10(steps))));
+                        piirturi.scale(this.getRealScalefactor(), this.getRealScalefactor());
                         break;
                     case 3:
-                        piirturi.scale(this.getScalefactor(), this.getScalefactor());
+                        piirturi.scale(this.getRealScalefactor(), this.getRealScalefactor());
                         break;
                     default:
                         break;
                 }
-                this.setIsscaled(true);
-                piirturi.setGlobalAlpha(1.0 / this.getScalefactor() * Math.pow(Math.log10(steps),2.0));
+                this.setRealScaled(true);
+                piirturi.setGlobalAlpha(1.0 / this.getRealScalefactor() * Math.pow(Math.log10(steps),2.0));
 
                 this.setNewdata(true);
                 this.setRms_runs();
@@ -1484,8 +1488,8 @@ public class RandomWalk extends Application {
             }
             this.setFxplot(new FXPlot("E"));
 
-            if ( this.isIsscaled() ) {
-                mmcpiirturi.scale(1.0/this.getScalefactor(), 1.0/this.getScalefactor());
+            if ( this.isMmcScaled() ) {
+                mmcpiirturi.scale(1.0/this.getMmcScalefactor(), 1.0/this.getMmcScalefactor());
             }
 
             double measure;
@@ -1511,16 +1515,16 @@ public class RandomWalk extends Application {
                 }
             }
 
-            this.setScalefactor((this.getAnimWidth() - 83.3) / measure);
+            this.setMmcScalefactor((this.getAnimWidth() - 83.3) / measure);
             if ( dim == 2 )
-                this.setLinewidth(1.0 / this.getScalefactor());
+                this.setLinewidth(1.0 / this.getMmcScalefactor());
             else
-                this.setLinewidth(diam / this.getScalefactor());
+                this.setLinewidth(diam / this.getMmcScalefactor());
 
-            mmcpiirturi.scale(this.getScalefactor(), this.getScalefactor());
+            mmcpiirturi.scale(this.getMmcScalefactor(), this.getMmcScalefactor());
 
-            this.setIsscaled(true);
-            mmcpiirturi.setGlobalAlpha(1.0 / this.getScalefactor() );
+            this.setMmcScaled(true);
+            mmcpiirturi.setGlobalAlpha(1.0 / this.getMmcScalefactor() );
 
             this.setNewdata(true);
             this.setEnergy_x(new ArrayList<>());
@@ -1534,8 +1538,8 @@ public class RandomWalk extends Application {
 
             mmcpiirturi.setGlobalAlpha(1.0);
             mmcpiirturi.setFill(Color.BLACK);
-            mmcpiirturi.fillRect(0, 0, 1.0/this.getScalefactor()*this.getAnimWidth(),
-                1.0/this.getScalefactor()*this.getAnimHeight());
+            mmcpiirturi.fillRect(0, 0, 1.0/this.getMmcScalefactor()*this.getAnimWidth(),
+                1.0/this.getMmcScalefactor()*this.getAnimHeight());
             mmcpiirturi.fill();
 
             /*
@@ -1547,7 +1551,7 @@ public class RandomWalk extends Application {
             /*
             * DRAW MMC ANIMATION
             */
-            getMMCScene.refresh(datafolder, initialDataFile, fexec, mmcpiirturi, this.getScalefactor(),
+            getMMCScene.refresh(datafolder, initialDataFile, fexec, mmcpiirturi, this.getMmcScalefactor(),
                     this.getAnimWidth(), this.getLinewidth(), this.getFxplot(), remBarNappiMMC, runMMC,
                     plotMMC, closeNappiMMC, menuNappiMMC, helpNappiMMC, this.getEnergy_x(), this.getEnergy_y(),
                     this.isNewdata(), measure, diff
@@ -1791,15 +1795,26 @@ public class RandomWalk extends Application {
     private void setVars(@NotNull String[] vars) { this.vars = vars.clone(); }
 
     /**
-     * @return the scalefactor
+     * @return the realscalefactor
      */
     @Contract(pure = true)
-    private double getScalefactor() { return scalefactor; }
+    private double getRealScalefactor() { return realscalefactor; }
 
     /**
-     * @param scalefactor the scalefactor to set
+     * @param realscalefactor the realscalefactor to set
      */
-    private void setScalefactor(double scalefactor) { this.scalefactor = scalefactor; }
+    private void setRealScalefactor(double realscalefactor) { this.realscalefactor = realscalefactor; }
+
+    /**
+     * @return the mmcscalefactor
+     */
+    @Contract(pure = true)
+    private double getMmcScalefactor() { return mmcscalefactor; }
+
+    /**
+     * @param mmcscalefactor the mmcscalefactor to set
+     */
+    private void setMmcScalefactor(double mmcscalefactor) { this.mmcscalefactor = mmcscalefactor; }
 
     /**
      * @return the linewidth
@@ -1813,15 +1828,26 @@ public class RandomWalk extends Application {
     private void setLinewidth(double linewidth) { this.linewidth = linewidth; }
 
     /**
-     * @return the isscaled
+     * @return the isrealscaled
      */
     @Contract(pure = true)
-    private boolean isIsscaled() { return isscaled; }
+    private boolean isRealScaled() { return isrealscaled; }
 
     /**
-     * @param isscaled the isscaled to set
+     * @param isrealscaled the isrealscaled to set
      */
-    private void setIsscaled(boolean isscaled) { this.isscaled = isscaled; }
+    private void setRealScaled(boolean isrealscaled) { this.isrealscaled = isrealscaled; }
+
+    /**
+     * @return the ismmcscaled
+     */
+    @Contract(pure = true)
+    private boolean isMmcScaled() { return ismmcscaled; }
+
+    /**
+     * @param ismmcscaled the ismmcscaled to set
+     */
+    private void setMmcScaled(boolean ismmcscaled) { this.ismmcscaled = ismmcscaled; }
 
     /**
      * @return the newdata
