@@ -33,7 +33,9 @@ Asennustyökalu *RandomWalk-1.0.msi* löytyy linkin *release* takaa:
 
 ## Ongelmia
 
-Valinnassa *MMC Diffusion* hiukkasten alkuasetelma on toisinaan hieman syrjässä siitä, missä niiden pitäisi olla. Kun liike alkaa, asemoituvat ne kuitenkin taas hyvin. En ole vielä löytänyt syytä alkuasetelman poikkeamiin.
+- Valinnassa *MMC Diffusion* hiukkasten alkuasetelma on toisinaan hieman syrjässä siitä, missä niiden pitäisi olla. Kun liike alkaa, asemoituvat ne kuitenkin taas hyvin. En ole vielä löytänyt syytä alkuasetelman poikkeamiin.
+- Toisinaan MMC Diffusionissa ainakin lattice-valinnalla koko hilakenttä näkyy vain pienenä ruutuna mustan kuvataustan vasemmassa yläkulmassa, eli ei ole skaalautunut oikein.
+Yleensä tapahtuu, kun on ensin käyttänyt jotain muuta osiota kuin MMC Diffusionia. Bugin syy ei selvillä.
 
 ## TODO
 
@@ -47,9 +49,9 @@ Valinnassa *MMC Diffusion* hiukkasten alkuasetelma on toisinaan hieman syrjäss�
 
 ## Kuvia
 
-<img src="https://user-images.githubusercontent.com/46410240/63885060-3163eb80-c9e0-11e9-8cde-8af7e0b3a310.png" alt="main_view" width="480" height="321" >
-<img src="https://user-images.githubusercontent.com/46410240/63885067-35900900-c9e0-11e9-8cb4-150413e834e5.png" alt="main_view" width="480" height="232" >
-<img src="https://user-images.githubusercontent.com/46410240/63885078-388af980-c9e0-11e9-8d04-9126a3b30383.png" alt="main_view" width="480" height="227" >
-<img src="https://user-images.githubusercontent.com/46410240/63885082-3c1e8080-c9e0-11e9-8193-86061f718e98.png" alt="main_view" width="480" height="270" >
-<img src="https://user-images.githubusercontent.com/46410240/63885086-3fb20780-c9e0-11e9-984d-a2a815602d41.png" alt="main_view" width="480" height="265" >
-<img src="https://user-images.githubusercontent.com/46410240/63885091-42acf800-c9e0-11e9-8388-0a421dc705b5.png" alt="main_view" width="480" height="200" >
+<img src="https://user-images.githubusercontent.com/46410240/63885060-3163eb80-c9e0-11e9-8cde-8af7e0b3a310.png" alt="main_view" width="450" height="321" >
+<img src="https://user-images.githubusercontent.com/46410240/63885067-35900900-c9e0-11e9-8cb4-150413e834e5.png" alt="main_view" width="450" height="232" >
+<img src="https://user-images.githubusercontent.com/46410240/63885078-388af980-c9e0-11e9-8d04-9126a3b30383.png" alt="main_view" width="450" height="227" >
+<img src="https://user-images.githubusercontent.com/46410240/63885082-3c1e8080-c9e0-11e9-8193-86061f718e98.png" alt="main_view" width="450" height="270" >
+<img src="https://user-images.githubusercontent.com/46410240/63885086-3fb20780-c9e0-11e9-984d-a2a815602d41.png" alt="main_view" width="450" height="265" >
+<img src="https://user-images.githubusercontent.com/46410240/63885091-42acf800-c9e0-11e9-8388-0a421dc705b5.png" alt="main_view" width="450" height="200" >
