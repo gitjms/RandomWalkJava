@@ -35,7 +35,10 @@ Asennustyökalu *RandomWalk-1.0.msi* löytyy linkin *release* takaa:
 
 - Valinnassa *MMC Diffusion* hiukkasten alkuasetelma on toisinaan hieman syrjässä siitä, missä niiden pitäisi olla. Kun liike alkaa, asemoituvat ne kuitenkin taas hyvin. En ole vielä löytänyt syytä alkuasetelman poikkeamiin.
 - Toisinaan MMC Diffusionissa ainakin lattice-valinnalla koko hilakenttä näkyy vain pienenä ruutuna mustan kuvataustan vasemmassa yläkulmassa, eli ei ole skaalautunut oikein.
-Yleensä tapahtuu, kun on ensin käyttänyt jotain muuta osiota kuin MMC Diffusionia. Bugin syy ei selvillä.
+Yleensä tapahtuu, kun on ensin käyttänyt jotain muuta osiota kuin MMC Diffusionia.
+- Linux-versiossa vaihtaessa osiosta toiseen uusi plotti ei tule esiin, vaan ohjelma näyttää edellisen osion plotin uudestaan.
+Esim. jos ensin tekee kuvan osiolla *RMS vs SQRT(s)*, ja sen jälkeen vaihtaa osioon *PATH TRACING*, voi uudeksi path-kuvaksi tullakin esiin edellinen rms-kuva.
+Tällöin kannattaa vain klikata uudelleen path-osion *EXECUTE*-nappia, jolloin uusi kuva on path-kuva.
 
 ## TODO
 
@@ -48,6 +51,9 @@ Yleensä tapahtuu, kun on ensin käyttänyt jotain muuta osiota kuin MMC Diffusi
 ![tree](https://user-images.githubusercontent.com/46410240/63843911-db675780-c98f-11e9-8b2f-8a39ec67fe21.png)
 
 ## Kuvia
+
+HUOM: Ensimmäisen napin teksti *RMS vs SQRT(N)* tulisi olla mieluummin *RMS vs SQRT(S)*, jossa *S* tarkoittaa askeleita (steps). Kyse ei siis ole hiukkasten lukumäärästä.
+Samoin kyseisen osion plotin otsikossa ja x-akselin nimenä tulisi olla *SQRT(S)*.
 
 <img src="https://user-images.githubusercontent.com/46410240/63885060-3163eb80-c9e0-11e9-8cde-8af7e0b3a310.png" alt="main_view" width="450" height="321" >
 <img src="https://user-images.githubusercontent.com/46410240/63885067-35900900-c9e0-11e9-8cb4-150413e834e5.png" alt="main_view" width="450" height="232" >
