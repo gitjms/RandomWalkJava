@@ -14,24 +14,24 @@ class HelpText {
     */
     String menu() {
 
-        return " \n Button 'RMS vs SQRT(N)' shows a control panel with which you can\n"
+        return " \n Button 'RMS vs SQRT(steps)' shows a control panel with which you can\n"
             + " calculate root mean square (rms) distances of random walk particles.\n\n"
             + " Program plots 'rms<dist>' versus 'sqrt(steps)'.\n\n"
             + " Every run will save the data in a file replacing the previous one if\n"
             + " the options remain the same.\n\n"
             + " One run produces a data file ending with '.xy', and an image file in\n"
-            + " '.pdf' format (600dpi). The files will be in the 'C:/RWDATA' folder.\n\n"
+            + " '.pdf' format (300dpi). The files will be in the 'C:/RWDATA' folder.\n\n"
             + " ---------------------------------------------------------------------\n\n"
             + " Button 'PATH TRACING' will show a control panel with which you can\n"
             + " plot different random walk path simulations. One run produces an\n"
             + " image file and four or five data files ending with '.xy'. The image\n"
-            + " is in '.pdf' format (600dpi).\n\n"
+            + " is in '.pdf' format (300dpi).\n\n"
             + " ---------------------------------------------------------------------\n\n"
             + " Button 'REAL TIME RMS' opens a bigger window in which will be an\n"
             + " animation of fixed source random walk. Program loops the number of\n"
             + " steps user defines until user stops the run.\n\n"
             + " During the animation there will be an image with two real time plots\n"
-            + " running different graphics: 'rms and sqrt(N) vs. walks' and either\n"
+            + " running different graphics: 'rms and sqrt(steps) vs. walks' and either\n"
             + " 'rms standard normal distribution' or 'rms normal distribution'. No\n"
             + " files will be saved automatically.\n\n"
             + " ---------------------------------------------------------------------\n\n"
@@ -42,14 +42,14 @@ class HelpText {
             + " image will be saved. The latter creates an image file with start and\n"
             + " final positions of particles. In that case there will be four or five\n"
             + " data files ending with '.xy'. The image will be saved in '.pdf' format\n"
-            + " (600dpi).\n\n"
+            + " (300dpi).\n\n"
             + " ---------------------------------------------------------------------\n\n"
             + " Button '1D DISTANCE' shows a control panel with which you can plot\n"
             + " particle distances versus steps.\n"
             + " Every run will save the data in a file replacing the previous one if\n"
             + " the options remain the same.\n"
             + " One run produces three data files ending with '.xy', of which two are\n"
-            + " redundant, and an image file in '.pdf' format (600dpi).\n\n";
+            + " redundant, and an image file in '.pdf' format (300dpi).\n\n";
     }
     /**
     * @return RMS CALCULATION HELP TEXT
@@ -111,7 +111,7 @@ class HelpText {
             + " Toggle Button 'STD NORM'/'NORM' changes the lower side plot between standard normal\n"
             + " distribution and normal distribution.\n\n"
             + " Button 'RUN' starts an animation. During the animation there will be an image with\n"
-            + " two real time plots running different graphics: 'rms and sqrt(N) vs. walks' and\n"
+            + " two real time plots running different graphics: 'rms and sqrt(steps) vs. walks' and\n"
             + " either 'rms standard normal distribution' or 'rms normal distribution'.\n\n"
             + " User can save the image by right-clicking the mouse and choosing 'save' or 'export'.\n\n"
             + " 'Save' formats are: 'png', 'jpg', 'bmp', 'gif', 'svg', 'eps', and 'pdf'.\n\n"
