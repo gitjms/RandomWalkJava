@@ -152,7 +152,7 @@ class Execution {
          * WAIT FOR THE DATA FILES
          */
         try {
-            Thread.sleep((long) Math.log10(particles*steps)*dimension*5000);
+            Thread.sleep((long) (Math.log10(particles*steps)*Math.pow(dimension,2.0))*1000);
         } catch (InterruptedException ex) {
             System.out.println(ex.getMessage());
         }
@@ -185,7 +185,7 @@ class Execution {
                          * WAIT FOR THE PDF FILE
                          */
                         try {
-                            Thread.sleep((long) Math.log10(particles*steps)*dimension*5000);
+                            Thread.sleep((long) (Math.log10(particles*steps)*Math.pow(dimension,2.0))*1000);
                         } catch (InterruptedException ex) {
                             System.out.println(ex.getMessage());
                         }
@@ -298,7 +298,7 @@ class Execution {
          * WAIT FOR THE DATA FILES
          */
         try {
-            Thread.sleep((long) Math.log10(particles*steps)*dimension*5000);
+            Thread.sleep((long) (Math.log10(particles*steps)*Math.pow(dimension,2.0))*1000);
         } catch (InterruptedException ex) {
             System.out.println(ex.getMessage());
         }
@@ -331,7 +331,7 @@ class Execution {
                          * WAIT FOR THE PDF FILE
                          */
                         try {
-                            Thread.sleep((long) Math.log10(particles*steps)*dimension*5000);
+                            Thread.sleep((long) (Math.log10(particles*steps)*Math.pow(dimension,2.0))*1000);
                         } catch (InterruptedException ex) {
                             System.out.println(ex.getMessage());
                         }
@@ -438,7 +438,7 @@ class Execution {
          * WAIT FOR THE DATA FILES
          */
         try {
-            Thread.sleep((long) Math.log10(particles*steps)*dimension*5000);
+            Thread.sleep((long) (Math.log10(particles*steps)*Math.pow(dimension,2.0))*1000);
         } catch (InterruptedException ex) {
             System.out.println(ex.getMessage());
         }
@@ -471,7 +471,7 @@ class Execution {
                          * WAIT FOR THE PDF FILE
                          */
                         try {
-                            Thread.sleep((long) Math.log10(particles*steps)*dimension*5000);
+                            Thread.sleep((long) (Math.log10(particles*steps)*Math.pow(dimension,2.0))*1000);
                         } catch (InterruptedException ex) {
                             System.out.println(ex.getMessage());
                         }
@@ -575,7 +575,7 @@ class Execution {
          * WAIT FOR THE DATA FILES
          */
         try {
-            Thread.sleep((long) Math.log10(particles*steps)*dimension*5000);
+            Thread.sleep((long) (Math.log10(particles*steps)*Math.pow(dimension,2.0))*1000);
         } catch (InterruptedException ex) {
             System.out.println(ex.getMessage());
         }
@@ -608,7 +608,7 @@ class Execution {
                         * WAIT FOR THE PDF FILE
                          */
                         try {
-                            Thread.sleep((long) Math.log10(particles*steps)*dimension*5000);
+                            Thread.sleep((long) (Math.log10(particles*steps)*Math.pow(dimension,2.0))*1000);
                         } catch (InterruptedException ex) {
                             System.out.println(ex.getMessage());
                         }

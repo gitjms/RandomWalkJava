@@ -149,7 +149,6 @@ class SceneMMC extends Data {
         this.setPiirturi(piirturi);
         this.setLinewidth(linewidth);
         this.setAnimwidth(animwidth);
-        this.setScalefactor(scalefactor);
         this.setFxplot(fxplot);
         this.setRemBarNappiMMC(remBarNappiMMC);
         this.setRunMMC(runMMC);
@@ -173,9 +172,10 @@ class SceneMMC extends Data {
         if (newdata) {
             this.setPhase(0);
             this.setFirst(false);
+            this.setScalefactor(scalefactor);
             energy_x.clear();
             energy_y.clear();
-            clearDots(dim);
+            clearDots(this.dim);
         }
 
         this.getRemBarNappiMMC().setVisible(true);
@@ -196,7 +196,7 @@ class SceneMMC extends Data {
             this.getFxplot().setFrameVis();
         });
 
-        this.setValues(new double[dim][this.getNumPart()]);
+        this.setValues(new double[this.dim][this.getNumPart()]);
 
         piirturi.setLineWidth(linewidth);
 
