@@ -703,13 +703,13 @@ class Execution {
      * @return the mmcWidth
      */
     @Contract(pure = true)
-    private int getMmcWidth() { return 450 / (int) Screen.getMainScreen().getRenderScale(); }
+    private int getMmcWidth() { return 530 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the mmcHeight
      */
     @Contract(pure = true)
-    private int getMmcHeight() { return 800 / (int) Screen.getMainScreen().getRenderScale(); }
+    private int getMmcHeight() { return 950 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the screenHeight

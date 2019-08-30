@@ -412,6 +412,7 @@ public class RandomWalk extends Application {
         textAreaPath.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         textAreaPath.setBlendMode(BlendMode.DIFFERENCE);
+
         /*
         * REAL TIME RMS TEXT AREA
         */
