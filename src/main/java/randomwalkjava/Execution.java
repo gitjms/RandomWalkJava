@@ -73,11 +73,9 @@ class Execution {
         pyexec2d = "python ".concat(pyexec2d);
         pyexec3d = "python ".concat(pyexec3d);
         this.setFrame();
-        String xDataPath;
         String yDataPath = null;
-        String zDataPath;
+        String zDataPath = null;
         String titletext = null;
-        BufferedImage image;
         String[] command = null;
 
         Boolean result = false;
@@ -103,10 +101,7 @@ class Execution {
             titletext = "Spread out free particles, ";
         }
 
-        xDataPath = "x_path"
-            + dimension + "D_"
-            + particles + "N_"
-            + steps + "S.xy";
+        String xDataPath = "x_path" + dimension + "D_" + particles + "N_" + steps + "S.xy";
 
         File pdfFile = new File(path + "/jpyplot" + dimension + "D_N" + particles + "_S" + steps + ".pdf");
         if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
@@ -122,10 +117,7 @@ class Execution {
         * 2D DATA
         */
         if ( dimension == 2 || dimension == 3 ) {
-            yDataPath =  "y_path"
-                + dimension + "D_"
-                + particles + "N_"
-                + steps + "S.xy";
+            yDataPath =  "y_path" + dimension + "D_" + particles + "N_" + steps + "S.xy";
             if ( dimension == 2 ) {
                 command = new String[]{"cmd","/c", pyexec2d, xDataPath, yDataPath};
             }
@@ -135,74 +127,14 @@ class Execution {
         * 3D DATA
         */
         if ( dimension == 3 ) {
-            zDataPath =  "z_path"
-                + dimension + "D_"
-                + particles + "N_"
-                + steps + "S.xy";
+            zDataPath =  "z_path" + dimension + "D_" + particles + "N_" + steps + "S.xy";
             command = new String[]{"cmd","/c", pyexec3d, xDataPath, yDataPath, zDataPath};
         }
 
         /*
-        * CREATE IMAGE
-        */
-        this.setRuntime(Runtime.getRuntime());
-        runtimeStart();
-
-        /*
-         * WAIT FOR THE DATA FILES
+         * GET IMAGE
          */
-        try {
-            Thread.sleep((long) (Math.log10(particles*steps)*Math.pow(dimension,2.0))*1000);
-        } catch (InterruptedException ex) {
-            System.out.println(ex.getMessage());
-        }
-        /*
-         * CREATE IMAGE
-         */
-        try {
-            this.getRuntime().exec(command, null, folder);
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
-        while (true) {
-            if (Files.notExists(pdfFile.toPath())) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    System.out.println(ex.getMessage());
-                }
-            } else if (Files.exists(pdfFile.toPath())) {
-                while (true) {
-                    image = null;
-                    if (!pdfFile.canRead()) {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException ex) {
-                            System.out.println(ex.getMessage());
-                        }
-                    } else if (pdfFile.canRead()) {
-                        /*
-                         * WAIT FOR THE PDF FILE
-                         */
-                        try {
-                            Thread.sleep((long) (Math.log10(particles*steps)*Math.pow(dimension,2.0))*1000);
-                        } catch (InterruptedException ex) {
-                            System.out.println(ex.getMessage());
-                        }
-                        try {
-                            PDDocument document = PDDocument.load(pdfFile);
-                            PDFRenderer renderer = new PDFRenderer(document);
-                            image = renderer.renderImageWithDPI(0, 300, ImageType.RGB);
-                            document.close();
-                        } catch (IOException ex) {
-                            //System.out.println(ex.getMessage());
-                        }
-                    }
-                    if (image != null) break;
-                }
-                if (image != null) break;
-            }
-        }
+        BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension);
 
         this.getFrame().setTitle("Random Walk - Path Tracing");
         JLabel titleLabel = new JLabel(titletext + "N=" + particles + ", " + steps + " steps\n");
@@ -257,7 +189,6 @@ class Execution {
         pyexecmmc3d = "python ".concat(pyexecmmc3d);
         this.setFrame();
         File pdfFile = null;
-        BufferedImage image;
         String[] command = null;
 
         Boolean result = false;
@@ -274,12 +205,8 @@ class Execution {
         int steps = parseInt(vars[3]);
         final int dimension = parseInt(vars[4]);
 
-        String startDataMMC = "startMMC_"
-            + dimension + "D_"
-            + particles + "N.xy";
-        String finalDataMMC = "finalMMC_"
-            + dimension + "D_"
-            + particles + "N.xy";
+        String startDataMMC = "startMMC_" + dimension + "D_" + particles + "N.xy";
+        String finalDataMMC = "finalMMC_" + dimension + "D_" + particles + "N.xy";
 
         if ( dimension == 2 ) {
             pdfFile = new File(path + "/jpyplotmmc2D_N" + particles + "_diam" + diameter + ".pdf");
@@ -291,64 +218,10 @@ class Execution {
             command = new String[]{"cmd","/c", pyexecmmc3d, startDataMMC, finalDataMMC};
         }
 
-        this.setRuntime(Runtime.getRuntime());
-        runtimeStart();
-
         /*
-         * WAIT FOR THE DATA FILES
+         * GET IMAGE
          */
-        try {
-            Thread.sleep((long) (Math.log10(particles*steps)*Math.pow(dimension,2.0))*1000);
-        } catch (InterruptedException ex) {
-            System.out.println(ex.getMessage());
-        }
-        /*
-         * CREATE IMAGE
-         */
-        try {
-            this.getRuntime().exec(command, null, folder);
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
-        while (true) {
-            if (Files.notExists(pdfFile.toPath())) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    System.out.println(ex.getMessage());
-                }
-            } else if (Files.exists(pdfFile.toPath())) {
-                while (true) {
-                    image = null;
-                    if (!pdfFile.canRead()) {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException ex) {
-                            System.out.println(ex.getMessage());
-                        }
-                    } else if (pdfFile.canRead()) {
-                        /*
-                         * WAIT FOR THE PDF FILE
-                         */
-                        try {
-                            Thread.sleep((long) (Math.log10(particles*steps)*Math.pow(dimension,2.0))*1000);
-                        } catch (InterruptedException ex) {
-                            System.out.println(ex.getMessage());
-                        }
-                        try {
-                            PDDocument document = PDDocument.load(pdfFile);
-                            PDFRenderer renderer = new PDFRenderer(document);
-                            image = renderer.renderImageWithDPI(0, 300, ImageType.RGB);
-                            document.close();
-                        } catch (IOException ex) {
-                            //System.out.println(ex.getMessage());
-                        }
-                    }
-                    if (image != null) break;
-                }
-                if (image != null) break;
-            }
-        }
+        BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension);
 
         this.getFrame().setTitle("Random Walk - MMC Diffusion Plot");
 
@@ -395,9 +268,7 @@ class Execution {
         */
         pyexecrms = "python ".concat(pyexecrms);
         this.setFrame();
-        String rmsDataPath;
         String titletext = null;
-        BufferedImage image;
 
         Boolean result = false;
         try {
@@ -406,8 +277,7 @@ class Execution {
             System.out.println(ex.getMessage());
         }
 
-        if (!result)
-            return;
+        if (!result) return;
 
         int particles = parseInt(vars[0]);
         int steps = parseInt(vars[3]);
@@ -422,73 +292,18 @@ class Execution {
         } else if ( vars[6].equals("-") && vars[7].equals("-") ) {
             titletext = "Spread out free particles";
         }
-                
-        rmsDataPath = "rms_"
-            + dimension + "D_"
-            + steps + "S.xy";
+
+        String rmsDataPath = "rms_" + dimension + "D_" + steps + "S.xy";
 
         File pdfFile = new File(path + "/jpyplotRMS" + dimension + "D_" + steps + "S.pdf");
         if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
 
         String[] command = new String[]{"cmd","/c", pyexecrms, rmsDataPath};
-        this.setRuntime(Runtime.getRuntime());
-        runtimeStart();
 
         /*
-         * WAIT FOR THE DATA FILES
+         * GET IMAGE
          */
-        try {
-            Thread.sleep((long) (Math.log10(particles*steps)*Math.pow(dimension,2.0))*1000);
-        } catch (InterruptedException ex) {
-            System.out.println(ex.getMessage());
-        }
-        /*
-         * CREATE IMAGE
-         */
-        try {
-            this.getRuntime().exec(command, null, folder);
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
-        while (true) {
-            if (Files.notExists(pdfFile.toPath())) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    System.out.println(ex.getMessage());
-                }
-            } else if (Files.exists(pdfFile.toPath())) {
-                while (true) {
-                    image = null;
-                    if (!pdfFile.canRead()) {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException ex) {
-                            System.out.println(ex.getMessage());
-                        }
-                    } else if (pdfFile.canRead()) {
-                        /*
-                         * WAIT FOR THE PDF FILE
-                         */
-                        try {
-                            Thread.sleep((long) (Math.log10(particles*steps)*Math.pow(dimension,2.0))*1000);
-                        } catch (InterruptedException ex) {
-                            System.out.println(ex.getMessage());
-                        }
-                        try {
-                            PDDocument document = PDDocument.load(pdfFile);
-                            PDFRenderer renderer = new PDFRenderer(document);
-                            image = renderer.renderImageWithDPI(0, 300, ImageType.RGB);
-                            document.close();
-                        } catch (IOException ex) {
-                            //System.out.println(ex.getMessage());
-                        }
-                    }
-                    if (image != null) break;
-                }
-                if (image != null) break;
-            }
-        }
+        BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension);
 
         this.getFrame().setTitle("Random Walk - R_rms Calculation - " + titletext);
 
@@ -531,10 +346,7 @@ class Execution {
          */
         pyexec1d = "python ".concat(pyexec1d);
         this.setFrame();
-        String xDataPath;
         String titletext = null;
-        BufferedImage image;
-        String[] command = null;
 
         Boolean result = false;
         try {
@@ -542,8 +354,7 @@ class Execution {
         } catch (Throwable ex) {
             System.out.println(ex.getMessage());
         }
-        if (!result)
-            return;
+        if (!result) return;
 
         int particles = parseInt(vars[0]);
         int steps = parseInt(vars[3]);
@@ -555,30 +366,39 @@ class Execution {
             titletext = "Free particles";
         }
 
-        xDataPath = "x_path"
-            + "1D_"
-            + particles + "N_"
-            + steps + "S.xy";
+        String xDataPath = "x_path" + "1D_" + particles + "N_" + steps + "S.xy";
 
         File pdfFile = new File(path + "/jpyplot1Ddist_N" + particles + "_S" + steps + ".pdf");
         if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
 
+        String[] command = new String[]{"cmd","/c", pyexec1d, xDataPath};
+
         /*
-         * 1D DATA
+         * GET IMAGE
          */
-        command = new String[]{"cmd","/c", pyexec1d, xDataPath};
+        BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension);
+
+        this.getFrame().setTitle("Random Walk - 1D Distance - " + titletext);
+
+        assert image != null;
+        this.getFrame().setSize(this.getBigChartWidth(), this.getBigChartHeight());
+        this.getFrame().setLocation(0, (int) ((this.getScreenHeight()-this.getBigChartHeight())/2.0)-getYMargin());
+        Image image2 = image.getScaledInstance(this.getBigChartWidth(), this.getBigChartHeight()+this.getYMargin(), Image.SCALE_AREA_AVERAGING);
+        ImageIcon figIcn = new ImageIcon(image2);
+        JLabel figLabel = new JLabel(figIcn);
+        this.getFrame().add(figLabel);
+        this.getFrame().repaint();
+        this.getFrame().pack();
+        this.getFrame().setVisible(true);
+    }
+
+    BufferedImage createPdf(File folder, String[] command, File pdfFile, int particles, int steps, int dimension) {
+
+        BufferedImage image;
 
         this.setRuntime(Runtime.getRuntime());
         runtimeStart();
 
-        /*
-         * WAIT FOR THE DATA FILES
-         */
-        try {
-            Thread.sleep((long) (Math.log10(particles*steps)*Math.pow(dimension,2.0))*1000);
-        } catch (InterruptedException ex) {
-            System.out.println(ex.getMessage());
-        }
         /*
          * CREATE IMAGE
          */
@@ -605,10 +425,10 @@ class Execution {
                         }
                     } else if (pdfFile.canRead()) {
                         /*
-                        * WAIT FOR THE PDF FILE
+                         * WAIT FOR THE PDF FILE
                          */
                         try {
-                            Thread.sleep((long) (Math.log10(particles*steps)*Math.pow(dimension,2.0))*1000);
+                            Thread.sleep((long) (Math.log10(particles*steps)*Math.pow(dimension,2.0))*500);
                         } catch (InterruptedException ex) {
                             System.out.println(ex.getMessage());
                         }
@@ -626,19 +446,7 @@ class Execution {
                 if (image != null) break;
             }
         }
-
-        this.getFrame().setTitle("Random Walk - 1D Distance - " + titletext);
-
-        assert image != null;
-        this.getFrame().setSize(this.getBigChartWidth(), this.getBigChartHeight());
-        this.getFrame().setLocation(0, (int) ((this.getScreenHeight()-this.getBigChartHeight())/2.0)-getYMargin());
-        Image image2 = image.getScaledInstance(this.getBigChartWidth(), this.getBigChartHeight()+this.getYMargin(), Image.SCALE_AREA_AVERAGING);
-        ImageIcon figIcn = new ImageIcon(image2);
-        JLabel figLabel = new JLabel(figIcn);
-        this.getFrame().add(figLabel);
-        this.getFrame().repaint();
-        this.getFrame().pack();
-        this.getFrame().setVisible(true);
+        return image;
     }
 
     /**

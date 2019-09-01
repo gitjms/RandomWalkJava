@@ -52,6 +52,12 @@ public class RandomWalk extends Application {
     private randomwalkjava.FXPlot fxplot;
     private JFrame frame;
     private String[] vars;
+    private TextArea textAreaCalc;
+    private TextArea textAreaPath;
+    private TextArea textAreaReal;
+    private TextArea textAreaMMC;
+    private TextArea textArea1Ddist;
+    private TextArea textAreaMenu;
     private double realscalefactor;
     private double mmcscalefactor;
     private double linewidth;
@@ -386,90 +392,90 @@ public class RandomWalk extends Application {
         /*
         * CALCULATION TEXT AREA
         */
-        TextArea textAreaCalc = new TextArea();
-        textAreaCalc.setMinWidth(this.getTextWidth());
-        textAreaCalc.setMaxWidth(this.getTextWidth());
-        textAreaCalc.setMinHeight(this.getTextHeight());
-        textAreaCalc.setMaxHeight(this.getTextHeight());
-        textAreaCalc.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
-        textAreaCalc.setBorder(null);
-        textAreaCalc.setEditable(false);
-        textAreaCalc.setBackground(new Background(new BackgroundFill(
+        this.textAreaCalc = new TextArea();
+        this.textAreaCalc.setMinWidth(this.getTextWidth());
+        this.textAreaCalc.setMaxWidth(this.getTextWidth());
+        this.textAreaCalc.setMinHeight(this.getTextHeight());
+        this.textAreaCalc.setMaxHeight(this.getTextHeight());
+        this.textAreaCalc.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
+        this.textAreaCalc.setBorder(null);
+        this.textAreaCalc.setEditable(false);
+        this.textAreaCalc.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        textAreaCalc.setBlendMode(BlendMode.DIFFERENCE);
+        this.textAreaCalc.setBlendMode(BlendMode.DIFFERENCE);
 
         /*
         * PATH TRACING TEXT AREA
         */
-        TextArea textAreaPath = new TextArea();
-        textAreaPath.setMinWidth(this.getTextWidth());
-        textAreaPath.setMaxWidth(this.getTextWidth());
-        textAreaPath.setMinHeight(this.getPathHeight());
-        textAreaPath.setMaxHeight(this.getPathHeight());
-        textAreaPath.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
-        textAreaPath.setBorder(null);
-        textAreaPath.setEditable(false);
-        textAreaPath.setBackground(new Background(new BackgroundFill(
+        this.textAreaPath = new TextArea();
+        this.textAreaPath.setMinWidth(this.getTextWidth());
+        this.textAreaPath.setMaxWidth(this.getTextWidth());
+        this.textAreaPath.setMinHeight(this.getPathHeight());
+        this.textAreaPath.setMaxHeight(this.getPathHeight());
+        this.textAreaPath.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
+        this.textAreaPath.setBorder(null);
+        this.textAreaPath.setEditable(false);
+        this.textAreaPath.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        textAreaPath.setBlendMode(BlendMode.DIFFERENCE);
+        this.textAreaPath.setBlendMode(BlendMode.DIFFERENCE);
 
         /*
         * REAL TIME RMS TEXT AREA
         */
-        TextArea textAreaReal = new TextArea();
-        textAreaReal.setMinWidth(this.getAnimWidth());
-        textAreaReal.setMaxWidth(this.getAnimWidth());
-        textAreaReal.setMinHeight(this.getAnimHeight());
-        textAreaReal.setMaxHeight(this.getAnimHeight());
-        textAreaReal.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
-        textAreaReal.setBorder(null);
-        textAreaReal.setEditable(false);
-        textAreaReal.setBackground(new Background(new BackgroundFill(
+        this.textAreaReal = new TextArea();
+        this.textAreaReal.setMinWidth(this.getAnimWidth());
+        this.textAreaReal.setMaxWidth(this.getAnimWidth());
+        this.textAreaReal.setMinHeight(this.getAnimHeight());
+        this.textAreaReal.setMaxHeight(this.getAnimHeight());
+        this.textAreaReal.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
+        this.textAreaReal.setBorder(null);
+        this.textAreaReal.setEditable(false);
+        this.textAreaReal.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        textAreaReal.setBlendMode(BlendMode.DIFFERENCE);
+        this.textAreaReal.setBlendMode(BlendMode.DIFFERENCE);
         /*
         * MMC TEXT AREA
         */
-        TextArea textAreaMMC = new TextArea();
-        textAreaMMC.setMinWidth(this.getAnimWidth());
-        textAreaMMC.setMaxWidth(this.getAnimWidth());
-        textAreaMMC.setMinHeight(this.getAnimHeight());
-        textAreaMMC.setMaxHeight(this.getAnimHeight());
-        textAreaMMC.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
-        textAreaMMC.setBorder(null);
-        textAreaMMC.setEditable(false);
-        textAreaMMC.setBackground(new Background(new BackgroundFill(
+        this.textAreaMMC = new TextArea();
+        this.textAreaMMC.setMinWidth(this.getAnimWidth());
+        this.textAreaMMC.setMaxWidth(this.getAnimWidth());
+        this.textAreaMMC.setMinHeight(this.getAnimHeight());
+        this.textAreaMMC.setMaxHeight(this.getAnimHeight());
+        this.textAreaMMC.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
+        this.textAreaMMC.setBorder(null);
+        this.textAreaMMC.setEditable(false);
+        this.textAreaMMC.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        textAreaMMC.setBlendMode(BlendMode.DIFFERENCE);
+        this.textAreaMMC.setBlendMode(BlendMode.DIFFERENCE);
         /*
          * 1D DISTANCE TEXT AREA
          */
-        TextArea textArea1Ddist = new TextArea();
-        textArea1Ddist.setMinWidth(this.getTextWidth());
-        textArea1Ddist.setMaxWidth(this.getTextWidth());
-        textArea1Ddist.setMinHeight(this.getTextHeight());
-        textArea1Ddist.setMaxHeight(this.getTextHeight());
-        textArea1Ddist.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
-        textArea1Ddist.setBorder(null);
-        textArea1Ddist.setEditable(false);
-        textArea1Ddist.setBackground(new Background(new BackgroundFill(
+        this.textArea1Ddist = new TextArea();
+        this.textArea1Ddist.setMinWidth(this.getTextWidth());
+        this.textArea1Ddist.setMaxWidth(this.getTextWidth());
+        this.textArea1Ddist.setMinHeight(this.getTextHeight());
+        this.textArea1Ddist.setMaxHeight(this.getTextHeight());
+        this.textArea1Ddist.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
+        this.textArea1Ddist.setBorder(null);
+        this.textArea1Ddist.setEditable(false);
+        this.textArea1Ddist.setBackground(new Background(new BackgroundFill(
             Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        textArea1Ddist.setBlendMode(BlendMode.DIFFERENCE);
+        this.textArea1Ddist.setBlendMode(BlendMode.DIFFERENCE);
 
         /*
         * TEXT AREA MENU
         */
-        TextArea textAreaMenu = new TextArea(helpText.welcome());
-        textAreaMenu.setMinWidth(this.getTextWidth());
-        textAreaMenu.setMaxWidth(this.getTextWidth());
-        textAreaMenu.setMinHeight(this.getTextHeight());
-        textAreaMenu.setMaxHeight(this.getTextHeight());
-        textAreaMenu.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
-        textAreaMenu.setBorder(null);
-        textAreaMenu.setEditable(false);
-        textAreaMenu.setBackground(new Background(new BackgroundFill(
+        this.textAreaMenu = new TextArea(helpText.welcome());
+        this.textAreaMenu.setMinWidth(this.getTextWidth());
+        this.textAreaMenu.setMaxWidth(this.getTextWidth());
+        this.textAreaMenu.setMinHeight(this.getTextHeight());
+        this.textAreaMenu.setMaxHeight(this.getTextHeight());
+        this.textAreaMenu.setFont(Font.font("Consolas",FontWeight.NORMAL, 18));
+        this.textAreaMenu.setBorder(null);
+        this.textAreaMenu.setEditable(false);
+        this.textAreaMenu.setBackground(new Background(new BackgroundFill(
                 Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        textAreaMenu.setBlendMode(BlendMode.DIFFERENCE);
+        this.textAreaMenu.setBlendMode(BlendMode.DIFFERENCE);
         
         /*
         * REAL TIME RMS COMPONENTS
@@ -509,7 +515,7 @@ public class RandomWalk extends Application {
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> nappiMenuHelp.setEffect(shadow));
         nappiMenuHelp.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> nappiMenuHelp.setEffect(null));
-        nappiMenuHelp.setOnAction(event -> textAreaMenu.setText(helpText.menu()));
+        nappiMenuHelp.setOnAction(event -> this.textAreaMenu.setText(helpText.menu()));
 
         /*
         * FIRST VIEW BUTTON: CLOSE
@@ -574,7 +580,7 @@ public class RandomWalk extends Application {
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> helpNappiCalc.setEffect(shadow));
         helpNappiCalc.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> helpNappiCalc.setEffect(null));
-        helpNappiCalc.setOnAction(event -> textAreaCalc.setText(helpText.calculation()));
+        helpNappiCalc.setOnAction(event -> this.textAreaCalc.setText(helpText.calculation()));
         helpNappiCalc.setVisible(true);
 
         /*
@@ -645,7 +651,7 @@ public class RandomWalk extends Application {
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> helpNappiPath.setEffect(shadow));
         helpNappiPath.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> helpNappiPath.setEffect(null));
-        helpNappiPath.setOnAction(event -> textAreaPath.setText(helpText.pathtracing()));
+        helpNappiPath.setOnAction(event -> this.textAreaPath.setText(helpText.pathtracing()));
         helpNappiPath.setVisible(true);
 
         /*
@@ -754,9 +760,9 @@ public class RandomWalk extends Application {
         helpNappiReal.setOnAction(event -> {
             if (isovalikkoReal.getChildren().contains(pane)){
                 isovalikkoReal.getChildren().remove(pane);
-                isovalikkoReal.getChildren().add(textAreaReal);
+                isovalikkoReal.getChildren().add(this.textAreaReal);
             }
-            textAreaReal.setText(helpText.realtimerms());
+            this.textAreaReal.setText(helpText.realtimerms());
         });
         helpNappiReal.setVisible(true);
 
@@ -843,9 +849,9 @@ public class RandomWalk extends Application {
         helpNappiMMC.setOnAction(event -> {
             if (isovalikkoMMC.getChildren().contains(pane)){
                 isovalikkoMMC.getChildren().remove(pane);
-                isovalikkoMMC.getChildren().add(textAreaMMC);
+                isovalikkoMMC.getChildren().add(this.textAreaMMC);
             }
-            textAreaMMC.setText(helpText.mmc());
+            this.textAreaMMC.setText(helpText.mmc());
         });
         helpNappiMMC.setVisible(true);
 
@@ -957,7 +963,7 @@ public class RandomWalk extends Application {
             MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> helpNappi1Ddist.setEffect(shadow));
         helpNappi1Ddist.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> helpNappi1Ddist.setEffect(null));
-        helpNappi1Ddist.setOnAction(event -> textArea1Ddist.setText(helpText.distance1D()));
+        helpNappi1Ddist.setOnAction(event -> this.textArea1Ddist.setText(helpText.distance1D()));
         helpNappi1Ddist.setVisible(true);
 
         /*
@@ -1000,7 +1006,7 @@ public class RandomWalk extends Application {
             closeNappiMenu);
         isovalikkoMenu.getChildren().addAll(
             valikkoMenu,
-            textAreaMenu);
+            this.textAreaMenu);
         asetteluMenu.setCenter(isovalikkoMenu);
 
         /*
@@ -1014,7 +1020,7 @@ public class RandomWalk extends Application {
             closeNappiCalc);
         isovalikkoCalc.getChildren().addAll(
             valikkoCalc,
-            textAreaCalc);
+            this.textAreaCalc);
         asetteluCalc.setCenter(isovalikkoCalc);
 
         /*
@@ -1028,7 +1034,7 @@ public class RandomWalk extends Application {
             closeNappiPath);
         isovalikkoPath.getChildren().addAll(
             valikkoPath,
-            textAreaPath);
+            this.textAreaPath);
         asetteluPath.setCenter(isovalikkoPath);
 
         /*
@@ -1043,7 +1049,7 @@ public class RandomWalk extends Application {
             closeNappiReal);
         isovalikkoReal.getChildren().addAll(
             valikkoReal,
-            textAreaReal);
+            this.textAreaReal);
         asetteluReal.setCenter(isovalikkoReal);
 
         /*
@@ -1059,7 +1065,7 @@ public class RandomWalk extends Application {
             closeNappiMMC);
         isovalikkoMMC.getChildren().addAll(
             valikkoMMC,
-            textAreaMMC);
+            this.textAreaMMC);
         asetteluMMC.setCenter(isovalikkoMMC);
 
         /*
@@ -1073,7 +1079,7 @@ public class RandomWalk extends Application {
             closeNappi1Ddist);
         isovalikko1Ddist.getChildren().addAll(
             valikko1Ddist,
-            textArea1Ddist);
+            this.textArea1Ddist);
         asettelu1Ddist.setCenter(isovalikko1Ddist);
 
         /*
@@ -1112,10 +1118,10 @@ public class RandomWalk extends Application {
         });
         menuNappiCalc.setOnMouseClicked(event -> {
             stage.setTitle("Random Walk");
-            if (textAreaCalc.getText().equals(helpText.calculation()))
-                textAreaMenu.setText(helpText.welcome());
+            if (this.textAreaCalc.getText().equals(helpText.calculation()))
+                this.textAreaMenu.setText(helpText.welcome());
             else
-                textAreaMenu.setText(textAreaCalc.getText());
+                this.textAreaMenu.setText(this.textAreaCalc.getText());
             stage.setScene(firstScene);
         });
         /*
@@ -1134,10 +1140,10 @@ public class RandomWalk extends Application {
         });
         menuNappiPath.setOnAction(event -> {
             stage.setTitle("Random Walk");
-            if (textAreaPath.getText().equals(helpText.pathtracing()))
-                textAreaMenu.setText(helpText.welcome());
+            if (this.textAreaPath.getText().equals(helpText.pathtracing()))
+                this.textAreaMenu.setText(helpText.welcome());
             else
-                textAreaMenu.setText(textAreaPath.getText());
+                this.textAreaMenu.setText(this.textAreaPath.getText());
             stage.setY((this.getScreenHeight()-this.getStageHeight())/2.0);
             stage.setHeight(this.getStageHeight());
             stage.setScene(firstScene);
@@ -1158,10 +1164,10 @@ public class RandomWalk extends Application {
         });
         menuNappiReal.setOnAction(event -> {
             stage.setTitle("Random Walk");
-            if (textAreaReal.getText().equals(helpText.realtimerms()))
-                textAreaMenu.setText(helpText.welcome());
+            if (this.textAreaReal.getText().equals(helpText.realtimerms()))
+                this.textAreaMenu.setText(helpText.welcome());
             else
-                textAreaMenu.clear();
+                this.textAreaMenu.clear();
             stage.setX(this.getScreenWidth()-this.getStageWidth());
             stage.setY((this.getScreenHeight()-this.getStageHeight())/2.0);
             stage.setWidth(this.getStageWidth());
@@ -1184,10 +1190,10 @@ public class RandomWalk extends Application {
         });
         menuNappiMMC.setOnAction(event -> {
             stage.setTitle("Random Walk");
-            if (textAreaMMC.getText().equals(helpText.mmc()))
-                textAreaMenu.setText(helpText.welcome());
+            if (this.textAreaMMC.getText().equals(helpText.mmc()))
+                this.textAreaMenu.setText(helpText.welcome());
             else
-                textAreaMenu.setText(textAreaMMC.getText());
+                this.textAreaMenu.setText(this.textAreaMMC.getText());
             stage.setX(this.getScreenWidth()-this.getStageWidth());
             stage.setY((this.getScreenHeight()-this.getStageHeight())/2.0);
             stage.setWidth(this.getStageWidth());
@@ -1203,10 +1209,10 @@ public class RandomWalk extends Application {
         });
         menuNappi1Ddist.setOnAction(event -> {
             stage.setTitle("Random Walk");
-            if (textArea1Ddist.getText().equals(helpText.distance1D()))
-                textAreaMenu.setText(helpText.welcome());
+            if (this.textArea1Ddist.getText().equals(helpText.distance1D()))
+                this.textAreaMenu.setText(helpText.welcome());
             else
-                textAreaMenu.setText(textArea1Ddist.getText());
+                this.textAreaMenu.setText(this.textArea1Ddist.getText());
             stage.setScene(firstScene);
         });
 
@@ -1240,7 +1246,26 @@ public class RandomWalk extends Application {
 
             if ( fail ) return;
 
-            ex.executeRms(datafolder, datapath, fexec, pyexecrms, data, this.getVars());
+            int hours = (int) (steps * dim * 0.00005)/60;
+            int mins = (int) (steps * dim * 0.00005)%60;
+            String warnText = "";
+            if (Math.log10(steps) > 4) {
+                if (hours > 1)
+                    warnText = "Data processing may take " + hours + "h.";
+                else if (hours > 0)
+                    warnText = "Data processing may take " + mins + "min.";
+            }
+
+            if (Math.log10(steps) < 5) {
+                ex.executeRms(datafolder, datapath, fexec, pyexecrms, data, this.getVars());
+            } else {
+                Alert alert = new Alert(Alert.AlertType.WARNING,
+                    warnText + " Do you want to continue?",  ButtonType.NO, ButtonType.YES);
+                alert.showAndWait();
+                if ( alert.getResult() == ButtonType.YES) {
+                    ex.executeRms(datafolder, datapath, fexec, pyexecrms, data, this.getVars());
+                }
+            }
         });
 
         /*
@@ -1271,8 +1296,25 @@ public class RandomWalk extends Application {
 
             if ( fail ) return;
 
-            ex.executePath(datafolder, datapath, fexec, pyexec1d, pyexec2d,
-                pyexec3d, data, this.getVars());
+            String warnText;
+            int cost = (int) Math.log10(particles*steps);
+
+            if (cost < 8) {
+                warnText = "Time estimate is over half an hour.";
+            } else {
+                warnText = "Time estimate is hours.";
+            }
+
+            if ( cost < 6 ) {
+                    ex.executePath(datafolder, datapath, fexec, pyexec1d, pyexec2d, pyexec3d, data, this.getVars());
+            } else {
+                Alert alert = new Alert(Alert.AlertType.WARNING,
+                    warnText + " Do you want to continue?",  ButtonType.NO, ButtonType.YES);
+                alert.showAndWait();
+                if ( alert.getResult() == ButtonType.YES) {
+                    ex.executePath(datafolder, datapath, fexec, pyexec1d, pyexec2d, pyexec3d, data, this.getVars());
+                }
+            }
         });
 
         /*
@@ -1531,9 +1573,9 @@ public class RandomWalk extends Application {
             this.setEnergy_x(new ArrayList<>());
             this.setEnergy_y(new ArrayList<>());
 
-			if ( isovalikkoMMC.getChildren().contains(textAreaMMC)) {
-                textAreaMMC.clear();
-                isovalikkoMMC.getChildren().remove(textAreaMMC);
+			if ( isovalikkoMMC.getChildren().contains(this.textAreaMMC)) {
+                this.textAreaMMC.clear();
+                isovalikkoMMC.getChildren().remove(this.textAreaMMC);
                 isovalikkoMMC.getChildren().add(mmcpane);
             }
 
@@ -1570,17 +1612,36 @@ public class RandomWalk extends Application {
             Data data = new Data(vars);
             boolean fail = false;
 
+            int particles = parseInt(getVars()[0]);
             int steps = parseInt(getVars()[3]);
-            int dim = parseInt(this.getVars()[4]);
             String lattice = this.getVars()[7];
 
+            if ( particles < 0 ) fail = true;
             if ( steps < 1 ) fail = true;
-            if ( dim != 1 ) fail = true;
             if ( !lattice.equals("l") && !lattice.equals("-") ) fail = true;
 
             if ( fail ) return;
 
-            ex.execute1Ddist(datafolder, datapath, fexec, pyexec1Ddist, data, this.getVars());
+            int hours = (int) (particles * steps * 0.0000005)/60;
+            int mins = (int) (particles * steps * 0.0000005)%60;
+            String warnText = "";
+            if (Math.log10(particles * steps) > 6) {
+                if (hours > 1)
+                    warnText = "Data processing may take " + hours + "h.";
+                else
+                    warnText = "Data processing may take " + mins + "min.";
+            }
+
+            if (Math.log10(particles * steps) <= 6) {
+                ex.execute1Ddist(datafolder, datapath, fexec, pyexec1Ddist, data, this.getVars());
+            } else {
+                Alert alert = new Alert(Alert.AlertType.WARNING,
+                    warnText + " Do you want to continue?",  ButtonType.NO, ButtonType.YES);
+                alert.showAndWait();
+                if ( alert.getResult() == ButtonType.YES) {
+                    ex.execute1Ddist(datafolder, datapath, fexec, pyexec1Ddist, data, this.getVars());
+                }
+            }
         });
 
         stage.addEventHandler(EventType.ROOT, e -> stage.setOnHiding(f-> {
