@@ -31,9 +31,6 @@ Asennustyökalu *RandomWalk-1.0.msi* löytyy linkin *release* takaa:
 
 <img src="https://user-images.githubusercontent.com/46410240/63167309-952e0200-c039-11e9-9d65-571ce3170085.png" alt="release" width="612" height="180" >
 
-## Ongelmia
-Kun jossain osiossa on plotannut kuvan ja vaihtaa sitten arvoja uutta kuvaa varten, antaa ohjelma yhä saman vanhan kuvan. Vasta toisen kerran yritettäessä ohjelma tekee uuden kuvan.
-
 ## TODO (mahdollisia tulevia kehitysnäkymiä)
 
 * MMC diffuusio -animaatioon 3D-hilarakenne näkyviin
