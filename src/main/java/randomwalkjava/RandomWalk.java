@@ -203,11 +203,11 @@ public class RandomWalk extends Application {
         /*
         * FIRST VIEW BUTTONS
         */
-        Button nappiScene1 = new Button("RMS vs SQRT(S)"); // SceneCalculation
-        Button nappiScene2 = new Button("PATH TRACING"); // ScenePathTracing
-        Button nappiScene3 = new Button("REAL TIME RMS"); // SceneRealTimeRms
-        Button nappiScene4 = new Button("MMC DIFFUSION"); // SceneMMC
-        Button nappiScene5 = new Button("1D DISTANCE"); // Scene1Ddist
+        Button nappiScene1 = new Button("PATH TRACING"); // ScenePathTracing
+        Button nappiScene2 = new Button("1D DISTANCE"); // Scene1Ddist
+        Button nappiScene3 = new Button("RMS vs SQRT(S)"); // SceneCalculation
+        Button nappiScene4 = new Button("REAL TIME RMS"); // SceneRealTimeRms
+        Button nappiScene5 = new Button("MMC DIFFUSION"); // SceneMMC
         nappiScene1.setMinWidth(this.getButtonWidth());
         nappiScene1.setMaxWidth(this.getButtonWidth());
         nappiScene2.setMinWidth(this.getButtonWidth());
@@ -224,7 +224,7 @@ public class RandomWalk extends Application {
         nappiMenuHelp.setMaxWidth(this.getButtonWidth());
 
         /*
-        * GRIDPANES: SceneCalculation
+         * GRIDPANES: ScenePathTracing
          */
         GridPane.setHalignment(nappiScene1, HPos.LEFT);
         asettelu.add(nappiScene1, 0, 0, 2, 1);
@@ -242,7 +242,7 @@ public class RandomWalk extends Application {
         asettelu.add(empty1, 0, 1, 2, 1);
 
         /*
-         * GRIDPANES: ScenePathTracing
+         * GRIDPANES: Scene1Ddist
          */
         GridPane.setHalignment(nappiScene2, HPos.LEFT);
         asettelu.add(nappiScene2, 0, 2, 2, 1);
@@ -260,7 +260,7 @@ public class RandomWalk extends Application {
         asettelu.add(empty2, 0, 3, 2, 1);
 
         /*
-         * GRIDPANES: SceneRealTimeRms
+        * GRIDPANES: SceneCalculation
          */
         GridPane.setHalignment(nappiScene3, HPos.LEFT);
         asettelu.add(nappiScene3, 0, 4, 2, 1);
@@ -278,7 +278,7 @@ public class RandomWalk extends Application {
         asettelu.add(empty3, 0, 5, 2, 1);
 
         /*
-         * GRIDPANES: SceneMMC
+         * GRIDPANES: SceneRealTimeRms
          */
         GridPane.setHalignment(nappiScene4, HPos.LEFT);
         asettelu.add(nappiScene4, 0, 6, 2, 1);
@@ -296,7 +296,7 @@ public class RandomWalk extends Application {
         asettelu.add(empty4, 0, 7, 2, 1);
 
         /*
-         * GRIDPANES: Scene1Ddist
+         * GRIDPANES: SceneMMC
          */
         GridPane.setHalignment(nappiScene5, HPos.LEFT);
         asettelu.add(nappiScene5, 0, 8, 2, 1);
@@ -1109,32 +1109,17 @@ public class RandomWalk extends Application {
         dist1DScene.getStylesheets().add("/Styles.css");
 
         /*
-        * SET SCENE CHOICE BUTTONS' EFFECTS
-        * CALCULATION
-        */
+         * SET SCENE CHOICE BUTTONS' EFFECTS
+         * PATH TRACING
+         */
         nappiScene1.setOnMouseClicked(event -> {
-            stage.setTitle("R_rms calculation");
-            stage.setScene(calcScene);
-        });
-        menuNappiCalc.setOnMouseClicked(event -> {
-            stage.setTitle("Random Walk");
-            if (this.textAreaCalc.getText().equals(helpText.calculation()))
-                this.textAreaMenu.setText(helpText.welcome());
-            else
-                this.textAreaMenu.setText(this.textAreaCalc.getText());
-            stage.setScene(firstScene);
-        });
-        /*
-        * PATH TRACING
-        */
-        nappiScene2.setOnMouseClicked(event -> {
             stage.setTitle("Path Tracing");
             if ( stage.getHeight() == this.getStageHeight() ){
                 stage.setHeight(
                     this.getStageHeight()+(this.getPathHeight()-this.getTextHeight()));
                 stage.setY(
                     (this.getScreenHeight()-this.getStageHeight())/2.0
-                    - (this.getPathHeight()-this.getTextHeight())/2.0);
+                        - (this.getPathHeight()-this.getTextHeight())/2.0);
             }
             stage.setScene(pathScene);
         });
@@ -1149,9 +1134,39 @@ public class RandomWalk extends Application {
             stage.setScene(firstScene);
         });
         /*
-        * REAL TIME RMS
+         * 1D DISTANCE
+         */
+        nappiScene2.setOnMouseClicked(event -> {
+            stage.setTitle("1D Distance");
+            stage.setScene(dist1DScene);
+        });
+        menuNappi1Ddist.setOnAction(event -> {
+            stage.setTitle("Random Walk");
+            if (this.textArea1Ddist.getText().equals(helpText.distance1D()))
+                this.textAreaMenu.setText(helpText.welcome());
+            else
+                this.textAreaMenu.setText(this.textArea1Ddist.getText());
+            stage.setScene(firstScene);
+        });
+        /*
+        * CALCULATION
         */
         nappiScene3.setOnMouseClicked(event -> {
+            stage.setTitle("R_rms calculation");
+            stage.setScene(calcScene);
+        });
+        menuNappiCalc.setOnMouseClicked(event -> {
+            stage.setTitle("Random Walk");
+            if (this.textAreaCalc.getText().equals(helpText.calculation()))
+                this.textAreaMenu.setText(helpText.welcome());
+            else
+                this.textAreaMenu.setText(this.textAreaCalc.getText());
+            stage.setScene(firstScene);
+        });
+        /*
+        * REAL TIME RMS
+        */
+        nappiScene4.setOnMouseClicked(event -> {
             stage.setTitle("Real Time rms");
             if ( stage.getWidth() == this.getStageWidth() ){
                 stage.setWidth(this.getStageWidth()+(this.getAnimWidth()-this.getTextWidth()));
@@ -1177,7 +1192,7 @@ public class RandomWalk extends Application {
         /*
         * MMC
         */
-        nappiScene4.setOnMouseClicked(event -> {
+        nappiScene5.setOnMouseClicked(event -> {
             stage.setTitle("MMC Diffusion");
             if ( stage.getWidth() == this.getStageWidth() ){
                 stage.setWidth(this.getStageWidth()+(this.getAnimWidth()-this.getTextWidth()));
@@ -1198,21 +1213,6 @@ public class RandomWalk extends Application {
             stage.setY((this.getScreenHeight()-this.getStageHeight())/2.0);
             stage.setWidth(this.getStageWidth());
             stage.setHeight(this.getStageHeight());
-            stage.setScene(firstScene);
-        });
-        /*
-         * 1D DISTANCE
-         */
-        nappiScene5.setOnMouseClicked(event -> {
-            stage.setTitle("1D Distance");
-            stage.setScene(dist1DScene);
-        });
-        menuNappi1Ddist.setOnAction(event -> {
-            stage.setTitle("Random Walk");
-            if (this.textArea1Ddist.getText().equals(helpText.distance1D()))
-                this.textAreaMenu.setText(helpText.welcome());
-            else
-                this.textAreaMenu.setText(this.textArea1Ddist.getText());
             stage.setScene(firstScene);
         });
 

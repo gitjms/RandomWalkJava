@@ -48,7 +48,7 @@ class FXPlot extends SceneRealTimeRms {
 
         if (which.equals("Walks&norm")) {
             this.getFrame().setLocation(0, this.getYMarginTiny());
-            this.getFrame().setPreferredSize(new Dimension(this.getWidth(), this.getWalkNormHeight()));
+            this.getFrame().setPreferredSize(new Dimension(this.getWNWidth(), this.getWalkNormHeight()));
             this.getFrame().setTitle("Real Time R_rms");
             this.getFrame().getContentPane().setLayout(new GridLayout(2,1));
         } else if (which.equals("E")) {
@@ -72,10 +72,10 @@ class FXPlot extends SceneRealTimeRms {
         this.chartPanelE = new XChartPanel<>(this.getCalcChartE());
 
         if (which.equals("Walks&norm")) {
-            this.getChartPanelW().setBounds(0, this.getYMarginTiny(), this.getWidth(), this.getHeight()/2);
+            this.getChartPanelW().setBounds(0, this.getYMarginTiny(), this.getWNWidth(), this.getHeight()/2);
             this.getChartPanelW().setVisible(true);
 
-            this.getChartPanelH().setBounds(0, this.getHeight()/2, this.getWidth(), this.getHeight()/2);
+            this.getChartPanelH().setBounds(0, this.getHeight()/2, this.getWNWidth(), this.getHeight()/2);
             this.getChartPanelH().setVisible(true);
             /*
             * Upper XYChart calcChartW
@@ -138,8 +138,8 @@ class FXPlot extends SceneRealTimeRms {
     }
 
     /**
-     * method for plotting R_rms and sqrt(N) vs. walks in Real Time Rms
-     * plot has two data lines: "R_rms" and "sqrt(N)"
+     * method for plotting R_rms and sqrt(steps) vs. walks in Real Time Rms
+     * plot has two data lines: "R_rms" and "sqrt(steps)"
      * @param x x-axis data (rms_runs)
      * @param y y-axis data (rms_runs)
      * @param expected value of Math.sqrt((double) steps)
@@ -155,9 +155,9 @@ class FXPlot extends SceneRealTimeRms {
         			JOIN_MITER, 10.0f, new float[]{5, 5}, 2.0f )
         };
         this.getCalcChartW().addSeries("R_rms", x, y).setLineStyle(BasicStroke[0]).setLineColor(Color.red);
-        this.getCalcChartW().addSeries("sqrt(N)", x, y).setLineStyle(BasicStroke[1]).setLineColor(Color.blue);
+        this.getCalcChartW().addSeries("sqrt(steps)", x, y).setLineStyle(BasicStroke[1]).setLineColor(Color.blue);
 
-        this.getCalcChartW().setTitle("R_rms and sqrt(N) vs. walks, "+"sqrt(N) = "+String.format("%.2f",expected));
+        this.getCalcChartW().setTitle("R_rms and sqrt(steps) vs. walks, "+"sqrt(steps) = "+String.format("%.2f",expected));
         this.getCalcChartW().getStyler().setAntiAlias(true);
         this.getFrame().getContentPane().add(this.getChartPanelW());
         this.getFrame().repaint();
@@ -220,8 +220,8 @@ class FXPlot extends SceneRealTimeRms {
     }
 
     /**
-     * method for updating R_rms and sqrt(N) vs. walks in Real Time Rms
-     * @param name name for "R_rms" or "sqrt(N)"
+     * method for updating R_rms and sqrt(steps) vs. walks in Real Time Rms
+     * @param name name for "R_rms" or "sqrt(steps)"
      * @param x x-axis data (xAxis)
      * @param y y-axis data (yAxis or y2Axis)
      */
@@ -321,6 +321,12 @@ class FXPlot extends SceneRealTimeRms {
      */
     @Contract(pure = true)
     private int getWidth() { return 600 / (int) Screen.getMainScreen().getRenderScale(); }
+
+    /**
+     * @return the wnwidth
+     */
+    @Contract(pure = true)
+    private int getWNWidth() { return 700 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the height

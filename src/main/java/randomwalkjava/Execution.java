@@ -84,8 +84,7 @@ class Execution {
         } catch (Throwable ex) {
             System.out.println(ex.getMessage());
         }
-        if (!result)
-            return;
+        if (!result) return;
 
         int particles = parseInt(vars[0]);
         int steps = parseInt(vars[3]);

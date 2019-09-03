@@ -357,7 +357,7 @@ class SceneRealTimeRms extends Data {
                                 fxplot.setMinY(this.getSmallest() * 0.8 );
                                 fxplot.setMaxY(this.getGreatest() * 1.2 );
                                 fxplot.updateWData("R_rms", xAxis, yAxis);
-                                fxplot.updateWData("sqrt(N)", xAxis, y2Axis);
+                                fxplot.updateWData("sqrt(steps)", xAxis, y2Axis);
 
                                 double sigma2 = Math.pow(rrms - this.getRms_sum()/this.getRuns(),2.0);
                                 double ynorm;
