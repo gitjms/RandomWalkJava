@@ -110,7 +110,6 @@ class Data {
             teksti.append("\n").append(e.getMessage());
             System.out.println(teksti);
         }
-
         return ok;
     }
 
@@ -125,16 +124,27 @@ class Data {
     
         double[] values;
         List<double[]> dataList = new ArrayList<>();
-        
+
         try ( Scanner sc = new Scanner(filePath) ) {
             while (sc.hasNextLine()) {
-                values = new double[dim];
+                values = new double[dim+1];
                 String data = sc.nextLine();
                 String[] osat;
                 osat = data.trim().split("(\\s+)");
                 if (!osat[0].equals("Start")) {
-                    for (int i = 0; i < osat.length; i++) {
-                        values[i] = Double.parseDouble(osat[i]);
+                    for (int i = 1; i < osat.length; i++) {
+                        values[i-1] = Double.parseDouble(osat[i]);
+                    }
+                    switch (osat[0].trim()) {
+                        case "+":
+                            values[dim] = 1.0;
+                            break;
+                        case "-":
+                            values[dim] = 2.0;
+                            break;
+                        case "*":
+                            values[dim] = 3.0;
+                            break;
                     }
                     dataList.add(values);
                 }
@@ -150,8 +160,6 @@ class Data {
      * method for setting the save parameter in vars array
      * @param var the vars array to set
      */
-    void setVar(String var) {
-        this.vars[8]=var;
-    }
+    void setSave(String var) { this.vars[8]=var; }
 
 }

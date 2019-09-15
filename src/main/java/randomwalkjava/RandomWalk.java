@@ -34,7 +34,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static java.lang.Double.parseDouble;
@@ -62,15 +61,12 @@ public class RandomWalk extends Application {
     private double mmcscalefactor;
     private double linewidth;
     private boolean isrealscaled;
-    private boolean ismmcscaled;
     private boolean newdata;
-    private boolean standnorm;
-    private double mincount;
-    private double maxcount;
-    private double[] rms_runs;
-    private double[] rms_norm;
+    private List <Double> diffusion_x;
+    private List <Double> diffusion_y;
     private List <Double> energy_x;
     private List <Double> energy_y;
+    private Pane mempane;
 
     @Override
     public void start(Stage stage) {
@@ -84,9 +80,7 @@ public class RandomWalk extends Application {
         setMmcScalefactor(1.0);
         setLinewidth(1.0);
         setRealScaled(false);
-        setMmcScaled(false);
         setNewdata(false);
-        setStandnorm(true);
 
         /*
         * FILE AND FOLDER CHECK
@@ -501,7 +495,6 @@ public class RandomWalk extends Application {
         GraphicsContext mmcpiirturi = mmcAlusta.getGraphicsContext2D();
         mmcpiirturi.setFill(Color.BLACK);
         mmcpiirturi.fillRect(0, 0, this.getAnimWidth(), this.getAnimHeight());
-        mmcpiirturi.setStroke(Color.YELLOW);
 
         Pane mmcpane = new Pane();
         mmcpane.setPrefSize(this.getAnimWidth(), this.getAnimHeight());
@@ -686,40 +679,6 @@ public class RandomWalk extends Application {
         closeNappiPath.setVisible(true);
 
         /*
-        * OTHER VIEWS BUTTON: PLOT CHOICE REAL TIME RMS
-        */
-        Button standNorm = new Button("STD NORM");
-        standNorm.setMinWidth(this.getButtonWidth());
-        standNorm.setMaxWidth(this.getButtonWidth());
-        standNorm.setBackground(new Background(
-            new BackgroundFill(
-                Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
-        standNorm.setId("standnorm");
-        standNorm.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> standNorm.setEffect(shadow));
-        standNorm.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> standNorm.setEffect(null));
-        standNorm.setOnMouseClicked((MouseEvent event) -> {
-            if (standNorm.getText().equals("NORM")){
-                // BUTTON PRESSED ON
-                standNorm.setText("STD NORM");
-                standNorm.setBackground(
-                    new Background(
-                        new BackgroundFill(
-                            Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.setStandnorm(true);
-            } else if (standNorm.getText().equals("STD NORM")) {
-                // BUTTON PRESSED OFF
-                standNorm.setText("NORM");
-                standNorm.setBackground(
-                    new Background(new BackgroundFill(
-                        Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.setStandnorm(false);
-            }
-        });
-        standNorm.setVisible(true);
-
-        /*
         * OTHER VIEWS BUTTON: RUN REAL TIME RMS
         */
         Button runReal = new Button("RUN");
@@ -758,9 +717,28 @@ public class RandomWalk extends Application {
         helpNappiReal.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> helpNappiReal.setEffect(null));
         helpNappiReal.setOnAction(event -> {
-            if (isovalikkoReal.getChildren().contains(pane)){
+            if ( isovalikkoReal.getChildren().contains(pane) && helpNappiReal.getText().equals("HELP") ){
+                mempane = new Pane();
+                mempane.getChildren().addAll(pane.getChildren());
                 isovalikkoReal.getChildren().remove(pane);
                 isovalikkoReal.getChildren().add(this.textAreaReal);
+                helpNappiReal.setText("BACK");
+            } else if ( isovalikkoReal.getChildren().contains(this.textAreaReal) && helpNappiReal.getText().equals("BACK") ){
+                isovalikkoReal.getChildren().remove(this.textAreaReal);
+                pane.getChildren().addAll(mempane.getChildren());
+                isovalikkoReal.getChildren().add(pane);
+                helpNappiReal.setText("HELP");
+            } else if ( isovalikkoReal.getChildren().contains(pane) && helpNappiReal.getText().equals("HELP") ){
+                mempane = new Pane();
+                mempane.getChildren().addAll(pane.getChildren());
+                isovalikkoReal.getChildren().remove(pane);
+                isovalikkoReal.getChildren().add(this.textAreaReal);
+                helpNappiReal.setText("BACK");
+            } else if ( isovalikkoReal.getChildren().contains(this.textAreaReal) && helpNappiReal.getText().equals("BACK") ) {
+                isovalikkoReal.getChildren().remove(this.textAreaReal);
+                pane.getChildren().addAll(mempane.getChildren());
+                isovalikkoReal.getChildren().add(pane);
+                helpNappiReal.setText("HELP");
             }
             this.textAreaReal.setText(helpText.realtimerms());
         });
@@ -847,9 +825,28 @@ public class RandomWalk extends Application {
         helpNappiMMC.addEventHandler(
             MouseEvent.MOUSE_EXITED, (MouseEvent e) -> helpNappiMMC.setEffect(null));
         helpNappiMMC.setOnAction(event -> {
-            if (isovalikkoMMC.getChildren().contains(pane)){
+            if ( isovalikkoMMC.getChildren().contains(pane) && helpNappiMMC.getText().equals("HELP") ){
+                mempane = new Pane();
+                mempane.getChildren().addAll(pane.getChildren());
                 isovalikkoMMC.getChildren().remove(pane);
                 isovalikkoMMC.getChildren().add(this.textAreaMMC);
+                helpNappiMMC.setText("BACK");
+            } else if ( isovalikkoMMC.getChildren().contains(this.textAreaMMC) && helpNappiMMC.getText().equals("BACK") ){
+                isovalikkoMMC.getChildren().remove(this.textAreaMMC);
+                pane.getChildren().addAll(mempane.getChildren());
+                isovalikkoMMC.getChildren().add(pane);
+                helpNappiMMC.setText("HELP");
+            } else if ( isovalikkoMMC.getChildren().contains(mmcpane) && helpNappiMMC.getText().equals("HELP") ){
+                mempane = new Pane();
+                mempane.getChildren().addAll(mmcpane.getChildren());
+                isovalikkoMMC.getChildren().remove(mmcpane);
+                isovalikkoMMC.getChildren().add(this.textAreaMMC);
+                helpNappiMMC.setText("BACK");
+            } else if ( isovalikkoMMC.getChildren().contains(this.textAreaMMC) && helpNappiMMC.getText().equals("BACK") ) {
+                isovalikkoMMC.getChildren().remove(this.textAreaMMC);
+                mmcpane.getChildren().addAll(mempane.getChildren());
+                isovalikkoMMC.getChildren().add(mmcpane);
+                helpNappiMMC.setText("HELP");
             }
             this.textAreaMMC.setText(helpText.mmc());
         });
@@ -1044,7 +1041,6 @@ public class RandomWalk extends Application {
             menuNappiReal,
             helpNappiReal,
             getRealScene.getSceneReal(),
-            standNorm,
             runReal,
             closeNappiReal);
         isovalikkoReal.getChildren().addAll(
@@ -1230,7 +1226,7 @@ public class RandomWalk extends Application {
         * EXECUTE BUTTON CALCULATION
         */
         executeNappiCalc.setOnMouseClicked((MouseEvent event) -> {
-            getCalcScene.setVar("s");
+            getCalcScene.setSave("s");
             String[] vars = getCalcScene.getVars();
             this.setVars(vars);
             Data data = new Data(vars);
@@ -1272,7 +1268,7 @@ public class RandomWalk extends Application {
         * EXECUTE BUTTON PATH TRACING
         */
         executeNappiPath.setOnMouseClicked((MouseEvent event) -> {
-            getMMCScene.setVar("s");
+            getMMCScene.setSave("s");
             String[] vars = getPathScene.getVars();
             this.setVars(vars);
             Data data = new Data(vars);
@@ -1373,7 +1369,7 @@ public class RandomWalk extends Application {
                 * DRAW ANIMATION
                 */
                 getRealScene.refresh(datafolder, fexec, piirturi, getRealScalefactor(), getLinewidth(), getFxplot(),
-                    rms_runs, isNewdata(), getMincount(), getMaxcount(), isStandnorm(), getAnimWidth());
+                    isNewdata(), getAnimWidth());
                 setNewdata(false);
 
                 this.prevTime = currentNanoTime;
@@ -1395,35 +1391,35 @@ public class RandomWalk extends Application {
                 menuNappiReal.setDisable(false);
                 helpNappiReal.setDisable(false);
                 closeNappiReal.setDisable(false);
-                standNorm.setDisable(false);
-                runReal.setText("RUN");
+                runReal.setText("NEW RUN");
             } else {
                 this.setVars(getRealScene.getVars());
-                getRealScene.setVar("-");
+                getRealScene.setSave("-");
                 boolean fail = false;
 
                 int particles = parseInt(getVars()[0]);
-                int dim = parseInt(this.getVars()[4]);
                 int steps = parseInt(getVars()[3]);
- 
-                if ( particles < 0 ) fail = true;
-                if ( steps < 1 ) fail = true;
-                if ( dim < 1 || dim > 3 ) fail = true;
+                int dim = parseInt(this.getVars()[4]);
 
-                if ( fail ) return;
+                if (particles < 0) fail = true;
+                if (steps < 1) fail = true;
+                if (dim < 1 || dim > 3) fail = true;
+
+                if (fail) return;
 
                 if (this.getFxplot() != null) {
-                if (this.getFxplot().isRunning()) this.getFxplot().stop();
-                if (this.getFxplot().getFrame().isShowing()
-                    || this.getFxplot().getFrame().isActive()
-                    || this.getFxplot().getFrame().isDisplayable())
-                    this.getFxplot().getFrame().dispose();
+                    if (this.getFxplot().isRunning()) this.getFxplot().stop();
+                    if (this.getFxplot().getFrame().isShowing()
+                        || this.getFxplot().getFrame().isActive()
+                        || this.getFxplot().getFrame().isDisplayable())
+                        this.getFxplot().getFrame().dispose();
                 }
+
                 this.setFxplot(new FXPlot("Walks&norm"));
 
-                this.setRealScalefactor(Math.sqrt(this.getAnimWidth() + Math.pow(dim,2.0) * 100
-                    * Math.pow(Math.log10(steps),2.0) ) / Math.pow(Math.log10(steps),2.0));
- 
+                this.setRealScalefactor(Math.sqrt(this.getAnimWidth() + Math.pow(dim, 2.0) * 100
+                    * Math.pow(Math.log10(steps), 2.0)) / Math.pow(Math.log10(steps), 2.0));
+
                 switch (dim) {
                     case 1:
                         this.setLinewidth(1.0 / Math.log10(steps));
@@ -1440,34 +1436,15 @@ public class RandomWalk extends Application {
                         break;
                 }
                 this.setRealScaled(true);
-                piirturi.setGlobalAlpha(1.0 / this.getRealScalefactor() * Math.pow(Math.log10(steps),2.0));
+                piirturi.setGlobalAlpha(1.0 / this.getRealScalefactor() * Math.pow(Math.log10(steps), 2.0));
 
                 this.setNewdata(true);
-                this.setRms_runs();
-                this.setRms_norm();
-                double expected = Math.sqrt(steps);
 
-                if ( !this.isStandnorm() ) {
-                    if ( (int) expected < 5 ) {
-                        this.setMincount(0.0);
-                    } else {
-                        this.setMincount(expected - 5.0);
-                    }
-                    this.setMaxcount(expected + 5.0);
-                } else {
-                    this.setMincount(-4.0);
-                    this.setMaxcount(4.0);
-                }
-
-                this.getFxplot().setWData(this.getRms_runs(), this.getRms_runs(), expected);
-                this.getFxplot().setHData(this.getRms_norm(), this.getRms_norm(), this.getMincount(), this.getMaxcount(), this.isStandnorm());
-        
                 getRealScene.start();
                 runReal.setText("STOP");
                 menuNappiReal.setDisable(true);
                 helpNappiReal.setDisable(true);
                 closeNappiReal.setDisable(true);
-                standNorm.setDisable(true);
             }
         });
 
@@ -1476,7 +1453,7 @@ public class RandomWalk extends Application {
         */
         plotMMC.setOnMouseClicked((MouseEvent event) -> {
             valikkoMMC.setDisable(true);
-            getMMCScene.setVar("s");
+            getMMCScene.setSave("+");
             String[] vars = getMMCScene.getVars();
             this.setVars(vars);
             Data data = new Data(vars);
@@ -1489,7 +1466,7 @@ public class RandomWalk extends Application {
 
             if ( particles < 0 ) fail = true;
             if ( diam <= 0.0 || diam >= 1.0 ) fail = true;
-            if ( charge < 0 || charge > 2 ) fail = true;
+            if ( charge < 1 || charge > 2 ) fail = true;
             if ( dim < 2 || dim > 3 ) fail = true;
             if ( !lattice.equals("l") && !lattice.equals("-") ) fail = true;
 
@@ -1504,7 +1481,7 @@ public class RandomWalk extends Application {
         */
         runMMC.setOnMouseClicked((MouseEvent event) -> {
             if ( getMMCScene.timerIsRunning()) return;
-            getMMCScene.setVar("-");
+            getMMCScene.setSave("-");
             String[] vars = getMMCScene.getVars();
             this.setVars(vars);
             int particles = parseInt(getVars()[0]);
@@ -1516,7 +1493,7 @@ public class RandomWalk extends Application {
 
             if ( particles < 0 ) fail = true;
             if ( diam <= 0.0 || diam >= 1.0 ) fail = true;
-            if ( charge < 0 || charge > 2 ) fail = true;
+            if ( charge < 1 || charge > 2 ) fail = true;
             if ( dim < 2 || dim > 3 ) fail = true;
             if ( !lattice.equals("l") && !lattice.equals("-") ) fail = true;
 
@@ -1529,11 +1506,14 @@ public class RandomWalk extends Application {
                     || this.getFxplot().getFrame().isDisplayable())
                     this.getFxplot().getFrame().dispose();
             }
-            this.setFxplot(new FXPlot("E"));
 
-            if ( this.isMmcScaled() ) {
-                mmcpiirturi.scale(1.0/this.getMmcScalefactor(), 1.0/this.getMmcScalefactor());
-            }
+            this.setFxplot(new FXPlot("energy&diffusion"));
+            this.setEnergy_x(new ArrayList<>());
+            this.setEnergy_y(new ArrayList<>());
+            this.setDiffusion_x(new ArrayList<>());
+            this.setDiffusion_y(new ArrayList<>());
+
+            mmcpiirturi.scale(1.0/this.getMmcScalefactor(), 1.0/this.getMmcScalefactor());
 
             double measure;
             double diff;
@@ -1566,12 +1546,9 @@ public class RandomWalk extends Application {
 
             mmcpiirturi.scale(this.getMmcScalefactor(), this.getMmcScalefactor());
 
-            this.setMmcScaled(true);
             mmcpiirturi.setGlobalAlpha(1.0 / this.getMmcScalefactor() );
 
             this.setNewdata(true);
-            this.setEnergy_x(new ArrayList<>());
-            this.setEnergy_y(new ArrayList<>());
 
 			if ( isovalikkoMMC.getChildren().contains(this.textAreaMMC)) {
                 this.textAreaMMC.clear();
@@ -1588,17 +1565,24 @@ public class RandomWalk extends Application {
             /*
             * GET INITIAL DATA
             */
-            File initialDataFile = new File(
-                datapath + "/startMMC_" + dim + "D_" + particles + "N.xy");
+            File initialDataFile = new File( datapath + "/startMMC_" + dim + "D_" + particles + "N.xy");
+            boolean deleted;
+            if (Files.exists(initialDataFile.toPath())) {
+                deleted = initialDataFile.delete();
+                if (!deleted) System.out.println("Old data file 'startMMC_" + dim + "D_" + particles + "N.xy'couldn't be"
+                    + " deleted, which may spoil your run.\n"
+                    + "Try closing the application, delete the file manually, and then run again.");
+            }
 
             /*
             * DRAW MMC ANIMATION
             */
             getMMCScene.refresh(datafolder, initialDataFile, fexec, mmcpiirturi, this.getMmcScalefactor(),
-                    this.getAnimWidth(), this.getLinewidth(), this.getFxplot(), remBarNappiMMC, runMMC,
-                    plotMMC, closeNappiMMC, menuNappiMMC, helpNappiMMC, this.getEnergy_x(), this.getEnergy_y(),
-                    this.isNewdata(), measure, diff
+                this.getAnimWidth(), this.getLinewidth(), this.getFxplot(), remBarNappiMMC, runMMC,
+                plotMMC, closeNappiMMC, menuNappiMMC, helpNappiMMC, this.getEnergy_x(), this.getEnergy_y(),
+                this.getDiffusion_x(), this.getDiffusion_y(), this.isNewdata(), measure, diff
             );
+
             this.setNewdata(false);
 
         });
@@ -1901,17 +1885,6 @@ public class RandomWalk extends Application {
     private void setRealScaled(boolean isrealscaled) { this.isrealscaled = isrealscaled; }
 
     /**
-     * @return the ismmcscaled
-     */
-    @Contract(pure = true)
-    private boolean isMmcScaled() { return ismmcscaled; }
-
-    /**
-     * @param ismmcscaled the ismmcscaled to set
-     */
-    private void setMmcScaled(boolean ismmcscaled) { this.ismmcscaled = ismmcscaled; }
-
-    /**
      * @return the newdata
      */
     @Contract(pure = true)
@@ -1923,64 +1896,26 @@ public class RandomWalk extends Application {
     private void setNewdata(boolean newdata) { this.newdata = newdata; }
 
     /**
-     * @return the standnorm
-     */
-
-    @Contract(pure = true)
-    private boolean isStandnorm() { return standnorm; }
-
-    /**
-     * @param standnorm the standnorm to set
-     */
-    private void setStandnorm(boolean standnorm) { this.standnorm = standnorm; }
-
-    /**
-     * @return the mincount
+     * @return the diffusion_x
      */
     @Contract(pure = true)
-    private double getMincount() { return mincount; }
+    private List <Double> getDiffusion_x() { return diffusion_x; }
 
     /**
-     * @param mincount the mincount to set
+     * @param diffusion_x the diffusion_x to set
      */
-    private void setMincount(double mincount) { this.mincount = mincount; }
+    private void setDiffusion_x(List<Double> diffusion_x) { this.diffusion_x = diffusion_x; }
 
     /**
-     * @return the maxcount
+     * @return the diffusion_y
      */
     @Contract(pure = true)
-    private double getMaxcount() { return maxcount; }
+    private List <Double> getDiffusion_y() { return diffusion_y; }
 
     /**
-     * @param maxcount the maxcount to set
+     * @param diffusion_y the diffusion_y to set
      */
-    private void setMaxcount(double maxcount) { this.maxcount = maxcount; }
-
-    /**
-     * @return the rms_runs
-     */
-    private double[] getRms_runs() { return rms_runs.clone(); }
-
-    /**
-     * rms_runs to fill with zeros
-     */
-    private void setRms_runs() {
-        this.rms_runs = new double[10];
-        Arrays.fill(this.rms_runs, 0.0);
-    }
-
-    /**
-     * @return the rms_norm
-     */
-    private double[] getRms_norm() { return rms_norm.clone(); }
-
-    /**
-     * rms_norm to fill with zeros
-     */
-    private void setRms_norm() {
-        this.rms_norm = new double[10];
-        Arrays.fill(this.rms_norm, 0.0);
-    }
+    private void setDiffusion_y(List<Double> diffusion_y) { this.diffusion_y = diffusion_y; }
 
     /**
      * @return the energy_x
