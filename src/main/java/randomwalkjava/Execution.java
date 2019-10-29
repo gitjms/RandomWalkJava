@@ -29,6 +29,7 @@ import static java.lang.Integer.parseInt;
 @SuppressWarnings("ALL")
 class Execution {
 
+    private String language;
     private int screenHeight;
     private Runtime runtime;
     private boolean running;
@@ -37,21 +38,22 @@ class Execution {
     /**
      * Initiating variables
      */
-    Execution() {
+    Execution(String language) {
+        this.setLanguage(language);
         setScreenHeight(Toolkit.getDefaultToolkit().getScreenSize().height);
     }
 
     /**
      * method for Path tracing Fortran and Python execution and image creation
-     * @param folder datafolder C:/RWDATA
-     * @param path datapath C:/RWDATA
-     * @param fexec Fortran executable walk.exe
-     * @param pyexec1d Python executable plot1d.py
-     * @param pyexec2d Python executable plot2d.py
-     * @param pyexec3d Python executable plot3d.py
+     * @param folder datafolder "C:/RWDATA"
+     * @param path datapath "C:/RWDATA"
+     * @param fexec Fortran executable "walk.exe"
+     * @param pyexec1d Python executable "plot1d.py"
+     * @param pyexec2d Python executable "plot2d.py"
+     * @param pyexec3d Python executable "plot3d.py"
      * @param frame JFrame for image
      * @param data instance of Data class
-     * @param vars user data from GUI via
+     * @param vars user data from GUI
      */
     void executePath(File folder, String path, String fexec,
                      String pyexec1d, String pyexec2d, String pyexec3d,
@@ -91,13 +93,13 @@ class Execution {
         int dimension = parseInt(vars[4]);
 
         if ( vars[6].equals("f") && vars[7].equals("l") ) {
-            titletext = "Fixed source lattice particles, ";
+            titletext = this.getLanguage().equals("fin") ? "Keskitetyn lähteen hilahiukkaset, " : "Fixed source lattice particles, ";
         } else if ( vars[6].equals("f") && vars[7].equals("-") ) {
-            titletext = "Fixed source free particles, ";
+            titletext = this.getLanguage().equals("fin") ? "Keskitetyn lähteen vapaat hiukkaset, " : "Fixed source free particles, ";
         } else if ( vars[6].equals("-") && vars[7].equals("l") ) {
-            titletext = "Spread out lattice particles, ";
+            titletext = this.getLanguage().equals("fin") ? "Hajautetut hilahiukkaset, " : "Spread out lattice particles, ";
         } else if ( vars[6].equals("-") && vars[7].equals("-") ) {
-            titletext = "Spread out free particles, ";
+            titletext = this.getLanguage().equals("fin") ? "Hajautetut vapaat hiukkaset, " : "Spread out free particles, ";
         }
 
         String xDataPath = "x_path" + dimension + "D_" + particles + "N_" + steps + "S.xy";
@@ -135,23 +137,29 @@ class Execution {
          */
         BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension);
 
-        this.getFrame().setTitle("Random Walk - Path Tracing");
-        JLabel titleLabel = new JLabel(titletext + "N=" + particles + ", " + steps + " steps\n");
+        this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Satunnaiskulku - liikeradat" : "Random Walk - Path Tracing");
+        JLabel titleLabel = new JLabel(titletext + "N=" + particles + ", " + steps + (this.getLanguage().equals("fin") ? " askelta\n" :" steps\n"));
         java.awt.Font labelFont = titleLabel.getFont();
-        int newFontSize = (int)(labelFont.getSize() * 1.3);
+        int newFontSize = (int)(labelFont.getSize() * 2.0);
         titleLabel.setFont(new java.awt.Font(labelFont.getName(), java.awt.Font.PLAIN, newFontSize));
-        titleLabel.setBounds(this.getChartWidth()/2-this.getXMarginBig(),0, this.getChartWidth(),newFontSize);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         /*
         * PLOT
         */
         assert image != null;
-        this.getFrame().setSize(this.getChartWidth(), this.getChartHeight());
-        this.getFrame().setLocation(0, (int) ((this.getScreenHeight()-this.getChartHeight())/2.0));
-        Image image2 = image.getScaledInstance(this.getChartWidth(), this.getChartHeight()-this.getYMargin(), Image.SCALE_AREA_AVERAGING);
+        this.getFrame().setSize(this.getChartWidth(), this.getChartHeight()+this.getYMargin());
+        this.getFrame().setLocation(0, (int) ((this.getScreenHeight()-this.getChartHeight()-2*this.getYMargin())/2.0));
+        Image image2 = image.getScaledInstance(this.getChartWidth(), this.getChartHeight(), Image.SCALE_AREA_AVERAGING);
         ImageIcon figIcn = new ImageIcon(image2);
         JLabel figLabel = new JLabel(figIcn);
-        this.getFrame().add(titleLabel);
-        this.getFrame().add(figLabel);
+        Box vbox = Box.createVerticalBox();
+        vbox.setOpaque(true);
+        vbox.setBackground(Color.WHITE);
+        vbox.add(titleLabel);
+        vbox.add(figLabel);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        figLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        this.getFrame().add(vbox);
         this.getFrame().repaint();
         this.getFrame().pack();
         this.getFrame().setVisible(true);
@@ -159,15 +167,15 @@ class Execution {
 
     /**
      * method for MMC Fortran and Python execution and image creation
-     * @param folder datafolder C:/RWDATA
-     * @param path datapath C:/RWDATA
-     * @param fexec Fortran executable walk.exe
-     * @param pyexecmmc2d Python executable plotmmc2d.py
-     * @param pyexecmmc3d Python executable plotmmc3d.py
+     * @param folder datafolder "C:/RWDATA"
+     * @param path datapath "C:/RWDATA"
+     * @param fexec Fortran executable "walk.exe"
+     * @param pyexecmmc2d Python executable "plotmmc2d.py"
+     * @param pyexecmmc3d Python executable "plotmmc3d.py"
      * @param valikkoMMC VBox component in GUI to disable during run
      * @param frame JFrame for image
      * @param data instance of Data class
-     * @param vars user data from GUI via
+     * @param vars user data from GUI
      */
     void executeMMC(File folder, String path, String fexec, String pyexecmmc2d,
                     String pyexecmmc3d, VBox valikkoMMC, Data data, String[] vars) {
@@ -210,11 +218,11 @@ class Execution {
         if ( dimension == 2 ) {
             pdfFile = new File(path + "/jpyplotmmc2D_N" + particles + "_diam" + diameter + ".pdf");
             if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
-            command = new String[]{"cmd","/c", pyexecmmc2d, startDataMMC, finalDataMMC};
+            command = new String[]{"cmd","/c", pyexecmmc2d, startDataMMC, finalDataMMC, this.getLanguage()};
         } else if ( dimension == 3 ) {
             pdfFile = new File(path + "/jpyplotmmc3D_N" + particles + "_diam" + diameter + ".pdf");
             if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
-            command = new String[]{"cmd","/c", pyexecmmc3d, startDataMMC, finalDataMMC};
+            command = new String[]{"cmd","/c", pyexecmmc3d, startDataMMC, finalDataMMC, this.getLanguage()};
         }
 
         /*
@@ -222,7 +230,7 @@ class Execution {
          */
         BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension);
 
-        this.getFrame().setTitle("Random Walk - MMC Diffusion Plot");
+        this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Satunnaiskulku - MMC-diffuusiokuvaaja" : "Random Walk - MMC Diffusion Plot");
 
         /*
         * PLOT
@@ -242,13 +250,13 @@ class Execution {
 
     /**
      * method for Rms calculation Fortran and Python execution and image creation
-     * @param folder datafolder C:/RWDATA
-     * @param path datapath C:/RWDATA
-     * @param fexec Fortran executable walk.exe
-     * @param pyexecrms Python executable plotrms.py
+     * @param folder datafolder "C:/RWDATA"
+     * @param path datapath "C:/RWDATA"
+     * @param fexec Fortran executable "walk.exe"
+     * @param pyexecrms Python executable "plotrms.py"
      * @param frame JFrame for image
      * @param data instance of Data class
-     * @param vars user data from GUI via
+     * @param vars user data from GUI
      */
     void executeRms(File folder, String path, String fexec,
                     String pyexecrms, Data data, String[] vars) {
@@ -283,13 +291,13 @@ class Execution {
         int dimension = parseInt(vars[4]);
 
         if ( vars[6].equals("f") && vars[7].equals("l") ) {
-            titletext = "Fixed source lattice particles";
+            titletext = this.getLanguage().equals("fin") ? "Keskitetyn lähteen hilahiukkaset" : "Fixed source lattice particles";
         } else if ( vars[6].equals("f") && vars[7].equals("-") ) {
-            titletext = "Fixed source free particles";
+            titletext = this.getLanguage().equals("fin") ? "Keskitetyn lähteen vapaat hiukkaset" : "Fixed source free particles";
         } else if ( vars[6].equals("-") && vars[7].equals("l") ) {
-            titletext = "Spread out lattice particles";
+            titletext = this.getLanguage().equals("fin") ? "Hajautetut hilahiukkaset" : "Spread out lattice particles";
         } else if ( vars[6].equals("-") && vars[7].equals("-") ) {
-            titletext = "Spread out free particles";
+            titletext = this.getLanguage().equals("fin") ? "Hajautetut vapaat hiukkaset" : "Spread out free particles";
         }
 
         String rmsDataPath = "rms_" + dimension + "D_" + steps + "S.xy";
@@ -297,14 +305,15 @@ class Execution {
         File pdfFile = new File(path + "/jpyplotRMS" + dimension + "D_" + steps + "S.pdf");
         if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
 
-        String[] command = new String[]{"cmd","/c", pyexecrms, rmsDataPath};
+        String[] command = new String[]{"cmd","/c", pyexecrms, rmsDataPath, this.getLanguage()};
 
         /*
          * GET IMAGE
          */
         BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension);
 
-        this.getFrame().setTitle("Random Walk - R_rms Calculation - " + titletext);
+        this.getFrame().setTitle(this.getLanguage()
+            .equals("fin") ? "Satunnaiskulku - rms-laskenta - " + titletext : "Random Walk - R_rms Calculation - " + titletext);
 
         assert image != null;
         this.getFrame().setSize(this.getChartWidth(), this.getChartHeight());
@@ -320,16 +329,15 @@ class Execution {
 
     /**
      * method for 1D distance Fortran and Python execution and image creation
-     * @param folder datafolder C:/RWDATA
-     * @param path datapath C:/RWDATA
-     * @param fexec Fortran executable walk.exe
-     * @param pyexecrms Python executable plotrms.py
+     * @param folder datafolder "C:/RWDATA"
+     * @param path datapath "C:/RWDATA"
+     * @param fexec Fortran executable "walk.exe"
+     * @param pyexecrms Python executable "plotrms.py"
      * @param frame JFrame for image
      * @param data instance of Data class
      * @param vars user data from GUI via
      */
-    void execute1Ddist(File folder, String path, String fexec,
-                       String pyexec1d, Data data, String[] vars) {
+    void execute1Ddist(File folder, String path, String fexec, String pyexec1d, Data data, String[] vars) {
         /*
          * FROM SCENE1Ddist
          * vars from user:
@@ -360,9 +368,9 @@ class Execution {
         int dimension = parseInt(vars[4]);
 
         if ( vars[7].equals("l") ) {
-            titletext = "Lattice particles";
+            titletext = this.getLanguage().equals("fin") ? "Hilahiukkaset" : "Lattice particles";
         } else if ( vars[7].equals("-") ) {
-            titletext = "Free particles";
+            titletext = this.getLanguage().equals("fin") ? "Vapaat hiukkaset" : "Free particles";
         }
 
         String xDataPath = "x_path" + "1D_" + particles + "N_" + steps + "S.xy";
@@ -370,14 +378,14 @@ class Execution {
         File pdfFile = new File(path + "/jpyplot1Ddist_N" + particles + "_S" + steps + ".pdf");
         if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
 
-        String[] command = new String[]{"cmd","/c", pyexec1d, xDataPath};
+        String[] command = new String[]{"cmd","/c", pyexec1d, xDataPath, this.getLanguage()};
 
         /*
          * GET IMAGE
          */
         BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension);
 
-        this.getFrame().setTitle("Random Walk - 1D Distance - " + titletext);
+        this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Satunnaiskulku - 1D-etäisyys - " + titletext : "Random Walk - 1D Distance - " + titletext);
 
         assert image != null;
         this.getFrame().setSize(this.getBigChartWidth(), this.getBigChartHeight());
@@ -391,6 +399,104 @@ class Execution {
         this.getFrame().setVisible(true);
     }
 
+    /**
+     * method for Saw Fortran and Python execution and image creation
+     * @param folder datafolder "C:/RWDATA"
+     * @param path datapath "C:/RWDATA"
+     * @param fexec Fortran executable "walk.exe"
+     * @param pyexecsaw2d Python executable "plotsaw2d.py"
+     * @param pyexecsaw3d Python executable "plotsaw3d.py"
+     * @param frame JFrame for image
+     * @param data instance of Data class
+     * @param vars user data from GUI via
+     */
+    void executeSAW(File folder, String path, String fexec, String pyexecsaw2d,
+                    String pyexecsaw3d, VBox valikkoSAW, Data data, String[] vars, boolean issaw) {
+        /*
+         * FROM SCENEPATHTRACING
+         * vars from user:
+         * vars[0] = particles,  n/a
+         * vars[1] = diameter,   n/a
+         * vars[2] = charge,     n/a
+         * vars[3] = steps,      n/a
+         * vars[4] = dimension,  USER
+         * vars[5] = mmc,        n/a
+         * vars[6] = fixed,      n/a
+         * vars[7] = lattice,    n/a
+         * vars[8] = save        n/a
+         */
+        pyexecsaw2d = "python ".concat(pyexecsaw2d);
+        pyexecsaw3d = "python ".concat(pyexecsaw3d);
+        this.setFrame();
+        String yDataPath = null;
+        String zDataPath = null;
+        String titletext = null;
+        String[] command = null;
+
+        Boolean result = false;
+        try {
+            result = data.createData(folder, fexec);
+        } catch (Throwable ex) {
+            System.out.println(ex.getMessage());
+        }
+        if (!result) return;
+
+        int steps = parseInt(vars[3]);
+        int dimension = parseInt(vars[4]);
+
+        String dataPath;
+        if (issaw) dataPath = "saw_" + dimension + "D.xy";
+        else dataPath = "cbmc_" + dimension + "D_" + steps + "S.xy";
+
+        File pdfFile = new File(path + "/jpyplotSAW" + dimension + "D.pdf");
+        if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
+
+        /*
+         * 2D DATA
+         */
+        if ( dimension == 2 ) {
+            command = new String[]{"cmd","/c", pyexecsaw2d, dataPath, this.getLanguage()};
+        }
+
+        /*
+         * 3D DATA
+         */
+        if ( dimension == 3 ) {
+            command = new String[]{"cmd","/c", pyexecsaw3d, dataPath, this.getLanguage()};
+        }
+
+        /*
+         * GET IMAGE
+         */
+        BufferedImage image = createPdf(folder, command, pdfFile, 1, 100, dimension);
+
+        this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Satunnaiskulku - SAW-liikeradat" : "Random Walk - SAW Path Tracing");
+        /*
+         * PLOT
+         */
+        assert image != null;
+        this.getFrame().setSize(this.getChartWidth(), this.getSawHeight());
+        this.getFrame().setLocation(0, (int) ((this.getScreenHeight()-this.getSawHeight())/2.0));
+        Image image2 = image.getScaledInstance(this.getChartWidth(), this.getSawHeight()-this.getYMargin(), Image.SCALE_AREA_AVERAGING);
+        ImageIcon figIcn = new ImageIcon(image2);
+        JLabel figLabel = new JLabel(figIcn);
+        this.getFrame().add(figLabel);
+        this.getFrame().repaint();
+        this.getFrame().pack();
+        this.getFrame().setVisible(true);
+        valikkoSAW.setDisable(false);
+    }
+
+    /**
+     *
+     * @param folder datafolder "C:/RWDATA"
+     * @param command command string array to execute
+     * @param pdfFile image file to get
+     * @param particles number of particles from vars
+     * @param steps number of steps from vars
+     * @param dimension dimension from vars
+     * @return pdf image file
+     */
     BufferedImage createPdf(File folder, String[] command, File pdfFile, int particles, int steps, int dimension) {
 
         BufferedImage image;
@@ -454,8 +560,10 @@ class Execution {
      */
     private void setFrame() {
         this.frame = new JFrame();
+        //this.frame.getContentPane().removeAll();
         this.frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.frame.setIconImage(new ImageIcon(Execution.class.getResource("/icon64.png")).getImage());
+		//this.frame.setIconImage(new ImageIcon(getClass().getResource("/icon64.png")).getImage());
     }
 
     /**
@@ -519,6 +627,12 @@ class Execution {
     private int getMmcHeight() { return 950 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
+     * @return the mmcHeight
+     */
+    @Contract(pure = true)
+    private int getSawHeight() { return 800 / (int) Screen.getMainScreen().getRenderScale(); }
+
+    /**
      * @return the screenHeight
      */
     @Contract(pure = true)
@@ -539,13 +653,19 @@ class Execution {
      * @return the XMarginBig
      */
     @Contract(pure = true)
-    private int getXMarginBig() { return 150 / (int) Screen.getMainScreen().getRenderScale(); }
+    private int getXMarginBig() { return 200 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the YMarginSmall
      */
     @Contract(pure = true)
     private int getYMargin() { return 10 / (int) Screen.getMainScreen().getRenderScale(); }
+
+    /**
+     * @return the YMarginSmall
+     */
+    @Contract(pure = true)
+    private int getYMarginBig() { return 30 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the runtime
@@ -568,4 +688,15 @@ class Execution {
      * @param running the running to set
      */
     private void setRunning(boolean running) { this.running = running; }
+
+    /**
+     * @return the language
+     */
+    @Contract(pure = true)
+    private String getLanguage() { return this.language; }
+
+    /**
+     * @param language the language to set
+     */
+    private void setLanguage(String language) { this.language = language; }
 }

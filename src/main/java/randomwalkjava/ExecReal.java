@@ -5,6 +5,8 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -25,7 +27,6 @@ import static java.lang.Integer.parseInt;
 class ExecReal extends Data {
 
     private String language;
-    private FXPlot fxPlot;
     private double realscalefactor;
     private double linewidth;
     private boolean isrealscaled;
@@ -42,8 +43,6 @@ class ExecReal extends Data {
     void setRmsClick(File folder, String executable, @NotNull Button execNappi, SceneRealTimeRms rmsScene,
                      Button closeNappiReal, Button menuNappiReal, Button helpNappiReal,
                      HBox isovalikkoReal, TextArea textAreaReal, Pane realPane, GraphicsContext piirturi) {
-
-        this.setFxplot(fxPlot);
 
         /*
          * ANIMATION TIMER FOR REAL TIME RMS ANIMATION
@@ -195,11 +194,6 @@ class ExecReal extends Data {
      * @param vars the vars to set
      */
     private void setVars(@NotNull String[] vars) { this.vars = vars.clone(); }
-
-    /**
-     * @param fxplot the fxplot to set
-     */
-    private void setFxplot(FXPlot fxplot) { this.fxPlot = fxplot; }
 
     /**
      * @return the realscalefactor

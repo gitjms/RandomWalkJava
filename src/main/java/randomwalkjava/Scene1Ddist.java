@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Contract;
 @SuppressWarnings("SameReturnValue")
 class Scene1Ddist extends Data {
 
+    private String language;
     private final Button nappiLattice;
     private TextField setNumParticles;
 
@@ -36,9 +37,10 @@ class Scene1Ddist extends Data {
     /**
      * initiating scene button and user variable array
      */
-    Scene1Ddist() {
+    Scene1Ddist(String language){
         super();
-        this.nappiLattice = new Button("FREE");
+        this.setLanguage(language);
+        this.nappiLattice = new Button(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
         this.vars = new String[]{
             "0",    // vars[0] particles        USER
             "0.1",  // vars[1] diameter (0.1)   n/a
@@ -84,7 +86,7 @@ class Scene1Ddist extends Data {
         /*
          * COMPONENTS...
          */
-        Label labNumParticles = new Label("number of particles:");
+        Label labNumParticles = new Label(this.getLanguage().equals("fin") ? "hiukkasten lukumäärä:" : "number of particles:");
         this.setNumParticles = new TextField("");
         this.setNumParticles.setOnKeyReleased(e -> {
             if (isNumInteger(this.setNumParticles.getText().trim())){
@@ -100,7 +102,7 @@ class Scene1Ddist extends Data {
         this.vars[1] = "0.1"; // (diameter of particl)
         this.vars[2] = "0"; // (charge of particles)
 
-        Label labNumSteps = new Label("number of steps:");
+        Label labNumSteps = new Label(this.getLanguage().equals("fin") ? "askelten lukumäärä:" : "number of steps:");
         TextField setNumSteps = new TextField("");
         setNumSteps.setOnKeyReleased(e -> {
             if (isNumInteger(setNumSteps.getText().trim())){
@@ -135,25 +137,18 @@ class Scene1Ddist extends Data {
          */
         this.getNappiLattice().setMinWidth(getCompwidth());
         this.getNappiLattice().setMaxWidth(getCompwidth());
-        this.getNappiLattice().setBackground(new Background(
-            new BackgroundFill(
-                Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
         this.getNappiLattice().setId("lattice");
         this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getNappiLattice().setEffect(shadow));
         this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getNappiLattice().setEffect(null));
         this.getNappiLattice().setOnMouseClicked((MouseEvent event) -> {
-            if (this.getNappiLattice().getText().equals("LATTICE")){
-                this.getNappiLattice().setText("FREE");
-                this.getNappiLattice().setBackground(
-                    new Background(
-                        new BackgroundFill(
-                            Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
+            if (this.getNappiLattice().getText().equals("LATTICE") || this.getNappiLattice().getText().equals("HILA")){
+                this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
+                this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[7] = "-";
-            } else if (this.getNappiLattice().getText().equals("FREE")){
-                this.getNappiLattice().setText("LATTICE");
-                this.getNappiLattice().setBackground(
-                    new Background(new BackgroundFill(
-                        Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
+            } else if (this.getNappiLattice().getText().equals("FREE") || this.getNappiLattice().getText().equals("VAPAA")){
+                this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "HILA" : "LATTICE");
+                this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[7] = "l";
             }
         });
@@ -194,4 +189,15 @@ class Scene1Ddist extends Data {
     private Button getNappiLattice() {
         return nappiLattice;
     }
+
+    /**
+     * @return the language
+     */
+    @Contract(pure = true)
+    private String getLanguage() { return this.language; }
+
+    /**
+     * @param language the language to set
+     */
+    private void setLanguage(String language) { this.language = language; }
 }

@@ -8,10 +8,6 @@ import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -40,6 +36,7 @@ import static java.lang.Integer.parseInt;
 @SuppressWarnings("SameReturnValue")
 class SceneMMC extends Data {
 
+    private String language;
     private ToggleButton setCharge1;
     private ToggleButton setCharge2;
     private ToggleButton setDim2;
@@ -50,23 +47,27 @@ class SceneMMC extends Data {
 
     private long phaseEnergy;
     private long phaseDiffus;
+    private long phaseVisc;
     private double smallest;
-    private double smallestDiff;
     private double greatest;
     private double greatestDiff;
+    private double greatestVisc;
     private boolean firstEnergy;
     private boolean firstDiffus;
+    private boolean firstVisc;
     private double linewidth;
     private double scalefactor;
     private boolean timerRunning;
     private double animwidth;
     private double center;
+    private double initT;
+    private double finT;
     private GraphicsContext piirturi;
     private FXPlot fxplot;
     private Button remBarNappiMMC;
+    private VBox valikkoMMC;
     private Button runMMC;
-    private Button nappiDiffusLogPlot;
-    private Button nappiBalls3D;
+    private final Button nappiBalls3D;
     private Button plotMMC;
     private Button closeNappiMMC;
     private Button menuNappiMMC;
@@ -82,7 +83,6 @@ class SceneMMC extends Data {
     private boolean barrier;
     private boolean walk;
     private boolean lattice;
-    private boolean diffuslog;
     private boolean balls3D;
     private Image redP;
     private Image blueP;
@@ -98,6 +98,8 @@ class SceneMMC extends Data {
     private List<Double> energy_y;
     private List<Double> diffusion_x;
     private List<Double> diffusion_y;
+    private List<Double> visc_x;
+    private List<Double> visc_y;
     private double measure;
     private double differ;
 
@@ -110,12 +112,11 @@ class SceneMMC extends Data {
     /**
      * initiating scene button and user variable array
      */
-    SceneMMC() {
+    SceneMMC(String language){
         super();
-        this.nappiLattice = new Button("FREE");
-        this.nappiDiffusLogPlot = new Button("LOG Y AXIS");
-        this.diffuslog = true;
-        this.nappiBalls3D = new Button("BALLS");
+        this.setLanguage(language);
+        this.nappiLattice = new Button(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
+        this.nappiBalls3D = new Button(this.getLanguage().equals("fin") ? "PALLOT" : "BALLS");
         this.balls3D = true;
         this.vars = new String[]{
             "0",    // vars[0] particles        USER
@@ -131,16 +132,16 @@ class SceneMMC extends Data {
 
     /**
      * MMC execution, uses Timer
-     * @param folder datafolder C:/RWDATA
+     * @param folder datafolder "C:/RWDATA"
      * @param initialDataFile initial particle data
-     * @param executable Fortran executable walk.exe
+     * @param executable Fortran executable "walk.exe"
      * @param piirturi GraphicsContext which draws the animation
      * @param scalefactor scaling is used in different particle amounts
      * @param animwidth drawing area width
      * @param linewidth width for lines
-     * @param fxplot plotting element for graphs
      * @param remBarNappiMMC removing barrier in animation
      * @param runMMC run animation, no plot
+     * @param valikkoMMC valikkoMMC
      * @param plotMMC plot initial and final particle configurations, no animation
      * @param closeNappiMMC close button must be disabled during run
      * @param menuNappiMMC menu button must be disabled during run
@@ -149,16 +150,18 @@ class SceneMMC extends Data {
      * @param energy_y fxplot energy graph y-axis container
      * @param diffusion_x fxplot diffusion graph x-axis container
      * @param diffusion_y fxplot diffusion graph y-axis container
+     * @param visc_x fxplot visosity graph x-axis container
+     * @param visc_y fxplot visosity graph y-axis container
      * @param newdata if is a new run with new data
      * @param measure area/volume size
      * @param differ difference in between the lattice structure
      */
     void refresh(File folder, File initialDataFile, String executable,
                  GraphicsContext piirturi, double scalefactor, double animwidth, double linewidth,
-                 FXPlot fxplot, Button remBarNappiMMC, Button runMMC, Button plotMMC, Button closeNappiMMC,
-                 Button menuNappiMMC, Button helpNappiMMC, List<Double> energy_x, List<Double> energy_y,
-                 List<Double> diffusion_x, List<Double> diffusion_y,
-                 boolean newdata, double measure, double differ) {
+                 Button remBarNappiMMC, Button runMMC, VBox valikkoMMC, Button plotMMC,
+                 Button closeNappiMMC, Button menuNappiMMC, Button helpNappiMMC, List<Double> energy_x,
+                 List<Double> energy_y, List<Double> diffusion_x, List<Double> diffusion_y, List<Double> visc_x,
+                 List<Double> visc_y, boolean newdata, double measure, double differ) {
 
         this.setRedP(new Image("/Pred.png"));
         this.setBlueP(new Image("/Pblue.png"));
@@ -168,9 +171,9 @@ class SceneMMC extends Data {
         this.setPiirturi(piirturi);
         this.setLinewidth(linewidth);
         this.setAnimwidth(animwidth);
-        this.setFxplot(fxplot);
         this.setRemBarNappiMMC(remBarNappiMMC);
         this.setRunMMC(runMMC);
+        this.setValikkoMMC(valikkoMMC);
         this.setPlotMMC(plotMMC);
         this.setCloseNappiMMC(closeNappiMMC);
         this.setMenuNappiMMC(menuNappiMMC);
@@ -181,26 +184,32 @@ class SceneMMC extends Data {
         barrierOn();
 
         if (newdata) {
+            this.setInitT(0);
             this.setNumPart(parseInt(this.vars[0]));
             this.setDiam(parseDouble(this.vars[1]));
             this.setCharge(parseInt(this.vars[2]));
             this.setDim(parseInt(this.vars[4]));
             this.setLattice(this.vars[7].equals("l"));
-            this.setDiffusLog(this.isDiffusLog());
             this.setBalls3D(this.isBalls3D());
             this.setPhaseEnergy(0);
             this.setPhaseDiffus(0);
+            this.setPhaseVisc(0);
             this.setFirstEnergy(false);
             this.setFirstDiffus(false);
+            this.setFirstVisc(false);
             this.setScalefactor(scalefactor);
             this.setEnergyX(energy_x);
             this.setEnergyY(energy_y);
             this.setDiffusionX(diffusion_x);
             this.setDiffusionY(diffusion_y);
+            this.setViscX(visc_x);
+            this.setViscY(visc_y);
             this.energy_x.clear();
             this.energy_y.clear();
             this.diffusion_x.clear();
             this.diffusion_y.clear();
+            this.visc_x.clear();
+            this.visc_y.clear();
             this.setValues(new double[this.getDim() + 1][this.getNumPart()]);
             clearDots();
         }
@@ -214,11 +223,13 @@ class SceneMMC extends Data {
         this.getDim2().setDisable(true);
         this.getDim3().setDisable(true);
         this.getNappiLattice().setDisable(true);
-        this.getNappiDiffusLogPlot().setDisable(true);
         this.getNappiBalls3D().setDisable(true);
-        this.getRunMMC().setDisable(true);
+        this.getValikkoMMC().getChildren().set(3, this.getRemBarNappiMMC());
+
         this.getRemBarNappiMMC().setOnMouseClicked(event -> {
             barrierOff();
+            this.getValikkoMMC().getChildren().set(3, this.getRunMMC());
+            this.getRunMMC().setDisable(true);
             this.getRemBarNappiMMC().setVisible(false);
             this.getCloseNappiMMC().setDisable(true);
             this.getFxplot().setFrameVis();
@@ -231,9 +242,8 @@ class SceneMMC extends Data {
         try
         {
         command = new String[]{"cmd","/c",executable,
-            this.vars[0], this.vars[1], this.vars[2], this.vars[3],
-            this.vars[4], this.vars[5], this.vars[6], this.vars[7],
-            this.vars[8]};
+            this.vars[0], this.vars[1], this.vars[2], this.vars[3], this.vars[4],
+            this.vars[5], this.vars[6], this.vars[7], this.vars[8]};
 
         this.setRuntime(Runtime.getRuntime());
         runtimeStart();
@@ -305,10 +315,11 @@ class SceneMMC extends Data {
                         if (line.trim().startsWith("S") || line.isEmpty()) {
                             continue;
                         }
-                        if (!line.substring(0,1).matches("([0-9]|-|\\+|\\*)|E|D"))
+                        if (!line.substring(0,1).matches("([0-9]|-|\\+|\\*)|E|D|V"))
                             continue;
                         if ( !(line.trim().split("(\\s+)")[0].trim().equals("E")
-                            || line.trim().split("(\\s+)")[0].trim().equals("D")) ) {
+                            || line.trim().split("(\\s+)")[0].trim().equals("D")
+                            || line.trim().split("(\\s+)")[0].trim().equals("V")) ) {
                             if (getDim() == 2) {
                                 String[] valStr = line.split("(\\s+)");
                                 String sign = valStr[0].trim();
@@ -378,7 +389,7 @@ class SceneMMC extends Data {
                             try {
                                 if ( firstLetter.equals("E") && !isFirstEnergy() ) {
                                     double firstNum = Double.parseDouble(line.split("(\\s+)")[1].trim());
-                                    if ( firstNum != 0.0 ) setFirstEnergy(true);
+                                    setFirstEnergy(true);
 
                                     if ( isFirstEnergy() ) {
                                         if (!Double.isNaN(firstNum) && !Double.isInfinite(firstNum)
@@ -406,7 +417,7 @@ class SceneMMC extends Data {
                                         setPhaseEnergy(getPhaseEnergy() + 1);
                                 } else if ( firstLetter.equals("D") && !isFirstDiffus() ) {
                                     double firstNum = Double.parseDouble(line.split("(\\s+)")[1].trim());
-                                    if ( firstNum != 0.0 ) setFirstDiffus(true);
+                                    setFirstDiffus(true);
 
                                     if ( isFirstDiffus() ) {
                                         if (!Double.isNaN(firstNum) && !Double.isInfinite(firstNum)
@@ -419,10 +430,7 @@ class SceneMMC extends Data {
                                         if (!nanFound) {
                                             setPhaseDiffus(getPhaseDiffus() + 1);
                                             setGreatestDiff(getDiffusionY().get(0));
-                                            if (isDiffusLog())
-                                                getFxplot().setDLogData(getDiffusionX(), getDiffusionY());
-                                            else
-                                                getFxplot().setDNormData(getDiffusionX(), getDiffusionY());
+                                            getFxplot().setDData(getDiffusionX(), getDiffusionY());
                                         }
                                     }
                                 } else if ( firstLetter.equals("D") ) {
@@ -435,6 +443,41 @@ class SceneMMC extends Data {
                                         nanFound = true;
                                     if (!nanFound)
                                         setPhaseDiffus(getPhaseDiffus() + 1);
+                                } else if ( firstLetter.equals("V") && !isFirstVisc() ) {
+                                    double firstNum = 0.0;
+                                    if (getDiffusionY().get((int) getPhaseDiffus() - 1) != 0.0)
+                                        firstNum = 1.0e12 * Double.parseDouble(line.split("(\\s+)")[1].trim()) /
+                                            getDiffusionY().get((int) getPhaseDiffus() - 1);
+                                    setFirstVisc(true);
+
+                                    if ( isFirstVisc() ) {
+                                        if (!Double.isNaN(firstNum) && !Double.isInfinite(firstNum)
+                                            && !Double.isNaN(getPhaseVisc()) && !Double.isInfinite(getPhaseVisc())) {
+                                            getViscY().add(firstNum);
+                                            getViscX().add((double) getPhaseVisc());
+                                        } else
+                                            nanFound = true;
+
+                                        if (!nanFound) {
+                                            setPhaseVisc(getPhaseVisc() + 1);
+                                            setGreatestVisc(getViscY().get(0));
+                                            getFxplot().setVData(getViscX(), getViscY());
+                                        }
+                                    }
+                                } else if ( firstLetter.equals("V") ) {
+                                    double number = 0.0;
+                                    if (getDiffusionY().get((int) getPhaseDiffus() - 1) != 0.0)
+                                        number = 1.0e12 * Double.parseDouble(line.split("(\\s+)")[1].trim()) /
+                                            getDiffusionY().get((int) getPhaseDiffus() - 1);
+
+                                    if ( !Double.isNaN(number) && !Double.isInfinite(number) && number > 0.0
+                                        && !Double.isNaN(getPhaseVisc()) && !Double.isInfinite(getPhaseVisc()) ) {
+                                        getViscY().add(number);
+                                        getViscX().add((double) getPhaseVisc());
+                                    } else
+                                        nanFound = true;
+                                    if (!nanFound)
+                                        setPhaseVisc(getPhaseVisc() + 1);
                                 }
                             } catch (NumberFormatException e) {
                                 continue;
@@ -453,38 +496,33 @@ class SceneMMC extends Data {
                                             getFxplot().setEMinY(getSmallest());
                                         }
                                     }
-                                    getFxplot().setInitT(2.0/3.0*getEnergyY().get(0)/8.617333262145e-5);
+                                    setInitT(2.0/3.0*getEnergyY().get(0)/8.617333262145e-5);
                                     getFxplot().updateEData(getEnergyX(), getEnergyY());
                                 } else if ( firstLetter.equals("D") && isFirstDiffus() ) {
                                     if (getDiffusionY().get((int) getPhaseDiffus() - 1) > getGreatestDiff()) {
                                         setGreatestDiff(getDiffusionY().get((int) getPhaseDiffus() - 1));
-                                        if (isDiffusLog())
-                                            getFxplot().setDLogMaxY(getGreatestDiff());
-                                        else
-                                            getFxplot().setDNormMaxY(getGreatestDiff());
+                                        getFxplot().setDMaxY(getGreatestDiff());
                                     }
 
-                                    if (getDiffusionY().get((int) getPhaseDiffus() - 1) < getSmallestDiff()) {
-                                        setSmallestDiff(getDiffusionY().get(((int) getPhaseDiffus() - 1))/0.1E01);
-                                        if (isDiffusLog())
-                                            getFxplot().setDLogMinY(getSmallestDiff());
-                                        else
-                                            getFxplot().setDNormMinY(getSmallestDiff());
+                                    getFxplot().updateDData(getDiffusionX(), getDiffusionY());
+                                } else if ( firstLetter.equals("V") && isFirstVisc() ) {
+                                    if (getViscY().get((int) getPhaseVisc() - 1) > getGreatestVisc()) {
+                                        setGreatestVisc(getViscY().get((int) getPhaseVisc() - 1));
+                                        getFxplot().setVMaxY(getGreatestVisc());
                                     }
 
-                                    if (isDiffusLog())
-                                        getFxplot().updateDLogData(getDiffusionX(), getDiffusionY());
-                                    else
-                                        getFxplot().updateDNormData(getDiffusionX(), getDiffusionY());
+                                    getFxplot().updateVData(getViscX(), getViscY());
                                 }
                             }
                         }
                     }
 
-                    if (isDiffusLog()) getFxplot().setDLogTitle(getGreatestDiff());
-                    else getFxplot().setDNormTitle(getGreatestDiff());
-
-                    getFxplot().setFinT(2.0/3.0*getEnergyY().get((int) getPhaseEnergy() - 1)/8.617333262145e-5);
+                    int time = getViscX().size()-1;
+                    getFxplot().setVTitle(time, getViscY().get(getViscY().size()-1));
+                    getFxplot().setDTitle(time, getDiffusionY().get(getDiffusionY().size()-1));
+                    setFinT(2.0/3.0*getEnergyY().get((int) getPhaseEnergy() - 1)/8.617333262145e-5);
+                    double deltaT = getFinT() - getInitT();
+                    getFxplot().setDeltaT(deltaT);
 
                     setExitVal(getProcess().waitFor());
                     if (getExitVal() != 0) {
@@ -500,7 +538,6 @@ class SceneMMC extends Data {
                         getDim2().setDisable(false);
                         getDim3().setDisable(false);
                         getNappiLattice().setDisable(false);
-                        getNappiDiffusLogPlot().setDisable(false);
                         getNappiBalls3D().setDisable(false);
                         getCloseNappiMMC().setDisable(false);
                         getRuntime().gc();
@@ -518,13 +555,15 @@ class SceneMMC extends Data {
                     getDim2().setDisable(false);
                     getDim3().setDisable(false);
                     getNappiLattice().setDisable(false);
-                    getNappiDiffusLogPlot().setDisable(false);
                     getNappiBalls3D().setDisable(false);
                     getCloseNappiMMC().setDisable(false);
                     getRuntime().gc();
                     Platform.runLater(() -> {
-                        Alert alert = new Alert(AlertType.INFORMATION);
-                        alert.setContentText("Walk finished.");
+                        /*
+                         * INFO DIALOG
+                         */
+                        GetDialogs getDialogs = new GetDialogs();
+                        Alert alert = getDialogs.getInfo(getLanguage().equals("fin") ? "Ajo on päättynyt." : "Run is finished.");
                         walkStop();
                         alert.show();
                     });
@@ -545,7 +584,7 @@ class SceneMMC extends Data {
 
      /**
       * method for drawing the initial particles
-      * @param initialDataFile data from C:/RWDATA
+      * @param initialDataFile data from "C:/RWDATA"
       */
      private void drawInitials(File initialDataFile) {
 
@@ -554,19 +593,15 @@ class SceneMMC extends Data {
         List<double[]> initialData = readDataMMC(initialDataFile, this.getDim());
 
         this.getPiirturi().setGlobalAlpha(1.0);
-        if ( this.getNumPart() < 25 )
-            this.getPiirturi().setLineWidth(5.0 / (Math.log(this.getNumPart())*this.getScalefactor()));
-        else
-            this.getPiirturi().setLineWidth(10.0 / (Math.log(this.getNumPart())*this.getScalefactor()));
-         /*
-          * Draw barrier line
-          */
+        if ( this.getNumPart() < 25 ) this.getPiirturi().setLineWidth(5.0 / (Math.log(this.getNumPart())*this.getScalefactor()));
+        else this.getPiirturi().setLineWidth(10.0 / (Math.log(this.getNumPart())*this.getScalefactor()));
+        /*
+         * Draw barrier line
+         */
         this.getPiirturi().setStroke(Color.DIMGRAY);
         this.getPiirturi().strokeLine(
-            this.getCenter() / this.getScalefactor(),
-            0.0,
-            this.getCenter() / this.getScalefactor(),
-            2.0 * this.getCenter() / this.getScalefactor());
+            this.getCenter() / this.getScalefactor(), 0.0,
+            this.getCenter() / this.getScalefactor(), 2.0 * this.getCenter() / this.getScalefactor());
 
         /*
         * Draw initial data spots
@@ -594,12 +629,10 @@ class SceneMMC extends Data {
         this.getPiirturi().setFill(Color.BLACK);
         if ( this.getDim() == 2 )
             this.getPiirturi().fillRect(0, 0,
-                this.getAnimwidth() / this.getScalefactor(),
-                this.getAnimwidth() / this.getScalefactor());
+                this.getAnimwidth() / this.getScalefactor(), this.getAnimwidth() / this.getScalefactor());
         else if ( this.getDim() == 3 )
             this.getPiirturi().fillRect(0, 0,
-                1.0/this.getScalefactor()*this.getAnimwidth(),
-                1.0/this.getScalefactor()*this.getAnimwidth());
+                1.0/this.getScalefactor()*this.getAnimwidth(), 1.0/this.getScalefactor()*this.getAnimwidth());
         this.getPiirturi().fill();
     }
 
@@ -642,12 +675,9 @@ class SceneMMC extends Data {
             else if (ball == 3.0) ballImg = this.getYellowP();
             this.getPiirturi().drawImage(ballImg,x - xypos, y - xypos, widthheight, widthheight);
         } else {
-            if ( ball == 1 ) this.getPiirturi().setFill(
-                Color.rgb(255,80,80,1.0-z/(20.0*this.getScalefactor()))); // red
-            else if ( ball == 2 ) this.getPiirturi().setFill(
-                Color.rgb(100,100,255,1.0-z/(20.0*this.getNumPart()*this.getScalefactor()))); // blue
-            else if ( ball == 3 ) this.getPiirturi().setFill(
-                Color.rgb(255,255,50,1.0-z/(20.0*this.getNumPart()*this.getScalefactor()))); // yellow
+            if ( ball == 1 ) this.getPiirturi().setFill(Color.rgb(255,80,80,1.0-z/(20.0*this.getScalefactor()))); // red
+            else if ( ball == 2 ) this.getPiirturi().setFill(Color.rgb(100,100,255,1.0-z/(20.0*this.getNumPart()*this.getScalefactor()))); // blue
+            else if ( ball == 3 ) this.getPiirturi().setFill(Color.rgb(255,255,50,1.0-z/(20.0*this.getNumPart()*this.getScalefactor()))); // yellow
             this.getPiirturi().setGlobalAlpha(1.0-z/(this.getScalefactor()));
             this.getPiirturi().setLineWidth(this.getLinewidth());
             this.getPiirturi().setGlobalBlendMode(BlendMode.DIFFERENCE);
@@ -664,8 +694,7 @@ class SceneMMC extends Data {
             for ( int j = 0; j < (int) this.getMeasure() + 2; j+=2 ) {
                 if (isBalls3D()) {
                     this.getPiirturi().drawImage(this.getGrayP(),
-                        (double) i + this.getDiffer(), (double) j + this.getDiffer(),
-                        1.0, 1.0);
+                        (double) i + this.getDiffer(), (double) j + this.getDiffer(), 1.0, 1.0);
                 } else {
                     this.getPiirturi().setFill(Color.rgb(60,60,60));
                     this.getPiirturi().fillRoundRect(
@@ -723,7 +752,7 @@ class SceneMMC extends Data {
         /*
         * COMPONENTS...
         */
-        Label labNumParticles = new Label("number of particles:");
+        Label labNumParticles = new Label(this.getLanguage().equals("fin") ? "hiukkasten lukumäärä:" : "number of particles:");
         this.setNumParticles = new TextField("");
         this.setNumParticles.setOnKeyReleased(e -> {
             if (isNumInteger(this.setNumParticles.getText().trim())){
@@ -737,7 +766,7 @@ class SceneMMC extends Data {
                 this.vars[0] = "0";
         });
 
-        Label labSizeParticles = new Label("diameter of particle:");
+        Label labSizeParticles = new Label(this.getLanguage().equals("fin") ? "hiukkasten halkaisija:" : "diameter of particle:");
         this.setSizeParticles = new TextField("");
         this.setSizeParticles.setOnKeyReleased(e -> {
             if (isNumDouble(this.setSizeParticles.getText().trim())){
@@ -746,7 +775,7 @@ class SceneMMC extends Data {
                 this.vars[1] = "0.0";
         });
 
-        Label labCharge = new Label("charge of particles:");
+        Label labCharge = new Label(this.getLanguage().equals("fin") ? "hiukkasten varaus:" : "charge of particles:");
 
         this.setCharge1 = new ToggleButton("1");
         this.setCharge1.setMinWidth(55);
@@ -777,12 +806,11 @@ class SceneMMC extends Data {
 
         this.vars[3] = "0"; // steps
 
-        Label labNumDimensions = new Label("dimension:");
+        Label labNumDimensions = new Label(this.getLanguage().equals("fin") ? "ulottuvuus:" : "dimension:");
         this.setDim2 = new ToggleButton("2");
         this.setDim2.setMinWidth(55);
         this.setDim2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        this.setDim2.setBackground(new Background(new BackgroundFill(
-            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         this.setDim2.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.setDim2.setEffect(shadow));
         this.setDim2.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.setDim2.setEffect(null));
 
@@ -850,12 +878,12 @@ class SceneMMC extends Data {
         this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getNappiLattice().setEffect(shadow));
         this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getNappiLattice().setEffect(null));
         this.getNappiLattice().setOnMouseClicked((MouseEvent event) -> {
-            if (this.getNappiLattice().getText().equals("LATTICE")){
-                this.getNappiLattice().setText("FREE");
+            if (this.getNappiLattice().getText().equals("LATTICE") || this.getNappiLattice().getText().equals("HILA")){
+                this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
                 this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[7] = "-";
-            } else if (this.getNappiLattice().getText().equals("FREE")){
-                this.getNappiLattice().setText("LATTICE");
+            } else if (this.getNappiLattice().getText().equals("FREE") || this.getNappiLattice().getText().equals("VAPAA")){
+                this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "HILA" : "LATTICE");
                 this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[7] = "l";
             }
@@ -869,33 +897,7 @@ class SceneMMC extends Data {
 
         final Pane empty = new Pane();
         GridPane.setHalignment(empty, HPos.CENTER);
-        asettelu.add(empty, 0, 9, 2, 1);
-
-        /*
-         * BUTTON: DIFFUSLOG
-         */
-        this.getNappiDiffusLogPlot().setMinWidth(this.getCompwidth());
-        this.getNappiDiffusLogPlot().setMaxWidth(this.getCompwidth());
-        this.getNappiDiffusLogPlot().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.getNappiDiffusLogPlot().setId("diffuslog");
-        this.getNappiDiffusLogPlot().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getNappiDiffusLogPlot().setEffect(shadow));
-        this.getNappiDiffusLogPlot().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getNappiDiffusLogPlot().setEffect(null));
-        this.getNappiDiffusLogPlot().setOnMouseClicked((MouseEvent event) -> {
-            if (this.getNappiDiffusLogPlot().getText().equals("LOG Y AXIS")){
-                this.getNappiDiffusLogPlot().setText("NORM Y AXIS");
-                this.getNappiDiffusLogPlot().setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.diffuslog = false;
-            } else if (this.getNappiDiffusLogPlot().getText().equals("NORM Y AXIS")){
-                this.getNappiDiffusLogPlot().setText("LOG Y AXIS");
-                this.getNappiDiffusLogPlot().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.diffuslog = true;
-            }
-        });
-        valikko.getChildren().add(this.getNappiDiffusLogPlot());
-
-        final Pane empty2 = new Pane();
-        GridPane.setHalignment(empty2, HPos.CENTER);
-        asettelu.add(empty2, 0, 10, 2, 1);
+        asettelu.add(empty, 0, 9, 2, 2);
 
         /*
          * BUTTON: BALLS3D
@@ -907,21 +909,21 @@ class SceneMMC extends Data {
         this.getNappiBalls3D().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getNappiBalls3D().setEffect(shadow));
         this.getNappiBalls3D().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getNappiBalls3D().setEffect(null));
         this.getNappiBalls3D().setOnMouseClicked((MouseEvent event) -> {
-            if (this.getNappiBalls3D().getText().equals("CIRCLES")){
-                this.getNappiBalls3D().setText("BALLS");
+            if (this.getNappiBalls3D().getText().equals("CIRCLES") || this.getNappiBalls3D().getText().equals("YMPYRÄT")){
+                this.getNappiBalls3D().setText(this.getLanguage().equals("fin") ? "PALLOT" : "BALLS");
                 this.getNappiBalls3D().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.balls3D = true;
-            } else if (this.getNappiBalls3D().getText().equals("BALLS")){
-                this.getNappiBalls3D().setText("CIRCLES");
+            } else if (this.getNappiBalls3D().getText().equals("BALLS") || this.getNappiBalls3D().getText().equals("PALLOT")){
+                this.getNappiBalls3D().setText(this.getLanguage().equals("fin") ? "YMPYRÄT" : "CIRCLES");
                 this.getNappiBalls3D().setBackground(new Background(new BackgroundFill(Color.PINK,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.balls3D = false;
             }
         });
         valikko.getChildren().add(this.getNappiBalls3D());
 
-        final Pane empty3 = new Pane();
-        GridPane.setHalignment(empty3, HPos.CENTER);
-        asettelu.add(empty3, 0, 11, 2, 1);
+        final Pane empty2 = new Pane();
+        GridPane.setHalignment(empty2, HPos.CENTER);
+        asettelu.add(empty2, 0, 10, 2, 1);
 
        return asettelu;
     }
@@ -1021,6 +1023,30 @@ class SceneMMC extends Data {
      */
     @Contract(pure = true)
     private List<Double> getDiffusionY() { return diffusion_y; }
+
+    /**
+     *
+     * @param visc_x the visc_x to set
+     */
+    private void setViscX( List<Double> visc_x ) { this.visc_x = visc_x; }
+
+    /**
+     * @return the visc_x
+     */
+    @Contract(pure = true)
+    private List<Double> getViscX() { return visc_x; }
+
+    /**
+     *
+     * @param visc_y the visc_y to set
+     */
+    private void setViscY( List<Double> visc_y ) { this.visc_y = visc_y; }
+
+    /**
+     * @return the visc_y
+     */
+    @Contract(pure = true)
+    private List<Double> getViscY() { return visc_y; }
 
     /**
      *
@@ -1184,12 +1210,6 @@ class SceneMMC extends Data {
     private Button getNappiLattice() { return nappiLattice; }
 
     /**
-     * @return the nappiDiffusLogPlot
-     */
-    @Contract(pure = true)
-    private Button getNappiDiffusLogPlot() { return nappiDiffusLogPlot; }
-
-    /**
      * @return the nappiBalls3D
      */
     @Contract(pure = true)
@@ -1199,12 +1219,12 @@ class SceneMMC extends Data {
      * @return the fxplot
      */
     @Contract(pure = true)
-    private FXPlot getFxplot() { return fxplot; }
+    FXPlot getFxplot() { return fxplot; }
 
     /**
      * @param fxplot the fxplot to set
      */
-    private void setFxplot( FXPlot fxplot ) { this.fxplot = fxplot; }
+    void setFxplot( FXPlot fxplot ) { this.fxplot = fxplot; }
 
     /**
      * @return the remBarNappiMMC
@@ -1227,6 +1247,17 @@ class SceneMMC extends Data {
      * @param runMMC the runMMC to set
      */
     private void setRunMMC( Button runMMC ) { this.runMMC = runMMC; }
+
+    /**
+     * @return the valikkoMMC
+     */
+    @Contract(pure = true)
+    private VBox getValikkoMMC() { return valikkoMMC; }
+
+    /**
+     * @param valikkoMMC the valikkoMMC to set
+     */
+    private void setValikkoMMC( VBox valikkoMMC ) { this.valikkoMMC = valikkoMMC; }
 
     /**
      * @return the plotMMC
@@ -1295,6 +1326,17 @@ class SceneMMC extends Data {
     private void setPhaseEnergy( long phaseEnergy ) { this.phaseEnergy = phaseEnergy; }
 
     /**
+     * @return the phaseVisc
+     */
+    @Contract(pure = true)
+    private long getPhaseVisc() { return phaseVisc; }
+
+    /**
+     * @param phaseVisc the phaseVisc to set
+     */
+    private void setPhaseVisc( long phaseVisc ) { this.phaseVisc = phaseVisc; }
+
+    /**
      * @param smallest the smallest to set
      */
     private void setSmallest( double smallest ) { this.smallest = smallest; }
@@ -1304,17 +1346,6 @@ class SceneMMC extends Data {
      */
     @Contract(pure = true)
     private double getSmallest() { return smallest; }
-
-    /**
-     * @param smallestDiff the smallestDiff to set
-     */
-    private void setSmallestDiff( double smallestDiff ) { this.smallestDiff = smallestDiff; }
-
-    /**
-     * @return the smallestDiff
-     */
-    @Contract(pure = true)
-    private double getSmallestDiff() { return smallestDiff; }
 
     /**
      * @param greatest the greatest to set
@@ -1339,6 +1370,17 @@ class SceneMMC extends Data {
     private double getGreatestDiff() { return greatestDiff; }
 
     /**
+     * @param greatestVisc the greatestVisc to set
+     */
+    private void setGreatestVisc( double greatestVisc ) { this.greatestVisc = greatestVisc; }
+
+    /**
+     * @return the greatestVisc
+     */
+    @Contract(pure = true)
+    private double getGreatestVisc() { return greatestVisc; }
+
+    /**
      * @return the firstEnergy
      */
     @Contract(pure = true)
@@ -1356,9 +1398,18 @@ class SceneMMC extends Data {
     private boolean isFirstDiffus() { return firstDiffus; }
 
     /**
-     * @param firstDiffus the firstDiffus to set
      */
-    private void setFirstDiffus( boolean firstDiffus ) { this.firstDiffus = firstDiffus; }
+    private void setFirstDiffus(boolean firstDiffus) { this.firstDiffus = firstDiffus; }
+
+    /**
+     * @return the firstVisc
+     */
+    @Contract(pure = true)
+    private boolean isFirstVisc() { return firstVisc; }
+
+    /**
+     */
+    private void setFirstVisc(boolean firstVisc) { this.firstVisc = firstVisc; }
 
     /**
      * @return the linewidth
@@ -1537,17 +1588,6 @@ class SceneMMC extends Data {
     private void setLattice( boolean lattice ) { this.lattice = lattice; }
 
     /**
-     * @return the Diffuslog
-     */
-    @Contract(pure = true)
-    private boolean isDiffusLog() { return diffuslog; }
-
-    /**
-     * @param diffuslog the DiffusLog to set
-     */
-    private void setDiffusLog( boolean diffuslog ) { this.diffuslog = diffuslog; }
-
-    /**
      * @return the Balls3D
      */
     @Contract(pure = true)
@@ -1611,5 +1651,38 @@ class SceneMMC extends Data {
      * @param output the output to set
      */
     private void setOutput( BufferedWriter output ) { this.output = output; }
+
+    /**
+     * @return the language
+     */
+    @Contract(pure = true)
+    private String getLanguage() { return this.language; }
+
+    /**
+     * @param language the language to set
+     */
+    private void setLanguage(String language) { this.language = language; }
+
+    /**
+     * @return the initT
+     */
+    @Contract(pure = true)
+    private double getInitT() { return this.initT; }
+
+    /**
+     * @param initT the initT to set
+     */
+    private void setInitT(double initT) { this.initT = initT; }
+
+    /**
+     * @return the finT
+     */
+    @Contract(pure = true)
+    private double getFinT() { return this.finT; }
+
+    /**
+     * @param finT the finT to set
+     */
+    private void setFinT(double finT) { this.finT = finT; }
 
 }

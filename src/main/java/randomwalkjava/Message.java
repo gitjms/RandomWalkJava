@@ -17,7 +17,7 @@ class Message extends Thread {
         Alert alert;
         alert = new Alert(
                 Alert.AlertType.ERROR,
-                "Program is closing due to errors.",
+                "Sovellus sulkeutuu virheen vuoksi.\nProgram is closing due to error.",
                 ButtonType.OK);
         alert.showAndWait();
     }

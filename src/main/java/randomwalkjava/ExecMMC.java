@@ -28,7 +28,6 @@ import static java.lang.Integer.parseInt;
 class ExecMMC extends Data {
 
     private String language;
-    private FXPlot fxPlot;
     private List <Double> diffusion_x;
     private List <Double> diffusion_y;
     private List <Double> energy_x;

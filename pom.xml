@@ -185,7 +185,7 @@
                     <vendor>Jari Sunnari</vendor>
                     <mainClass>randomwalkjava.Main</mainClass>
                     <!-- bundler can be msi, exe, or windows.app -->
-                    <bundler>msi</bundler>
+                    <bundler>exe</bundler>
                     <bundleArguments>
                         <dropinResourcesRoot>${project.basedir}/src/main/resources</dropinResourcesRoot>
                         <jnlp.includeDT>true</jnlp.includeDT>
@@ -193,7 +193,6 @@
                         <includes>
                             <include>**/*.dll</include>
                             <include>**/*.py</include>
-                            <include>**/*.png</include>
                             <include>**/*.exe</include>
                             <include>**/*.fxml</include>
                         </includes>

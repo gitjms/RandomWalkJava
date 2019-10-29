@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Contract;
 @SuppressWarnings("SameReturnValue")
 class SceneCalculation extends Data {
 
+    private String language;
     private final Button nappiLattice;
 
     /**
@@ -39,9 +40,10 @@ class SceneCalculation extends Data {
     /**
      * initiating scene button and user variable array
      */
-    SceneCalculation() {
+    SceneCalculation(String language){
         super();
-        this.nappiLattice = new Button("FREE");
+        this.setLanguage(language);
+        this.nappiLattice = new Button(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
         this.vars = new String[]{
             "0",    // vars[0] particles        n/a
             "0",    // vars[1] diameter         n/a
@@ -91,7 +93,7 @@ class SceneCalculation extends Data {
         this.vars[1] = "0"; // (diameter of particl)
         this.vars[2] = "0"; // (charge of particles)
 
-        Label labNumSteps = new Label("number of steps:");
+        Label labNumSteps = new Label(this.getLanguage().equals("fin") ? "askelten lukumäärä:" : "number of steps:");
         TextField setNumSteps = new TextField("");
         setNumSteps.setOnKeyReleased(e -> {
             if (isNumInteger(setNumSteps.getText().trim())){
@@ -100,61 +102,43 @@ class SceneCalculation extends Data {
                 this.vars[3] = "0";
         });
 
-        Label labNumDimensions = new Label("dimension:");
+        Label labNumDimensions = new Label(this.getLanguage().equals("fin") ? "ulottuvuus:" : "dimension:");
         ToggleButton setDim1 = new ToggleButton("1");
         setDim1.setMinWidth(35);
         setDim1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        setDim1.setBackground(new Background(new BackgroundFill(
-            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        setDim1.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setDim1.setEffect(shadow));
-        setDim1.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setDim1.setEffect(null));
+        setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        setDim1.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setDim1.setEffect(shadow));
+        setDim1.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setDim1.setEffect(null));
         ToggleButton setDim2 = new ToggleButton("2");
         setDim2.setMinWidth(35);
         setDim2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        setDim2.setBackground(new Background(new BackgroundFill(
-            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        setDim2.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setDim2.setEffect(shadow));
-        setDim2.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setDim2.setEffect(null));
+        setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        setDim2.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setDim2.setEffect(shadow));
+        setDim2.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setDim2.setEffect(null));
         ToggleButton setDim3 = new ToggleButton("3");
         setDim3.setMinWidth(35);
         setDim3.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        setDim3.setBackground(new Background(new BackgroundFill(
-            Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        setDim3.addEventHandler(
-            MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setDim3.setEffect(shadow));
-        setDim3.addEventHandler(
-            MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setDim3.setEffect(null));
+        setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        setDim3.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setDim3.setEffect(shadow));
+        setDim3.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setDim3.setEffect(null));
         HBox setDimension = new HBox(setDim1,setDim2,setDim3);
         setDimension.setSpacing(20);
         setDim1.setOnMouseClicked(f -> {
-            setDim1.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
-            setDim2.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            setDim3.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
+            setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[4] = "1";
         });
         setDim2.setOnMouseClicked(f -> {
-            setDim1.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            setDim2.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
-            setDim3.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
+            setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[4] = "2";
         });
         setDim3.setOnMouseClicked(f -> {
-            setDim1.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            setDim2.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            setDim3.setBackground(new Background(new BackgroundFill(
-                Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
+            setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             this.vars[4] = "3";
         });
 
@@ -184,25 +168,18 @@ class SceneCalculation extends Data {
         */
         this.getNappiLattice().setMinWidth(getCompwidth());
         this.getNappiLattice().setMaxWidth(getCompwidth());
-        this.getNappiLattice().setBackground(new Background(
-            new BackgroundFill(
-                Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
         this.getNappiLattice().setId("lattice");
         this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getNappiLattice().setEffect(shadow));
         this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getNappiLattice().setEffect(null));
         this.getNappiLattice().setOnMouseClicked((MouseEvent event) -> {
-            if (this.getNappiLattice().getText().equals("LATTICE")){
-                this.getNappiLattice().setText("FREE");
-                this.getNappiLattice().setBackground(
-                    new Background(
-                        new BackgroundFill(
-                            Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
+            if (this.getNappiLattice().getText().equals("LATTICE") || this.getNappiLattice().getText().equals("HILA")){
+                this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
+                this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[7] = "-";
-            } else if (this.getNappiLattice().getText().equals("FREE")){
-                this.getNappiLattice().setText("LATTICE");
-                this.getNappiLattice().setBackground(
-                    new Background(new BackgroundFill(
-                        Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
+            } else if (this.getNappiLattice().getText().equals("FREE") || this.getNappiLattice().getText().equals("VAPAA")){
+                this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "HILA" : "LATTICE");
+                this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[7] = "l";
             }
         });
@@ -243,4 +220,15 @@ class SceneCalculation extends Data {
     private Button getNappiLattice() {
         return nappiLattice;
     }
+
+    /**
+     * @return the language
+     */
+    @Contract(pure = true)
+    private String getLanguage() { return this.language; }
+
+    /**
+     * @param language the language to set
+     */
+    private void setLanguage(String language) { this.language = language; }
 }

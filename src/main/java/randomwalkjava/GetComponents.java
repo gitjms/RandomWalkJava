@@ -7,6 +7,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.effect.BlendMode;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -47,7 +48,7 @@ class GetComponents {
     }
 
     /**
-     * method for setting Panes
+     * method for setting Panes for Real Time Rms and MMC Diffusion
      * @param alusta javafx Canvas
      * @return pane
      */
@@ -55,6 +56,18 @@ class GetComponents {
         Pane pane = new Pane();
         pane.setPrefSize(this.getAnimWidth(), this.getAnimHeight());
         if (alusta != null) pane.getChildren().add(alusta);
+        pane.setVisible(true);
+        return pane;
+    }
+
+    /**
+     * method for setting Panes for Rms Calculation and Real Time Saw
+     * @param image javafx ImageView
+     * @return pane
+     */
+    Pane getPane2(ImageView image) {
+        Pane pane = new Pane();
+        if (image != null) pane.getChildren().add(image);
         pane.setVisible(true);
         return pane;
     }
@@ -143,5 +156,17 @@ class GetComponents {
      */
     @Contract(pure = true)
     private double getAnimHeight() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
+
+    /**
+     * @return the imgWidth
+     */
+    @Contract(pure = true)
+    private double getImgWidth() { return 200.0 / Screen.getMainScreen().getRenderScale(); }
+
+    /**
+     * @return the imgheight
+     */
+    @Contract(pure = true)
+    private double getImgHeight() { return 100.0 / Screen.getMainScreen().getRenderScale(); }
 
 }

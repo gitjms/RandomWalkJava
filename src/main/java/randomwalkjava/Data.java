@@ -39,8 +39,8 @@ class Data {
 
     /**
      * method executes Fortan code to get data
-     * @param folderPath datafolder c:/RWDATA
-     * @param executable Fortran executable walk.exe
+     * @param folderPath datafolder "c:/RWDATA"
+     * @param executable Fortran executable "walk.exe"
      * @return true if fortran execution succeeded, false otherwise
      */
     Boolean createData(File folderPath, String executable) {
@@ -60,9 +60,8 @@ class Data {
         * vars[8] = save
         */
         String[] command = new String[]{"cmd","/c",executable,
-            this.vars[0], this.vars[1], this.vars[2], this.vars[3],
-            this.vars[4], this.vars[5], this.vars[6], this.vars[7],
-            this.vars[8]};
+            this.vars[0], this.vars[1], this.vars[2], this.vars[3], this.vars[4],
+            this.vars[5], this.vars[6], this.vars[7], this.vars[8]};
 
         Runtime runtime = Runtime.getRuntime();
 
@@ -91,10 +90,10 @@ class Data {
 
                 exitVal = process.waitFor();
                 if (exitVal == 0) {
-                    msg = " Fortran execution ended with no errors";
+                    msg = " Fortran execution ended.";
                     System.out.println(msg);
                 } else {
-                    msg = " Fortran execution ended with error code " + exitVal;
+                    msg = " Fortran execution ended with error code " + exitVal + ".";
                     System.out.println(msg);
                     runtime.addShutdownHook(new Message());
                     runtime.exit(exitVal);
@@ -115,7 +114,7 @@ class Data {
 
     /**
      * method reads the initial data from file for MMC
-     * @param filePath datafolder c:/RWDATA
+     * @param filePath datafolder "c:/RWDATA"
      * @param dim particle field dimension, user choice
      * @return list of initial particle configuration data
      */
@@ -161,5 +160,11 @@ class Data {
      * @param var the vars array to set
      */
     void setSave(String var) { this.vars[8]=var; }
+
+    /**
+     * method for setting the cbmc parameter in vars array
+     * @param var the vars array to set
+     */
+    void setSawCbmc(String var) { this.vars[5]=var; }
 
 }

@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 def main():
 	start_file = sys.argv[1]
 	final_file = sys.argv[2]
+	language = sys.argv[3]
 #!----------------------------------------------------------------------
 #!	DATA
 #!----------------------------------------------------------------------
@@ -43,20 +44,40 @@ def main():
 
 	plt.gca().ticklabel_format(axis='both', style='plain', useOffset=False)
 
+	if (language == 'fin'):
+		labtext1 = "Alkuasetelma, N=%d"%particles
+	else:
+		labtext1 = "Start Configuration, N=%d"%particles
+
+	if (language == 'fin'):
+		text1 = "Alkuasetelma, N=%d, halk=%.2f"%(int(particles),float(diameter))
+	else:
+		text1 = r"Initial Configuration, N=%d, diam=%.2f"%(int(particles),float(diameter))
+		
 	plt.subplot(211)
 	plt.plot(xdata_start,ydata_start,'o',ms=1,mew=3,antialiased=True,
-		  label="Start configuration, N=%d"%particles)
+		  label=labtext1)
 	plt.xlim(minx-abs(minx-maxx)/10,maxx+abs(minx-maxx)/10)
 	plt.ylim(miny-abs(miny-maxy)/10,maxy+abs(miny-maxy)/10)
-	text=r"Initial configuration, N=%d, diam=%.2f"%(int(particles),float(diameter))
+	text=text1
 	plt.title(text,fontsize=16)
+
+	if (language == 'fin'):
+		labtext2 = "Loppuasetelma, N=%d"%particles
+	else:
+		labtext2 = "Final Configuration, N=%d"%particles
+
+	if (language == 'fin'):
+		text2 = "Loppuasetelma, N=%d, halk=%.2f"%(int(particles),float(diameter))
+	else:
+		text2 = r"Final Configuration, N=%d, diam=%.2f"%(int(particles),float(diameter))
 
 	plt.subplot(212)
 	plt.plot(xdata_final,ydata_final,'o',ms=1,mew=3,antialiased=True,
-		  label="Final configuration, N=%d"%particles)
+		  label=labtext2)
 	plt.xlim(minx-abs(minx-maxx)/10,maxx+abs(minx-maxx)/10)
 	plt.ylim(miny-abs(miny-maxy)/10,maxy+abs(miny-maxy)/10)
-	text=r"Final configuration, N=%d, diam=%.2f"%(int(particles),float(diameter))
+	text=text2
 	plt.title(text,fontsize=16)
 
 	plt.tight_layout()

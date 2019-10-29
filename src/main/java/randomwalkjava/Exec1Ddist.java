@@ -16,16 +16,16 @@ import static java.lang.Integer.parseInt;
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
  *
- * Class for creating execute button for 1D distance
+ * Class for executing 1D distance
  */
-public class Exec1DdistClick extends Data {
+class Exec1Ddist extends Data {
 
     private String language;
 
     /**
      * Initiating class
      */
-    Exec1DdistClick(String language) {
+    Exec1Ddist(String language) {
         super();
         this.setLanguage(language);
     }
@@ -41,8 +41,8 @@ public class Exec1DdistClick extends Data {
      * @param pyexec1Ddist pyexec1Ddist
      * @param getDialogs getDialogs
      */
-    void setMouseClick(@NotNull Button execNappi, Scene1Ddist distScene, Execution ex, File datafolder, String datapath,
-                       String fexec, String pyexec1Ddist, GetDialogs getDialogs) {
+    void setExecClick(@NotNull Button execNappi, Scene1Ddist distScene, Execution ex, File datafolder, String datapath,
+                      String fexec, String pyexec1Ddist, GetDialogs getDialogs) {
         execNappi.setOnMouseClicked((MouseEvent event) -> {
             String[] vars = distScene.getVars();
             this.setVars(vars);
@@ -81,7 +81,8 @@ public class Exec1DdistClick extends Data {
 
                 if ( alert1Ddist.getResult() == ButtonType.YES) {
                     ex.execute1Ddist(datafolder, datapath, fexec, pyexec1Ddist, data, this.getVars());
-                }
+                    alert1Ddist.close();
+                } else alert1Ddist.close();
             }
         });
     }

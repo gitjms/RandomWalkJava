@@ -2,13 +2,15 @@
 # -*- coding: utf-8 -*-
 import sys
 import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
+
+# This import registers the 3D projection, but is otherwise unused.
 from mpl_toolkits.mplot3d import Axes3D
 
 def main():
 	start_file = sys.argv[1]
 	final_file = sys.argv[2]
+	language = sys.argv[3]
 #!----------------------------------------------------------------------
 #!	DATA
 #!----------------------------------------------------------------------
@@ -49,20 +51,30 @@ def main():
 	fig.set_figheight(10)
 	fig.set_figwidth(6)
 
+	if (language == 'fin'):
+		text1 = "Alkuasetelma, N=%d, halk=%.2f"%(int(particles),float(diameter))
+	else:
+		text1 = r"Initial Configuration, N=%d, diam=%.2f"%(int(particles),float(diameter))
+
 	ax = fig.add_subplot(211, projection='3d')
 	ax.scatter3D(xdata_start,ydata_start,zdata_start,zdir='z')
 	ax.set_xlim([minx-abs(minx-maxx)/10,maxx+abs(minx-maxx)/10])
 	ax.set_ylim([miny-abs(miny-maxy)/10,maxy+abs(miny-maxy)/10])
 	ax.set_zlim([minz-abs(minz-maxz)/10,maxz+abs(minz-maxz)/10])
-	text=r"Initial configuration, N=%d, diam=%.2f"%(int(particles),float(diameter))
+	text=text1
 	plt.title(text,fontsize=16)
+
+	if (language == 'fin'):
+		text2 = "Loppuasetelma, N=%d, halk=%.2f"%(int(particles),float(diameter))
+	else:
+		text2 = r"Final Configuration, N=%d, diam=%.2f"%(int(particles),float(diameter))
 
 	ax = fig.add_subplot(212, projection='3d')
 	ax.scatter3D(xdata_final,ydata_final,zdata_final,zdir='z')
 	ax.set_xlim([minx-abs(minx-maxx)/10,maxx+abs(minx-maxx)/10])
 	ax.set_ylim([miny-abs(miny-maxy)/10,maxy+abs(miny-maxy)/10])
 	ax.set_zlim([minz-abs(minz-maxz)/10,maxz+abs(minz-maxz)/10])
-	text=r"Final configuration, N=%d, diam=%.2f"%(int(particles),float(diameter))
+	text=text2
 	plt.title(text,fontsize=16)
 
 

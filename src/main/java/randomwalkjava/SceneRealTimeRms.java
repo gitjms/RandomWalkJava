@@ -16,6 +16,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,13 +38,14 @@ import static java.lang.System.arraycopy;
 @SuppressWarnings("SameReturnValue")
 class SceneRealTimeRms extends Data {
 
+    private String language;
     private double scalefactor;
     private double linewidth;
+    private FXPlot fxplot;
     private GraphicsContext piirturi;
     private boolean running;
     private boolean runtimeRunning;
     private int num_parts;
-    private int num_steps;
     private double steps;
     private int dim;
     private double expected;
@@ -56,15 +58,19 @@ class SceneRealTimeRms extends Data {
     private double[] y2Axis;
     private double[] xnormAxis;
     private double[] ynormAxis;
-    private double[] yotherAxis;
+    private double[] histoXAxis;
+    private double[] histoYAxis;
     private double[] sum;
+    private List<Double> saw_lengths;
     private long runs;
+    private int init_part;
+    private double bigg_dist;
     private double rms_sum;
     private double rms_data;
     private double sum_parts;
     private double smallest;
     private double greatest;
-    private double greatestdiff;
+    private double greatestdn;
     private double centerX;
     private double centerY;
     private double measure;
@@ -83,8 +89,10 @@ class SceneRealTimeRms extends Data {
     private boolean diffPlot;
     private TextField setNumParticles;
     private TextField setNumSteps;
-    private VBox setPlotChoice;
+    private VBox plotChoice;
+    private HBox dim_choice;
     private Map<String,double[]> others;
+    private double sigSeed;
 
     /**
      * main class gets vars via this
@@ -95,8 +103,9 @@ class SceneRealTimeRms extends Data {
     /**
      * initiating user variable array and other variables
      */
-    SceneRealTimeRms() {
+    SceneRealTimeRms(String language){
         super();
+        this.setLanguage(language);
         this.vars = new String[]{
             "0",    // vars[0] particles        USER
             "0.1",  // vars[1] diameter         n/a
@@ -112,17 +121,16 @@ class SceneRealTimeRms extends Data {
 
     /**
      * Real Time Rms
-     * @param folder datafolder C:/RWDATA
-     * @param executable Fortran executable walk.exe
+     * @param folder datafolder "C:/RWDATA"
+     * @param executable Fortran executable "walk.exe"
      * @param piirturi GraphicsContext which draws the animation
      * @param scalefactor scaling is used in different particle amounts
      * @param linewidth width for lines
-     * @param fxplot plotting element for graphs
      * @param newdata true if is a new run with new data
      * @param measure width and height for drawing area
      */
     void refresh(File folder, String executable, GraphicsContext piirturi, double scalefactor,
-                 double linewidth, FXPlot fxplot, boolean newdata, double measure) {
+                 double linewidth, boolean newdata, double measure) {
 
         int i = 0;
         int j = 0;
@@ -131,55 +139,56 @@ class SceneRealTimeRms extends Data {
         this.setPiirturi(piirturi);
         this.setLinewidth(linewidth);
         this.setScalefactor(scalefactor);
-        this.setPlotChoice.setDisable(true);
         this.setRms_sum(0.0);
         this.setRms_data(0.0);
         this.setSmallest();
+        this.setOthers(new HashMap<>());
+        this.getOthers().clear();
 
         if (newdata) {
+            this.setBiggDist(0.0);
             this.setRuns(1);
+            this.setSigSeed(0.0);
+            this.setInitPart(0);
             this.setRms_runs();
             this.setRms_norm();
             this.setMeasure(measure);
             this.numParts(parseInt(this.vars[0]));
-            this.numSteps(parseInt(this.vars[3]) + 1);
             this.setSteps(parseDouble(this.vars[3]));
             this.dim(parseInt(this.vars[4]));
             this.setExpected(Math.sqrt(this.getSteps()));
-            this.setGreatest(this.getExpected());
-            this.setGreatestDiff(0.0);
+            this.setGreatest(this.getExpected() + Math.log10(this.getSteps()));
             String standdiff = "";
             this.setOthers(new HashMap<>());
             this.getOthers().clear();
 
             if ( this.isStandPlot() ){
-                this.setMincount(-4.0);
-                this.setMaxcount(4.0);
+                /*this.setMincount(-3.0);
+                this.setMaxcount(3.0);*/
+                this.setMincount(-this.getExpected());
+                this.setMaxcount(this.getExpected());
             } else if ( this.isDiffPlot() ){
-                this.setMincount(-(Math.sqrt(this.getSteps())*2));
-                this.setMaxcount(Math.sqrt(this.getSteps())*2);
+                /*this.setMincount(-(7.0+65.0*(1.0-Math.exp(-0.001*this.getSteps()))));
+                this.setMaxcount(7.0+65.0*(1.0-Math.exp(-0.001*this.getSteps())));*/
+                this.setMincount(-this.getExpected());
+                this.setMaxcount(this.getExpected());
             }
-            fxplot.setHDiffMaxY(0.0);
 
             if (this.isStandPlot()) standdiff = "stand";
             else if (this.isDiffPlot()) standdiff = "diff";
 
-            fxplot.setWData(this.getRms_runs(), this.getRms_runs(), this.getExpected());
-            fxplot.setHData(this.getRms_norm(), this.getRms_norm(), this.getMincount(), this.getMaxcount(), standdiff);
+            this.setGreatestDN(0.0);
 
             this.setMuistiX(new double[this.getNumParts()]);
             this.setMuistiY(new double[this.getNumParts()]);
 
-            if( this.getDim() < 3 )
-                this.setValues(new double[2][this.getNumParts()]);
-            else
-                this.setValues(new double[3][this.getNumParts()]);
+            if( this.getDim() < 3 ) this.setValues(new double[2][this.getNumParts()]);
+            else this.setValues(new double[3][this.getNumParts()]);
 
             this.setPlotData(new double[this.getNumParts()]);
 
             this.setXAxis(new double[10]);
-            for (int x = 0; x < 10; x++)
-                this.getXAxis()[x] = x;
+            for (int x = 0; x < 10; x++) this.getXAxis()[x] = x;
 
             this.setYAxis(new double[10]);
             Arrays.fill(this.getYAxis(), 0.0);
@@ -187,17 +196,23 @@ class SceneRealTimeRms extends Data {
             this.setY2Axis(new double[10]);
             Arrays.fill(this.getY2Axis(), this.getExpected());
 
-            this.setXnormAxis(new double[1000]);
-            double skip = (this.getMaxcount()-this.getMincount())/1000.0;
+            this.setXnormAxis(new double[100]);
+            double skip = (this.getMaxcount()-this.getMincount())/100.0;
             this.getXnormAxis()[0] = this.getMincount() + skip/2.0;
-            for (int x = 0; x < 999; x++) {
-                this.getXnormAxis()[x+1] = this.getXnormAxis()[x] + skip;
-            }
+            for (int x = 0; x < 99; x++) this.getXnormAxis()[x+1] = this.getXnormAxis()[x] + skip;
 
-            this.setYnormAxis(new double[1000]);
+            this.setYnormAxis(new double[100]);
             Arrays.fill(this.getYnormAxis(), 0.0);
-            this.setYotherAxis(new double[1000]);
-            Arrays.fill(this.getYotherAxis(), 0.0);
+
+            int sizeEx = ((int) this.getExpected() * 2 + 6);
+            this.setHistoXAxis(new double[sizeEx]);
+            for (int x = 0; x < sizeEx; x++) this.getHistoXAxis()[x] = x;
+
+            this.setHistoYAxis(new double[sizeEx]);
+            for (int x = 0; x < sizeEx; x++) this.getHistoYAxis()[x] = 0;
+
+            this.setSawLengths(new ArrayList<>());
+            for (int x = 0; x < this.getNumParts(); x++) this.getSawLengths().add(0.0);
 
             this.setSum(new double[this.getNumParts()]);
             this.setSumParts(0.0);
@@ -205,7 +220,11 @@ class SceneRealTimeRms extends Data {
             this.setCenterX(this.getMeasure()/2.0);
             this.setCenterY(this.getMeasure()/2.0);
 
-            fxplot.setFrameVis();
+            this.getFxplot().setWData(this.getRms_runs(), this.getRms_runs(), this.getExpected());
+            this.getFxplot().setNData(this.getRms_norm(), this.getRms_norm(), this.getMincount(), this.getMaxcount(), standdiff);
+            this.getFxplot().setHData(this.getHistoXAxis(), this.getHistoYAxis());
+
+            this.getFxplot().setFrameVis();
         }
 
         this.getPiirturi().setLineWidth(this.getLinewidth());
@@ -213,9 +232,8 @@ class SceneRealTimeRms extends Data {
         String[] command;
 
         command = new String[]{"cmd","/c",executable,
-            this.vars[0], this.vars[1], this.vars[2], this.vars[3],
-            this.vars[4], this.vars[5], this.vars[6], this.vars[7],
-            this.vars[8]};
+            this.vars[0], this.vars[1], this.vars[2], this.vars[3], this.vars[4],
+            this.vars[5], this.vars[6], this.vars[7], this.vars[8]};
 
         try {
             this.setRuntime(Runtime.getRuntime());
@@ -229,16 +247,13 @@ class SceneRealTimeRms extends Data {
                 String line;
 
                 while ((line = input.readLine()) != null) {
-                    if (line.trim().startsWith("S") || line.isEmpty()) {
-                        continue;
-                    }
-                    if (!line.substring(0,1).matches("([0-9]|-|\\+)"))
-                        continue;
+                    if (line.trim().startsWith("S") || line.isEmpty()) continue;
+                    if (!line.substring(0,1).matches("([0-9]|-|\\+)")) continue;
                     if ( !(line.trim().split("(\\s+)")[0].trim().equals("+")) ) {
                         switch (this.getDim()) {
                             case 1: {
                                 try {
-                                    this.getValues()[0][i] = Double.parseDouble(line.trim()) + this.getCenterX() / this.getScalefactor();
+                                    this.getValues()[0][i] = Double.parseDouble(line.trim()) + this.getCenterX()/this.getScalefactor();
                                 } catch (NumberFormatException e) {
                                     continue;
                                 }
@@ -249,7 +264,7 @@ class SceneRealTimeRms extends Data {
                                  String[] valStr = line.split("(\\s+)");
                                  try {
                                      this.getValues()[0][i] = Double.parseDouble(valStr[0].trim()) + this.getCenterX()/this.getScalefactor();
-                                     this.getValues()[1][i] = Double.parseDouble(valStr[1].trim()) + this.getCenterX()/this.getScalefactor();
+                                     this.getValues()[1][i] = Double.parseDouble(valStr[1].trim()) + this.getCenterY()/this.getScalefactor();
                                  } catch (NumberFormatException e) {
                                      continue;
                                  }
@@ -259,7 +274,7 @@ class SceneRealTimeRms extends Data {
                                  String[] valStr = line.split("(\\s+)");
                                  try {
                                      this.getValues()[0][i] = Double.parseDouble(valStr[0].trim()) + this.getCenterX()/this.getScalefactor();
-                                     this.getValues()[1][i] = Double.parseDouble(valStr[1].trim()) + this.getCenterX()/this.getScalefactor();
+                                     this.getValues()[1][i] = Double.parseDouble(valStr[1].trim()) + this.getCenterY()/this.getScalefactor();
                                      this.getValues()[2][i] = Double.parseDouble(valStr[2].trim()) + 1.2*this.getCenterX()/this.getScalefactor();
                                  } catch (NumberFormatException e) {
                                      continue;
@@ -269,43 +284,21 @@ class SceneRealTimeRms extends Data {
                              default:
                                  break;
                         }
-                        /*
-                           * RED SOURCE DOT
-                           */
-                        if ( j == 0 && i == 0 ) {
-                            this.getPiirturi().setFill(Color.RED);
-                            final double widthheight = this.getExpected() * Math.log10(this.getSteps()) / (Math.sqrt(this.getSteps()) * this.getDim());
-                            if (this.getDim() == 1) {
-                                this.getPiirturi().fillRect(
-                                    this.getCenterX() / this.getScalefactor(), this.getCenterY(),
-                                    this.getExpected() / (10.0 * Math.sqrt(Math.log10(this.getSteps()))),
-                                    Math.sqrt(this.getCenterY() / 2.0));
-                            } else {
-                                this.getPiirturi().fillRect(
-                                    this.getCenterX()/this.getScalefactor(), this.getCenterY()/this.getScalefactor(),
-                                    widthheight, widthheight);
-                            }
-                            this.getPiirturi().setStroke(Color.YELLOW);
-                        }
 
                         /*
                          * YELLOW LINES
                          */
                         if ( j > 0){
+                            this.getPiirturi().setStroke(Color.YELLOW);
                             for (int k = 0; k < this.getNumParts(); k++){
                                 if ( this.getDim() < 3 ) {
                                     this.getPiirturi().strokeLine(
                                         this.getMuistiX()[k], this.getMuistiY()[k], this.getValues()[0][k], this.getValues()[1][k]);
                                 } else {
-                                    this.setLinewidth(10.0 * Math.log10(this.getSteps())
-                                        / ( this.getValues()[2][k] * this.getScalefactor() ));
-                                    this.getPiirturi().setLineWidth(this.getLinewidth());
                                     this.getPiirturi().strokeLine(
                                         this.getMuistiX()[k], this.getMuistiY()[k],
-                                        this.getValues()[0][k]
-                                            + Math.cos(this.getValues()[2][k]),
-                                        this.getValues()[1][k]
-                                            + Math.sin(this.getValues()[2][k]));
+                                        this.getValues()[0][k] + Math.cos(this.getValues()[2][k]),
+                                        this.getValues()[1][k] + Math.sin(this.getValues()[2][k]));
                                 }
                             }
                         }
@@ -313,10 +306,30 @@ class SceneRealTimeRms extends Data {
                             this.getMuistiX()[i] = this.getValues()[0][i];
                             this.getMuistiY()[i] = this.getValues()[1][i];
                         } else {
-                            this.getMuistiX()[i] = this.getValues()[0][i]
-                                + Math.cos(this.getValues()[2][i]);
-                            this.getMuistiY()[i] = this.getValues()[1][i]
-                                + Math.sin(this.getValues()[2][i]);
+                            this.getMuistiX()[i] = this.getValues()[0][i] + Math.cos(this.getValues()[2][i]);
+                            this.getMuistiY()[i] = this.getValues()[1][i] + Math.sin(this.getValues()[2][i]);
+                        }
+
+                        /*
+                         * RED SOURCE DOT
+                         */
+                        if ( j == 0 && i == 0 ) {
+                            this.getPiirturi().setFill(Color.RED);
+                            if (this.getDim() == 1) {
+                                final double width = this.getExpected() / (10.0 * Math.sqrt(Math.log10(this.getSteps())));
+                                final double height = Math.sqrt(this.getCenterY() / 2.0);
+                                this.getPiirturi().fillRect(
+                                    this.getCenterX()/this.getScalefactor(),
+                                    this.getCenterY() - height/2.0,
+                                    width, height);
+                            } else {
+                                final double widthheight = 20.0 / this.getScalefactor();
+                                final double scalecenter = this.getCenterX()/this.getScalefactor();
+                                this.getPiirturi().fillRect(
+                                    (this.getDim() == 2 ? scalecenter - widthheight/2.0 : scalecenter - 0.0),
+                                    (this.getDim() == 2 ? scalecenter - widthheight/2.0 : scalecenter - 2.0*widthheight/Math.log10(this.getSteps())),
+                                    widthheight, widthheight);
+                            }
                         }
 
                         i++;
@@ -326,7 +339,7 @@ class SceneRealTimeRms extends Data {
                             j++;
                         }
 
-                        if ( j == this.getNumSteps() ) {
+                        if ( j == this.getSteps() + 1) {
                             i = 0;
                             j = 0;
                         }
@@ -339,6 +352,13 @@ class SceneRealTimeRms extends Data {
                         try {
                             dataVal = Double.parseDouble(line.split("(\\s+)")[1].trim());
                             this.getPlotData()[j] = dataVal;
+
+                            this.setBiggDist(Math.max(this.getBiggDist(), Math.sqrt(dataVal)));
+
+                            if (this.getRuns() > 1) this.getSawLengths().add(Math.sqrt(dataVal));
+                            else this.getSawLengths().set(this.getInitPart(), Math.sqrt(dataVal));
+                            this.setInitPart(this.getInitPart() + 1);
+
                         } catch (NumberFormatException e) {
                             continue;
                         }
@@ -363,97 +383,133 @@ class SceneRealTimeRms extends Data {
                             for (int m = 0; m < this.getNumParts(); m++)
                                 this.setSumParts(this.getSumParts() + this.getSum()[m]);
 
-                            double dist_rms = this.getSumParts()/this.getNumParts();
-                            double rrms = Math.sqrt((this.getSumParts()/this.getNumParts()) / this.getRuns());
-                            this.setRms_sum(this.getRms_sum() + rrms);
+                            double rrms_walk = Math.sqrt(this.getSumParts()/(this.getNumParts()*this.getRuns()));
+                            this.setRms_sum(this.getRms_sum() + rrms_walk);
+                            double avg = this.getRms_sum()/this.getRuns();
+                            this.setSigSeed(this.getSigSeed() + Math.pow(rrms_walk - avg, 2.0));
 
                             if ( this.getRuns() < 11 ) {
-                                this.getRms_runs()[(int) this.getRuns() - 1] = rrms;
+                                this.getRms_runs()[(int) this.getRuns() - 1] = rrms_walk;
                             } else {
                                 arraycopy(this.getRms_runs(), 1, this.getRms_runs(), 0, 9);
-                                this.getRms_runs()[9] = rrms;
+                                this.getRms_runs()[9] = rrms_walk;
                             }
                             this.setYAxis(this.getRms_runs().clone());
 
                             /*
                              * find greatest value for y-axis max limit
                              */
-                            if ( rrms > this.getGreatest() || rrms > this.getExpected() ) this.setGreatest(rrms);
+                            if ( rrms_walk + Math.log10(this.getSteps()) > this.getGreatest() || rrms_walk > this.getExpected() )
+                                this.setGreatest(rrms_walk + Math.log10(this.getSteps()));
 
-                            fxplot.setWMinY(this.getSmallest());
-                            fxplot.setWMaxY(this.getGreatest() * 2.0 );
-                            fxplot.updateWData("R_rms", this.getXAxis(), this.getYAxis());
-                            fxplot.updateWData("sqrt(steps)", this.getXAxis(), this.getY2Axis());
-
-                            double sigma = Math.pow(rrms - this.getRms_sum() / this.getRuns(), 2.0)/this.getSteps();
+                            this.getFxplot().setWMinY(this.getSmallest());
+                            this.getFxplot().setWMaxY(this.getGreatest() + 1.0 );
+                            this.getFxplot().updateWData("Rrms", this.getXAxis(), this.getYAxis(), this.getExpected(), rrms_walk);
+                            this.getFxplot().updateWData(this.getLanguage().equals("fin") ? "\u221Aaskeleet" : "\u221Asteps",
+                                this.getXAxis(), this.getY2Axis(), this.getExpected(), rrms_walk);
 
                             double ynorm = 0.0;
-                            //double mean;
-                            double diff;
 
-                            //mean = this.getRms_sum() / this.getRuns();
-
-                            for (int h = 0; h < 1000; h++) {
+                            for (int h = 0; h < 100; h++) {
                                 if (this.isStandPlot()) {
-                                    ynorm = Math.exp(-Math.pow(this.getXnormAxis()[h], 2.0) / (2.0 * sigma));
+                                    double sigma = Math.sqrt(this.getSigSeed()/this.getRuns());
+                                    ynorm = 1.0 / (Math.sqrt(2.0 * Math.PI * sigma))
+                                        * Math.exp(-Math.pow(this.getXnormAxis()[h]*3.0, 2.0) / (2.0 * Math.pow(sigma,2)));
+                                    this.setGreatestDN(ynorm > this.getGreatestDN() ? ynorm : this.getGreatestDN());
+                                    this.getFxplot().setNMaxY(this.getGreatestDN());
                                 } else if (this.isDiffPlot()) {
-                                    if (this.getDim() == 1) {
-                                        diff = dist_rms / (2.0 * this.getRuns());
-                                        ynorm = //this.getNumParts() / (2.0 * Math.sqrt(Math.PI * diff * this.getRuns()))
-                                            Math.exp(-Math.pow(this.getXnormAxis()[h], 2.0) / (2.0 * diff * this.getRuns()));
-                                    } else if (this.getDim() == 2) {
-                                        diff = Math.pow(rrms, 2.0) / (4.0 * this.getRuns());
-                                        ynorm = 1.0 / (2.0 * Math.sqrt(Math.PI * diff * this.getRuns()))
-                                            * Math.exp(-Math.pow(this.getXnormAxis()[h], 2.0) / (4.0 * diff * this.getRuns()));
-                                    } else if (this.getDim() == 3) {
-                                        diff = dist_rms / (6.0 * this.getRuns());
-                                        ynorm = //this.getNumParts() / (2.0 * Math.sqrt(Math.PI * diff * this.getRuns()))
-                                            Math.exp(-Math.pow(this.getXnormAxis()[h], 2.0) / (6.0 * diff * this.getRuns()));
-                                    }
-                                    if ( ynorm > this.getGreatestDiff() ) this.setGreatestDiff(ynorm);
-                                    fxplot.setHDiffMaxY(this.getGreatestDiff());
+                                    /*double factor = 0.0;
+                                    if (this.getDim() == 1) factor = 2.0;
+                                    else if (this.getDim() == 2) factor = 4.0;
+                                    else if (this.getDim() == 3) factor = 6.0;*/
+                                    //double rrms = this.getSumParts()/this.getNumParts();
+                                    double diff = rrms_walk / (2.0 * this.getDim() * this.getSteps());
+                                    double sigma = Math.sqrt(4.0 * Math.PI * diff * this.getSteps());
+                                    ynorm = 1.0 / sigma//Math.sqrt(4.0 * Math.PI * sigma)
+                                        * Math.exp(-Math.pow(this.getXnormAxis()[h], 2.0) / (4.0 *diff * this.getSteps()));
+                                        //* Math.exp(-Math.pow(this.getXnormAxis()[h]*3.0/sigma, 2.0) / 2.0);
+                                    if ( ynorm > this.getGreatestDN() ) this.setGreatestDN(ynorm);
+                                    this.getFxplot().setNMaxY(this.getGreatestDN());
                                 }
-                                if (this. isDiffPlot()) {
-                                    this.getYnormAxis()[h] = ynorm;
-                                    this.getYotherAxis()[h] = ynorm;
-                                } else if (this.isStandPlot())
-                                    this.getYnormAxis()[h] = ynorm;
+                                this.getYnormAxis()[h] = ynorm;
                             }
+
+                            /*
+                             * DISTANCE HISTOGRAM
+                             */
+                            int size = (int) this.getBiggDist();
+                            if ( size > this.getHistoXAxis().length ) {
+                                this.setHistoYAxis(calcHistogram(this.getSawLengths(), size+2, size+1));
+                                Thread.sleep(100);
+                                this.setHistoXAxis(new double[size+1]);
+                                for (int x = 0; x < size+1; x++) this.getHistoXAxis()[x] = x;
+                            } else if ( size > (int) this.getExpected() * 2 + 6 ) {
+                                this.setHistoYAxis(calcHistogram(this.getSawLengths(), size+2, this.getHistoYAxis().length));
+                                Thread.sleep(100);
+                            } else this.setHistoYAxis(calcHistogram( this.getSawLengths(),
+                                (int) this.getExpected() * 2 + 7, (int) this.getExpected() * 2 + 6));
                         }
                     }
                 }
-                if ( this. isDiffPlot() && this.getRuns() < 6 ) {
-                    if (!this.getOthers().containsKey(String.valueOf(this.getRuns()))) {
-                        this.getOthers().put(String.valueOf(this.getRuns()), this.getYotherAxis().clone());
+
+                if ( this.getRuns() < 6 ) {
+                    String mapkey;
+                    String mapkey1 = "\u03C1(r,t\u2081)";
+                    String mapkey2 = "\u03C1(r,t\u2082)";
+                    String mapkey3 = "\u03C1(r,t\u2083)";
+                    String mapkey4 = "\u03C1(r,t\u2084)";
+                    String mapkey5 = "\u03C1(r,t\u2085)";
+                    if (this.getRuns() == 1) mapkey = mapkey1;
+                    else if (this.getRuns() == 2) mapkey = mapkey2;
+                    else if (this.getRuns() == 3) mapkey = mapkey3;
+                    else if (this.getRuns() == 4) mapkey = mapkey4;
+                    else mapkey = mapkey5;
+                    if (!this.getOthers().containsKey(mapkey)) {
+                        this.getOthers().put(mapkey, this.getYnormAxis().clone());
                         for (Map.Entry<String, double[]> longEntry : this.getOthers().entrySet()) {
-                            fxplot.updateHDiffData(String.valueOf(((Map.Entry) longEntry).getKey()), this.getXnormAxis(), (double[]) ((Map.Entry) longEntry).getValue());
+                            this.getFxplot().updateNData(String.valueOf(((Map.Entry) longEntry).getKey()), this.getXnormAxis(), (double[]) ((Map.Entry) longEntry).getValue());
                         }
                     }
                 }
-                if (this.isDiffPlot()) {
-                    fxplot.updateHDiffData("diff", this.getXnormAxis(), this.getYotherAxis());
-                    for (Map.Entry<String, double[]> longEntry : this.getOthers().entrySet()) {
-                        fxplot.updateHDiffData(String.valueOf(((Map.Entry) longEntry).getKey()), this.getXnormAxis(), (double[]) ((Map.Entry) longEntry).getValue());
-                    }
-                } else if (this.isStandPlot()) {
-                    fxplot.updateHData(this.getXnormAxis(), this.getYnormAxis());
+
+                this.getFxplot().updateNData("\u03C1(r,t)", this.getXnormAxis(), this.getYnormAxis());
+
+                for (Map.Entry<String, double[]> longEntry : this.getOthers().entrySet()) {
+                    this.getFxplot().updateNData(String.valueOf(((Map.Entry) longEntry).getKey()), this.getXnormAxis(), (double[]) ((Map.Entry) longEntry).getValue());
                 }
+
+                this.getFxplot().updateHData( this.getHistoXAxis(), this.getHistoYAxis() );
+
                 this.setRuns(this.getRuns() + 1);
 
                 this.setExitVal(process.waitFor());
-                if (this.getExitVal() != 0) {
-                    this.setPlotChoice.setDisable(false);
-                    this.getRuntime().exit(getExitVal());
-                    this.getRuntime().exit(this.getExitVal());
-                }
-            } 
+                if (this.getExitVal() != 0) this.getRuntime().exit(this.getExitVal());
+            }
 
         } catch (IOException | InterruptedException e) {
             this.getRuntime().gc();
             System.out.println(e.getMessage());
         }
+    }
 
-        this.setPlotChoice.setDisable(false);
+    /**
+     * method for creating histogram
+     * @param data input data
+     * @param max max value
+     * @param numBins number of bins
+     * @return bin data array
+     */
+    @NotNull
+    @Contract(pure = true)
+    private static double[] calcHistogram(@NotNull List<Double> data, double max, int numBins) {
+        final double[] result = new double[numBins];
+        final double binSize = max / numBins;
+
+        for (double d : data) {
+            int bin = (int) Math.ceil(d / binSize);
+            if (bin >= 0 && bin < numBins) result[bin] += 1;
+        }
+        return result;
     }
 
     /**
@@ -489,7 +545,7 @@ class SceneRealTimeRms extends Data {
         /*
         * COMPONENTS...
         */
-        Label labNumParticles = new Label("number of particles:");
+        Label labNumParticles = new Label(this.getLanguage().equals("fin") ? "hiukkasten lukumäärä:" : "number of particles:");
         this.setNumParticles = new TextField("");
         this.setNumParticles.setOnKeyReleased(e -> {
             if (isNumInteger(this.setNumParticles.getText().trim())){
@@ -506,7 +562,7 @@ class SceneRealTimeRms extends Data {
         this.vars[1] = "0.1"; // (diameter of particle)
         this.vars[2] = "0"; // (charge of particles)
 
-        Label labNumSteps = new Label("number of steps:");
+        Label labNumSteps = new Label(this.getLanguage().equals("fin") ? "askelten lukumäärä:" : "number of steps:");
         this.setNumSteps = new TextField("");
         this.setNumSteps.setOnKeyReleased(e -> {
             if (isNumInteger(this.setNumSteps.getText().trim())){
@@ -515,7 +571,7 @@ class SceneRealTimeRms extends Data {
                 this.vars[3] = "0";
         });
 
-        Label labNumDimensions = new Label("dimension:");
+        Label labNumDimensions = new Label(this.getLanguage().equals("fin") ? "ulottuvuus:" : "dimension:");
         this.setDim1 = new ToggleButton("1");
         this.setDim1.setMinWidth(35);
         this.setDim1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
@@ -537,8 +593,8 @@ class SceneRealTimeRms extends Data {
         this.setDim3.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setDim3.setEffect(shadow));
         this.setDim3.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setDim3.setEffect(null));
 
-        HBox setDimension = new HBox(this.setDim1,this.setDim2,this.setDim3);
-        setDimension.setSpacing(20);
+        this.setDimension(new HBox(this.setDim1,this.setDim2,this.setDim3));
+        this.getDimension().setSpacing(20);
         this.setDim1.setOnMouseClicked(f -> {
             this.setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
@@ -563,23 +619,23 @@ class SceneRealTimeRms extends Data {
         this.vars[7] = "-"; // (lattice/)free   n/a
         this.vars[8] = "-"; // save (off)       n/a
 
-        Label labPlotChoice = new Label("Plot type:");
-        this.setStandPlot = new ToggleButton("STANDARD");
+        Label labPlotChoice = new Label(this.getLanguage().equals("fin") ? "Kuvaaja:" : "Plot type:");
+        this.setStandPlot = new ToggleButton(this.getLanguage().equals("fin") ? "NORM. JAKAUMA" : "NORM. DISTRIB.");
         this.setStandPlot.setMinWidth(this.getCompwidth());
         this.setStandPlot.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
         this.setStandPlot.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         this.setStandPlot.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setStandPlot.setEffect(shadow));
         this.setStandPlot.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setStandPlot.setEffect(null));
 
-        this.setDiffPlot = new ToggleButton("DIFFUSION");
+        this.setDiffPlot = new ToggleButton(this.getLanguage().equals("fin") ? "DIFF. JAKAUMA" : "DIFF. DISTRIB.");
         this.setDiffPlot.setMinWidth(this.getCompwidth());
         this.setDiffPlot.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
         this.setDiffPlot.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         this.setDiffPlot.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setDiffPlot.setEffect(shadow));
         this.setDiffPlot.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setDiffPlot.setEffect(null));
 
-        this.setPlotChoice = new VBox(this.setStandPlot,this.setDiffPlot);
-        this.setPlotChoice.setSpacing(10);
+        this.setPlotChoice(new VBox(this.setStandPlot,this.setDiffPlot));
+        this.getPlotChoice().setSpacing(10);
         this.setStandPlot.setOnMouseClicked(f -> {
             this.setStandPlot.setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDiffPlot.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
@@ -610,36 +666,28 @@ class SceneRealTimeRms extends Data {
         
         GridPane.setHalignment(labNumDimensions, HPos.LEFT);
         asettelu.add(labNumDimensions, 0, 4);
-        GridPane.setHalignment(setDimension, HPos.CENTER);
-        setDimension.setMinWidth(getCompwidth());
-        setDimension.setMaxWidth(getCompwidth());
-        asettelu.add(setDimension, 0, 5);
+        GridPane.setHalignment(this.getDimension(), HPos.CENTER);
+        this.getDimension().setMinWidth(getCompwidth());
+        this.getDimension().setMaxWidth(getCompwidth());
+        asettelu.add(this.getDimension(), 0, 5);
 
         final Pane empty1 = new Pane();
         GridPane.setHalignment(empty1, HPos.CENTER);
-        asettelu.add(empty1, 0, 6, 2, 1);
-
-        final Pane empty2 = new Pane();
-        GridPane.setHalignment(empty2, HPos.CENTER);
-        asettelu.add(empty2, 0, 7, 2, 1);
+        asettelu.add(empty1, 0, 6, 2, 2);
 
         GridPane.setHalignment(labPlotChoice, HPos.LEFT);
-        asettelu.add(labPlotChoice, 0, 8);
-        GridPane.setHalignment(this.setPlotChoice, HPos.CENTER);
-        this.setPlotChoice.setMinWidth(getCompwidth());
-        this.setPlotChoice.setMaxWidth(getCompwidth());
-        asettelu.add(this.setPlotChoice, 0, 9);
+        asettelu.add(labPlotChoice, 0, 7);
+        GridPane.setHalignment(this.getPlotChoice(), HPos.CENTER);
+        this.getPlotChoice().setMinWidth(getCompwidth());
+        this.getPlotChoice().setMaxWidth(getCompwidth());
+        asettelu.add(this.getPlotChoice(), 0, 8);
 
         GridPane.setHalignment(valikko, HPos.LEFT);
-        asettelu.add(valikko, 0, 10, 2, 1);
+        asettelu.add(valikko, 0, 9, 2, 1);
 
         final Pane empty3 = new Pane();
         GridPane.setHalignment(empty3, HPos.CENTER);
-        asettelu.add(empty3, 0, 11, 2, 1);
-
-        final Pane empty4 = new Pane();
-        GridPane.setHalignment(empty4, HPos.CENTER);
-        asettelu.add(empty4, 0, 12, 2, 1);
+        asettelu.add(empty3, 0, 10, 2, 2);
 
         return asettelu;
     }
@@ -741,6 +789,17 @@ class SceneRealTimeRms extends Data {
     private void setRuns(long runs) { this.runs = runs; }
 
     /**
+     * @return the init_part
+     */
+    @Contract(pure = true)
+    private int getInitPart() { return this.init_part; }
+
+    /**
+     * @param init_part the init_part to set
+     */
+    private void setInitPart(int init_part) { this.init_part = init_part; }
+
+    /**
      * @return the rms_sum
      */
     @Contract(pure = true)
@@ -800,17 +859,6 @@ class SceneRealTimeRms extends Data {
      */
     @Contract(pure = true)
     private int getNumParts() { return this. num_parts; }
-
-    /**
-     * @param numSteps amount of steps plus 1 for array to set
-     */
-    private void numSteps(int numSteps) { this.num_steps = numSteps; }
-
-    /**
-     * @return amount of steps plus 1 for array
-     */
-    @Contract(pure = true)
-    private int getNumSteps() { return this.num_steps; }
 
     /**
      * @param steps amount of steps to set
@@ -912,17 +960,6 @@ class SceneRealTimeRms extends Data {
     private double[] getY2Axis() { return this.y2Axis; }
 
     /**
-     * @param yotherAxis y-axis data array for normal distribution plots to set
-     */
-    private void setYotherAxis(double[] yotherAxis) { this.yotherAxis = yotherAxis; }
-
-    /**
-     * @return y-axis data array for normal distribution plots
-     */
-    @Contract(pure = true)
-    private double[] getYotherAxis() { return this.yotherAxis; }
-
-    /**
      * @param xnormAxis x-axis data array for normal distribution plots to set
      */
     private void setXnormAxis(double[] xnormAxis) { this.xnormAxis = xnormAxis; }
@@ -943,6 +980,28 @@ class SceneRealTimeRms extends Data {
      */
     @Contract(pure = true)
     private double[] getYnormAxis() { return this.ynormAxis; }
+
+    /**
+     * @param histoXAxis x-axis data array for normal distribution plots to set
+     */
+    private void setHistoXAxis(double[] histoXAxis) { this.histoXAxis = histoXAxis; }
+
+    /**
+     * @return x-axis data array for normal distribution plots
+     */
+    @Contract(pure = true)
+    private double[] getHistoXAxis() { return this.histoXAxis; }
+
+    /**
+     * @param histoYAxis y-axis data array for normal distribution plots to set
+     */
+    private void setHistoYAxis(double[] histoYAxis) { this.histoYAxis = histoYAxis; }
+
+    /**
+     * @return y-axis data array for normal distribution plots
+     */
+    @Contract(pure = true)
+    private double[] getHistoYAxis() { return this.histoYAxis; }
 
     /**
      * @param expected expected value to set
@@ -1066,15 +1125,15 @@ class SceneRealTimeRms extends Data {
     private void setGreatest(double greatest) { this.greatest = greatest; }
 
     /**
-     * @return the greatestdiff
+     * @return the greatestdn
      */
     @Contract(pure = true)
-    private double getGreatestDiff() { return this.greatestdiff; }
+    private double getGreatestDN() { return this.greatestdn; }
 
     /**
-     * @param greatestdiff the greatestdiff to set
+     * @param greatestdn the greatestdn to set
      */
-    private void setGreatestDiff(double greatestdiff) { this.greatestdiff = greatestdiff; }
+    private void setGreatestDN(double greatestdn) { this.greatestdn = greatestdn; }
 
     /**
      * @return the runtime
@@ -1109,4 +1168,81 @@ class SceneRealTimeRms extends Data {
      */
     @Contract(pure = true)
     private Map<String,double[]> getOthers() { return others; }
+
+    /**
+     * @return the language
+     */
+    @Contract(pure = true)
+    private String getLanguage() { return this.language; }
+
+    /**
+     * @param language the language to set
+     */
+    private void setLanguage(String language) { this.language = language; }
+
+    /**
+     * @return the plotChoice
+     */
+    @Contract(pure = true)
+    VBox getPlotChoice() { return this.plotChoice; }
+
+    /**
+     * @param plotChoice the plotChoice to set
+     */
+    private void setPlotChoice(VBox plotChoice) { this.plotChoice = plotChoice; }
+
+    /**
+     * @return the dim_choice
+     */
+    @Contract(pure = true)
+    HBox getDimension() { return this.dim_choice; }
+
+    /**
+     * @param dim_choice the dim_choice to set
+     */
+    private void setDimension(HBox dim_choice) { this.dim_choice = dim_choice; }
+
+    /**
+     * @return the fxplot
+     */
+    @Contract(pure = true)
+    FXPlot getFxplot() { return fxplot; }
+
+    /**
+     * @param fxplot the fxplot to set
+     */
+    void setFxplot( FXPlot fxplot ) { this.fxplot = fxplot; }
+
+    /**
+     * @return the saw_lengths
+     */
+    @Contract(pure = true)
+    private List <Double> getSawLengths() { return this.saw_lengths; }
+
+    /**
+     * @param saw_lengths the saw_lengths to set
+     */
+    private void setSawLengths(List<Double> saw_lengths) { this.saw_lengths = saw_lengths; }
+
+    /**
+     * @return the bigg_dist
+     */
+    @Contract(pure = true)
+    private double getBiggDist() { return this.bigg_dist; }
+
+    /**
+     * bigg_dist to set
+     */
+    private void setBiggDist(double bigg_dist) { this.bigg_dist = bigg_dist; }
+
+    /**
+     * @return the sigSeed
+     */
+    @Contract(pure = true)
+    private double getSigSeed() { return this.sigSeed; }
+
+    /**
+     * sigSeed to set
+     */
+    private void setSigSeed(double sigSeed) { this.sigSeed = sigSeed; }
 }

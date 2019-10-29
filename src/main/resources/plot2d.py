@@ -28,8 +28,8 @@ def main():
 	fig.set_figwidth(9)
 
 	plt.gca().ticklabel_format(axis='both', style='plain', useOffset=False)
-	
-	plt.plot(xdata_path,ydata_path,'-',lw=0.5,antialiased=True,label="Path trace, N=%d"%int(particles))
+
+	plt.plot(xdata_path,ydata_path,'-',lw=0.5,antialiased=True)
 
 	plt.tight_layout()
 	savename = "jpyplot2D_N" + str(particles) + "_S" + str(steps) + ".pdf"

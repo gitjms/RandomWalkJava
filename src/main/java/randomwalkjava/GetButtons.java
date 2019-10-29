@@ -31,6 +31,7 @@ class GetButtons extends HelpText {
     private String language;
     private String text;
     private Pane mempane;
+    private TextArea newTextArea;
     private ButtonType buttonYES;
     private ButtonType buttonNO;
 
@@ -68,7 +69,7 @@ class GetButtons extends HelpText {
      * @param text button text
      * @return button
      */
-    Button getExecuteButton(String language, @NotNull String text) {
+    Button getExecuteButton(String language, int width, @NotNull String text) {
         this.setLanguage(language);
 
         Button button;
@@ -76,24 +77,48 @@ class GetButtons extends HelpText {
             case "RUN":
                 button = this.getLanguage().equals("fin") ? new Button("AJA") : new Button("RUN");
                 button.setStyle("-fx-background-color: Red");
+                button.setMinWidth(this.getButtonWidth());
+                button.setMaxWidth(this.getButtonWidth());
+                break;
+            case "SAW":
+                button = this.getLanguage().equals("fin") ? new Button("AJA SAW") : new Button("RUN SAW");
+                button.setStyle("-fx-background-color: Red");
+                button.setMinWidth(this.getCbmcButtonWidth());
+                button.setMaxWidth(this.getCbmcButtonWidth());
+                break;
+            case "CBMC":
+                button = this.getLanguage().equals("fin") ? new Button("AJA CBMC") : new Button("RUN CBMC");
+                button.setStyle("-fx-background-color: Red");
+                button.setMinWidth(this.getCbmcButtonWidth());
+                button.setMaxWidth(this.getCbmcButtonWidth());
                 break;
             case "ANIM":
                 button = this.getLanguage().equals("fin") ? new Button("ANIMAATIO") : new Button("ANIMATION");
                 button.setStyle("-fx-background-color: Red");
+                button.setMinWidth(this.getButtonWidth());
+                button.setMaxWidth(this.getButtonWidth());
                 break;
             case "PLOT":
                 button = this.getLanguage().equals("fin") ? new Button("KUVAAJA") : new Button("PLOT");
                 button.setStyle("-fx-background-color: Blue");
+                button.setMinWidth(width == 0 ? this.getButtonWidth() : this.getSawButtonWidth());
+                button.setMaxWidth(width == 0 ? this.getButtonWidth() : this.getSawButtonWidth());
+                break;
+            case "SAWPLOT":
+                button = this.getLanguage().equals("fin") ? new Button("SAW KUVAAJA") : new Button("SAW PLOT");
+                button.setStyle("-fx-background-color: Blue");
+                button.setMinWidth(width == 0 ? this.getButtonWidth() : this.getSawButtonWidth());
+                button.setMaxWidth(width == 0 ? this.getButtonWidth() : this.getSawButtonWidth());
                 break;
             default:
                 button = this.getLanguage().equals("fin") ? new Button("SUORITA") : new Button("EXECUTE");
                 button.setStyle("-fx-background-color: Red");
+                button.setMinWidth(width == 0 ? this.getButtonWidth() : this.getSawButtonWidth());
+                button.setMaxWidth(width == 0 ? this.getButtonWidth() : this.getSawButtonWidth());
                 break;
         }
 
         button.setDefaultButton(true);
-        button.setMinWidth(this.getButtonWidth());
-        button.setMaxWidth(this.getButtonWidth());
         button.setTextFill(Color.WHITE);
         button.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> button.setEffect(this.getShadow()));
         button.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> button.setEffect(null));
@@ -114,7 +139,7 @@ class GetButtons extends HelpText {
      * @param buttonNO confirmation button
      * @return button for closing stage
      */
-    Button getCloseButton(SceneRealTimeRms getRealScene, SceneMMC getMMCScene, SceneRealTimeSaw getSAWScene,
+    Button getCloseButton(SceneRealTimeRms getRealScene, SceneMMC getMMCScene, SceneRealTimeSaw getSAWScene, int width,
                           Execution ex, String language, JFrame frame, ButtonType buttonYES, ButtonType buttonNO) {
         this.setLanguage(language);
         this.setFrame(frame);
@@ -124,8 +149,8 @@ class GetButtons extends HelpText {
         GetDialogs getDialogs = new GetDialogs();
 
         Button button = this.getLanguage().equals("fin") ? new Button("SULJE") : new Button("CLOSE");
-        button.setMinWidth(this.getButtonWidth());
-        button.setMaxWidth(this.getButtonWidth());
+        button.setMinWidth(width == 0 ? this.getButtonWidth() : this.getSawButtonWidth());
+        button.setMaxWidth(width == 0 ? this.getButtonWidth() : this.getSawButtonWidth());
         button.setTextFill(Color.RED);
         button.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         GridPane.setHalignment(button, HPos.LEFT);
@@ -263,12 +288,14 @@ class GetButtons extends HelpText {
      * @param which which scene
      * @return button
      */
-    Button getHelpButton(String language, TextArea textArea, HBox isovalikko, Pane pane, @NotNull String which) {
+    Button getHelpButton(String language, TextArea textArea, HBox isovalikko, Pane pane, @NotNull String which, int width) {
         this.setLanguage(language);
 
+        GetComponents getComponents = new GetComponents();
+
         Button button = this.getLanguage().equals("fin") ? new Button("OHJE") : new Button("HELP");
-        button.setMinWidth(this.getButtonWidth());
-        button.setMaxWidth(this.getButtonWidth());
+        button.setMinWidth(width == 0 ? this.getButtonWidth() : this.getSawButtonWidth());
+        button.setMaxWidth(width == 0 ? this.getButtonWidth() : this.getSawButtonWidth());
         button.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
         button.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> button.setEffect(this.getShadow()));
         button.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> button.setEffect(null));
@@ -284,58 +311,103 @@ class GetButtons extends HelpText {
                 button.setOnAction(event -> textArea.setText(this.getLanguage().equals("fin") ? super.distance1DFI() : super.distance1DEN()));
                 break;
             case "calc":
-                button.setOnAction(event -> textArea.setText(this.getLanguage().equals("fin") ? super.calculationFI() : super.calculationEN()));
+                button.setOnAction(event -> {
+                    assert isovalikko != null;
+                    if (isovalikko.getChildren().contains(pane) && (button.getText().equals("OHJE") || button.getText().equals("HELP"))) {
+                        this.mempane = new Pane();
+                        this.mempane.getChildren().addAll(pane.getChildren());
+                        isovalikko.getChildren().removeAll(pane);
+                        this.newTextArea = getComponents.GetTextArea(this.getTextWidth(), this.getTextHeight());
+                        this.newTextArea.setText(this.getLanguage().equals("fin") ? super.calculationFI() : super.calculationEN());
+                        this.newTextArea.setVisible(true);
+                        isovalikko.getChildren().add(this.newTextArea);
+                        button.setText(this.getLanguage().equals("fin") ? "PALAA" : "BACK");
+                    } else if (isovalikko.getChildren().contains(this.newTextArea) && (button.getText().equals("PALAA") || button.getText().equals("BACK"))) {
+                        if (this.mempane != null) {
+                            isovalikko.getChildren().remove(this.newTextArea);
+                            pane.getChildren().addAll(this.mempane.getChildren());
+                            isovalikko.getChildren().add(pane);
+                            button.setText(this.getLanguage().equals("fin") ? "OHJE" : "HELP");
+                        }
+                    } else if (isovalikko.getChildren().contains(textArea) && (button.getText().equals("OHJE") || button.getText().equals("HELP"))) {
+                        textArea.setText(this.getLanguage().equals("fin") ? super.calculationFI() : super.calculationEN());
+                    }
+                });
                 break;
             case "real":
-                button.setOnAction(event -> textArea.setText(this.getLanguage().equals("fin") ? super.realtimermsFI() : super.realtimermsEN()));
+                button.setOnAction(event -> {
+                    assert isovalikko != null;
+                    if (isovalikko.getChildren().contains(pane) && (button.getText().equals("OHJE") || button.getText().equals("HELP"))) {
+                        this.mempane = new Pane();
+                        this.mempane.getChildren().addAll(pane.getChildren());
+                        isovalikko.getChildren().removeAll(pane);
+                        this.newTextArea = getComponents.GetTextArea(this.getAnimWidth(), this.getAnimHeight());
+                        this.newTextArea.setText(this.getLanguage().equals("fin") ? super.realtimermsFI() : super.realtimermsEN());
+                        this.newTextArea.setVisible(true);
+                        isovalikko.getChildren().add(this.newTextArea);
+                        button.setText(this.getLanguage().equals("fin") ? "PALAA" : "BACK");
+                    } else if (isovalikko.getChildren().contains(this.newTextArea) && (button.getText().equals("PALAA") || button.getText().equals("BACK"))) {
+                        if (this.mempane != null) {
+                            isovalikko.getChildren().remove(this.newTextArea);
+                            pane.getChildren().addAll(this.mempane.getChildren());
+                            isovalikko.getChildren().add(pane);
+                            button.setText(this.getLanguage().equals("fin") ? "OHJE" : "HELP");
+                        }
+                    } else if (isovalikko.getChildren().contains(textArea) && (button.getText().equals("OHJE") || button.getText().equals("HELP"))) {
+                        textArea.setText(this.getLanguage().equals("fin") ? super.realtimermsFI() : super.realtimermsEN());
+                    }
+                });
                 break;
             case "mmc":
-                button.setOnAction(event -> textArea.setText(this.getLanguage().equals("fin") ? super.mmcFI() : super.mmcEN()));
+                button.setOnAction(event -> {
+                    assert isovalikko != null;
+                    if (isovalikko.getChildren().contains(pane) && (button.getText().equals("OHJE") || button.getText().equals("HELP"))) {
+                        this.mempane = new Pane();
+                        this.mempane.getChildren().addAll(pane.getChildren());
+                        isovalikko.getChildren().removeAll(pane);
+                        this.newTextArea = getComponents.GetTextArea(this.getTextWidth(), this.getTextHeight());
+                        this.newTextArea.setText(this.getLanguage().equals("fin") ? super.mmcFI() : super.mmcEN());
+                        this.newTextArea.setVisible(true);
+                        isovalikko.getChildren().add(this.newTextArea);
+                        button.setText(this.getLanguage().equals("fin") ? "PALAA" : "BACK");
+                    } else if (isovalikko.getChildren().contains(this.newTextArea) && (button.getText().equals("PALAA") || button.getText().equals("BACK"))) {
+                        if (this.mempane != null) {
+                            isovalikko.getChildren().remove(this.newTextArea);
+                            pane.getChildren().addAll(this.mempane.getChildren());
+                            isovalikko.getChildren().add(pane);
+                            button.setText(this.getLanguage().equals("fin") ? "OHJE" : "HELP");
+                        }
+                    } else if (isovalikko.getChildren().contains(textArea) && (button.getText().equals("OHJE") || button.getText().equals("HELP"))) {
+                        textArea.setText(this.getLanguage().equals("fin") ? super.mmcFI() : super.mmcEN());
+                    }
+                });
                 break;
             case "saw":
-                button.setOnAction(event -> textArea.setText(this.getLanguage().equals("fin") ? super.realtimesawFI() : super.realtimesawEN()));
+                button.setOnAction(event -> {
+                    assert isovalikko != null;
+                    if (isovalikko.getChildren().contains(pane) && (button.getText().equals("OHJE") || button.getText().equals("HELP"))) {
+                        this.mempane = new Pane();
+                        this.mempane.getChildren().addAll(pane.getChildren());
+                        isovalikko.getChildren().removeAll(pane);
+                        this.newTextArea = getComponents.GetTextArea(this.getSawTextWidth(), this.getSawTextHeight());
+                        this.newTextArea.setText(this.getLanguage().equals("fin") ? super.realtimesawFI() : super.realtimesawEN());
+                        this.newTextArea.setVisible(true);
+                        isovalikko.getChildren().add(this.newTextArea);
+                        button.setText(this.getLanguage().equals("fin") ? "PALAA" : "BACK");
+                    } else if (isovalikko.getChildren().contains(this.newTextArea) && (button.getText().equals("PALAA") || button.getText().equals("BACK"))) {
+                        if (this.mempane != null) {
+                            isovalikko.getChildren().remove(this.newTextArea);
+                            pane.getChildren().addAll(this.mempane.getChildren());
+                            isovalikko.getChildren().add(pane);
+                            button.setText(this.getLanguage().equals("fin") ? "OHJE" : "HELP");
+                        }
+                    } else if (isovalikko.getChildren().contains(textArea) && (button.getText().equals("OHJE") || button.getText().equals("HELP"))) {
+                        textArea.setText(this.getLanguage().equals("fin") ? super.realtimesawFI() : super.realtimesawEN());
+                    }
+                });
                 break;
         }
 
-        /*
-        * only for scenes 'Real Time RMS' and 'MMC Diffusion'
-        */
-        if (pane != null) {
-            button.setOnAction(event -> {
-                assert isovalikko != null;
-                if (isovalikko.getChildren().contains(pane) && (button.getText().equals("OHJE") || button.getText().equals("HELP"))) {
-                    this.mempane = new Pane();
-                    this.mempane.getChildren().addAll(pane.getChildren());
-                    isovalikko.getChildren().removeAll(pane);
-                    switch (which) {
-                        case "real":
-                            textArea.setText(this.getLanguage().equals("fin") ? super.realtimermsFI() : super.realtimermsEN());
-                            break;
-                        case "mmc":
-                            textArea.setText(this.getLanguage().equals("fin") ? super.realtimesawFI() : super.realtimesawEN());
-                            break;
-                    }
-                    isovalikko.getChildren().add(textArea);
-                    button.setText(this.getLanguage().equals("fin") ? "PALAA" : "BACK");
-                } else if (isovalikko.getChildren().contains(textArea) && (button.getText().equals("PALAA") || button.getText().equals("BACK"))) {
-                    if (this.mempane != null) {
-                        isovalikko.getChildren().remove(textArea);
-                        pane.getChildren().addAll(this.mempane.getChildren());
-                        isovalikko.getChildren().add(pane);
-                        button.setText(this.getLanguage().equals("fin") ? "OHJE" : "HELP");
-                    }
-                } else if (isovalikko.getChildren().contains(textArea) && (button.getText().equals("OHJE") || button.getText().equals("HELP"))) {
-                    switch (which) {
-                        case "real":
-                            textArea.setText(this.getLanguage().equals("fin") ? super.realtimermsFI() : super.realtimermsEN());
-                            break;
-                        case "mmc":
-                            textArea.setText(this.getLanguage().equals("fin") ? super.realtimesawFI() : super.realtimesawEN());
-                            break;
-                    }
-                }
-            });
-        }
         button.setVisible(true);
 
         return button;
@@ -346,12 +418,12 @@ class GetButtons extends HelpText {
      * @param language GUI language
      * @return button
      */
-    Button getMenuButton(String language) {
+    Button getMenuButton(String language, int width) {
         this.setLanguage(language);
 
         Button button = this.getLanguage().equals("fin") ? new Button("PALAA MENUUN") : new Button("BACK TO MENU");
-        button.setMinWidth(this.getButtonWidth());
-        button.setMaxWidth(this.getButtonWidth());
+        button.setMinWidth(width == 0 ? this.getButtonWidth() : this.getSawButtonWidth());
+        button.setMaxWidth(width == 0 ? this.getButtonWidth() : this.getSawButtonWidth());
         button.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> button.setEffect(this.getShadow()));
         button.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> button.setEffect(null));
         button.setVisible(true);
@@ -420,6 +492,18 @@ class GetButtons extends HelpText {
     private double getButtonWidth() { return 150.0 / Screen.getMainScreen().getRenderScale(); }
 
     /**
+     * @return the buttonWidth
+     */
+    @Contract(pure = true)
+    private double getSawButtonWidth() { return 205.0 / Screen.getMainScreen().getRenderScale(); }
+
+    /**
+     * @return the buttonWidth
+     */
+    @Contract(pure = true)
+    private double getCbmcButtonWidth() { return 100.0 / Screen.getMainScreen().getRenderScale(); }
+
+    /**
      * @return the stage
      */
     @Contract(pure = true)
@@ -473,6 +557,42 @@ class GetButtons extends HelpText {
      * @param buttonNO the buttonNO to set
      */
     private void setButtonNO(ButtonType buttonNO) { this.buttonNO = buttonNO; }
+
+    /**
+     * @return the textwidth
+     */
+    @Contract(pure = true)
+    private double getTextWidth() { return 740.0 / Screen.getMainScreen().getRenderScale(); }
+
+    /**
+     * @return the textheight
+     */
+    @Contract(pure = true)
+    private double getTextHeight() { return 600.0 / Screen.getMainScreen().getRenderScale(); }
+
+    /**
+     * @return the textwidth
+     */
+    @Contract(pure = true)
+    private double getSawTextWidth() { return 690.0 / Screen.getMainScreen().getRenderScale(); }
+
+    /**
+     * @return the textheight
+     */
+    @Contract(pure = true)
+    private double getSawTextHeight() { return 615.0 / Screen.getMainScreen().getRenderScale(); }
+
+    /**
+     * @return the animwidth
+     */
+    @Contract(pure = true)
+    private double getAnimWidth() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
+
+    /**
+     * @return the animheight
+     */
+    @Contract(pure = true)
+    private double getAnimHeight() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
 
 }
 

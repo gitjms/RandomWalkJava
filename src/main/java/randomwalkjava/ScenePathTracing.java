@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Contract;
 @SuppressWarnings("SameReturnValue")
 class ScenePathTracing extends Data {
 
+    private String language;
     private final Button nappiFixed;
     private final Button nappiLattice;
     private ToggleButton setCharge0;
@@ -49,10 +50,11 @@ class ScenePathTracing extends Data {
     /**
      * initiating scene buttons and user variable array
      */
-    ScenePathTracing() {
+    ScenePathTracing(String language){
         super();
-        this.nappiFixed = new Button("FIXED");
-        this.nappiLattice = new Button("FREE");
+        this.setLanguage(language);
+        this.nappiFixed = new Button(this.getLanguage().equals("fin") ? "KESKITETTY" : "FIXED");
+        this.nappiLattice = new Button(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
         this.vars = new String[]{
             "0",    // vars[0] particles        USER
             "0.0",  // vars[1] diameter         USER
@@ -112,7 +114,7 @@ class ScenePathTracing extends Data {
         /*
         * COMPONENTS...
         */
-        Label labNumParticles = new Label("number of particles:");
+        Label labNumParticles = new Label(this.getLanguage().equals("fin") ? "hiukkasten lukumäärä:" : "number of particles:");
         this.setNumParticles = new TextField("");
         this.setNumParticles.setOnKeyReleased(e -> {
             if (isNumInteger(this.setNumParticles.getText().trim())){
@@ -126,7 +128,7 @@ class ScenePathTracing extends Data {
                 this.vars[0] = "0";
         });
 
-        Label labSizeParticles = new Label("diameter of particle:");
+        Label labSizeParticles = new Label(this.getLanguage().equals("fin") ? "hiukkasten halkaisija:" : "diameter of particle:");
         this.setSizeParticles = new TextField("");
         this.setSizeParticles.setOnKeyReleased(e -> {
             if (isNumDouble(this.setSizeParticles.getText().trim()))
@@ -135,7 +137,7 @@ class ScenePathTracing extends Data {
                 this.vars[1] = "0.0";
         });
 
-        Label labCharge = new Label("charge of particles:");
+        Label labCharge = new Label(this.getLanguage().equals("fin") ? "hiukkasten varaus:" : "charge of particles:");
         this.setCharge0 = new ToggleButton("0");
         this.setCharge0.setMinWidth(35);
         this.setCharge0.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
@@ -178,7 +180,7 @@ class ScenePathTracing extends Data {
             this.vars[2] = "2";
         });
 
-        Label labNumSteps = new Label("number of steps:");
+        Label labNumSteps = new Label(this.getLanguage().equals("fin") ? "askelten lukumäärä:" : "number of steps:");
         this.setNumSteps = new TextField("");
         this.setNumSteps.setOnKeyReleased(e -> {
             if (isNumInteger(this.setNumSteps.getText().trim())){
@@ -187,7 +189,7 @@ class ScenePathTracing extends Data {
                 this.vars[3] = "0";
         });
 
-        Label labNumDimensions = new Label("dimension:");
+        Label labNumDimensions = new Label(this.getLanguage().equals("fin") ? "ulottuvuus:" : "dimension:");
         this.setDim1 = new ToggleButton("1");
         this.setDim1.setMinWidth(35);
         this.setDim1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
@@ -280,12 +282,12 @@ class ScenePathTracing extends Data {
         this.getNappiFixed().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getNappiFixed().setEffect(shadow));
         this.getNappiFixed().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getNappiFixed().setEffect(null));
         this.getNappiFixed().setOnMouseClicked((MouseEvent event) -> {
-            if (this.getNappiFixed().getText().equals("SPREAD")){
-                this.getNappiFixed().setText("FIXED");
+            if (this.getNappiFixed().getText().equals("HAJAUTETTU") || this.getNappiFixed().getText().equals("SPREAD")){
+                this.getNappiFixed().setText(this.getLanguage().equals("fin") ? "KESKITETTY" : "FIXED");
                 this.getNappiFixed().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[6] = "f";
-            } else if (this.getNappiFixed().getText().equals("FIXED")){
-                this.getNappiFixed().setText("SPREAD");
+            } else if (this.getNappiFixed().getText().equals("KESKITETTY") || this.getNappiFixed().getText().equals("FIXED")){
+                this.getNappiFixed().setText(this.getLanguage().equals("fin") ? "HAJAUTETTU" : "SPREAD");
                 this.getNappiFixed().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[6] = "-";
             }
@@ -302,12 +304,12 @@ class ScenePathTracing extends Data {
         this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getNappiLattice().setEffect(shadow));
         this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getNappiLattice().setEffect(null));
         this.getNappiLattice().setOnMouseClicked((MouseEvent event) -> {
-            if (this.getNappiLattice().getText().equals("LATTICE")){
-                this.getNappiLattice().setText("FREE");
+            if (this.getNappiLattice().getText().equals("HILA") || this.getNappiLattice().getText().equals("LATTICE")){
+                this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
                 this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[7] = "-";
-            } else if (this.getNappiLattice().getText().equals("FREE")){
-                this.getNappiLattice().setText("LATTICE");
+            } else if (this.getNappiLattice().getText().equals("VAPAA") || this.getNappiLattice().getText().equals("FREE")){
+                this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "HILA" : "LATTICE");
                 this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[7] = "l";
             }
@@ -353,5 +355,16 @@ class ScenePathTracing extends Data {
     private Button getNappiLattice() {
         return nappiLattice;
     }
+
+    /**
+     * @return the language
+     */
+    @Contract(pure = true)
+    private String getLanguage() { return this.language; }
+
+    /**
+     * @param language the language to set
+     */
+    private void setLanguage(String language) { this.language = language; }
 
 }

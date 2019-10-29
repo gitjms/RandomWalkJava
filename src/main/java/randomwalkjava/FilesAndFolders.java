@@ -20,12 +20,12 @@ class FilesAndFolders {
     }
 
     /**
-     * If data folder C:/RWDATA does not exist, tries to create it,
+     * If data folder "C:/RWDATA" does not exist, tries to create it,
      * then tries to create source files
      * <p>
      *     Returns true if cannot create files or data folder
      * </p>
-     * @param datapath data folder C:/RWDATA
+     * @param datapath data folder "C:/RWDATA"
      * @param fexec Fortran executable
      * @param pyexecrms Python executable for rms calculation plot
      * @param pyexec1d Python executable for path tracing plot in 1D
@@ -55,11 +55,11 @@ class FilesAndFolders {
     }
 
     /**
-     * If data folder C:/RWDATA does exist, tries to create source files
+     * If data folder "C:/RWDATA" does exist, tries to create source files
      * <p>
      *     Returns true if cannot create files
      * </p>
-     * @param datapath data folder C:/RWDATA
+     * @param datapath data folder "C:/RWDATA"
      * @param pyexecrms Python executable for rms calculation plot
      * @param pyexec1d Python executable for path tracing plot in 1D
      * @param pyexec2d Python executable for path tracing plot in 2D
@@ -106,13 +106,13 @@ class FilesAndFolders {
     }
 
     /**
-     * method for creating a working directory C:/RWDATA if needed, and
-     * copies executables there from resources/.
+     * method for creating a working directory "C:/RWDATA" if needed, and
+     * copies executables there from "resources/".
      * <p>
      *     returns false if all goes well, true otherwise
      * </p>
-     * @param destination path for working directory C:/RWDATA
-     * @param executable file to copy from resources/ to C:/RWDATA
+     * @param destination path for working directory "C:/RWDATA"
+     * @param executable file to copy from "resources/" to "C:/RWDATA"
      * @param createDir true if has to create working directory
      * @return false if all goes well, true otherwise
      */

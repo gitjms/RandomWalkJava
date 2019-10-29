@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 def main():
 	path_trace_y = sys.argv[1]
+	language = sys.argv[2]
 
 #!----------------------------------------------------------------------
 #!	DATA
@@ -44,14 +45,29 @@ def main():
 		for i in range(0,particles):
 				plt.plot(x_data,y_data[:,i],'-',lw=linew,antialiased=True)
 
-	plt.plot(x_data,y2_data,'k-',lw=2,antialiased=True,label=r"Expected value, $\sqrt{steps}$")
+	if (language == 'fin'):
+		legtext = r"Odotusarvo, $\sqrt{S}$"
+	else:
+		legtext = r"Expected value, $\sqrt{S}$"
+
+	plt.plot(x_data,y2_data,'k-',lw=2,antialiased=True,label=legtext)
 	plt.plot(x_data,-y2_data,'k-',lw=2,antialiased=True)
 
 	plt.xlim(0,steps)
 	plt.ylim(miny,maxy)
-	plt.xlabel(r"steps", fontsize=14)
-	plt.ylabel(r"distance", fontsize=14)
-	text=r"Distance vs. steps, steps=%d"%(int(steps))
+	
+	if (language == 'fin'):
+		plt.xlabel(r"Askelten lukumäärä, S", fontsize=14)
+	else:
+		plt.xlabel(r"Number of Steps, S", fontsize=14)
+	if (language == 'fin'):
+		plt.ylabel(r"Etäisyys", fontsize=14)
+	else:
+		plt.ylabel(r"Distance", fontsize=14)
+	if (language == 'fin'):
+		text=r"Etäisyys askelten funktiona, %d askelta"%(int(steps))
+	else:
+		text=r"Distance as a function of steps, %d steps"%(int(steps))
 	plt.title(text,fontsize=16)
 	plt.grid(axis='y')
 	plt.legend(loc='upper left')

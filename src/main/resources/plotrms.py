@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 def main():
 	rms_file = sys.argv[1]
+	language = sys.argv[2]
 	
 #!----------------------------------------------------------------------
 #!	DATA
@@ -34,9 +35,16 @@ def main():
 	plt.plot(x_data,y_data,'-',lw=1,antialiased=True,label=r"R_rms, N=%d"%int(steps))
 	plt.xlim(0,maxx)
 	plt.ylim(0,maxy)
-	plt.xlabel(r"$\sqrt{steps}$", fontsize=14)
-	plt.ylabel(r"$R_{rms}$", fontsize=14)
-	text=r"$R_{rms}$ vs. $\sqrt{steps}$ (%dD), steps=%d"%(int(dimension),int(steps))
+	if (language == 'fin'):
+		xlab = r"Odotusarvo ($\sqrt{S}$)"
+	else:
+		xlab = r"Expected value ($\sqrt{S}$)"
+	plt.xlabel(xlab, fontsize=14)
+	plt.ylabel(r"$R_{rms}$ $\left(\sqrt{\langle x^2\rangle}\right)$", fontsize=14)
+	if (language == 'fin'):
+		text = r"$R_{rms}$ odotusarvon funktiona (%dD), %d askelta"%(int(dimension),int(steps))
+	else:
+		text = r"$R_{rms}$ as a Function of Expected Value (%dD), %d steps"%(int(dimension),int(steps))
 	plt.title(text,fontsize=16)
 
 	plt.grid()
