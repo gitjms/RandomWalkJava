@@ -9,7 +9,6 @@ import matplotlib.ticker as plticker
 def main():
 	saw_data = sys.argv[1]
 	language = sys.argv[2]
-
 #!----------------------------------------------------------------------
 #!	DATA
 #!----------------------------------------------------------------------
@@ -58,7 +57,7 @@ def main():
 		label2="Start"
 		label3="Finish"
 
-	plt.plot(xdata_saw,ydata_saw,'C0-',lw=10,antialiased=True,label=label1+", S=%d"%int(steps))
+	plt.plot(xdata_saw,ydata_saw,'C0-',lw=5,antialiased=True,label=label1+", S=%d"%int(steps))
 	plt.plot(xdata_saw[0],ydata_saw[0],'ro',ms=20,antialiased=True,label=label2)
 	plt.plot(xdata_saw[steps],ydata_saw[steps],'r*',ms=30,antialiased=True,label=label3)
 

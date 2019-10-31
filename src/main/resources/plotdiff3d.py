@@ -83,7 +83,7 @@ def main():
 	ax.set_zlabel('$Z$', fontsize=12)
 	
 	plt.tight_layout()
-	savename = "jpyplotmmc3D_N" + str(particles) + "_diam" + str(diameter) + ".pdf"
+	savename = "jpyplotdiff3D_N" + str(particles) + "_diam" + str(diameter) + ".pdf"
 	plt.savefig(savename)
 
 if __name__=="__main__":

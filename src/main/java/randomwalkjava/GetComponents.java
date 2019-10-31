@@ -48,7 +48,7 @@ class GetComponents {
     }
 
     /**
-     * method for setting Panes for Real Time Rms and MMC Diffusion
+     * method for setting Panes for Real Time Rms and Diffusion
      * @param alusta javafx Canvas
      * @return pane
      */
@@ -78,7 +78,7 @@ class GetComponents {
      * @param nappi2 button for '1D Distance'
      * @param nappi3 button for 'RMS vs SQRT(S)'
      * @param nappi4 button for 'Real Time RMS'
-     * @param nappi5 button for 'MMC Diffusion'
+     * @param nappi5 button for 'Diffusion'
      * @param nappi6 button for 'Real Time SAW'
      * @return asettelu
      */
@@ -156,17 +156,5 @@ class GetComponents {
      */
     @Contract(pure = true)
     private double getAnimHeight() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the imgWidth
-     */
-    @Contract(pure = true)
-    private double getImgWidth() { return 200.0 / Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the imgheight
-     */
-    @Contract(pure = true)
-    private double getImgHeight() { return 100.0 / Screen.getMainScreen().getRenderScale(); }
 
 }

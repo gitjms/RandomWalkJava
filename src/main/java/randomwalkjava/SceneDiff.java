@@ -20,6 +20,8 @@ import org.jetbrains.annotations.Contract;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -31,10 +33,10 @@ import static java.lang.Integer.parseInt;
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
  * 
- * Class for MMC DIFFUSION
+ * Class for DIFFUSION
  */
 @SuppressWarnings("SameReturnValue")
-class SceneMMC extends Data {
+class SceneDiff extends Data {
 
     private String language;
     private ToggleButton setCharge1;
@@ -64,14 +66,14 @@ class SceneMMC extends Data {
     private double finT;
     private GraphicsContext piirturi;
     private FXPlot fxplot;
-    private Button remBarNappiMMC;
-    private VBox valikkoMMC;
-    private Button runMMC;
+    private Button remBarNappiDiff;
+    private VBox valikkoDiff;
+    private Button runDiff;
     private final Button nappiBalls3D;
-    private Button plotMMC;
-    private Button closeNappiMMC;
-    private Button menuNappiMMC;
-    private Button helpNappiMMC;
+    private Button plotDiff;
+    private Button closeNappiDiff;
+    private Button menuNappiDiff;
+    private Button helpNappiDiff;
 
     private boolean platfRunning;
     private Process process;
@@ -89,6 +91,8 @@ class SceneMMC extends Data {
     private Image yellowP;
     private Image grayP;
     private BufferedWriter output;
+    private double walktime;
+    private NumberFormat formatter;
 
     private int num_part;
     private double diam;
@@ -112,26 +116,27 @@ class SceneMMC extends Data {
     /**
      * initiating scene button and user variable array
      */
-    SceneMMC(String language){
+    SceneDiff(String language){
         super();
         this.setLanguage(language);
         this.nappiLattice = new Button(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
         this.nappiBalls3D = new Button(this.getLanguage().equals("fin") ? "PALLOT" : "BALLS");
         this.balls3D = true;
+        this.formatter = new DecimalFormat("0.00");
         this.vars = new String[]{
             "0",    // vars[0] particles        USER
             "0.0",  // vars[1] diameter         USER
             "0",    // vars[2] charge           USER
             "0",    // vars[3] steps            n/a
             "0",    // vars[4] dimension        USER
-            "m",    // vars[5] mmc              n/a
+            "m",    // vars[5] diff             n/a
             "-",    // vars[6] (fixed/)spread   n/a
             "-",    // vars[7] (lattice/)free   USER
             "-"};   // vars[8] save (off)       n/a
     }
 
     /**
-     * MMC execution, uses Timer
+     * Diffusion execution, uses Timer
      * @param folder datafolder "C:/RWDATA"
      * @param initialDataFile initial particle data
      * @param executable Fortran executable "walk.exe"
@@ -139,13 +144,13 @@ class SceneMMC extends Data {
      * @param scalefactor scaling is used in different particle amounts
      * @param animwidth drawing area width
      * @param linewidth width for lines
-     * @param remBarNappiMMC removing barrier in animation
-     * @param runMMC run animation, no plot
-     * @param valikkoMMC valikkoMMC
-     * @param plotMMC plot initial and final particle configurations, no animation
-     * @param closeNappiMMC close button must be disabled during run
-     * @param menuNappiMMC menu button must be disabled during run
-     * @param helpNappiMMC help button must be disabled during run
+     * @param remBarNappiDiff removing barrier in animation
+     * @param runDiff run animation, no plot
+     * @param valikkoDiff valikkoDiff
+     * @param plotDiff plot initial and final particle configurations, no animation
+     * @param closeNappiDiff close button must be disabled during run
+     * @param menuNappiDiff menu button must be disabled during run
+     * @param helpNappiDiff help button must be disabled during run
      * @param energy_x fxplot energy graph x-axis container
      * @param energy_y fxplot energy graph y-axis container
      * @param diffusion_x fxplot diffusion graph x-axis container
@@ -158,8 +163,8 @@ class SceneMMC extends Data {
      */
     void refresh(File folder, File initialDataFile, String executable,
                  GraphicsContext piirturi, double scalefactor, double animwidth, double linewidth,
-                 Button remBarNappiMMC, Button runMMC, VBox valikkoMMC, Button plotMMC,
-                 Button closeNappiMMC, Button menuNappiMMC, Button helpNappiMMC, List<Double> energy_x,
+                 Button remBarNappiDiff, Button runDiff, VBox valikkoDiff, Button plotDiff,
+                 Button closeNappiDiff, Button menuNappiDiff, Button helpNappiDiff, List<Double> energy_x,
                  List<Double> energy_y, List<Double> diffusion_x, List<Double> diffusion_y, List<Double> visc_x,
                  List<Double> visc_y, boolean newdata, double measure, double differ) {
 
@@ -171,13 +176,13 @@ class SceneMMC extends Data {
         this.setPiirturi(piirturi);
         this.setLinewidth(linewidth);
         this.setAnimwidth(animwidth);
-        this.setRemBarNappiMMC(remBarNappiMMC);
-        this.setRunMMC(runMMC);
-        this.setValikkoMMC(valikkoMMC);
-        this.setPlotMMC(plotMMC);
-        this.setCloseNappiMMC(closeNappiMMC);
-        this.setMenuNappiMMC(menuNappiMMC);
-        this.setHelpNappiMMC(helpNappiMMC);
+        this.setRemBarNappiDiff(remBarNappiDiff);
+        this.setRunDiff(runDiff);
+        this.setValikkoDiff(valikkoDiff);
+        this.setPlotDiff(plotDiff);
+        this.setCloseNappiDiff(closeNappiDiff);
+        this.setMenuNappiDiff(menuNappiDiff);
+        this.setHelpNappiDiff(helpNappiDiff);
         this.setCenter(this.getAnimwidth()/2.0);
         this.setMeasure(measure);
         this.setDiffer(differ);
@@ -212,26 +217,27 @@ class SceneMMC extends Data {
             this.visc_y.clear();
             this.setValues(new double[this.getDim() + 1][this.getNumPart()]);
             clearDots();
+            this.setWalkTime(0.0);
         }
 
-        this.getRemBarNappiMMC().setVisible(true);
-        this.getPlotMMC().setVisible(false);
-        this.getMenuNappiMMC().setDisable(true);
-        this.getHelpNappiMMC().setDisable(true);
+        this.getRemBarNappiDiff().setVisible(true);
+        this.getPlotDiff().setVisible(false);
+        this.getMenuNappiDiff().setDisable(true);
+        this.getHelpNappiDiff().setDisable(true);
         this.getCharge1().setDisable(true);
         this.getCharge2().setDisable(true);
         this.getDim2().setDisable(true);
         this.getDim3().setDisable(true);
         this.getNappiLattice().setDisable(true);
         this.getNappiBalls3D().setDisable(true);
-        this.getValikkoMMC().getChildren().set(3, this.getRemBarNappiMMC());
+        this.getValikkoDiff().getChildren().set(3, this.getRemBarNappiDiff());
 
-        this.getRemBarNappiMMC().setOnMouseClicked(event -> {
+        this.getRemBarNappiDiff().setOnMouseClicked(event -> {
             barrierOff();
-            this.getValikkoMMC().getChildren().set(3, this.getRunMMC());
-            this.getRunMMC().setDisable(true);
-            this.getRemBarNappiMMC().setVisible(false);
-            this.getCloseNappiMMC().setDisable(true);
+            this.getValikkoDiff().getChildren().set(3, this.getRunDiff());
+            this.getRunDiff().setDisable(true);
+            this.getRemBarNappiDiff().setVisible(false);
+            this.getCloseNappiDiff().setDisable(true);
             this.getFxplot().setFrameVis();
         });
 
@@ -315,11 +321,12 @@ class SceneMMC extends Data {
                         if (line.trim().startsWith("S") || line.isEmpty()) {
                             continue;
                         }
-                        if (!line.substring(0,1).matches("([0-9]|-|\\+|\\*)|E|D|V"))
+                        if (!line.substring(0,1).matches("([0-9]|-|\\+|\\*)|E|D|V|T"))
                             continue;
                         if ( !(line.trim().split("(\\s+)")[0].trim().equals("E")
                             || line.trim().split("(\\s+)")[0].trim().equals("D")
-                            || line.trim().split("(\\s+)")[0].trim().equals("V")) ) {
+                            || line.trim().split("(\\s+)")[0].trim().equals("V")
+                            || line.trim().split("(\\s+)")[0].trim().equals("T")) ) {
                             if (getDim() == 2) {
                                 String[] valStr = line.split("(\\s+)");
                                 String sign = valStr[0].trim();
@@ -478,6 +485,8 @@ class SceneMMC extends Data {
                                         nanFound = true;
                                     if (!nanFound)
                                         setPhaseVisc(getPhaseVisc() + 1);
+                                } else if ( firstLetter.equals("T") ) {
+                                    setWalkTime(Double.parseDouble(line.split("(\\s+)")[1].trim()));
                                 }
                             } catch (NumberFormatException e) {
                                 continue;
@@ -517,10 +526,10 @@ class SceneMMC extends Data {
                         }
                     }
 
-                    int time = getViscX().size()-1;
-                    getFxplot().setVTitle(time, getViscY().get(getViscY().size()-1));
-                    getFxplot().setDTitle(time, getDiffusionY().get(getDiffusionY().size()-1));
-                    setFinT(2.0/3.0*getEnergyY().get((int) getPhaseEnergy() - 1)/8.617333262145e-5);
+                    int time = getViscX().size() - 1;
+                    getFxplot().setVTitle(time, getViscY().get(getViscY().size() - 1));
+                    getFxplot().setDTitle(time, getDiffusionY().get(getDiffusionY().size() - 1));
+                    setFinT(2.0 / 3.0 * getEnergyY().get((int) getPhaseEnergy() - 1) / 8.617333262145e-5);
                     double deltaT = getFinT() - getInitT();
                     getFxplot().setDeltaT(deltaT);
 
@@ -529,41 +538,43 @@ class SceneMMC extends Data {
                         walkStop();
                         platfStop();
                         timerStop();
-                        getMenuNappiMMC().setDisable(false);
-                        getHelpNappiMMC().setDisable(false);
-                        getRunMMC().setDisable(false);
-                        getPlotMMC().setVisible(true);
+                        getMenuNappiDiff().setDisable(false);
+                        getHelpNappiDiff().setDisable(false);
+                        getRunDiff().setDisable(false);
+                        getPlotDiff().setVisible(true);
                         getCharge1().setDisable(false);
                         getCharge2().setDisable(false);
                         getDim2().setDisable(false);
                         getDim3().setDisable(false);
                         getNappiLattice().setDisable(false);
                         getNappiBalls3D().setDisable(false);
-                        getCloseNappiMMC().setDisable(false);
+                        getCloseNappiDiff().setDisable(false);
                         getRuntime().gc();
                         getRuntime().exit(getExitVal());
                     }
                 } catch (IOException | InterruptedException e) {
                     platfStop();
                     timerStop();
-                    getMenuNappiMMC().setDisable(false);
-                    getHelpNappiMMC().setDisable(false);
-                    getRunMMC().setDisable(false);
-                    getPlotMMC().setVisible(true);
+                    getMenuNappiDiff().setDisable(false);
+                    getHelpNappiDiff().setDisable(false);
+                    getRunDiff().setDisable(false);
+                    getPlotDiff().setVisible(true);
                     getCharge1().setDisable(false);
                     getCharge2().setDisable(false);
                     getDim2().setDisable(false);
                     getDim3().setDisable(false);
                     getNappiLattice().setDisable(false);
                     getNappiBalls3D().setDisable(false);
-                    getCloseNappiMMC().setDisable(false);
+                    getCloseNappiDiff().setDisable(false);
                     getRuntime().gc();
                     Platform.runLater(() -> {
                         /*
                          * INFO DIALOG
                          */
                         GetDialogs getDialogs = new GetDialogs();
-                        Alert alert = getDialogs.getInfo(getLanguage().equals("fin") ? "Ajo on päättynyt." : "Run is finished.");
+                        Alert alert = getDialogs.getInfo(getLanguage().equals("fin")
+                            ? "Ajo on päättynyt.\nKulkukesto: " + formatter.format(getWalkTime()) + "s"
+                            : "Run is finished.\nWalk Time: " + formatter.format(getWalkTime()) + "s");
                         walkStop();
                         alert.show();
                     });
@@ -590,7 +601,7 @@ class SceneMMC extends Data {
 
         if ( this.getDim() == 2 && isLattice() ) drawLattice();
         this.getPiirturi().setLineWidth(this.getLinewidth());
-        List<double[]> initialData = readDataMMC(initialDataFile, this.getDim());
+        List<double[]> initialData = readDataDiff(initialDataFile, this.getDim());
 
         this.getPiirturi().setGlobalAlpha(1.0);
         if ( this.getNumPart() < 25 ) this.getPiirturi().setLineWidth(5.0 / (Math.log(this.getNumPart())*this.getScalefactor()));
@@ -734,10 +745,10 @@ class SceneMMC extends Data {
     }
 
     /**
-     * Create GUI for MMC
-     * @return MMC DIFFUSION SCENE
+     * Create GUI for Diffusion
+     * @return DIFFUSION SCENE
      */
-    Parent getSceneMMC(){
+    Parent getSceneDiff(){
         GridPane asettelu = new GridPane();
         asettelu.setMaxWidth(getPaneWidth());
         asettelu.setVgap(5);
@@ -865,8 +876,9 @@ class SceneMMC extends Data {
         setDimension.setMaxWidth(this.getCompwidth());
         asettelu.add(setDimension, 0, 7);
 
-        this.vars[5] = "m"; // mmc
+        this.vars[5] = "d"; // diff
         this.vars[6] = "-"; // spread out
+
 
         /*
         * BUTTON: LATTICE
@@ -1227,81 +1239,81 @@ class SceneMMC extends Data {
     void setFxplot( FXPlot fxplot ) { this.fxplot = fxplot; }
 
     /**
-     * @return the remBarNappiMMC
+     * @return the remBarNappiDiff
      */
     @Contract(pure = true)
-    private Button getRemBarNappiMMC() { return remBarNappiMMC; }
+    private Button getRemBarNappiDiff() { return remBarNappiDiff; }
 
     /**
-     * @param remBarNappiMMC the remBarNappiMMC to set
+     * @param remBarNappiDiff the remBarNappiDiff to set
      */
-    private void setRemBarNappiMMC( Button remBarNappiMMC ) { this.remBarNappiMMC = remBarNappiMMC; }
+    private void setRemBarNappiDiff(Button remBarNappiDiff ) { this.remBarNappiDiff = remBarNappiDiff; }
 
     /**
-     * @return the runMMC
-     */
-    @Contract(pure = true)
-    private Button getRunMMC() { return runMMC; }
-
-    /**
-     * @param runMMC the runMMC to set
-     */
-    private void setRunMMC( Button runMMC ) { this.runMMC = runMMC; }
-
-    /**
-     * @return the valikkoMMC
+     * @return the runDiff
      */
     @Contract(pure = true)
-    private VBox getValikkoMMC() { return valikkoMMC; }
+    private Button getRunDiff() { return runDiff; }
 
     /**
-     * @param valikkoMMC the valikkoMMC to set
+     * @param runDiff the runDiff to set
      */
-    private void setValikkoMMC( VBox valikkoMMC ) { this.valikkoMMC = valikkoMMC; }
+    private void setRunDiff(Button runDiff ) { this.runDiff = runDiff; }
 
     /**
-     * @return the plotMMC
-     */
-    @Contract(pure = true)
-    private Button getPlotMMC() { return plotMMC; }
-
-    /**
-     * @param plotMMC the plotMMC to set
-     */
-    private void setPlotMMC( Button plotMMC ) { this.plotMMC = plotMMC; }
-
-    /**
-     * @return the closeNappiMMC
+     * @return the valikkoDiff
      */
     @Contract(pure = true)
-    private Button getCloseNappiMMC() { return closeNappiMMC; }
+    private VBox getValikkoDiff() { return valikkoDiff; }
 
     /**
-     * @param closeNappiMMC the closeNappiMMC to set
+     * @param valikkoDiff the valikkoDiff to set
      */
-    private void setCloseNappiMMC( Button closeNappiMMC ) { this.closeNappiMMC = closeNappiMMC; }
+    private void setValikkoDiff(VBox valikkoDiff ) { this.valikkoDiff = valikkoDiff; }
 
     /**
-     * @return the menuNappiMMC
-     */
-    @Contract(pure = true)
-    private Button getMenuNappiMMC() { return menuNappiMMC; }
-
-    /**
-     * @param menuNappiMMC the menuNappiMMC to set
-     */
-    private void setMenuNappiMMC( Button menuNappiMMC ) { this.menuNappiMMC = menuNappiMMC; }
-
-    /**
-     * @return the helpNappiMMC
+     * @return the plotDiff
      */
     @Contract(pure = true)
-    private Button getHelpNappiMMC() { return helpNappiMMC; }
+    private Button getPlotDiff() { return plotDiff; }
 
     /**
-     * @param helpNappiMMC the helpNappiMMC to set
+     * @param plotDiff the plotDiff to set
      */
-    private void setHelpNappiMMC( Button helpNappiMMC ) { this.helpNappiMMC = helpNappiMMC; }
+    private void setPlotDiff(Button plotDiff ) { this.plotDiff = plotDiff; }
+
+    /**
+     * @return the closeNappiDiff
+     */
+    @Contract(pure = true)
+    private Button getCloseNappiDiff() { return closeNappiDiff; }
+
+    /**
+     * @param closeNappiDiff the closeNappiDiff to set
+     */
+    private void setCloseNappiDiff(Button closeNappiDiff ) { this.closeNappiDiff = closeNappiDiff; }
+
+    /**
+     * @return the menuNappiDiff
+     */
+    @Contract(pure = true)
+    private Button getMenuNappiDiff() { return menuNappiDiff; }
+
+    /**
+     * @param menuNappiDiff the menuNappiDiff to set
+     */
+    private void setMenuNappiDiff(Button menuNappiDiff ) { this.menuNappiDiff = menuNappiDiff; }
+
+    /**
+     * @return the helpNappiDiff
+     */
+    @Contract(pure = true)
+    private Button getHelpNappiDiff() { return helpNappiDiff; }
+
+    /**
+     * @param helpNappiDiff the helpNappiDiff to set
+     */
+    private void setHelpNappiDiff(Button helpNappiDiff ) { this.helpNappiDiff = helpNappiDiff; }
 
     /**
      * @return the phaseDiffus
@@ -1684,5 +1696,16 @@ class SceneMMC extends Data {
      * @param finT the finT to set
      */
     private void setFinT(double finT) { this.finT = finT; }
+
+    /**
+     * @return the walktime
+     */
+    @Contract(pure = true)
+    private double getWalkTime() { return this.walktime; }
+
+    /**
+     * @param walktime the walktime to set
+     */
+    private void setWalkTime(double walktime) { this.walktime = walktime; }
 
 }

@@ -41,11 +41,11 @@ public class RandomWalk extends Application {
     private TextArea textAreaCalc;
     private TextArea textAreaPath;
     private TextArea textAreaReal;
-    private TextArea textAreaMMC;
+    private TextArea textAreaDiff;
     private TextArea textArea1Ddist;
     private TextArea textAreaSAW;
     private TextArea textAreaMenu;
-    private double mmcscalefactor;
+    private double diffscalefactor;
     private boolean newdata;
     private String language;
     private HBox isovalikkoMenu;
@@ -53,18 +53,18 @@ public class RandomWalk extends Application {
     private HBox isovalikkoCalc;
     private HBox isovalikko1Ddist;
     private HBox isovalikkoReal;
-    private HBox isovalikkoMMC;
+    private HBox isovalikkoDiff;
     private HBox isovalikkoSAW;
     private VBox valikkoMenu;
     private VBox valikkoPath;
     private VBox valikkoCalc;
     private VBox valikko1Ddist;
     private VBox valikkoReal;
-    private VBox valikkoMMC;
+    private VBox valikkoDiff;
     private VBox valikkoSAW;
     private Pane calcpane;
     private Pane realpane;
-    private Pane mmcpane;
+    private Pane diffpane;
     private Pane sawpane;
     private GridPane asettelu;
 
@@ -90,7 +90,7 @@ public class RandomWalk extends Application {
          */
         this.setScreenWidth(Toolkit.getDefaultToolkit().getScreenSize().width / Screen.getMainScreen().getRenderScale());
         this.setScreenHeight(Toolkit.getDefaultToolkit().getScreenSize().height / Screen.getMainScreen().getRenderScale());
-        this.setMmcScalefactor();
+        this.setDiffScalefactor();
         this.setNewdata();
 
         /*
@@ -106,8 +106,8 @@ public class RandomWalk extends Application {
         String pyexec1d = "plot1d.py";
         String pyexec2d = "plot2d.py";
         String pyexec3d = "plot3d.py";
-        String pyexecmmc2d = "plotmmc2d.py";
-        String pyexecmmc3d = "plotmmc3d.py";
+        String pyexecdiff2d = "plotdiff2d.py";
+        String pyexecdiff3d = "plotdiff3d.py";
         String pyexec1Ddist = "plot1Ddist.py";
         String pyexecsaw2d = "plotSaw2d.py";
         String pyexecsaw3d = "plotSaw3d.py";
@@ -118,14 +118,14 @@ public class RandomWalk extends Application {
 
         if (Files.notExists(datafolder.toPath())){
             if (filesAndFolders.checkCreateFolders(datapath, fexec, pyexecrms, pyexec1d, pyexec2d, pyexec3d,
-                pyexecmmc2d, pyexecmmc3d, pyexec1Ddist, pyexecsaw2d, pyexecsaw3d))
+                pyexecdiff2d, pyexecdiff3d, pyexec1Ddist, pyexecsaw2d, pyexecsaw3d))
                 Platform.exit();
         } else if (Files.notExists(sourceFile.toPath())) {
             if (filesAndFolders.createFolder(datapath, fexec, false)) {
                 Platform.exit();
             }
             if (filesAndFolders.checkSourceFiles(datapath, pyexecrms, pyexec1d, pyexec2d, pyexec3d,
-                pyexecmmc2d, pyexecmmc3d, pyexec1Ddist, pyexecsaw2d, pyexecsaw3d)) {
+                pyexecdiff2d, pyexecdiff3d, pyexec1Ddist, pyexecsaw2d, pyexecsaw3d)) {
                 Platform.exit();
             }
         }
@@ -153,7 +153,7 @@ public class RandomWalk extends Application {
         Button nappiScene2 = getButtons.getSceneButton(this.getLanguage().equals("fin") ? "1D-ETÄISYYS" : "1D DISTANCE");
         Button nappiScene3 = getButtons.getSceneButton(this.getLanguage().equals("fin") ? "RMS vs SQRT(S)" : "RMS vs SQRT(S)");
         Button nappiScene4 = getButtons.getSceneButton(this.getLanguage().equals("fin") ? "REAALIAIKA-RMS" : "REAL TIME RMS");
-        Button nappiScene5 = getButtons.getSceneButton(this.getLanguage().equals("fin") ? "MMC-DIFFUUSIO" : "MMC DIFFUSION");
+        Button nappiScene5 = getButtons.getSceneButton(this.getLanguage().equals("fin") ? "DIFFUUSIO" : "DIFFUSION");
         Button nappiScene6 = getButtons.getSceneButton(this.getLanguage().equals("fin") ? "REAALIAIKA-SAW" : "REAL TIME SAW");
 
         /*
@@ -168,7 +168,7 @@ public class RandomWalk extends Application {
         Scene1Ddist get1DdistScene = new Scene1Ddist(this.getLanguage());
         SceneCalculation getCalcScene = new SceneCalculation(this.getLanguage());
         SceneRealTimeRms getRealScene = new SceneRealTimeRms(this.getLanguage());
-        SceneMMC getMMCScene = new SceneMMC(this.getLanguage());
+        SceneDiff getDiffScene = new SceneDiff(this.getLanguage());
         SceneRealTimeSaw getSAWScene = new SceneRealTimeSaw(this.getLanguage());
 
         /*
@@ -179,7 +179,7 @@ public class RandomWalk extends Application {
         this.setIsovalikko1Ddist(getComponents.getHBox(0, 0));
         this.setIsovalikkoCalc(getComponents.getHBox(0, 0));
         this.setIsovalikkoReal(getComponents.getHBox(0, 0));
-        this.setIsovalikkoMMC(getComponents.getHBox(0, 0));
+        this.setIsovalikkoDiff(getComponents.getHBox(0, 0));
         this.setIsovalikkoSAW(getComponents.getHBox(0, 0));
 
         /*
@@ -190,7 +190,7 @@ public class RandomWalk extends Application {
         this.setValikko1Ddist(getComponents.getVBox(20));
         this.setValikkoCalc(getComponents.getVBox(20));
         this.setValikkoReal(getComponents.getVBox(20));
-        this.setValikkoMMC(getComponents.getVBox(20));
+        this.setValikkoDiff(getComponents.getVBox(20));
         this.setValikkoSAW(getComponents.getVBox(20));
 
         /*
@@ -201,7 +201,7 @@ public class RandomWalk extends Application {
         this.setTextArea1Ddist(getComponents.GetTextArea(this.getTextWidth(), this.getTextHeight()));
         this.setTextAreaCalc(getComponents.GetTextArea(this.getTextWidth(), this.getTextHeight()));
         this.setTextAreaReal(getComponents.GetTextArea(this.getAnimWidth(), this.getAnimHeight()));
-        this.setTextAreaMMC(getComponents.GetTextArea(this.getAnimWidth(), this.getAnimHeight()));
+        this.setTextAreaDiff(getComponents.GetTextArea(this.getAnimWidth(), this.getAnimHeight()));
         this.setTextAreaSAW(getComponents.GetTextArea(this.getSawTextWidth(), this.getSawTextHeight()));
 
         /*
@@ -220,7 +220,7 @@ public class RandomWalk extends Application {
         Button nappiMenuHelp = getButtons.getHelpButton(
             this.getLanguage(), this.getTextAreaMenu(), null, null, "menu", 0);
         this.getAsettelu().add(nappiMenuHelp, 0, 14, 2, 1);
-        Button closeNappiMenu = getButtons.getCloseButton(getRealScene, getMMCScene, getSAWScene,
+        Button closeNappiMenu = getButtons.getCloseButton(getRealScene, getDiffScene, getSAWScene,
             0, ex, this.getLanguage(), this.getFrame(), this.getButtonYES(), this.getButtonNO());
 
         /*
@@ -230,7 +230,7 @@ public class RandomWalk extends Application {
         Button menuNappiPath = getButtons.getMenuButton(this.getLanguage(), 0);
         Button helpNappiPath = getButtons.getHelpButton(
             this.getLanguage(), this.getTextAreaPath(), this.getIsovalikkoPath(), null, "path", 0);
-        Button closeNappiPath = getButtons.getCloseButton(getRealScene, getMMCScene, getSAWScene,
+        Button closeNappiPath = getButtons.getCloseButton(getRealScene, getDiffScene, getSAWScene,
             0, ex, this.getLanguage(), this.getFrame(), this.getButtonYES(), this.getButtonNO());
 
         /*
@@ -240,7 +240,7 @@ public class RandomWalk extends Application {
         Button menuNappi1Ddist = getButtons.getMenuButton(this.getLanguage(), 0);
         Button helpNappi1Ddist = getButtons.getHelpButton(
             this.getLanguage(), this.getTextArea1Ddist(), this.getIsovalikko1Ddist(), null, "1Ddist", 0);
-        Button closeNappi1Ddist = getButtons.getCloseButton(getRealScene, getMMCScene, getSAWScene,
+        Button closeNappi1Ddist = getButtons.getCloseButton(getRealScene, getDiffScene, getSAWScene,
             0, ex, this.getLanguage(), this.getFrame(), this.getButtonYES(), this.getButtonNO());
 
         /*
@@ -248,7 +248,7 @@ public class RandomWalk extends Application {
         */
         Button executeNappiCalc = getButtons.getExecuteButton(this.getLanguage(), 0, "EXEC");
         Button menuNappiCalc = getButtons.getMenuButton(this.getLanguage(), 0);
-        Button closeNappiCalc = getButtons.getCloseButton(getRealScene, getMMCScene, getSAWScene,
+        Button closeNappiCalc = getButtons.getCloseButton(getRealScene, getDiffScene, getSAWScene,
             0, ex, this.getLanguage(), this.getFrame(), this.getButtonYES(), this.getButtonNO());
         // CALCULATION COMPONENTS
         // MATH CARD
@@ -265,7 +265,7 @@ public class RandomWalk extends Application {
         */
         Button runReal = getButtons.getExecuteButton(this.getLanguage(), 0, "RUN");
         Button menuNappiReal = getButtons.getMenuButton(this.getLanguage(), 0);
-        Button closeNappiReal = getButtons.getCloseButton(getRealScene, getMMCScene, getSAWScene,
+        Button closeNappiReal = getButtons.getCloseButton(getRealScene, getDiffScene, getSAWScene,
             0, ex, this.getLanguage(), this.getFrame(), this.getButtonYES(), this.getButtonNO());
 
         // REAL TIME RMS COMPONENTS
@@ -279,23 +279,23 @@ public class RandomWalk extends Application {
             this.getLanguage(), this.getTextAreaReal(), this.getIsovalikkoReal(), this.getRealPane(), "real", 0);
 
         /*
-        * OTHER VIEWS BUTTONS: MMC DIFFUSION
+        * OTHER VIEWS BUTTONS: DIFFUSION
         */
-        Button runMMC = getButtons.getExecuteButton(this.getLanguage(), 0, "ANIM");
-        Button plotMMC = getButtons.getExecuteButton(this.getLanguage(), 0, "PLOT");
-        Button menuNappiMMC = getButtons.getMenuButton(this.getLanguage(), 0);
-        Button helpNappiMMC = getButtons.getHelpButton(
-            this.getLanguage(), this.getTextAreaMMC(), this.getIsovalikkoMMC(), this.getMMCPane(), "mmc", 0);
-        Button remBarNappiMMC = getButtons.getMMCBarrierButton(this.getLanguage());
-        Button closeNappiMMC = getButtons.getCloseMMCButton(this.getLanguage(), getMMCScene, this.getFrame());
+        Button runDiff = getButtons.getExecuteButton(this.getLanguage(), 0, "ANIM");
+        Button plotDiff = getButtons.getExecuteButton(this.getLanguage(), 0, "PLOT");
+        Button menuNappiDiff = getButtons.getMenuButton(this.getLanguage(), 0);
+        Button helpNappiDiff = getButtons.getHelpButton(
+            this.getLanguage(), this.getTextAreaDiff(), this.getIsovalikkoDiff(), this.getDiffPane(), "diff", 0);
+        Button remBarNappiDiff = getButtons.getDiffBarrierButton(this.getLanguage());
+        Button closeNappiDiff = getButtons.getCloseDiffButton(this.getLanguage(), getDiffScene, this.getFrame());
 
-        // MMC COMPONENTS
-        Canvas mmcAlusta = new Canvas(this.getAnimWidth(), this.getAnimHeight());
-        mmcAlusta.setVisible(true);
-        GraphicsContext mmcpiirturi = mmcAlusta.getGraphicsContext2D();
-        mmcpiirturi.setFill(Color.BLACK);
-        mmcpiirturi.fillRect(0, 0, this.getAnimWidth(), this.getAnimHeight());
-        this.setMMCPane(getComponents.getPane(mmcAlusta));
+        // DIFFUSION COMPONENTS
+        Canvas diffAlusta = new Canvas(this.getAnimWidth(), this.getAnimHeight());
+        diffAlusta.setVisible(true);
+        GraphicsContext diffpiirturi = diffAlusta.getGraphicsContext2D();
+        diffpiirturi.setFill(Color.BLACK);
+        diffpiirturi.fillRect(0, 0, this.getAnimWidth(), this.getAnimHeight());
+        this.setDiffPane(getComponents.getPane(diffAlusta));
 
         /*
          * OTHER VIEWS BUTTONS: REAL TIME SAW
@@ -306,7 +306,7 @@ public class RandomWalk extends Application {
         sawButtonBox.getChildren().addAll(runSAW, runCBMC);
         Button plotSAW = getButtons.getExecuteButton(this.getLanguage(), 1, "SAWPLOT");
         Button menuNappiSAW = getButtons.getMenuButton(this.getLanguage(), 1);
-        Button closeNappiSAW = getButtons.getCloseButton(getRealScene, getMMCScene, getSAWScene,
+        Button closeNappiSAW = getButtons.getCloseButton(getRealScene, getDiffScene, getSAWScene,
             1, ex, this.getLanguage(), this.getFrame(), this.getButtonYES(), this.getButtonNO());
 
         // REAL TIME SAW COMPONENTS
@@ -397,13 +397,13 @@ public class RandomWalk extends Application {
         asetteluReal.setCenter(this.getIsovalikkoReal());
 
         /*
-        * SET MMC DIFFUSION BORDERPANE
+        * SET DIFFUSION BORDERPANE
         */
-        this.getValikkoMMC().getChildren().addAll(
-            menuNappiMMC, helpNappiMMC, getMMCScene.getSceneMMC(), runMMC, plotMMC, closeNappiMMC);
-        this.getIsovalikkoMMC().getChildren().addAll(this.getValikkoMMC(), this.getTextAreaMMC());
-        BorderPane asetteluMMC = new BorderPane();
-        asetteluMMC.setCenter(this.getIsovalikkoMMC());
+        this.getValikkoDiff().getChildren().addAll(
+            menuNappiDiff, helpNappiDiff, getDiffScene.getSceneDiff(), runDiff, plotDiff, closeNappiDiff);
+        this.getIsovalikkoDiff().getChildren().addAll(this.getValikkoDiff(), this.getTextAreaDiff());
+        BorderPane asetteluDiff = new BorderPane();
+        asetteluDiff.setCenter(this.getIsovalikkoDiff());
 
         /*
          * SET REAL TIME SAW BORDERPANE
@@ -436,10 +436,10 @@ public class RandomWalk extends Application {
             this.getStageHeight() + (this.getAnimHeight()-this.getTextHeight()));
         realScene.getStylesheets().add("/Styles.css");
 
-        Scene mmcScene = new Scene(asetteluMMC,
+        Scene diffScene = new Scene(asetteluDiff,
             this.getStageWidth() + (this.getAnimWidth()-this.getTextWidth()),
             this.getStageHeight() + (this.getAnimHeight()-this.getTextHeight()));
-        mmcScene.getStylesheets().add("/Styles.css");
+        diffScene.getStylesheets().add("/Styles.css");
 
         Scene sawScene = new Scene(asetteluSAW,
             this.getStageWidth() + (this.getAnimWidth()-this.getTextWidth()),
@@ -467,9 +467,9 @@ public class RandomWalk extends Application {
         setChoices.setMenuEffects(this.getLanguage(), menuNappiReal, "real",
             this.getTextAreaReal(), this.getTextAreaMenu(), firstScene, 2);
 
-        setChoices.setBigSceneEffects(this.getLanguage(), nappiScene5, mmcScene, "MMC-diffuusio", "MMC Diffusion");
-        setChoices.setMenuEffects(this.getLanguage(), menuNappiMMC, "mmc",
-            this.getTextAreaMMC(), this.getTextAreaMenu(), firstScene, 2);
+        setChoices.setBigSceneEffects(this.getLanguage(), nappiScene5, diffScene, "Diffuusio", "Diffusion");
+        setChoices.setMenuEffects(this.getLanguage(), menuNappiDiff, "diff",
+            this.getTextAreaDiff(), this.getTextAreaMenu(), firstScene, 2);
 
         setChoices.setSemiSceneEffects(this.getLanguage(), nappiScene6, sawScene, "saw");
         setChoices.setMenuEffects(this.getLanguage(), menuNappiSAW, "saw",
@@ -503,21 +503,21 @@ public class RandomWalk extends Application {
             helpNappiReal, this.getIsovalikkoReal(), this.getTextAreaReal(), this.getRealPane(), piirturi);
 
         /*
-        * PLOT & EXECUTE BUTTONS MMC DIFFUSION
+        * PLOT & EXECUTE BUTTONS DIFFUSION
         */
-        ExecMMC execMMC = new ExecMMC(this.getLanguage());
-        execMMC.setPlotClick(plotMMC, getMMCScene, this.valikkoMMC, datapath, datafolder,
-            fexec, pyexecmmc2d, pyexecmmc3d, ex);
-        execMMC.setExecClick(runMMC, getMMCScene, mmcpiirturi,
-            this.getMmcScalefactor(), this.getAnimWidth(), this.getAnimHeight(),
-            this.newdata, this.isovalikkoMMC, this.valikkoMMC, this.textAreaMMC, this.mmcpane, datapath, datafolder,
-            fexec, remBarNappiMMC, plotMMC, closeNappiMMC, menuNappiMMC, helpNappiMMC);
+        ExecDiff execDIFF = new ExecDiff(this.getLanguage());
+        execDIFF.setPlotClick(plotDiff, getDiffScene, this.valikkoDiff, datapath, datafolder,
+            fexec, pyexecdiff2d, pyexecdiff3d, ex);
+        execDIFF.setExecClick(runDiff, getDiffScene, diffpiirturi,
+            this.getDiffScalefactor(), this.getAnimWidth(), this.getAnimHeight(),
+            this.newdata, this.isovalikkoDiff, this.valikkoDiff, this.textAreaDiff, this.diffpane, datapath, datafolder,
+            fexec, remBarNappiDiff, plotDiff, closeNappiDiff, menuNappiDiff, helpNappiDiff);
 
         /*
          * PLOT & RUN BUTTONS REAL TIME SAW
          */
         ExecSAW execSAW = new ExecSAW(this.getLanguage());
-        execSAW.setPlotClick(plotSAW, getSAWScene, this.valikkoSAW, datapath, datafolder,
+        execSAW.setPlotClick(plotSAW, runSAW, getSAWScene, this.valikkoSAW, datapath, datafolder,
             fexec, pyexecsaw2d, pyexecsaw3d, ex);
         execSAW.setSawClick(datafolder, fexec, runSAW, runCBMC, getSAWScene, this.getIsovalikkoSAW(), this.getSawPane(),
             this.getTextAreaSAW(), plotSAW, closeNappiSAW, menuNappiSAW, helpNappiSAW, sliderGam, sliderAa);
@@ -530,9 +530,9 @@ public class RandomWalk extends Application {
                 if (this.getFrame().isShowing() || this.getFrame().isActive() || this.getFrame().isDisplayable())
                     this.getFrame().dispose();
 
-            if (getMMCScene.runtimeIsRunning()) {
+            if (getDiffScene.runtimeIsRunning()) {
                 Runtime.getRuntime().gc();
-                getMMCScene.stopRuntime();
+                getDiffScene.stopRuntime();
             }
             if (getRealScene.runtimeIsRunning()) {
                 Runtime.getRuntime().gc();
@@ -671,14 +671,14 @@ public class RandomWalk extends Application {
     private void setFrame(JFrame frame) { this.frame = frame; }
 
     /**
-     * @return the mmcscalefactor
+     * @return the diffscalefactor
      */
     @Contract(pure = true)
-    private double getMmcScalefactor() { return mmcscalefactor; }
+    private double getDiffScalefactor() { return diffscalefactor; }
 
     /**
      */
-    private void setMmcScalefactor() { this.mmcscalefactor = 1.0; }
+    private void setDiffScalefactor() { this.diffscalefactor = 1.0; }
 
     /**
      */
@@ -740,15 +740,15 @@ public class RandomWalk extends Application {
     private void setTextAreaReal(TextArea textarea) { this.textAreaReal = textarea; }
 
     /**
-     * @return the textAreaMMC
+     * @return the textAreaDiff
      */
     @Contract(pure = true)
-    private TextArea getTextAreaMMC() { return this.textAreaMMC; }
+    private TextArea getTextAreaDiff() { return this.textAreaDiff; }
 
     /**
-     * @param textarea the textAreaMMC to set
+     * @param textarea the textAreaDiff to set
      */
-    private void setTextAreaMMC(TextArea textarea) { this.textAreaMMC = textarea; }
+    private void setTextAreaDiff(TextArea textarea) { this.textAreaDiff = textarea; }
 
     /**
      * @return the textAreaSAW
@@ -828,15 +828,15 @@ public class RandomWalk extends Application {
     private void setIsovalikkoReal(HBox hbox) { this.isovalikkoReal = hbox; }
 
     /**
-     * @return the isovalikkoMMC
+     * @return the isovalikkoDiff
      */
     @Contract(pure = true)
-    private HBox getIsovalikkoMMC() { return this.isovalikkoMMC; }
+    private HBox getIsovalikkoDiff() { return this.isovalikkoDiff; }
 
     /**
-     * @param hbox the isovalikkoMMC to set
+     * @param hbox the isovalikkoDiff to set
      */
-    private void setIsovalikkoMMC(HBox hbox) { this.isovalikkoMMC = hbox; }
+    private void setIsovalikkoDiff(HBox hbox) { this.isovalikkoDiff = hbox; }
 
     /**
      * @return the isovalikkoSAW
@@ -905,15 +905,15 @@ public class RandomWalk extends Application {
     private void setValikkoReal(VBox vbox) { this.valikkoReal = vbox; }
 
     /**
-     * @return the valikkoMMC
+     * @return the valikkoDiff
      */
     @Contract(pure = true)
-    private VBox getValikkoMMC() { return this.valikkoMMC; }
+    private VBox getValikkoDiff() { return this.valikkoDiff; }
 
     /**
-     * @param vbox the valikkoMMC to set
+     * @param vbox the valikkoDiff to set
      */
-    private void setValikkoMMC(VBox vbox) { this.valikkoMMC = vbox; }
+    private void setValikkoDiff(VBox vbox) { this.valikkoDiff = vbox; }
 
     /**
      * @return the valikkoSAW
@@ -949,15 +949,15 @@ public class RandomWalk extends Application {
     private void setRealPane(Pane pane) { this.realpane = pane; }
 
     /**
-     * @return the mmcpane
+     * @return the diffpane
      */
     @Contract(pure = true)
-    private Pane getMMCPane() { return this.mmcpane; }
+    private Pane getDiffPane() { return this.diffpane; }
 
     /**
-     * @param pane the mmcpane to set
+     * @param pane the diffpane to set
      */
-    private void setMMCPane(Pane pane) { this.mmcpane = pane; }
+    private void setDiffPane(Pane pane) { this.diffpane = pane; }
 
     /**
      * @return the sawpane

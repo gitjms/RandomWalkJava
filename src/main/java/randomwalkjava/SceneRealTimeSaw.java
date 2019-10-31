@@ -510,7 +510,7 @@ class SceneRealTimeSaw extends Data {
         this.vars[7] = "-"; // lattice/(free)   n/a
         this.vars[8] = "-"; // save (off)       n/a
 
-        Label labOptions = new Label(this.getLanguage().equals("fin") ? "säätöjä:" : "adjustments:");
+        Label labOptions = new Label(this.getLanguage().equals("fin") ? "säätöä:" : "adjustment:");
 
         this.setFactors = new Button(this.getLanguage().equals("fin") ? "OLETUSARVOT" : "DEFAULTS");
         this.setFactors.setMinWidth(130);

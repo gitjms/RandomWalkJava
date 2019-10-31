@@ -34,6 +34,7 @@ class Execution {
     private Runtime runtime;
     private boolean running;
     private JFrame frame;
+    private int exitVal;
 
     /**
      * Initiating variables
@@ -66,7 +67,7 @@ class Execution {
         * vars[2] = charge,     USER
         * vars[3] = steps,      USER
         * vars[4] = dimension,  USER
-        * vars[5] = mmc,        USER
+        * vars[5] = diff,       USER
         * vars[6] = fixed,      USER
         * vars[7] = lattice,    USER
         * vars[8] = save        n/a
@@ -82,7 +83,7 @@ class Execution {
 
         Boolean result = false;
         try {
-            result = data.createData(folder, fexec);
+            result = data.createData(folder, fexec, false);
         } catch (Throwable ex) {
             System.out.println(ex.getMessage());
         }
@@ -166,41 +167,41 @@ class Execution {
     }
 
     /**
-     * method for MMC Fortran and Python execution and image creation
+     * method for Diffusion Fortran and Python execution and image creation
      * @param folder datafolder "C:/RWDATA"
      * @param path datapath "C:/RWDATA"
      * @param fexec Fortran executable "walk.exe"
-     * @param pyexecmmc2d Python executable "plotmmc2d.py"
-     * @param pyexecmmc3d Python executable "plotmmc3d.py"
-     * @param valikkoMMC VBox component in GUI to disable during run
+     * @param pyexecdiff2d Python executable "plotdiff2d.py"
+     * @param pyexecdiff3d Python executable "plotdiff3d.py"
+     * @param valikkoDiff VBox component in GUI to disable during run
      * @param frame JFrame for image
      * @param data instance of Data class
      * @param vars user data from GUI
      */
-    void executeMMC(File folder, String path, String fexec, String pyexecmmc2d,
-                    String pyexecmmc3d, VBox valikkoMMC, Data data, String[] vars) {
+    void executeDiff(File folder, String path, String fexec, String pyexecdiff2d,
+                     String pyexecdiff3d, VBox valikkoDiff, Data data, String[] vars) {
         /*
-        * FROM SCENEMMC
+        * FROM SCENEDIFFUSION
         * vars from user:
         * vars[0] = particles,     USER
         * vars[1] = diameter,      USER
         * vars[2] = charge,        USER
         * vars[3] = steps,         n/a
         * vars[4] = dimension,     USER
-        * vars[5] = mmc,           n/a
+        * vars[5] = diff,          n/a
         * vars[6] = fixed,         n/a
         * vars[7] = lattice,       USER
         * vars[8] = save           n/a
         */
-        pyexecmmc2d = "python ".concat(pyexecmmc2d);
-        pyexecmmc3d = "python ".concat(pyexecmmc3d);
+        pyexecdiff2d = "python ".concat(pyexecdiff2d);
+        pyexecdiff3d = "python ".concat(pyexecdiff3d);
         this.setFrame();
         File pdfFile = null;
         String[] command = null;
 
         Boolean result = false;
         try {
-            result = data.createData(folder, fexec);
+            result = data.createData(folder, fexec, false);
         } catch (Throwable ex) {
             System.out.println(ex.getMessage());
         }
@@ -212,17 +213,17 @@ class Execution {
         int steps = parseInt(vars[3]);
         final int dimension = parseInt(vars[4]);
 
-        String startDataMMC = "startMMC_" + dimension + "D_" + particles + "N.xy";
-        String finalDataMMC = "finalMMC_" + dimension + "D_" + particles + "N.xy";
+        String startDataDiff = "startDiff_" + dimension + "D_" + particles + "N.xy";
+        String finalDataDiff = "finalDiff_" + dimension + "D_" + particles + "N.xy";
 
         if ( dimension == 2 ) {
-            pdfFile = new File(path + "/jpyplotmmc2D_N" + particles + "_diam" + diameter + ".pdf");
+            pdfFile = new File(path + "/jpyplotdiff2D_N" + particles + "_diam" + diameter + ".pdf");
             if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
-            command = new String[]{"cmd","/c", pyexecmmc2d, startDataMMC, finalDataMMC, this.getLanguage()};
+            command = new String[]{"cmd","/c", pyexecdiff2d, startDataDiff, finalDataDiff, this.getLanguage()};
         } else if ( dimension == 3 ) {
-            pdfFile = new File(path + "/jpyplotmmc3D_N" + particles + "_diam" + diameter + ".pdf");
+            pdfFile = new File(path + "/jpyplotdiff3D_N" + particles + "_diam" + diameter + ".pdf");
             if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
-            command = new String[]{"cmd","/c", pyexecmmc3d, startDataMMC, finalDataMMC, this.getLanguage()};
+            command = new String[]{"cmd","/c", pyexecdiff3d, startDataDiff, finalDataDiff, this.getLanguage()};
         }
 
         /*
@@ -230,22 +231,22 @@ class Execution {
          */
         BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension);
 
-        this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Satunnaiskulku - MMC-diffuusiokuvaaja" : "Random Walk - MMC Diffusion Plot");
+        this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Satunnaiskulku - diffuusiokuvaaja" : "Random Walk - Diffusion Plot");
 
         /*
         * PLOT
         */
         assert image != null;
-        this.getFrame().setSize(this.getMmcWidth(), this.getMmcHeight());
+        this.getFrame().setSize(this.getDiffWidth(), this.getDiffHeight());
         this.getFrame().setLocation(this.getXMarginSmall(), 0);
-        Image image2 = image.getScaledInstance(this.getMmcWidth(), this.getMmcHeight()-this.getYMargin(), Image.SCALE_AREA_AVERAGING);
+        Image image2 = image.getScaledInstance(this.getDiffWidth(), this.getDiffHeight()-this.getYMargin(), Image.SCALE_AREA_AVERAGING);
         ImageIcon figIcn = new ImageIcon(image2);
         JLabel figLabel = new JLabel(figIcn);
         this.getFrame().add(figLabel);
         this.getFrame().repaint();
         this.getFrame().pack();
         this.getFrame().setVisible(true);
-        valikkoMMC.setDisable(false);
+        valikkoDiff.setDisable(false);
     }
 
     /**
@@ -268,7 +269,7 @@ class Execution {
         * vars[2] = charge,        n/a
         * vars[3] = steps,         USER
         * vars[4] = dimension,     USER
-        * vars[5] = mmc,           n/a
+        * vars[5] = diff,          n/a
         * vars[6] = fixed,         n/a
         * vars[7] = lattice,       USER
         * vars[8] = save           n/a
@@ -279,7 +280,7 @@ class Execution {
 
         Boolean result = false;
         try {
-            result = data.createData(folder, fexec);
+            result = data.createData(folder, fexec, false);
         } catch (Throwable ex) {
             System.out.println(ex.getMessage());
         }
@@ -346,7 +347,7 @@ class Execution {
          * vars[2] = charge,        n/a
          * vars[3] = steps,         USER
          * vars[4] = dimension,     n/a
-         * vars[5] = mmc,           n/a
+         * vars[5] = diff,          n/a
          * vars[6] = fixed,         n/a
          * vars[7] = lattice,       USER
          * vars[8] = save           n/a
@@ -357,7 +358,7 @@ class Execution {
 
         Boolean result = false;
         try {
-            result = data.createData(folder, fexec);
+            result = data.createData(folder, fexec, false);
         } catch (Throwable ex) {
             System.out.println(ex.getMessage());
         }
@@ -410,17 +411,17 @@ class Execution {
      * @param data instance of Data class
      * @param vars user data from GUI via
      */
-    void executeSAW(File folder, String path, String fexec, String pyexecsaw2d,
-                    String pyexecsaw3d, VBox valikkoSAW, Data data, String[] vars, boolean issaw) {
+    boolean executeSAW(File folder, String path, String fexec, String pyexecsaw2d,
+                    String pyexecsaw3d, VBox valikkoSAW, Data data, String[] vars, boolean iscbmc) {
         /*
          * FROM SCENEPATHTRACING
          * vars from user:
          * vars[0] = particles,  n/a
          * vars[1] = diameter,   n/a
          * vars[2] = charge,     n/a
-         * vars[3] = steps,      n/a
+         * vars[3] = steps,      USER
          * vars[4] = dimension,  USER
-         * vars[5] = mmc,        n/a
+         * vars[5] = diff,       n/a
          * vars[6] = fixed,      n/a
          * vars[7] = lattice,    n/a
          * vars[8] = save        n/a
@@ -428,25 +429,22 @@ class Execution {
         pyexecsaw2d = "python ".concat(pyexecsaw2d);
         pyexecsaw3d = "python ".concat(pyexecsaw3d);
         this.setFrame();
-        String yDataPath = null;
-        String zDataPath = null;
-        String titletext = null;
         String[] command = null;
 
         Boolean result = false;
         try {
-            result = data.createData(folder, fexec);
+            result = data.createData(folder, fexec, iscbmc);
         } catch (Throwable ex) {
             System.out.println(ex.getMessage());
         }
-        if (!result) return;
+        if (!result) return false;
 
         int steps = parseInt(vars[3]);
         int dimension = parseInt(vars[4]);
 
         String dataPath;
-        if (issaw) dataPath = "saw_" + dimension + "D.xy";
-        else dataPath = "cbmc_" + dimension + "D_" + steps + "S.xy";
+        if (iscbmc) dataPath = "cbmc_" + dimension + "D_" + steps + "S.xy";
+        else dataPath = "saw_" + dimension + "D.xy";
 
         File pdfFile = new File(path + "/jpyplotSAW" + dimension + "D.pdf");
         if ( Files.exists(pdfFile.toPath()) ) pdfFile.delete();
@@ -485,6 +483,8 @@ class Execution {
         this.getFrame().pack();
         this.getFrame().setVisible(true);
         valikkoSAW.setDisable(false);
+
+        return true;
     }
 
     /**
@@ -495,6 +495,7 @@ class Execution {
      * @param particles number of particles from vars
      * @param steps number of steps from vars
      * @param dimension dimension from vars
+     * @param issaw whether is saw or cbmc saw
      * @return pdf image file
      */
     BufferedImage createPdf(File folder, String[] command, File pdfFile, int particles, int steps, int dimension) {
@@ -615,19 +616,19 @@ class Execution {
     private int getChartHeight() { return 700 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
-     * @return the mmcWidth
+     * @return the diffWidth
      */
     @Contract(pure = true)
-    private int getMmcWidth() { return 530 / (int) Screen.getMainScreen().getRenderScale(); }
+    private int getDiffWidth() { return 530 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
-     * @return the mmcHeight
+     * @return the diffHeight
      */
     @Contract(pure = true)
-    private int getMmcHeight() { return 950 / (int) Screen.getMainScreen().getRenderScale(); }
+    private int getDiffHeight() { return 950 / (int) Screen.getMainScreen().getRenderScale(); }
 
     /**
-     * @return the mmcHeight
+     * @return the diffHeight
      */
     @Contract(pure = true)
     private int getSawHeight() { return 800 / (int) Screen.getMainScreen().getRenderScale(); }
@@ -699,4 +700,15 @@ class Execution {
      * @param language the language to set
      */
     private void setLanguage(String language) { this.language = language; }
+
+    /**
+     * @return the exitVal
+     */
+    @Contract(pure = true)
+    private int getExitVal() { return this.exitVal; }
+
+    /**
+     * @param exitVal the exitVal to set
+     */
+    private void setExitVal(int exitVal) { this.exitVal = exitVal; }
 }

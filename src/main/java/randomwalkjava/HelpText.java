@@ -46,7 +46,7 @@ class HelpText {
             + " viimeisessä on 'Etäisyys-histogrammi'.\n\n"
             + " Mitään tiedostoa ei tallenneta automaattisesti.\n\n"
             + " ---------------------------------------------------------------------\n\n"
-            + " Nappi 'MMC-DIFFUUSIO' avaa isomman ikkunan, jossa pyörii animaatio\n"
+            + " Nappi 'DIFFUUSIO' avaa isomman ikkunan, jossa pyörii animaatio\n"
             + " käyttäjän niin valitessa. Animaatio kuvaa hiukkasten diffuusio-\n"
             + " liikettä 2D-tasossa tai 3D-tilassa.\n\n"
             + " Käyttäjä voi valita animaation tai tulostuksen. Edellinen luo vain\n"
@@ -62,13 +62,15 @@ class HelpText {
             + " Nappi 'REAALIAIKA-SAW' näyttää ohjauspaneelin, jolla käyttäjä voi\n"
             + " joko ajaa reaaliaikaisia kuvaajia itseään välttelevästä satunnais-\n"
             + " kulusta tai tulostaa kuvan satunnaiskulun liikeradasta.\n\n"
-            + " Käyttäjä voi valita animaation tai kuvatulostuksen. Edellinen\n"
-            + " silmukoi satunnaisia askelmääriä kunnes käyttäjä lopettaa ajon.\n"
-            + " Jälkimmäinen tulostaa kuvan itseään välttelevän kulun liikeradasta.\n\n"
+            + " Käyttäjä voi valita kuvaajat tai liikeratatulostuksen.\n\n"
+            + " Käyttäjä voi valita yksinkertaisen kulun tai biasoidun Monte Carlo\n"
+            +  "-kulun. Edellinen silmukoi satunnaisia askelmääriä kunnes käyttäjä\n"
+            + " lopettaa ajon. Jälkimmäinen käyttäjän asettamia askelmääriä.\n"
+            + " Kuvaaja-valinta tulostaa kuvan yksinkertaisen kulun liikeradasta.\n\n"
             + " Ajot suoritetaan yhdellä hiukkasella. Reaaliaikakuvaajat eivät tuota\n"
             + " lainkaan tiedostoja. Liikeratakuvaaja tuottaa yhden datatiedoston\n"
             + " päätteellä '.xy' sekä yhden kuvatiedoston 'pdf'-muodossa.\n\n"
-            + " Animaation ajan ohessa pyörii kolme reaaliaikaista graafia\n"
+            + " Ajojen aikana ohessa pyörii kolme reaaliaikaista graafia\n"
             + " erillisessä kuvaikkunassa: kaksi kuvaajaa otsikolla 'Itseään\n"
             + " välttelevä kulku', ja yksi otsikolla 'Etäisyys-histogrammi.\n\n"
             + " Ensimmäisessä SAW-kuaajassa on mukana liikkuva x-akseli, kun taas\n"
@@ -114,7 +116,7 @@ class HelpText {
             + " to user's choice, and the last one is 'Distance Histogram'.\n\n"
             + " No files will be saved automatically.\n\n"
             + " ---------------------------------------------------------------------\n\n"
-            + " Button 'MMC DIFFUSION' opens a bigger window in which will be an\n"
+            + " Button 'DIFFUSION' opens a bigger window in which will be an\n"
             + " animation if user so chooses. Animation depicts diffusion movement\n"
             + " of particles in 2D plane or 3D volume.\n\n"
             + " User may choose between animation or plotting. The former only\n"
@@ -131,9 +133,11 @@ class HelpText {
             + " Button 'REAL TIME SAW' will show a control panel with which user can\n"
             + " either run an animation with real time graphs of self-avoiding random\n"
             + " walk, or plot one graph of the path of random walk.\n\n"
-            + " User may choose between animation or plotting. The former loops\n"
-            + " random step runs until user stops the run. The latter plots an image\n"
-            + " of self-avoiding walk path.\n\n"
+            + " User may choose between graphs or path plot.\n\n"
+            + " User may choose a simple self-avoiding walk or a biased Monte Carlo\n"
+            + " walk. The former loops random step runs until user stops the run. The\n"
+            + " latter loops the amount of steps user defines. Plot option plots an\n"
+            + " image of self-avoiding walk path.\n\n"
             + " The runs are done with one particle. Real time graphs do not produce\n"
             + " files. Path plot will produce one data file ending with '.xy', and\n"
             + " one image file in 'pdf' format.\n\n"
@@ -328,11 +332,11 @@ class HelpText {
             + " Button 'CLOSE' closes the application.\n";
     }
     /**
-    * @return MMC DIFFUSION HELP TEXT
+    * @return DIFFUSION HELP TEXT
     */
-    String mmcFI() {
+    String diffFI() {
 
-        return "\n Mmc-diffuusio\n"
+        return "\n Diffuusio\n"
             + " -------------\n\n"
             + " Hiukkasten lukumäärä on positiivinen kokonaisluku, vähintään 1.\n\n"
             + " Hiukkasten halkaisija on positiivinen reaaliluku väliltä ]0.0, 1.0[.\n\n"
@@ -362,11 +366,11 @@ class HelpText {
             + " NAPPI 'SULJE' sulkee sovelluksen.\n";
     }
     /**
-     * @return MMC DIFFUSION HELP TEXT
+     * @return DIFFUSION HELP TEXT
      */
-    String mmcEN() {
+    String diffEN() {
 
-        return "\n Mmc Diffusion\n"
+        return "\n Diffusion\n"
             + " -------------\n\n"
             + " Number of particles is a positive integer, at least 1.\n\n"
             + " Diameter is a positive real number on the interval ]0.0, 1.0[.\n\n"
@@ -403,19 +407,38 @@ class HelpText {
 
         return "\n Reaaliaika-saw\n"
             + " --------------\n\n"
-            + " Ulottuvuus on 1, 2, or 3. Kaksi on kulkua xy-tasossa, kolme on\n"
+            + " Askelten lukumäärä on positiivinen kokonaisluku. Se tarkoittaa\n"
+            + " hiukkasten liikkuessa ottamien satunnaisten askelten määrää.\n\n"
+            + " Ulottuvuus on 2 tai 3. Kaksi on kulkua xy-tasossa, kolme on\n"
             + " kulkua kuutiossa akseleilla x, y, ja z.\n\n"
+            + " Säätäminen tarkoittaa gammakertoimen (\u0393, entrooppinen\n"
+            + " eksponentti) ja/tai A-kertoimen (amplitudi) säätöä liukukytki-\n"
+            + " mellä välillä [0,2]. Säätöjä voi tehdä myös kesken ajon.\n"
+            + " Nappi 'OLETUSARVOT' palauttaa säädöt takaisin oletusarvoihin.\n\n"
             + " ----------------------------------------------------------------\n\n"
             + " VALINTANAPIT:\n\n"
-            + " - 'AJA' aloittaa animaation, jonka aikana ohessa pyörii kolme\n"
-            + "    reaaliaikaista graafia: kaksi 'Itseään välttelevää kulkua'\n"
-            + "    sekä 'Etäisyys-histogrammi.\n\n"
-            + "    Käyttäjä voi tallentaa kuvan klikkaamalla sitä hiiren oikeal-\n"
-            + "    la korvalla ja valitsemalla 'save'.\n"
+            + " - 'AJA SAW' silmukoi yksinkertaista itseään välttelevää kulkua\n"
+            + "    jonka aikana ohessa pyörii kolme reaaliaikaista graafia:\n"
+            + "    kaksi 'Itseään välttelevää kulkua', joista ensimmäisessä on\n"
+            + "    mukana liikkuva x-akseli ja toisessa origoon sidottu kasvava\n"
+            + "    x-akseli, sekä alimpana 'Etäisyys-histogrammi.\n\n"
+            + "    Käyttäjä voi tallentaa pysäytetyn kuvan klikkaamalla sitä\n"
+            + "    hiiren oikealla korvalla ja valitsemalla 'save'.\n"
             + "    Tallennusmuodot: 'png', 'jpg', 'bmp', 'gif', 'svg', 'eps',\n"
             + "    'pdf'.\n\n"
-            + " - 'KUVAAJA' luo vain kuvan itseään välttelevän kulun liikeradas-\n"
-            + "    ta.\n\n"
+            + " - 'AJA CBMC' silmukoi konfiguraatio-biasoitua itseään välttele-\n"
+            + "    vää kulkua, joka hyödyntää Monte Carlo -metodia.\n"
+            + "    (Configurational Bias Monte Carlo.)\n\n"
+            + "    Ajon aikana ohessa pyörii kolme reaaliaikaista graafia:\n"
+            + "    kaksi 'Itseään välttelevää kulkua', joista ensimmäisessä on\n"
+            + "    mukana liikkuva x-akseli ja toisessa origoon sidottu kasvava\n"
+            + "    x-akseli, sekä alimpana 'Etäisyys-histogrammi.\n\n"
+            + "    Käyttäjä voi tallentaa pysäytetyn kuvan klikkaamalla sitä\n"
+            + "    hiiren oikealla korvalla ja valitsemalla 'save'.\n"
+            + "    Tallennusmuodot: 'png', 'jpg', 'bmp', 'gif', 'svg', 'eps',\n"
+            + "    'pdf'.\n\n"
+            + " - 'KUVAAJA' luo vain kuvan itseään välttelevän kulun liike-\n"
+            + "    radasta.\n\n"
             + " Nappi 'SULJE' sulkee sovelluksen.\n";
     }
     /**
@@ -425,13 +448,22 @@ class HelpText {
 
         return "\n Real Time Saw\n"
             + " -------------\n\n"
+            + " Steps is a positive integer. It means the repeated random\n"
+            + " steps the particles take while moving.\n\n"
             + " Dimension is either 2 or 3. Two means moving on a plane with axes\n"
             + " x and y, three means moving in a cube with axes x, y, and z.\n\n"
+            + " Adjustment means regulating the gamma factor (\u0393, entropic\n"
+            + " exponent) and/or regulating the factor A (amplitude) with a\n"
+            + " slider on the interval of [0,2]. Adjustments can also be made\n"
+            + " during the run. Button 'DEFAULTS' returns the adjustments back\n"
+            + " to default values.\n\n"
             + " -----------------------------------------------------------------\n\n"
             + " CHOICE BUTTONS:\n\n"
-            + " - 'RUN' starts an animation. During the animation there will be\n"
-            + "    an image window with three real time plots: two of 'Self-\n"
-            + "    avoiding walk', and one 'Distance Histogram'.\n\n"
+            + " - 'RUN SAW' loops a simple self-avoiding walk, during which there\n"
+            + "    will be an image window with three real time plots:\n"
+            + "    two of 'Self-avoiding walk', of which the first one has a co-\n"
+            + "    moving x-axis and the second one has an increasing x-axis\n"
+            + "    fixed to ordinate'. The last graph is a distance histogram'.\n\n"
             + "    User can save the image by right-clicking the mouse and\n"
             + "    choosing 'save'.\n"
             + "    Save formats are: 'png', 'jpg', 'bmp', 'gif', 'svg', 'eps',\n"

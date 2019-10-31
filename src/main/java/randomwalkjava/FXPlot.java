@@ -79,7 +79,7 @@ class FXPlot {
             case "energy&diffusion":
                 this.getFrame().setLocation(0, (int) ((this.getScreenHeight()-this.getHeight())/2.0) );
                 this.getFrame().setPreferredSize(new Dimension(this.getWidth(), this.getHeight()));
-                this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Reaaliaika-MMC-diffuusio" : "Real Time MMC Diffusion");
+                this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Reaaliaika-diffuusio" : "Real Time Diffusion");
                 this.getFrame().getContentPane().setLayout(new GridLayout(3, 1));
                 break;
             case "saw":
@@ -428,7 +428,7 @@ class FXPlot {
     }
 
     /**
-     * method for plotting energy minimization in MMC
+     * method for plotting energy minimization in Diffusion
      * @param x x-axis data (energy_x)
      * @param y y-axis data (energy_y)
      */
@@ -439,12 +439,12 @@ class FXPlot {
         this.getCalcChartE().addSeries(this.getLanguage().equals("fin") ? "energia" :"energy", x, y)
             .setLineStyle(BasicStroke[0]).setLineColor(Color.MAGENTA);
         this.getCalcChartE().setTitle(this.getLanguage().equals("fin")
-            ? "MMC energian minimointi" : "MMC Energy Minimizing");
+            ? "Energian minimointi" : "Energy Minimizing");
         this.getFrame().getContentPane().add(this.getChartPanelE());
     }
 
     /**
-     * method for plotting diffusion in MMC Diffusion (normal y-axis)
+     * method for plotting diffusion in Diffusion (normal y-axis)
      * @param x x-axis data
      * @param y y-axis data
      */
@@ -456,12 +456,12 @@ class FXPlot {
         this.getCalcChartD().addSeries(this.getLanguage().equals("fin") ? "diffuusio" : "diffusion", x, y)
             .setLineStyle(BasicStroke[0]).setLineColor(Color.red);
         this.getCalcChartD().setTitle(this.getLanguage().equals("fin")
-            ? "MMC diffuusiokerroin" : "MMC Diffusion Coefficient");
+            ? "Diffuusiokerroin" : "Diffusion Coefficient");
         this.getFrame().getContentPane().add(this.getChartPanelD());
     }
 
     /**
-     * method for plotting viscosity calculation in MMC
+     * method for plotting viscosity calculation in Diffusion
      * @param x x-axis data (visc_x)
      * @param y y-axis data (visc_y)
      */
@@ -473,7 +473,7 @@ class FXPlot {
         this.getCalcChartV().addSeries(this.getLanguage().equals("fin") ? "viskositeetti" : "viscosity", x, y)
             .setLineStyle(BasicStroke[0]).setLineColor(Color.orange);
         this.getCalcChartV().setTitle(this.getLanguage().equals("fin")
-            ? "MMC dynaaminen viskositeetti" : "MMC Dynamic Viscosity");
+            ? "Dynaaminen viskositeetti" : "Dynamic Viscosity");
         this.getFrame().getContentPane().add(this.getChartPanelV());
     }
 
@@ -579,7 +579,7 @@ class FXPlot {
     }
 
     /**
-     * method for updating energy minimization in MMC
+     * method for updating energy minimization in Diffusion
      * @param x x-axis data
      * @param y y-axis data
      */
@@ -603,7 +603,7 @@ class FXPlot {
     }
 
     /**
-     * method for updating viscosity calculation in MMC
+     * method for updating viscosity calculation in Diffusion
      * @param x x-axis data
      * @param y y-axis data
      */
@@ -747,8 +747,8 @@ class FXPlot {
      */
     void setVTitle(int time, double coeff) { // u03BC=μ, u00B5=micro
         this.getCalcChartV().setTitle(this.getLanguage().equals("fin")
-            ? "MMC dynaaminen viskositeetti, \u03BC(" + time + "ps) = "+this.diffformatter.format(coeff)+" \u00B5Pa s"
-            : "MMC dynamic viscosity, \u03BC(" + time + "ps) = "+this.diffformatter.format(coeff)+" \u00B5Pa s");
+            ? "Dynaaminen viskositeetti, \u03BC(" + time + "ps) = "+this.diffformatter.format(coeff)+" \u00B5Pa s"
+            : "Dynamic viscosity, \u03BC(" + time + "ps) = "+this.diffformatter.format(coeff)+" \u00B5Pa s");
     }
 
     /**

@@ -5,9 +5,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,6 +27,7 @@ class ExecSAW extends Data {
 
     private String language;
     private boolean issaw;
+    private boolean iscbmc;
     private boolean first;
     private List <Double> saw_rms;
     private List<Double> saw_rmsruns;
@@ -244,10 +243,17 @@ class ExecSAW extends Data {
         });
     }
 
-        void setPlotClick (@NotNull Button plotNappi, SceneRealTimeSaw sawScene, VBox valikkoSAW, String datapath,
+        void setPlotClick (@NotNull Button plotNappi, @NotNull Button runSAW, SceneRealTimeSaw sawScene, VBox valikkoSAW, String datapath,
                            File datafolder, String fexec, String pyexecsaw2d, String pyexecsaw3d, Execution ex){
 
             plotNappi.setOnMouseClicked((MouseEvent event) -> {
+                if (runSAW.isDisabled()) {
+                    sawScene.setSawCbmc("c");
+                    this.setIsCbmc(true);
+                } else {
+                    sawScene.setSawCbmc("-");
+                    this.setIsCbmc(false);
+                }
                 valikkoSAW.setDisable(true);
                 sawScene.setSave("s");
                 String[] vars = sawScene.getVars();
@@ -259,8 +265,12 @@ class ExecSAW extends Data {
                 if ( dim < 2 || dim > 3 ) fail = true;
                 if ( fail ) return;
 
-                ex.executeSAW(datafolder, datapath, fexec, pyexecsaw2d,
-                    pyexecsaw3d, valikkoSAW, data, this.getVars(), false);
+                boolean ok = false;
+                while (!ok) {
+                    ok = ex.executeSAW(datafolder, datapath, fexec, pyexecsaw2d,
+                        pyexecsaw3d, valikkoSAW, data, this.getVars(), this.isCbmc());
+                }
+                valikkoSAW.setDisable(false);
             });
         }
 
@@ -285,6 +295,17 @@ class ExecSAW extends Data {
      * @param issaw the issaw to set
      */
     private void setIsSaw(boolean issaw) { this.issaw = issaw; }
+
+    /**
+     * @return the iscbmc
+     */
+    @Contract(pure = true)
+    private boolean isCbmc() { return this.iscbmc; }
+
+    /**
+     * @param iscbmc the iscbmc to set
+     */
+    private void setIsCbmc(boolean iscbmc) { this.iscbmc = iscbmc; }
 
     /**
      * @return the vars

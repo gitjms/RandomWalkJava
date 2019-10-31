@@ -81,7 +81,7 @@ def main():
 	plt.title(text,fontsize=16)
 
 	plt.tight_layout()
-	savename = "jpyplotmmc2D_N" + str(particles) + "_diam" + str(diameter) + ".pdf"
+	savename = "jpyplotdiff2D_N" + str(particles) + "_diam" + str(diameter) + ".pdf"
 	plt.savefig(savename)
 
 if __name__=="__main__":

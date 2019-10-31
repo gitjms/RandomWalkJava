@@ -31,15 +31,15 @@ class FilesAndFolders {
      * @param pyexec1d Python executable for path tracing plot in 1D
      * @param pyexec2d Python executable for path tracing plot in 2D
      * @param pyexec3d Python executable for path tracing plot in 3D
-     * @param pyexecmmc2d Python executable for mmc diffusion plot in 2D
-     * @param pyexecmmc3d Python executable for mmc diffusion plot in 3D
+     * @param pyexecdiff2d Python executable for diffusion plot in 2D
+     * @param pyexecdiff3d Python executable for diffusion plot in 3D
      * @param pyexec1Ddist Python executable for 1d distance plot
      * @param pyexecsaw2d Python executable for saw plot in 2D
      * @param pyexecsaw3d Python executable for saw plot in 3D
      * @return true in error, false otherwise
      */
     boolean checkCreateFolders(String datapath, String fexec, String pyexecrms, String pyexec1d,
-                            String pyexec2d, String pyexec3d, String pyexecmmc2d, String pyexecmmc3d,
+                            String pyexec2d, String pyexec3d, String pyexecdiff2d, String pyexecdiff3d,
                             String pyexec1Ddist, String pyexecsaw2d, String pyexecsaw3d){
 
         if (createFolder(datapath, fexec, true)) return true;
@@ -47,8 +47,8 @@ class FilesAndFolders {
         if (createFolder(datapath, pyexec1d, false)) return true;
         if (createFolder(datapath, pyexec2d, false)) return true;
         if (createFolder(datapath, pyexec3d, false)) return true;
-        if (createFolder(datapath, pyexecmmc2d, false)) return true;
-        if (createFolder(datapath, pyexecmmc3d, false)) return true;
+        if (createFolder(datapath, pyexecdiff2d, false)) return true;
+        if (createFolder(datapath, pyexecdiff3d, false)) return true;
         if (createFolder(datapath, pyexec1Ddist, false)) return true;
         if (createFolder(datapath, pyexecsaw2d, false)) return true;
         return createFolder(datapath, pyexecsaw3d, false);
@@ -64,15 +64,15 @@ class FilesAndFolders {
      * @param pyexec1d Python executable for path tracing plot in 1D
      * @param pyexec2d Python executable for path tracing plot in 2D
      * @param pyexec3d Python executable for path tracing plot in 3D
-     * @param pyexecmmc2d Python executable for mmc diffusion plot in 2D
-     * @param pyexecmmc3d Python executable for mmc diffusion plot in 3D
+     * @param pyexecdiff2d Python executable for diffusion plot in 2D
+     * @param pyexecdiff3d Python executable for diffusion plot in 3D
      * @param pyexec1Ddist Python executable for 1d distance plot
      * @param pyexecsaw2d Python executable for saw plot in 2D
      * @param pyexecsaw3d Python executable for saw plot in 3D
      * @return true in error, false otherwise
      */
     boolean checkSourceFiles(String datapath, String pyexecrms, String pyexec1d,
-                             String pyexec2d, String pyexec3d, String pyexecmmc2d, String pyexecmmc3d,
+                             String pyexec2d, String pyexec3d, String pyexecdiff2d, String pyexecdiff3d,
                              String pyexec1Ddist, String pyexecsaw2d, String pyexecsaw3d) {
 
         File sourceFile = new File(datapath + "/" + pyexecrms);
@@ -87,11 +87,11 @@ class FilesAndFolders {
         sourceFile = new File(datapath + "/" + pyexec3d);
         if (Files.notExists(sourceFile.toPath())) return createFolder(datapath, pyexec3d, false);
 
-        sourceFile = new File(datapath + "/" + pyexecmmc2d);
-        if (Files.notExists(sourceFile.toPath())) return createFolder(datapath, pyexecmmc2d, false);
+        sourceFile = new File(datapath + "/" + pyexecdiff2d);
+        if (Files.notExists(sourceFile.toPath())) return createFolder(datapath, pyexecdiff2d, false);
 
-        sourceFile = new File(datapath + "/" + pyexecmmc3d);
-        if (Files.notExists(sourceFile.toPath())) return createFolder(datapath, pyexecmmc3d, false);
+        sourceFile = new File(datapath + "/" + pyexecdiff3d);
+        if (Files.notExists(sourceFile.toPath())) return createFolder(datapath, pyexecdiff3d, false);
 
         sourceFile = new File(datapath + "/" + pyexec1Ddist);
         if (Files.notExists(sourceFile.toPath())) return createFolder(datapath, pyexec1Ddist, false);

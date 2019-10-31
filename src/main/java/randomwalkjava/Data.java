@@ -43,7 +43,7 @@ class Data {
      * @param executable Fortran executable "walk.exe"
      * @return true if fortran execution succeeded, false otherwise
      */
-    Boolean createData(File folderPath, String executable) {
+    Boolean createData(File folderPath, String executable, boolean iscbmc) {
         StringBuilder teksti = new StringBuilder();
         boolean ok = true;
         String msg = "";
@@ -86,6 +86,8 @@ class Data {
                         teksti = new StringBuilder(line);
                     else
                         teksti.append(line).append("\n");
+
+                    if (iscbmc && line.startsWith("F")) ok = false;
                 }
 
                 exitVal = process.waitFor();
@@ -119,7 +121,7 @@ class Data {
      * @return list of initial particle configuration data
      */
     @NotNull
-    static List<double[]> readDataMMC(File filePath, Integer dim) {
+    static List<double[]> readDataDiff(File filePath, Integer dim) {
     
         double[] values;
         List<double[]> dataList = new ArrayList<>();

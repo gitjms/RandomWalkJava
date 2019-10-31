@@ -21,9 +21,14 @@ def main():
 
 	dimension = facts[0].split('=')[1].replace(',','')
 	steps = facts[1].split('=')[1]
-
+	
 	maxx = np.max(x_data)
 	maxy = np.max(y_data)
+	maxval = np.max([maxx,maxy])
+	dydx = maxy/maxx
+
+	x1_data = np.linspace(0,maxval,100)
+	y1_data = np.linspace(0,maxval,100)
 
 #!----------------------------------------------------------------------
 #!	PLOT
@@ -32,20 +37,23 @@ def main():
 	fig.set_figheight(7)
 	fig.set_figwidth(9)
 
-	plt.plot(x_data,y_data,'-',lw=1,antialiased=True,label=r"R_rms, N=%d"%int(steps))
-	plt.xlim(0,maxx)
-	plt.ylim(0,maxy)
+	plt.xlim(0,maxval)
+	plt.ylim(0,maxval)
+	plt.plot(x1_data,y1_data,'-',color='C0',lw=1,antialiased=True,label="y=x")
+	plt.plot(x_data,y_data,'-',color='C3',lw=1,antialiased=True,label=r"$R_{rms}\approx$%.2fx"%dydx)
+
 	if (language == 'fin'):
 		xlab = r"Odotusarvo ($\sqrt{S}$)"
 	else:
 		xlab = r"Expected value ($\sqrt{S}$)"
 	plt.xlabel(xlab, fontsize=14)
-	plt.ylabel(r"$R_{rms}$ $\left(\sqrt{\langle x^2\rangle}\right)$", fontsize=14)
+	plt.ylabel(r"$R_{rms}$ $\left(\sqrt{\langle r^2\rangle}\right)$", fontsize=14)
 	if (language == 'fin'):
 		text = r"$R_{rms}$ odotusarvon funktiona (%dD), %d askelta"%(int(dimension),int(steps))
 	else:
 		text = r"$R_{rms}$ as a Function of Expected Value (%dD), %d steps"%(int(dimension),int(steps))
 	plt.title(text,fontsize=16)
+	plt.legend(loc='upper left',prop={'size': 18})
 
 	plt.grid()
 	plt.tight_layout()

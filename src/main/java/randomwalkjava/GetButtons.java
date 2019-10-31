@@ -26,7 +26,7 @@ class GetButtons extends HelpText {
 
     private Stage stage;
     private JFrame frame;
-    private SceneMMC scene;
+    private SceneDiff scene;
     private DropShadow shadow;
     private String language;
     private String text;
@@ -128,9 +128,9 @@ class GetButtons extends HelpText {
     }
 
     /**
-     * method for setting scene close buttons (excluding 'MMC Diffusion')
+     * method for setting scene close buttons (excluding 'Diffusion')
      * @param getRealScene scene
-     * @param getMMCScene scene
+     * @param getDiffScene scene
      * @param getSAWScene scene
      * @param ex Python execution class
      * @param language GUI language
@@ -139,7 +139,7 @@ class GetButtons extends HelpText {
      * @param buttonNO confirmation button
      * @return button for closing stage
      */
-    Button getCloseButton(SceneRealTimeRms getRealScene, SceneMMC getMMCScene, SceneRealTimeSaw getSAWScene, int width,
+    Button getCloseButton(SceneRealTimeRms getRealScene, SceneDiff getDiffScene, SceneRealTimeSaw getSAWScene, int width,
                           Execution ex, String language, JFrame frame, ButtonType buttonYES, ButtonType buttonNO) {
         this.setLanguage(language);
         this.setFrame(frame);
@@ -173,20 +173,20 @@ class GetButtons extends HelpText {
                         || getRealScene.getFxplot().getFrame().isActive()
                         || getRealScene.getFxplot().getFrame().isDisplayable())
                         getRealScene.getFxplot().getFrame().dispose();
-                if (getMMCScene.getFxplot() != null)
-                    if (getMMCScene.getFxplot().getFrame().isShowing()
-                        || getMMCScene.getFxplot().getFrame().isActive()
-                        || getMMCScene.getFxplot().getFrame().isDisplayable())
-                        getMMCScene.getFxplot().getFrame().dispose();
+                if (getDiffScene.getFxplot() != null)
+                    if (getDiffScene.getFxplot().getFrame().isShowing()
+                        || getDiffScene.getFxplot().getFrame().isActive()
+                        || getDiffScene.getFxplot().getFrame().isDisplayable())
+                        getDiffScene.getFxplot().getFrame().dispose();
                 if (getSAWScene.getFxplot() != null)
                     if (getSAWScene.getFxplot().getFrame().isShowing()
                         || getSAWScene.getFxplot().getFrame().isActive()
                         || getSAWScene.getFxplot().getFrame().isDisplayable())
                         getSAWScene.getFxplot().getFrame().dispose();
 
-                if (getMMCScene.runtimeIsRunning()) {
+                if (getDiffScene.runtimeIsRunning()) {
                     Runtime.getRuntime().gc();
-                    getMMCScene.stopRuntime();
+                    getDiffScene.stopRuntime();
                 }
                 if (getRealScene.runtimeIsRunning()) {
                     Runtime.getRuntime().gc();
@@ -213,15 +213,15 @@ class GetButtons extends HelpText {
     }
 
     /**
-     * method for setting scene close button for 'MMC Diffusion' only
+     * method for setting scene close button for 'Diffusion' only
      * @param language GUI language
-     * @param mmcScene scene
+     * @param diffScene scene
      * @return button
      */
-    Button getCloseMMCButton(String language, SceneMMC mmcScene, JFrame frame) {
+    Button getCloseDiffButton(String language, SceneDiff diffScene, JFrame frame) {
         this.setLanguage(language);
         this.setFrame(frame);
-        this.setMMCScene(mmcScene);
+        this.setDiffScene(diffScene);
 
         GetDialogs getDialogs = new GetDialogs();
 
@@ -240,11 +240,11 @@ class GetButtons extends HelpText {
         Dialog conf = getDialogs.getConfirmation(getLanguage(), this.getButtonYES(), this.getButtonNO());
 
         button.setOnAction(event -> {
-            if ( this.getMMCScene().timerIsRunning() && this.getMMCScene().barrierIsOn() ) {
-                if ( this.getMMCScene().walkState() ) {
+            if ( this.getDiffScene().timerIsRunning() && this.getDiffScene().barrierIsOn() ) {
+                if ( this.getDiffScene().walkState() ) {
                     PrintWriter pw = null;
-                    if (this.getMMCScene().getProcOut() != null)
-                        pw = new PrintWriter(this.getMMCScene().getProcOut());
+                    if (this.getDiffScene().getProcOut() != null)
+                        pw = new PrintWriter(this.getDiffScene().getProcOut());
                     if (pw != null) {
                         pw.println("-");
                         pw.flush();
@@ -258,17 +258,17 @@ class GetButtons extends HelpText {
                 if (this.getFrame() != null)
                     if (this.getFrame().isShowing() || this.getFrame().isActive() || this.getFrame().isDisplayable())
                         this.getFrame().dispose();
-                    if (this.getMMCScene().getFxplot() != null)
-                        if (this.getMMCScene().getFxplot().getFrame().isShowing()
-                            || this.getMMCScene().getFxplot().getFrame().isActive()
-                            || this.getMMCScene().getFxplot().getFrame().isDisplayable())
-                                this.getMMCScene().getFxplot().getFrame().dispose();
+                    if (this.getDiffScene().getFxplot() != null)
+                        if (this.getDiffScene().getFxplot().getFrame().isShowing()
+                            || this.getDiffScene().getFxplot().getFrame().isActive()
+                            || this.getDiffScene().getFxplot().getFrame().isDisplayable())
+                                this.getDiffScene().getFxplot().getFrame().dispose();
                         this.getStage().close();
                         conf.close();
 
-                    if (this.getMMCScene().runtimeIsRunning()) {
+                    if (this.getDiffScene().runtimeIsRunning()) {
                         Runtime.getRuntime().gc();
-                        this.getMMCScene().stopRuntime();
+                        this.getDiffScene().stopRuntime();
                     }
                     Platform.exit();
                     System.exit(0);
@@ -358,7 +358,7 @@ class GetButtons extends HelpText {
                     }
                 });
                 break;
-            case "mmc":
+            case "diff":
                 button.setOnAction(event -> {
                     assert isovalikko != null;
                     if (isovalikko.getChildren().contains(pane) && (button.getText().equals("OHJE") || button.getText().equals("HELP"))) {
@@ -366,7 +366,7 @@ class GetButtons extends HelpText {
                         this.mempane.getChildren().addAll(pane.getChildren());
                         isovalikko.getChildren().removeAll(pane);
                         this.newTextArea = getComponents.GetTextArea(this.getTextWidth(), this.getTextHeight());
-                        this.newTextArea.setText(this.getLanguage().equals("fin") ? super.mmcFI() : super.mmcEN());
+                        this.newTextArea.setText(this.getLanguage().equals("fin") ? super.diffFI() : super.diffEN());
                         this.newTextArea.setVisible(true);
                         isovalikko.getChildren().add(this.newTextArea);
                         button.setText(this.getLanguage().equals("fin") ? "PALAA" : "BACK");
@@ -378,7 +378,7 @@ class GetButtons extends HelpText {
                             button.setText(this.getLanguage().equals("fin") ? "OHJE" : "HELP");
                         }
                     } else if (isovalikko.getChildren().contains(textArea) && (button.getText().equals("OHJE") || button.getText().equals("HELP"))) {
-                        textArea.setText(this.getLanguage().equals("fin") ? super.mmcFI() : super.mmcEN());
+                        textArea.setText(this.getLanguage().equals("fin") ? super.diffFI() : super.diffEN());
                     }
                 });
                 break;
@@ -432,11 +432,11 @@ class GetButtons extends HelpText {
     }
 
     /**
-     * method for setting barrier button for scene 'MMC Diffusion'
+     * method for setting barrier button for scene 'Diffusion'
      * @param language GUI language
      * @return button
      */
-    Button getMMCBarrierButton(String language) {
+    Button getDiffBarrierButton(String language) {
         this.setLanguage(language);
 
         Button button = this.getLanguage().equals("fin") ? new Button("JATKA") : new Button("CONTINUE");
@@ -529,12 +529,12 @@ class GetButtons extends HelpText {
      * @return the scene
      */
     @Contract(pure = true)
-    private SceneMMC getMMCScene() { return this.scene; }
+    private SceneDiff getDiffScene() { return this.scene; }
 
     /**
      * @param scene the scene to set
      */
-    private void setMMCScene(SceneMMC scene) { this.scene = scene; }
+    private void setDiffScene(SceneDiff scene) { this.scene = scene; }
 
     /**
      * @return the buttonYES

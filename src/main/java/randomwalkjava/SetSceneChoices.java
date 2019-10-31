@@ -148,8 +148,8 @@ class SetSceneChoices {
                     else
                         textAreaMenu.setText(textArea.getText());
                     break;
-                case "mmc":
-                    if (textArea.getText().startsWith(this.getLanguage().equals("fin") ? "\n Mmc-diffuusio" : "\n Mmc Diffusion")
+                case "diff":
+                    if (textArea.getText().startsWith(this.getLanguage().equals("fin") ? "\n Diffuusio" : "\n Diffusion")
                         || textArea.getText().isEmpty())
                         textAreaMenu.setText(this.getLanguage().equals("fin") ? helpText.welcomeFI() : helpText.welcomeEN());
                     else

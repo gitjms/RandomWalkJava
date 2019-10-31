@@ -23,9 +23,9 @@ import static java.lang.Integer.parseInt;
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
  *
- * Class for executing and plotting MMC Diffusion
+ * Class for executing and plotting Diffusion
  */
-class ExecMMC extends Data {
+class ExecDiff extends Data {
 
     private String language;
     private List <Double> diffusion_x;
@@ -34,31 +34,31 @@ class ExecMMC extends Data {
     private List <Double> energy_y;
     private List <Double> visc_x;
     private List <Double> visc_y;
-    private double mmcscalefactor;
+    private double diffscalefactor;
     private double linewidth;
     private boolean newdata;
 
     /**
      * Initiating class
      */
-    ExecMMC(String language) {
+    ExecDiff(String language) {
         super();
         this.setLanguage(language);
     }
 
-    void setExecClick(@NotNull Button execNappi, SceneMMC mmcScene,
-                      GraphicsContext mmcpiirturi, double scalefactor, double animwidth, double animheight,
-                      boolean newdata, HBox isovalikkoMMC, VBox valikkoMMC, TextArea textAreaMMC, Pane mmcpane,
-                      String datapath, File datafolder, String fexec, Button remBarNappiMMC, Button plotMMC,
-                      Button closeNappiMMC, Button menuNappiMMC, Button helpNappiMMC) {
+    void setExecClick(@NotNull Button execNappi, SceneDiff diffScene,
+                      GraphicsContext diffpiirturi, double scalefactor, double animwidth, double animheight,
+                      boolean newdata, HBox isovalikkoDiff, VBox valikkoDiff, TextArea textAreaDiff, Pane diffpane,
+                      String datapath, File datafolder, String fexec, Button remBarNappiDiff, Button plotDiff,
+                      Button closeNappiDiff, Button menuNappiDiff, Button helpNappiDiff) {
 
-        this.setMmcScalefactor(scalefactor);
+        this.setDiffScalefactor(scalefactor);
         this.setNewdata(newdata);
 
         execNappi.setOnMouseClicked((MouseEvent event) -> {
-            if ( mmcScene.timerIsRunning()) return;
-            mmcScene.setSave("-");
-            String[] vars = mmcScene.getVars();
+            if ( diffScene.timerIsRunning()) return;
+            diffScene.setSave("-");
+            String[] vars = diffScene.getVars();
             this.setVars(vars);
             int particles = parseInt(getVars()[0]);
             double diam = parseDouble(getVars()[1]);
@@ -75,15 +75,15 @@ class ExecMMC extends Data {
 
             if ( fail ) return;
 
-            if (mmcScene.getFxplot() != null) {
-                if (mmcScene.getFxplot().getFrame().isShowing()
-                    || mmcScene.getFxplot().getFrame().isActive()
-                    || mmcScene.getFxplot().getFrame().isDisplayable())
-                    mmcScene.getFxplot().getFrame().dispose();
+            if (diffScene.getFxplot() != null) {
+                if (diffScene.getFxplot().getFrame().isShowing()
+                    || diffScene.getFxplot().getFrame().isActive()
+                    || diffScene.getFxplot().getFrame().isDisplayable())
+                    diffScene.getFxplot().getFrame().dispose();
             }
 
-            mmcScene.setFxplot( new FXPlot());
-            mmcScene.getFxplot().setFXPlot(this.getLanguage(),"energy&diffusion");
+            diffScene.setFxplot( new FXPlot());
+            diffScene.getFxplot().setFXPlot(this.getLanguage(),"energy&diffusion");
 
             this.setEnergy_x(new ArrayList<>());
             this.setEnergy_y(new ArrayList<>());
@@ -92,7 +92,7 @@ class ExecMMC extends Data {
             this.setVisc_x(new ArrayList<>());
             this.setVisc_y(new ArrayList<>());
 
-            mmcpiirturi.scale(1.0/this.getMmcScalefactor(), 1.0/this.getMmcScalefactor());
+            diffpiirturi.scale(1.0/this.getDiffScalefactor(), 1.0/this.getDiffScalefactor());
 
             double measure;
             double diff;
@@ -117,50 +117,50 @@ class ExecMMC extends Data {
                 }
             }
 
-            this.setMmcScalefactor((animwidth - 83.3) / measure);
-            if ( dim == 2 ) this.setLinewidth(1.0 / this.getMmcScalefactor());
-            else this.setLinewidth(diam / this.getMmcScalefactor());
+            this.setDiffScalefactor((animwidth - 83.3) / measure);
+            if ( dim == 2 ) this.setLinewidth(1.0 / this.getDiffScalefactor());
+            else this.setLinewidth(diam / this.getDiffScalefactor());
 
-            mmcpiirturi.scale(this.getMmcScalefactor(), this.getMmcScalefactor());
+            diffpiirturi.scale(this.getDiffScalefactor(), this.getDiffScalefactor());
 
             this.setNewdata(true);
 
-            if ( isovalikkoMMC.getChildren().contains(textAreaMMC)) {
-                textAreaMMC.clear();
-                isovalikkoMMC.getChildren().remove(textAreaMMC);
-                isovalikkoMMC.getChildren().add(mmcpane);
+            if ( isovalikkoDiff.getChildren().contains(textAreaDiff)) {
+                textAreaDiff.clear();
+                isovalikkoDiff.getChildren().remove(textAreaDiff);
+                isovalikkoDiff.getChildren().add(diffpane);
             }
 
-            mmcpiirturi.setGlobalAlpha(1.0);
-            mmcpiirturi.setFill(Color.BLACK);
-            mmcpiirturi.fillRect(0, 0, 1.0/this.getMmcScalefactor()*animwidth, 1.0/this.getMmcScalefactor()*animheight);
-            mmcpiirturi.fill();
+            diffpiirturi.setGlobalAlpha(1.0);
+            diffpiirturi.setFill(Color.BLACK);
+            diffpiirturi.fillRect(0, 0, 1.0/this.getDiffScalefactor()*animwidth, 1.0/this.getDiffScalefactor()*animheight);
+            diffpiirturi.fill();
 
             /*
              * GET INITIAL DATA
              */
-            File initialDataFile = new File( datapath + "/startMMC_" + dim + "D_" + particles + "N.xy");
+            File initialDataFile = new File( datapath + "/startDiff_" + dim + "D_" + particles + "N.xy");
             boolean deleted;
             if (Files.exists(initialDataFile.toPath())) {
                 deleted = initialDataFile.delete();
                 String warntext = this.getLanguage().equals("fin")
-                    ? "Vanhaa datatiedostoa 'startMMC_" + dim + "D_" + particles + "N.xy' ei voitu"
+                    ? "Vanhaa datatiedostoa 'startDiff_" + dim + "D_" + particles + "N.xy' ei voitu"
                     + " poistaa, mikä voi pilata ajon.\n"
                     + "Yritä sulkea sovellus, poistaa tiedosto käsin, ja sitten ajaa uudestaan."
-                    : "Old data file 'startMMC_" + dim + "D_" + particles + "N.xy' couldn't be"
+                    : "Old data file 'startDiff_" + dim + "D_" + particles + "N.xy' couldn't be"
                     + " deleted, which may spoil your run.\n"
                     + "Try closing the application, delete the file manually, and then run again.";
                 if (!deleted) System.out.println(warntext);
             }
 
-            valikkoMMC.getChildren().set(3, remBarNappiMMC);
+            valikkoDiff.getChildren().set(3, remBarNappiDiff);
 
             /*
-             * DRAW MMC ANIMATION
+             * DRAW DIFFUSION ANIMATION
              */
-            mmcScene.refresh(datafolder, initialDataFile, fexec, mmcpiirturi, this.getMmcScalefactor(),
-                animwidth, this.getLinewidth(), remBarNappiMMC, execNappi, valikkoMMC,
-                plotMMC, closeNappiMMC, menuNappiMMC, helpNappiMMC, this.getEnergy_x(), this.getEnergy_y(),
+            diffScene.refresh(datafolder, initialDataFile, fexec, diffpiirturi, this.getDiffScalefactor(),
+                animwidth, this.getLinewidth(), remBarNappiDiff, execNappi, valikkoDiff,
+                plotDiff, closeNappiDiff, menuNappiDiff, helpNappiDiff, this.getEnergy_x(), this.getEnergy_y(),
                 this.getDiffusion_x(), this.getDiffusion_y(), this.getVisc_x(), this.getVisc_y(),
                 this.isNewdata(), measure, diff
             );
@@ -169,13 +169,13 @@ class ExecMMC extends Data {
         });
     }
 
-    void setPlotClick (@NotNull Button plotNappi, SceneMMC mmcScene, VBox valikkoMMC, String datapath,
-                       File datafolder, String fexec, String pyexecmmc2d, String pyexecmmc3d, Execution ex) {
+    void setPlotClick (@NotNull Button plotNappi, SceneDiff diffScene, VBox valikkoDiff, String datapath,
+                       File datafolder, String fexec, String pyexecdiff2d, String pyexecdiff3d, Execution ex) {
 
         plotNappi.setOnMouseClicked((MouseEvent event) -> {
-            valikkoMMC.setDisable(true);
-            mmcScene.setSave("+");
-            String[] vars = mmcScene.getVars();
+            valikkoDiff.setDisable(true);
+            diffScene.setSave("+");
+            String[] vars = diffScene.getVars();
             this.setVars(vars);
             Data data = new Data(vars);
             int particles = parseInt(getVars()[0]);
@@ -193,8 +193,8 @@ class ExecMMC extends Data {
 
             if ( fail ) return;
 
-            ex.executeMMC(datafolder, datapath, fexec, pyexecmmc2d,
-                pyexecmmc3d, valikkoMMC, data, this.getVars());
+            ex.executeDiff(datafolder, datapath, fexec, pyexecdiff2d,
+                pyexecdiff3d, valikkoDiff, data, this.getVars());
         });
     }
 
@@ -286,15 +286,15 @@ class ExecMMC extends Data {
     private void setVisc_y(List<Double> visc_y) { this.visc_y = visc_y; }
 
     /**
-     * @return the mmcscalefactor
+     * @return the diffscalefactor
      */
     @Contract(pure = true)
-    private double getMmcScalefactor() { return mmcscalefactor; }
+    private double getDiffScalefactor() { return diffscalefactor; }
 
     /**
-     * @param mmcscalefactor the mmcscalefactor to set
+     * @param diffscalefactor the diffscalefactor to set
      */
-    private void setMmcScalefactor(double mmcscalefactor) { this.mmcscalefactor = mmcscalefactor; }
+    private void setDiffScalefactor(double diffscalefactor) { this.diffscalefactor = diffscalefactor; }
 
     /**
      * @return the linewidth
