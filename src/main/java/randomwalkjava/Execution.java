@@ -16,9 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import static java.lang.Double.parseDouble;
-import static java.lang.Integer.parseInt;
-
 /**
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
@@ -56,9 +53,8 @@ class Execution {
      * @param data instance of Data class
      * @param vars user data from GUI
      */
-    void executePath(File folder, String path, String fexec,
-                     String pyexec1d, String pyexec2d, String pyexec3d,
-                     Data data, String[] vars) {
+    void executePath(File folder, String path, String fexec, String pyexec1d, String pyexec2d,
+                     String pyexec3d, Data data, String[] vars) {
         /*
         * FROM SCENEPATHTRACING
         * vars from user:
@@ -83,15 +79,15 @@ class Execution {
 
         Boolean result = false;
         try {
-            result = data.createData(folder, fexec, false);
+            result = data.createData(folder, fexec, false, false);
         } catch (Throwable ex) {
             System.out.println(ex.getMessage());
         }
         if (!result) return;
 
-        int particles = parseInt(vars[0]);
-        int steps = parseInt(vars[3]);
-        int dimension = parseInt(vars[4]);
+        int particles = Integer.parseInt(vars[0]);
+        int steps = Integer.parseInt(vars[3]);
+        int dimension = Integer.parseInt(vars[4]);
 
         if ( vars[6].equals("f") && vars[7].equals("l") ) {
             titletext = this.getLanguage().equals("fin") ? "Keskitetyn lähteen hilahiukkaset, " : "Fixed source lattice particles, ";
@@ -132,12 +128,13 @@ class Execution {
             zDataPath =  "z_path" + dimension + "D_" + particles + "N_" + steps + "S.xy";
             command = new String[]{"cmd","/c", pyexec3d, xDataPath, yDataPath, zDataPath};
         }
-
+        System.out.println("hep1");
         /*
          * GET IMAGE
          */
         BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension);
 
+        System.out.println("hep2");
         this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Satunnaiskulku - liikeradat" : "Random Walk - Path Tracing");
         JLabel titleLabel = new JLabel(titletext + "N=" + particles + ", " + steps + (this.getLanguage().equals("fin") ? " askelta\n" :" steps\n"));
         java.awt.Font labelFont = titleLabel.getFont();
@@ -201,17 +198,17 @@ class Execution {
 
         Boolean result = false;
         try {
-            result = data.createData(folder, fexec, false);
+            result = data.createData(folder, fexec, false, false);
         } catch (Throwable ex) {
             System.out.println(ex.getMessage());
         }
         if (!result)
             return;
 
-        int particles = parseInt(vars[0]);
-        double diameter = parseDouble(vars[1]);
-        int steps = parseInt(vars[3]);
-        final int dimension = parseInt(vars[4]);
+        int particles = Integer.parseInt(vars[0]);
+        double diameter = Double.parseDouble(vars[1]);
+        int steps = Integer.parseInt(vars[3]);
+        final int dimension = Integer.parseInt(vars[4]);
 
         String startDataDiff = "startDiff_" + dimension + "D_" + particles + "N.xy";
         String finalDataDiff = "finalDiff_" + dimension + "D_" + particles + "N.xy";
@@ -280,16 +277,16 @@ class Execution {
 
         Boolean result = false;
         try {
-            result = data.createData(folder, fexec, false);
+            result = data.createData(folder, fexec, false, false);
         } catch (Throwable ex) {
             System.out.println(ex.getMessage());
         }
 
         if (!result) return;
 
-        int particles = parseInt(vars[0]);
-        int steps = parseInt(vars[3]);
-        int dimension = parseInt(vars[4]);
+        int particles = Integer.parseInt(vars[0]);
+        int steps = Integer.parseInt(vars[3]);
+        int dimension = Integer.parseInt(vars[4]);
 
         if ( vars[6].equals("f") && vars[7].equals("l") ) {
             titletext = this.getLanguage().equals("fin") ? "Keskitetyn lähteen hilahiukkaset" : "Fixed source lattice particles";
@@ -358,15 +355,15 @@ class Execution {
 
         Boolean result = false;
         try {
-            result = data.createData(folder, fexec, false);
+            result = data.createData(folder, fexec, false, false);
         } catch (Throwable ex) {
             System.out.println(ex.getMessage());
         }
         if (!result) return;
 
-        int particles = parseInt(vars[0]);
-        int steps = parseInt(vars[3]);
-        int dimension = parseInt(vars[4]);
+        int particles = Integer.parseInt(vars[0]);
+        int steps = Integer.parseInt(vars[3]);
+        int dimension = Integer.parseInt(vars[4]);
 
         if ( vars[7].equals("l") ) {
             titletext = this.getLanguage().equals("fin") ? "Hilahiukkaset" : "Lattice particles";
@@ -433,14 +430,14 @@ class Execution {
 
         Boolean result = false;
         try {
-            result = data.createData(folder, fexec, iscbmc);
+            result = data.createData(folder, fexec, iscbmc, true);
         } catch (Throwable ex) {
             System.out.println(ex.getMessage());
         }
         if (!result) return false;
 
-        int steps = parseInt(vars[3]);
-        int dimension = parseInt(vars[4]);
+        int steps = Integer.parseInt(vars[3]);
+        int dimension = Integer.parseInt(vars[4]);
 
         String dataPath;
         if (iscbmc) dataPath = "cbmc_" + dimension + "D_" + steps + "S.xy";
@@ -466,7 +463,7 @@ class Execution {
         /*
          * GET IMAGE
          */
-        BufferedImage image = createPdf(folder, command, pdfFile, 1, 100, dimension);
+        BufferedImage image = createPdf(folder, command, pdfFile, 1, 1, dimension);
 
         this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Satunnaiskulku - SAW-liikeradat" : "Random Walk - SAW Path Tracing");
         /*

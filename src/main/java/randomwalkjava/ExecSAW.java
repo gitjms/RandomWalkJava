@@ -32,6 +32,7 @@ class ExecSAW extends Data {
     private List <Double> saw_rms;
     private List<Double> saw_rmsruns;
     private List <Double> saw_lengths;
+    private List<Double> cbmc_mu;
     private List<Double> saw_expd;
     private List <Double> rms_runs;
     private List <Integer> xAxis;
@@ -73,7 +74,7 @@ class ExecSAW extends Data {
                 if ( !sawScene.isRunning())
                     return;
 
-                sawScene.refresh(folder, executable, getFirst(), getSawLengths(), getSawExpd(), getSawRms(),
+                sawScene.refresh(folder, executable, getFirst(), getSawLengths(), getCbmcMu(), getSawExpd(), getSawRms(),
                     getSawRmsRuns(), getRmsRuns(), getXAxis(), getXhistAxis(), isSaw(), gamSlider, aaSlider);
 
                 if (getFirst()) setFirst(false);
@@ -90,7 +91,7 @@ class ExecSAW extends Data {
                 helpNappiSAW.setDisable(false);
                 closeNappiSAW.setDisable(false);
                 plotSAW.setDisable(false);
-                execSAW.setText(this.getLanguage().equals("fin") ? "UUSI AJO" : "NEW RUN");
+                execSAW.setText(this.getLanguage().equals("fin") ? "AJA SAW" : "RUN SAW");
             } else {
                 this.setVars(sawScene.getVars());
                 sawScene.setSawCbmc("-");
@@ -147,7 +148,7 @@ class ExecSAW extends Data {
                 else for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*10));
 
                 sawScene.getFxplot().setS1Data(this.getXAxis(), this.getRmsRuns(), dim);
-                sawScene.getFxplot().setS2Data(this.getXAxis(), this.getRmsRuns());
+                sawScene.getFxplot().setS2Data(this.getXAxis(), this.getRmsRuns(), false);
                 sawScene.getFxplot().setS3Data(labelMap, this.getXhistAxis(), this.getYhistAxis());
 
                 sawScene.start();
@@ -170,7 +171,7 @@ class ExecSAW extends Data {
                 helpNappiSAW.setDisable(false);
                 closeNappiSAW.setDisable(false);
                 plotSAW.setDisable(false);
-                execBMC.setText(this.getLanguage().equals("fin") ? "UUSI AJO" : "NEW RUN");
+                execBMC.setText(this.getLanguage().equals("fin") ? "AJA CBMC" : "RUN CBMC");
             } else {
                 this.setVars(sawScene.getVars());
                 sawScene.setSawCbmc("c");
@@ -209,6 +210,9 @@ class ExecSAW extends Data {
                 this.setSawLengths(new ArrayList<>());
                 for (int x = 0; x < 10; x++) this.getSawLengths().add(0.0);
 
+                this.setCbmcMu(new ArrayList<>());
+                for (int x = 0; x < 10; x++) this.getCbmcMu().add(0.0);
+
                 this.setSawExpd(new ArrayList<>());
                 for (int x = 0; x < 10; x++) this.getSawExpd().add(0.0);
 
@@ -223,11 +227,15 @@ class ExecSAW extends Data {
                 this.setFirst(true);
 
                 Map<Object, Object> labelMap = new HashMap<>();
-                if (dim == 2) for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)));
-                else for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*3));
+                if (steps < 30 ) {
+                    for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)));
+                } else {
+                    if (dim == 2 ) for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*3));
+                    else for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)));
+                }
 
                 sawScene.getFxplot().setS1Data(this.getXAxis(), this.getRmsRuns(), dim);
-                sawScene.getFxplot().setS2Data(this.getXAxis(), this.getRmsRuns());
+                sawScene.getFxplot().setS2Data(this.getXAxis(), this.getRmsRuns(), true);
                 sawScene.getFxplot().setS3Data(labelMap, this.getXhistAxis(), this.getYhistAxis());
 
                 sawScene.start();
@@ -254,7 +262,6 @@ class ExecSAW extends Data {
                     sawScene.setSawCbmc("-");
                     this.setIsCbmc(false);
                 }
-                valikkoSAW.setDisable(true);
                 sawScene.setSave("s");
                 String[] vars = sawScene.getVars();
                 this.setVars(vars);
@@ -264,6 +271,8 @@ class ExecSAW extends Data {
 
                 if ( dim < 2 || dim > 3 ) fail = true;
                 if ( fail ) return;
+
+                valikkoSAW.setDisable(true);
 
                 boolean ok = false;
                 while (!ok) {
@@ -327,6 +336,17 @@ class ExecSAW extends Data {
      * @param saw_lengths the saw_lengths to set
      */
     private void setSawLengths(List<Double> saw_lengths) { this.saw_lengths = saw_lengths; }
+
+    /**
+     * @return the cbmc_mu
+     */
+    @Contract(pure = true)
+    private List<Double> getCbmcMu() { return this.cbmc_mu; }
+
+    /**
+     * @param cbmc_mu the cbmc_mu to set
+     */
+    private void setCbmcMu(List<Double> cbmc_mu) { this.cbmc_mu = cbmc_mu; }
 
     /**
      * @return the saw_expd

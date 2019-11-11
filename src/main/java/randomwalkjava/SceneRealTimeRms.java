@@ -6,10 +6,9 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -91,8 +90,18 @@ class SceneRealTimeRms extends Data {
     private TextField setNumSteps;
     private VBox plotChoice;
     private HBox dim_choice;
+    private HBox norm_choice;
+    private HBox diff_choice;
     private Map<String,double[]> others;
     private double sigSeed;
+    private ToggleButton setNorm1;
+    private ToggleButton setNorm2;
+    private ToggleButton setDiff1;
+    private ToggleButton setDiff2;
+    private int whichnorm;
+    private int whichdiff;
+    private HBox isovalikko;
+    private Pane pane;
 
     /**
      * main class gets vars via this
@@ -112,7 +121,7 @@ class SceneRealTimeRms extends Data {
             "0",    // vars[2] charge           n/a
             "0",    // vars[3] steps            USER
             "0",    // vars[4] dimension        USER
-            "-",    // vars[5] mmc              n/a
+            "-",    // vars[5] diffusion        n/a
             "f",    // vars[6] fixed(/spread)   n/a
             "-",    // vars[7] (lattice/)free   n/a
             "-"};   // vars[8] save (off)       n/a
@@ -165,13 +174,13 @@ class SceneRealTimeRms extends Data {
             if ( this.isStandPlot() ){
                 /*this.setMincount(-3.0);
                 this.setMaxcount(3.0);*/
-                this.setMincount(-this.getExpected());
-                this.setMaxcount(this.getExpected());
+                this.setMincount(-this.getExpected()*2.5);
+                this.setMaxcount(this.getExpected()*2.5);
             } else if ( this.isDiffPlot() ){
                 /*this.setMincount(-(7.0+65.0*(1.0-Math.exp(-0.001*this.getSteps()))));
                 this.setMaxcount(7.0+65.0*(1.0-Math.exp(-0.001*this.getSteps())));*/
-                this.setMincount(-this.getExpected());
-                this.setMaxcount(this.getExpected());
+                this.setMincount(-this.getExpected()*1.5);
+                this.setMaxcount(this.getExpected()*1.5);
             }
 
             if (this.isStandPlot()) standdiff = "stand";
@@ -386,7 +395,7 @@ class SceneRealTimeRms extends Data {
                             double rrms_walk = Math.sqrt(this.getSumParts()/(this.getNumParts()*this.getRuns()));
                             this.setRms_sum(this.getRms_sum() + rrms_walk);
                             double avg = this.getRms_sum()/this.getRuns();
-                            this.setSigSeed(this.getSigSeed() + Math.pow(rrms_walk - avg, 2.0));
+                            this.setSigSeed(this.getSigSeed() + (rrms_walk - avg));
 
                             if ( this.getRuns() < 11 ) {
                                 this.getRms_runs()[(int) this.getRuns() - 1] = rrms_walk;
@@ -409,25 +418,28 @@ class SceneRealTimeRms extends Data {
                                 this.getXAxis(), this.getY2Axis(), this.getExpected(), rrms_walk);
 
                             double ynorm = 0.0;
-
                             for (int h = 0; h < 100; h++) {
                                 if (this.isStandPlot()) {
-                                    double sigma = Math.sqrt(this.getSigSeed()/this.getRuns());
-                                    ynorm = 1.0 / (Math.sqrt(2.0 * Math.PI * sigma))
-                                        * Math.exp(-Math.pow(this.getXnormAxis()[h]*3.0, 2.0) / (2.0 * Math.pow(sigma,2)));
+                                    double sigma = (this.getSigSeed()/this.getRuns());
+                                    if (this.whichNorm() == 1)
+                                        ynorm = 1.0 / (Math.sqrt(2.0 * Math.PI) * sigma)
+                                            * Math.exp(-Math.pow(this.getXnormAxis()[h], 2.0) / (2.0 * Math.pow(sigma,2)));
+                                    else if (this.whichNorm() == 2)
+                                        ynorm = 1.0 / Math.pow(2.0 * Math.PI * rrms_walk/this.getDim(), this.getDim()/2.0)
+                                            * Math.exp(-3.0*Math.pow(this.getXnormAxis()[h], 2.0) / (2.0 * Math.pow(rrms_walk,2.0)));
                                     this.setGreatestDN(ynorm > this.getGreatestDN() ? ynorm : this.getGreatestDN());
                                     this.getFxplot().setNMaxY(this.getGreatestDN());
                                 } else if (this.isDiffPlot()) {
-                                    /*double factor = 0.0;
-                                    if (this.getDim() == 1) factor = 2.0;
-                                    else if (this.getDim() == 2) factor = 4.0;
-                                    else if (this.getDim() == 3) factor = 6.0;*/
-                                    //double rrms = this.getSumParts()/this.getNumParts();
                                     double diff = rrms_walk / (2.0 * this.getDim() * this.getSteps());
-                                    double sigma = Math.sqrt(4.0 * Math.PI * diff * this.getSteps());
-                                    ynorm = 1.0 / sigma//Math.sqrt(4.0 * Math.PI * sigma)
-                                        * Math.exp(-Math.pow(this.getXnormAxis()[h], 2.0) / (4.0 *diff * this.getSteps()));
-                                        //* Math.exp(-Math.pow(this.getXnormAxis()[h]*3.0/sigma, 2.0) / 2.0);
+                                    double sigma2 = 2.0 * diff * this.getSteps();
+                                    if (this.whichDiff() == 1)
+                                        ynorm = 1.0 / Math.sqrt(2.0 * Math.PI * sigma2)
+                                            * Math.exp(-Math.pow(this.getXnormAxis()[h], 2.0) / (2.0 * sigma2));
+                                    else if (this.whichDiff() == 2)
+                                        ynorm = 1.0 / Math.pow(2.0 * Math.PI * sigma2, this.getDim()/2.0)
+                                            * Math.exp(-Math.pow(this.getXnormAxis()[h], 2.0) / (2.0 * sigma2));
+
+                                    if ( ynorm > this.getGreatestDN() ) this.setGreatestDN(ynorm);
                                     if ( ynorm > this.getGreatestDN() ) this.setGreatestDN(ynorm);
                                     this.getFxplot().setNMaxY(this.getGreatestDN());
                                 }
@@ -452,18 +464,14 @@ class SceneRealTimeRms extends Data {
                     }
                 }
 
-                if ( this.getRuns() < 6 ) {
+                if ( this.getRuns() < 4 ) {
                     String mapkey;
                     String mapkey1 = "\u03C1(r,t\u2081)";
                     String mapkey2 = "\u03C1(r,t\u2082)";
                     String mapkey3 = "\u03C1(r,t\u2083)";
-                    String mapkey4 = "\u03C1(r,t\u2084)";
-                    String mapkey5 = "\u03C1(r,t\u2085)";
                     if (this.getRuns() == 1) mapkey = mapkey1;
                     else if (this.getRuns() == 2) mapkey = mapkey2;
-                    else if (this.getRuns() == 3) mapkey = mapkey3;
-                    else if (this.getRuns() == 4) mapkey = mapkey4;
-                    else mapkey = mapkey5;
+                    else mapkey = mapkey3;
                     if (!this.getOthers().containsKey(mapkey)) {
                         this.getOthers().put(mapkey, this.getYnormAxis().clone());
                         for (Map.Entry<String, double[]> longEntry : this.getOthers().entrySet()) {
@@ -530,7 +538,11 @@ class SceneRealTimeRms extends Data {
      * Create GUI for Real Time Rms
      * @return REAL TIME RMS SCENE
      */
-    Parent getSceneReal(){
+    Parent getSceneReal(HBox isovalikko, Pane pane, ImageView ivRms1aFI, ImageView ivRms1aEN, ImageView ivRms1bFI,
+                        ImageView ivRms1bEN, ImageView ivRms2aFI, ImageView ivRms2aEN, ImageView ivRms2bFI,
+                        ImageView ivRms2bEN){
+        this.setIsoValikko(isovalikko);
+        this.setPane(pane);
         GridPane asettelu = new GridPane();
         asettelu.setMaxWidth(getPaneWidth());
         asettelu.setVgap(5);
@@ -541,6 +553,7 @@ class SceneRealTimeRms extends Data {
         valikko.setSpacing(10);
 
         DropShadow shadow = new DropShadow();
+        GetComponents getComponents = new GetComponents();
 
         /*
         * COMPONENTS...
@@ -614,7 +627,7 @@ class SceneRealTimeRms extends Data {
             this.vars[4] = "3";
         });
 
-        this.vars[5] = "-"; // mmc              n/a
+        this.vars[5] = "-"; // diffusion        n/a
         this.vars[6] = "f"; // fixed(/spread)   n/a
         this.vars[7] = "-"; // (lattice/)free   n/a
         this.vars[8] = "-"; // save (off)       n/a
@@ -634,18 +647,127 @@ class SceneRealTimeRms extends Data {
         this.setDiffPlot.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setDiffPlot.setEffect(shadow));
         this.setDiffPlot.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setDiffPlot.setEffect(null));
 
+        Label labNormDiff = new Label(this.getLanguage().equals("fin") ? "jakauma:" : "distribution:");
         this.setPlotChoice(new VBox(this.setStandPlot,this.setDiffPlot));
         this.getPlotChoice().setSpacing(10);
         this.setStandPlot.setOnMouseClicked(f -> {
+            this.setWhichNorm(1);
             this.setStandPlot.setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDiffPlot.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setNorm1.setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setNorm2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+
+            this.getIsoValikko().getChildren().remove(1);
+            this.setPane(this.getLanguage().equals("fin")
+                ? getComponents.getPane2(ivRms1aFI, this.getAnimWidth(), this.getAnimHeight())
+                : getComponents.getPane2(ivRms1aEN, this.getAnimWidth(), this.getAnimHeight()));
+            this.getIsoValikko().getChildren().addAll(this.getPane());
             this.standPlot = true; this.diffPlot = false;
+            labNormDiff.setVisible(true);
+            this.getNormChoice().setVisible(true);
+            this.getDiffChoice().setVisible(false);
         });
         this.setDiffPlot.setOnMouseClicked(f -> {
+            this.setWhichDiff(1);
             this.setStandPlot.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDiffPlot.setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setDiff1.setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setDiff2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+
+            this.getIsoValikko().getChildren().remove(1);
+            this.setPane(this.getLanguage().equals("fin")
+                ? getComponents.getPane2(ivRms2aFI, this.getAnimWidth(), this.getAnimHeight())
+                : getComponents.getPane2(ivRms2aEN, this.getAnimWidth(), this.getAnimHeight()));
+            this.getIsoValikko().getChildren().addAll(this.getPane());
             this.diffPlot = true; this.standPlot = false;
+            labNormDiff.setVisible(true);
+            this.getNormChoice().setVisible(false);
+            this.getDiffChoice().setVisible(true);
         });
+
+        this.setNorm1 = new ToggleButton("v1");
+        this.setNorm1.setMinWidth(65);
+        this.setNorm1.setMaxWidth(65);
+        this.setNorm1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.setNorm1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setNorm1.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.setNorm1.setEffect(shadow));
+        this.setNorm1.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.setNorm1.setEffect(null));
+
+        this.setNorm2 = new ToggleButton("v2");
+        this.setNorm2.setMinWidth(65);
+        this.setNorm2.setMaxWidth(65);
+        this.setNorm2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.setNorm2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setNorm2.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.setNorm2.setEffect(shadow));
+        this.setNorm2.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.setNorm2.setEffect(null));
+
+        this.setNormChoice(new HBox(this.setNorm1,this.setNorm2));
+        this.getNormChoice().setSpacing(20);
+        this.setNorm1.setOnMouseClicked(f -> {
+            this.setNorm1.setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setNorm2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.getIsoValikko().getChildren().remove(1);
+            this.setPane(this.getLanguage().equals("fin")
+                ? getComponents.getPane2(ivRms1aFI, this.getAnimWidth(), this.getAnimHeight())
+                : getComponents.getPane2(ivRms1aEN, this.getAnimWidth(), this.getAnimHeight()));
+            this.getIsoValikko().getChildren().addAll(this.getPane());
+            this.setWhichNorm(1);
+        });
+        this.setNorm2.setOnMouseClicked(f -> {
+            this.setNorm1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setNorm2.setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.getIsoValikko().getChildren().remove(1);
+            this.setPane(this.getLanguage().equals("fin")
+                ? getComponents.getPane2(ivRms1bFI, this.getAnimWidth(), this.getAnimHeight())
+                : getComponents.getPane2(ivRms1bEN, this.getAnimWidth(), this.getAnimHeight()));
+            this.getIsoValikko().getChildren().addAll(this.getPane());
+            this.setWhichNorm(2);
+        });
+
+        this.setDiff1 = new ToggleButton("v1");
+        this.setDiff1.setMinWidth(65);
+        this.setDiff1.setMaxWidth(65);
+        this.setDiff1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.setDiff1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setDiff1.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.setDiff1.setEffect(shadow));
+        this.setDiff1.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.setDiff1.setEffect(null));
+
+        this.setDiff2 = new ToggleButton("v2");
+        this.setDiff2.setMinWidth(65);
+        this.setDiff2.setMaxWidth(65);
+        this.setDiff2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.setDiff2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setDiff2.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.setDiff2.setEffect(shadow));
+        this.setDiff2.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.setDiff2.setEffect(null));
+
+        this.setDiffChoice(new HBox(this.setDiff1,this.setDiff2));
+        this.getDiffChoice().setSpacing(20);
+        this.setDiff1.setOnMouseClicked(f -> {
+            this.setDiff1.setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setDiff2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.getIsoValikko().getChildren().remove(1);
+            this.setPane(this.getLanguage().equals("fin")
+                ? getComponents.getPane2(ivRms2aFI, this.getAnimWidth(), this.getAnimHeight())
+                : getComponents.getPane2(ivRms2aEN, this.getAnimWidth(), this.getAnimHeight()));
+            this.getIsoValikko().getChildren().addAll(this.getPane());
+            this.setWhichDiff(1);
+        });
+        this.setDiff2.setOnMouseClicked(f -> {
+            this.setDiff1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setDiff2.setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.getIsoValikko().getChildren().remove(1);
+            this.setPane(this.getLanguage().equals("fin")
+                ? getComponents.getPane2(ivRms2bFI, this.getAnimWidth(), this.getAnimHeight())
+                : getComponents.getPane2(ivRms2bEN, this.getAnimWidth(), this.getAnimHeight()));
+            this.getIsoValikko().getChildren().addAll(this.getPane());
+            this.setWhichDiff(2);
+        });
+
+        this.setWhichNorm(1);
+        this.setWhichDiff(1);
+        labNormDiff.setVisible(false);
+        this.getNormChoice().setVisible(false);
+        this.getDiffChoice().setVisible(false);
 
         /*
         * ...THEIR PLACEMENTS
@@ -682,12 +804,19 @@ class SceneRealTimeRms extends Data {
         this.getPlotChoice().setMaxWidth(getCompwidth());
         asettelu.add(this.getPlotChoice(), 0, 8);
 
-        GridPane.setHalignment(valikko, HPos.LEFT);
-        asettelu.add(valikko, 0, 9, 2, 1);
+        final Pane empty2 = new Pane();
+        GridPane.setHalignment(empty2, HPos.CENTER);
+        asettelu.add(empty2, 0, 9, 2, 2);
 
-        final Pane empty3 = new Pane();
-        GridPane.setHalignment(empty3, HPos.CENTER);
-        asettelu.add(empty3, 0, 10, 2, 2);
+        GridPane.setHalignment(labNormDiff, HPos.LEFT);
+        asettelu.add(labNormDiff, 0, 10);
+        GridPane.setHalignment(this.getNormChoice(), HPos.LEFT);
+        asettelu.add(this.getNormChoice(), 0, 11);
+        GridPane.setHalignment(this.getDiffChoice(), HPos.LEFT);
+        asettelu.add(this.getDiffChoice(), 0, 11);
+
+        GridPane.setHalignment(valikko, HPos.LEFT);
+        asettelu.add(valikko, 0, 12, 2, 1);
 
         return asettelu;
     }
@@ -1203,6 +1332,28 @@ class SceneRealTimeRms extends Data {
     private void setDimension(HBox dim_choice) { this.dim_choice = dim_choice; }
 
     /**
+     * @return the norm_choice
+     */
+    @Contract(pure = true)
+    private HBox getNormChoice() { return this.norm_choice; }
+
+    /**
+     * @param norm_choice the norm_choice to set
+     */
+    private void setNormChoice(HBox norm_choice) { this.norm_choice = norm_choice; }
+
+    /**
+     * @return the diff_choice
+     */
+    @Contract(pure = true)
+    private HBox getDiffChoice() { return this.diff_choice; }
+
+    /**
+     * @param diff_choice the diff_choice to set
+     */
+    private void setDiffChoice(HBox diff_choice) { this.diff_choice = diff_choice; }
+
+    /**
      * @return the fxplot
      */
     @Contract(pure = true)
@@ -1245,4 +1396,62 @@ class SceneRealTimeRms extends Data {
      * sigSeed to set
      */
     private void setSigSeed(double sigSeed) { this.sigSeed = sigSeed; }
+
+    /**
+     * @return whichnorm
+     */
+    @Contract(pure = true)
+    private int whichNorm() { return this.whichnorm; }
+
+    /**
+     * whichnorm to set
+     */
+    @Contract(pure = true)
+    private void setWhichNorm(int whichnorm) { this.whichnorm = whichnorm; }
+
+    /**
+     * @return whichdiff
+     */
+    @Contract(pure = true)
+    private int whichDiff() { return this.whichdiff; }
+
+    /**
+     * whichdiff to set
+     */
+    @Contract(pure = true)
+    private void setWhichDiff(int whichdiff) { this.whichdiff = whichdiff; }
+
+    /**
+     * @return the pane
+     */
+    @Contract(pure = true)
+    private Pane getPane() { return this.pane; }
+
+    /**
+     * @param pane the pane to set
+     */
+    private void setPane(Pane pane) { this.pane = pane; }
+
+    /**
+     * @return the isovalikko
+     */
+    @Contract(pure = true)
+    private HBox getIsoValikko() { return this.isovalikko; }
+
+    /**
+     * @param isovalikko the isovalikko to set
+     */
+    private void setIsoValikko(HBox isovalikko) { this.isovalikko = isovalikko; }
+
+    /**
+     * @return the animwidth
+     */
+    @Contract(pure = true)
+    private double getAnimWidth() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
+
+    /**
+     * @return the animheight
+     */
+    @Contract(pure = true)
+    private double getAnimHeight() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
 }

@@ -12,7 +12,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -52,9 +51,9 @@ class GetComponents {
      * @param alusta javafx Canvas
      * @return pane
      */
-    Pane getPane(Canvas alusta) {
+    Pane getPane(Canvas alusta, double width, double height) {
         Pane pane = new Pane();
-        pane.setPrefSize(this.getAnimWidth(), this.getAnimHeight());
+        pane.setPrefSize(width, height);
         if (alusta != null) pane.getChildren().add(alusta);
         pane.setVisible(true);
         return pane;
@@ -65,9 +64,12 @@ class GetComponents {
      * @param image javafx ImageView
      * @return pane
      */
-    Pane getPane2(ImageView image) {
+    Pane getPane2(@NotNull ImageView image, double width, double height) {
         Pane pane = new Pane();
-        if (image != null) pane.getChildren().add(image);
+        pane.setMaxSize(width, height);
+        image.setFitWidth(width);
+        image.setFitHeight(height);
+        pane.getChildren().add(image);
         pane.setVisible(true);
         return pane;
     }
@@ -144,17 +146,5 @@ class GetComponents {
 
         return textArea;
     }
-
-    /**
-     * @return the animwidth
-     */
-    @Contract(pure = true)
-    private double getAnimWidth() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the animheight
-     */
-    @Contract(pure = true)
-    private double getAnimHeight() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
 
 }

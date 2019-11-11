@@ -53,11 +53,11 @@ class ExecPath extends Data {
             Data data = new Data(vars);
             boolean fail = false;
 
-            int particles = parseInt(getVars()[0]);
-            double diam = parseDouble(getVars()[1]);
-            int charge = parseInt(getVars()[2]);
-            int steps = parseInt(getVars()[3]);
-            int dim = parseInt(this.getVars()[4]);
+            int particles = Integer.parseInt(this.getVars()[0]);
+            double diam = Double.parseDouble(this.getVars()[1]);
+            int charge = Integer.parseInt(this.getVars()[2]);
+            int steps = Integer.parseInt(this.getVars()[3]);
+            int dim = Integer.parseInt(this.getVars()[4]);
             String fixed = this.getVars()[6];
             String lattice = this.getVars()[7];
 

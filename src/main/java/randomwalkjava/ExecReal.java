@@ -2,11 +2,10 @@ package randomwalkjava;
 
 import com.sun.glass.ui.Screen;
 import javafx.animation.AnimationTimer;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -31,6 +30,11 @@ class ExecReal extends Data {
     private double linewidth;
     private boolean isrealscaled;
     private boolean newdata;
+    private Pane pane;
+    private TextArea textarea;
+    private Canvas alusta;
+    private HBox isovalikko;
+    private GraphicsContext piirturi;
 
     /**
      * Initiating class
@@ -42,7 +46,14 @@ class ExecReal extends Data {
 
     void setRmsClick(File folder, String executable, @NotNull Button execNappi, SceneRealTimeRms rmsScene,
                      Button closeNappiReal, Button menuNappiReal, Button helpNappiReal,
-                     HBox isovalikkoReal, TextArea textAreaReal, Pane realPane, GraphicsContext piirturi) {
+                     HBox isovalikko, TextArea textAreaReal, Pane realPane, Canvas rtrmsAlusta,
+                     GraphicsContext piirturi) {
+
+        this.setIsoValikko(isovalikko);
+        this.setTextArea(textAreaReal);
+        this.setPane(realPane);
+        this.setAlusta(rtrmsAlusta);
+        this.setPiirturi(piirturi);
 
         /*
          * ANIMATION TIMER FOR REAL TIME RMS ANIMATION
@@ -64,10 +75,9 @@ class ExecReal extends Data {
                 if (!rmsScene.isRunning())
                     return;
 
-                if (isovalikkoReal.getChildren().contains(textAreaReal)) {
-                    textAreaReal.clear();
-                    isovalikkoReal.getChildren().remove(textAreaReal);
-                    isovalikkoReal.getChildren().add(realPane);
+                if (getIsoValikko().getChildren().contains(getTextArea())) {
+                    getTextArea().clear();
+                    getIsoValikko().getChildren().remove(getTextArea());
                 }
 
                 String[] vars = rmsScene.getVars();
@@ -87,19 +97,19 @@ class ExecReal extends Data {
 
                 int dim = parseInt(vars[4]);
 
-                piirturi.setGlobalAlpha(1.0);
-                piirturi.setFill(Color.BLACK);
+                getPiirturi().setGlobalAlpha(1.0);
+                getPiirturi().setFill(Color.BLACK);
                 if (dim == 1) {
-                    piirturi.fillRect(0, 0, 1.0 / getRealScalefactor() * getAnimWidth(), getAnimHeight());
+                    getPiirturi().fillRect(0, 0, 1.0 / getRealScalefactor() * getAnimWidth(), getAnimHeight());
                 } else {
-                    piirturi.fillRect(0, 0, 1.0 / getRealScalefactor() * getAnimWidth(), 1.0 / getRealScalefactor() * getAnimHeight());
+                    getPiirturi().fillRect(0, 0, 1.0 / getRealScalefactor() * getAnimWidth(), 1.0 / getRealScalefactor() * getAnimHeight());
                 }
-                piirturi.fill();
+                getPiirturi().fill();
 
                 /*
                  * DRAW ANIMATION
                  */
-                rmsScene.refresh(folder, executable, piirturi, getRealScalefactor(), getLinewidth(),
+                rmsScene.refresh(folder, executable, getPiirturi(), getRealScalefactor(), getLinewidth(),
                     isNewdata(), getAnimWidth());
                 setNewdata(false);
 
@@ -112,9 +122,9 @@ class ExecReal extends Data {
                 rmsScene.stop();
                 if (this.isRealScaled()) {
                     if (this.getVars()[4].equals("1"))
-                        piirturi.scale(1.0 / this.getRealScalefactor(), 1.0);
+                        this.getPiirturi().scale(1.0 / this.getRealScalefactor(), 1.0);
                     else
-                        piirturi.scale(1.0 / this.getRealScalefactor(), 1.0 / this.getRealScalefactor());
+                        this.getPiirturi().scale(1.0 / this.getRealScalefactor(), 1.0 / this.getRealScalefactor());
                 }
                 rmsScene.getPlotChoice().setDisable(false);
                 rmsScene.getDimension().setDisable(false);
@@ -122,14 +132,15 @@ class ExecReal extends Data {
                 helpNappiReal.setDisable(false);
                 closeNappiReal.setDisable(false);
                 execNappi.setText(this.getLanguage().equals("fin") ? "UUSI AJO" : "NEW RUN");
+
             } else {
                 this.setVars(rmsScene.getVars());
                 rmsScene.setSave("-");
                 boolean fail = false;
 
-                int particles = parseInt(getVars()[0]);
-                int steps = parseInt(getVars()[3]);
-                int dim = parseInt(this.getVars()[4]);
+                int particles = Integer.parseInt(this.getVars()[0]);
+                int steps = Integer.parseInt(this.getVars()[3]);
+                int dim = Integer.parseInt(this.getVars()[4]);
 
                 if (particles < 0) fail = true;
                 if (steps < 1) fail = true;
@@ -144,6 +155,15 @@ class ExecReal extends Data {
                         rmsScene.getFxplot().getFrame().dispose();
                 }
 
+                GetComponents getComponents = new GetComponents();
+
+                if (this.getIsoValikko().getChildren().size() > 1) {
+                    this.getIsoValikko().getChildren().remove(1);
+                    this.setPane(getComponents.getPane(this.getAlusta(), this.getAnimWidth(), this.getAnimHeight()));
+                    this.getIsoValikko().getChildren().add(this.getPane());
+                    helpNappiReal.setText(this.getLanguage().equals("fin") ? "OHJE" : "HELP");
+                }
+
                 rmsScene.setFxplot(new FXPlot());
                 rmsScene.getFxplot().setFXPlot(this.getLanguage(), "Walks&norm");
 
@@ -153,13 +173,13 @@ class ExecReal extends Data {
 
                 if (dim == 1) {
                     this.setLinewidth(1.0 / Math.log10(steps));
-                    piirturi.scale(this.getRealScalefactor(), 1.0);
+                    this.getPiirturi().scale(this.getRealScalefactor(), 1.0);
                 } else {
                     this.setLinewidth(1.2 / (this.getRealScalefactor() * Math.sqrt(Math.log10(steps))));
-                    piirturi.scale(this.getRealScalefactor(), this.getRealScalefactor());
+                    this.getPiirturi().scale(this.getRealScalefactor(), this.getRealScalefactor());
                 }
                 this.setRealScaled();
-                piirturi.setGlobalAlpha(1.0 / this.getRealScalefactor() * Math.pow(Math.log10(steps), 2.0));
+                this.getPiirturi().setGlobalAlpha(1.0 / this.getRealScalefactor() * Math.pow(Math.log10(steps), 2.0));
 
                 this.setNewdata(true);
 
@@ -173,6 +193,61 @@ class ExecReal extends Data {
             }
         });
     }
+
+    /**
+     * @return the textarea
+     */
+    @Contract(pure = true)
+    private TextArea getTextArea() { return this.textarea; }
+
+    /**
+     * @param textarea the textarea to set
+     */
+    private void setTextArea(TextArea textarea) { this.textarea = textarea; }
+
+    /**
+     * @return the alusta
+     */
+    @Contract(pure = true)
+    private Canvas getAlusta() { return this.alusta; }
+
+    /**
+     * @param alusta the alusta to set
+     */
+    private void setAlusta(Canvas alusta) { this.alusta = alusta; }
+
+    /**
+     * @return the isovalikko
+     */
+    @Contract(pure = true)
+    private HBox getIsoValikko() { return this.isovalikko; }
+
+    /**
+     * @param isovalikko the isovalikko to set
+     */
+    private void setIsoValikko(HBox isovalikko) { this.isovalikko = isovalikko; }
+
+    /**
+     * @return the pane
+     */
+    @Contract(pure = true)
+    private Pane getPane() { return this.pane; }
+
+    /**
+     * @param pane the pane to set
+     */
+    private void setPane(Pane pane) { this.pane = pane; }
+
+    /**
+     * @return the piirturi
+     */
+    @Contract(pure = true)
+    private GraphicsContext getPiirturi() { return this.piirturi; }
+
+    /**
+     * @param piirturi the piirturi to set
+     */
+    private void setPiirturi(GraphicsContext piirturi) { this.piirturi = piirturi; }
 
     /**
      * @return the language

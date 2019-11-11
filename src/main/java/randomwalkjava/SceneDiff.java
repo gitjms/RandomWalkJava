@@ -62,8 +62,8 @@ class SceneDiff extends Data {
     private boolean timerRunning;
     private double animwidth;
     private double center;
-    private double initT;
-    private double finT;
+    private double initE;
+    private double finE;
     private GraphicsContext piirturi;
     private FXPlot fxplot;
     private Button remBarNappiDiff;
@@ -189,7 +189,7 @@ class SceneDiff extends Data {
         barrierOn();
 
         if (newdata) {
-            this.setInitT(0);
+            this.setInitE(0);
             this.setNumPart(parseInt(this.vars[0]));
             this.setDiam(parseDouble(this.vars[1]));
             this.setCharge(parseInt(this.vars[2]));
@@ -453,7 +453,8 @@ class SceneDiff extends Data {
                                 } else if ( firstLetter.equals("V") && !isFirstVisc() ) {
                                     double firstNum = 0.0;
                                     if (getDiffusionY().get((int) getPhaseDiffus() - 1) != 0.0)
-                                        firstNum = 1.0e12 * Double.parseDouble(line.split("(\\s+)")[1].trim()) /
+                                        // 1.0e10: 1e4 (cm^2 to m^2) * 1e6 (micro-Pascal)
+                                        firstNum = 1.0e10 * Double.parseDouble(line.split("(\\s+)")[1].trim()) /
                                             getDiffusionY().get((int) getPhaseDiffus() - 1);
                                     setFirstVisc(true);
 
@@ -474,9 +475,9 @@ class SceneDiff extends Data {
                                 } else if ( firstLetter.equals("V") ) {
                                     double number = 0.0;
                                     if (getDiffusionY().get((int) getPhaseDiffus() - 1) != 0.0)
-                                        number = 1.0e12 * Double.parseDouble(line.split("(\\s+)")[1].trim()) /
+                                        // 1.0e10: 1e4 (cm^2 to m^2) * 1e6 (micro-Pascal)
+                                        number = 1.0e10 * Double.parseDouble(line.split("(\\s+)")[1].trim()) /
                                             getDiffusionY().get((int) getPhaseDiffus() - 1);
-
                                     if ( !Double.isNaN(number) && !Double.isInfinite(number) && number > 0.0
                                         && !Double.isNaN(getPhaseVisc()) && !Double.isInfinite(getPhaseVisc()) ) {
                                         getViscY().add(number);
@@ -505,7 +506,7 @@ class SceneDiff extends Data {
                                             getFxplot().setEMinY(getSmallest());
                                         }
                                     }
-                                    setInitT(2.0/3.0*getEnergyY().get(0)/8.617333262145e-5);
+                                    setInitE(getEnergyY().get(0));
                                     getFxplot().updateEData(getEnergyX(), getEnergyY());
                                 } else if ( firstLetter.equals("D") && isFirstDiffus() ) {
                                     if (getDiffusionY().get((int) getPhaseDiffus() - 1) > getGreatestDiff()) {
@@ -526,12 +527,12 @@ class SceneDiff extends Data {
                         }
                     }
 
-                    int time = getViscX().size() - 1;
-                    getFxplot().setVTitle(time, getViscY().get(getViscY().size() - 1));
-                    getFxplot().setDTitle(time, getDiffusionY().get(getDiffusionY().size() - 1));
-                    setFinT(2.0 / 3.0 * getEnergyY().get((int) getPhaseEnergy() - 1) / 8.617333262145e-5);
-                    double deltaT = getFinT() - getInitT();
-                    getFxplot().setDeltaT(deltaT);
+                    int titletime = getViscX().size() - 1;
+                    getFxplot().setVTitle(titletime, getViscY().get(getViscY().size() - 1));
+                    getFxplot().setDTitle(titletime, getDiffusionY().get(getDiffusionY().size() - 1));
+                    setFinE(getEnergyY().get((int) getPhaseEnergy() - 1));
+                    double deltaE = getFinE() - getInitE();
+                    getFxplot().setDeltaE(deltaE);
 
                     setExitVal(getProcess().waitFor());
                     if (getExitVal() != 0) {
@@ -1676,26 +1677,26 @@ class SceneDiff extends Data {
     private void setLanguage(String language) { this.language = language; }
 
     /**
-     * @return the initT
+     * @return the initE
      */
     @Contract(pure = true)
-    private double getInitT() { return this.initT; }
+    private double getInitE() { return this.initE; }
 
     /**
-     * @param initT the initT to set
+     * @param initE the initE to set
      */
-    private void setInitT(double initT) { this.initT = initT; }
+    private void setInitE(double initE) { this.initE = initE; }
 
     /**
-     * @return the finT
+     * @return the finE
      */
     @Contract(pure = true)
-    private double getFinT() { return this.finT; }
+    private double getFinE() { return this.finE; }
 
     /**
-     * @param finT the finT to set
+     * @param finE the finE to set
      */
-    private void setFinT(double finT) { this.finT = finT; }
+    private void setFinE(double finE) { this.finE = finE; }
 
     /**
      * @return the walktime

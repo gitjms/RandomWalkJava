@@ -10,6 +10,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -28,6 +30,9 @@ class SceneCalculation extends Data {
 
     private String language;
     private final Button nappiLattice;
+    private Button setFix;
+    private boolean fix;
+    private Pane pane;
 
     /**
      * main class gets vars via this
@@ -50,7 +55,7 @@ class SceneCalculation extends Data {
             "0",    // vars[2] charge           n/a
             "0",    // vars[3] steps            USER
             "0",    // vars[4] dimension        USER
-            "-",    // vars[5] mmc              n/a
+            "-",    // vars[5] diffusion        n/a
             "f",    // vars[6] fixed(/spread)   n/a
             "-",    // vars[7] (lattice/)free   USER
             "s"};   // vars[8] save (on)        n/a
@@ -74,7 +79,8 @@ class SceneCalculation extends Data {
      * Create GUI for R_rms calculation
      * @return CALCULATION SCENE
      */
-    Parent getSceneCalc(){
+    Parent getSceneCalc(Pane pane){
+        this.setPane(pane);
         GridPane asettelu = new GridPane();
         asettelu.setMaxWidth(getPaneWidth());
         asettelu.setVgap(5);
@@ -85,6 +91,19 @@ class SceneCalculation extends Data {
         valikko.setSpacing(10);
 
         DropShadow shadow = new DropShadow();
+        GetComponents getComponents = new GetComponents();
+        Image imgCalcFI = new Image("file:src/main/resources/mathcards/calcFI-1.png");
+        Image imgCalcEN = new Image("file:src/main/resources/mathcards/calcEN-1.png");
+        Image imgCalcFixFI = new Image("file:src/main/resources/mathcards/calcFixFI-1.png");
+        Image imgSalcFixEN = new Image("file:src/main/resources/mathcards/calcFixEN-1.png");
+        ImageView ivCalcFI = new ImageView(imgCalcFI);
+        ImageView ivCalcEN = new ImageView(imgCalcEN);
+        ImageView ivCalcFixFI = new ImageView(imgCalcFixFI);
+        ImageView ivCalcFixEN = new ImageView(imgSalcFixEN);
+        ivCalcFI.setSmooth(true);
+        ivCalcEN.setSmooth(true);
+        ivCalcFixFI.setSmooth(true);
+        ivCalcFixEN.setSmooth(true);
 
         /*
         * COMPONENTS...
@@ -142,7 +161,33 @@ class SceneCalculation extends Data {
             this.vars[4] = "3";
         });
 
-        this.vars[5] = "-"; // mmc
+        this.setFix = new Button(this.getLanguage().equals("fin") ? "KORJAUS" : "FIX");
+        this.setFix.setMinWidth(this.getCompwidth());
+        this.setFix.setMaxWidth(this.getCompwidth());
+        this.setFix.setFont(Font.font("System Regular",FontWeight.EXTRA_BOLD, 15));
+        this.setFix.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setFix.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.setFix.setEffect(shadow));
+        this.setFix.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.setFix.setEffect(null));
+        this.setFix(false);
+        this.setFix.setOnMouseClicked(f -> {
+            if (this.isFix()) {
+                this.getPane().getChildren().clear();
+                this.getPane().getChildren().add(this.getLanguage().equals("fin")
+                    ? getComponents.getPane2(ivCalcFI, this.getTextWidth(), this.getTextHeight())
+                    : getComponents.getPane2(ivCalcEN, this.getTextWidth(), this.getTextHeight()));
+                this.setFix.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.setFix(false);
+                this.vars[5] = "-";
+            } else {
+                this.getPane().getChildren().clear();
+                this.getPane().getChildren().add(this.getLanguage().equals("fin")
+                    ? getComponents.getPane2(ivCalcFixFI, this.getTextWidth(), this.getTextHeight())
+                    : getComponents.getPane2(ivCalcFixEN, this.getTextWidth(), this.getTextHeight()));
+                this.setFix.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.setFix(true);
+                this.vars[5] = "b";
+            }
+        });
 
         /*
         * ...THEIR PLACEMENTS
@@ -150,15 +195,15 @@ class SceneCalculation extends Data {
         GridPane.setHalignment(labNumSteps, HPos.LEFT);
         asettelu.add(labNumSteps, 0, 0);
         GridPane.setHalignment(setNumSteps, HPos.CENTER);
-        setNumSteps.setMinWidth(getCompwidth());
-        setNumSteps.setMaxWidth(getCompwidth());
+        setNumSteps.setMinWidth(this.getCompwidth());
+        setNumSteps.setMaxWidth(this.getCompwidth());
         asettelu.add(setNumSteps, 0, 1);
         
         GridPane.setHalignment(labNumDimensions, HPos.LEFT);
         asettelu.add(labNumDimensions, 0, 2);
         GridPane.setHalignment(setDimension, HPos.CENTER);
-        setDimension.setMinWidth(getCompwidth());
-        setDimension.setMaxWidth(getCompwidth());
+        setDimension.setMinWidth(this.getCompwidth());
+        setDimension.setMaxWidth(this.getCompwidth());
         asettelu.add(setDimension, 0, 3);
 
         this.vars[6] = "f"; // fixed(/spread)
@@ -166,8 +211,8 @@ class SceneCalculation extends Data {
         /*
         * BUTTON: LATTICE (TOGGLE)
         */
-        this.getNappiLattice().setMinWidth(getCompwidth());
-        this.getNappiLattice().setMaxWidth(getCompwidth());
+        this.getNappiLattice().setMinWidth(this.getCompwidth());
+        this.getNappiLattice().setMaxWidth(this.getCompwidth());
         this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
         this.getNappiLattice().setId("lattice");
         this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getNappiLattice().setEffect(shadow));
@@ -197,6 +242,9 @@ class SceneCalculation extends Data {
         final Pane empty2 = new Pane();
         GridPane.setHalignment(empty2, HPos.CENTER);
         asettelu.add(empty2, 0, 6, 2, 1);
+
+        GridPane.setHalignment(this.setFix, HPos.LEFT);
+        asettelu.add(this.setFix, 0, 7, 2, 1);
 
         return asettelu;
     }
@@ -231,4 +279,39 @@ class SceneCalculation extends Data {
      * @param language the language to set
      */
     private void setLanguage(String language) { this.language = language; }
+
+    /**
+     * @return fix
+     */
+    @Contract(pure = true)
+    private boolean isFix() { return this.fix; }
+
+    /**
+     * fix to set
+     */
+    @Contract(pure = true)
+    private void setFix(boolean fix) { this.fix = fix; }
+
+    /**
+     * @return the textwidth
+     */
+    @Contract(pure = true)
+    private double getTextWidth() { return 740.0 / Screen.getMainScreen().getRenderScale(); }
+
+    /**
+     * @return the textheight
+     */
+    @Contract(pure = true)
+    private double getTextHeight() { return 600.0 / Screen.getMainScreen().getRenderScale(); }
+
+    /**
+     * @return the pane
+     */
+    @Contract(pure = true)
+    private Pane getPane() { return this.pane; }
+
+    /**
+     * @param pane the pane to set
+     */
+    private void setPane(Pane pane) { this.pane = pane; }
 }

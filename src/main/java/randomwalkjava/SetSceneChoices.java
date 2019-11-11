@@ -35,27 +35,19 @@ class SetSceneChoices {
     }
 
     /**
-     * method for setting scene button effects for scene 'Path Tracing'
+     * method for setting scene button effects for scene 'Real Time SAW'
      * @param language GUI language
      * @param button button of the scene
      * @param scene scene
      */
-    void setSemiSceneEffects(String language, @NotNull Button button, Scene scene, String which) {
+    void setSawSceneEffects(String language, @NotNull Button button, Scene scene) {
         this.setLanguage(language);
 
         button.setOnMouseClicked(event -> {
-            if (which.equals("path")) {
-                this.getStage().setTitle(this.getLanguage().equals("fin") ? "Liikeradat" : "Path Tracing");
-                if ( this.getStage().getHeight() == this.getStageHeight() ){
-                    this.getStage().setHeight(this.getStageHeight()+(this.getPathHeight()-this.getTextHeight()));
-                    this.getStage().setY((this.getScreenHeight()-this.getStageHeight())/2.0 - (this.getPathHeight()-this.getTextHeight())/2.0);
-                }
-            } else if (which.equals("saw")) {
-                this.getStage().setTitle(this.getLanguage().equals("fin") ? "Reaaliaika-saw" : "Real Time saw");
-                if ( this.getStage().getHeight() == this.getStageHeight() ){
-                    this.getStage().setHeight(this.getStageHeight()+(this.getSawHeight()-this.getSawTextHeight()));
-                    this.getStage().setY((this.getScreenHeight()-this.getStageHeight())/2.0 - (this.getSawHeight()-this.getSawTextHeight())/2.0);
-                }
+            this.getStage().setTitle(this.getLanguage().equals("fin") ? "Reaaliaika-saw" : "Real Time saw");
+            if ( this.getStage().getHeight() == this.getStageHeight() ){
+                this.getStage().setHeight(this.getStageHeight()+(this.getSawHeight()-this.getSawTextHeight()));
+                this.getStage().setY((this.getScreenHeight()-this.getStageHeight())/2.0 - (this.getSawHeight()-this.getSawTextHeight())/2.0);
             }
             this.getStage().setScene(scene);
         });

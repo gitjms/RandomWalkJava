@@ -53,6 +53,7 @@ class SceneRealTimeSaw extends Data {
     private double mu1;
     private double mu2;
     private List<Double> saw_lengths;
+    private List<Double> cbmc_mu;
     private List<Double> saw_rms;
     private List<Double> saw_rmsruns;
     private List<Double> rms_runs;
@@ -91,8 +92,8 @@ class SceneRealTimeSaw extends Data {
             "0",    // vars[2] charge           n/a
             "0",    // vars[3] steps            USER
             "0",    // vars[4] dimension        USER
-            "-",    // vars[5] mmc              n/a
-            "-",    // vars[6] fixed(/spread)   n/a
+            "-",    // vars[5] diffusion        n/a
+            "c",    // vars[6] fixed(/spread)   n/a
             "-",    // vars[7] lattice/(free)   n/a
             "-"};   // vars[8] save (off)       n/a
         this.running = false;
@@ -104,6 +105,7 @@ class SceneRealTimeSaw extends Data {
      * @param executable Fortran executable "walk.exe"
      * @param firstdata true if is first run
      * @param saw_lengths data container
+     * @param cbmc_mu data container
      * @param expected data container
      * @param saw_rms data container
      * @param saw_rmsruns data container
@@ -114,9 +116,9 @@ class SceneRealTimeSaw extends Data {
      * @param gamSlider Slider
      * @param aaSlider Slider
      */
-    void refresh(File folder, String executable, boolean firstdata, List<Double> saw_lengths, List<Double> expected,
-                 List<Double> saw_rms, List<Double> saw_rmsruns, List<Double> rms_runs, List<Integer> xAxis,
-                 List<Integer> xHistAxis, boolean issaw, Slider gamSlider, Slider aaSlider) {
+    void refresh(File folder, String executable, boolean firstdata, List<Double> saw_lengths, List<Double> cbmc_mu,
+                 List<Double> expected, List<Double> saw_rms, List<Double> saw_rmsruns, List<Double> rms_runs,
+                 List<Integer> xAxis, List<Integer> xHistAxis, boolean issaw, Slider gamSlider, Slider aaSlider) {
 
 
         this.setFirstData(firstdata);
@@ -126,7 +128,7 @@ class SceneRealTimeSaw extends Data {
         if (this.isFirstData()) {
             this.setRuns(0);
             this.setFailed(0);
-            if (issaw) {
+            if (!issaw) {
                 this.setMu1(0.0);
                 this.setMu2(0.0);
             }
@@ -140,6 +142,7 @@ class SceneRealTimeSaw extends Data {
             this.setSawRms(saw_rms);
             this.setSawRmsRuns(saw_rmsruns);
             this.setSawLengths(saw_lengths);
+            this.setCbmcMu(cbmc_mu);
             this.setGreatestY(new double[10]);
             for (int x = 0; x < 10; x++) this.getGreatestY()[x] = 0.0;
             this.setGreatestY2(0.0);
@@ -223,24 +226,34 @@ class SceneRealTimeSaw extends Data {
                     if (this.getRuns() > 9) {
                         this.getRmsRuns().add(rmssum2);
                     } else {
-                        if (this.getRuns() == 0)
-                            this.getRmsRuns().set((int) this.getRuns(), 0.0);
-                        else
+                        //if (this.getRuns() == 0)
+                        //    this.getRmsRuns().set((int) this.getRuns(), 0.0);
+                        //else
                             this.getRmsRuns().set((int) this.getRuns(), rmssum2);
                     }
 
                     double biggest = Math.max(rmssum2, this.getBiggDist());
 
-                    if (this.isSaw()) {
+                    if (!this.isSaw()) {
                         /*
                          * CONNECTIVE CONSTANT µ
                          */
-                        this.setMu1(this.getMu1() + Math.pow((this.getRuns()+1), 1.0/this.getSteps()));
-                        this.setMu2(this.getMu2() + Math.pow((this.getRuns()+1)/(this.getAaSlider().getValue()
+                        //this.setMu1(this.getMu1() + Math.sqrt(rmssum2)*Math.exp(-(this.getGamSlider().getValue()-1)/this.getSteps()));
+                        //this.setMu1(this.getMu1() + Math.sqrt(rmssum2) + (this.getGamSlider().getValue()-1)/this.getSteps() + 1.0/this.getSteps());
+                        //this.setMu1(this.getMu1() + Math.sqrt(rmssum2)*(1.0+(this.getGamSlider().getValue()-1)/this.getSteps())));
+                        this.setMu1(this.getMu1() + Math.pow(this.getRuns(), 1.0 / this.getSteps()));
+                        //this.setMu2(this.getMu2() + Math.pow(this.getRuns()*this.getSteps(),
+                        //    this.getGamSlider().getValue() - 1.0)/this.getSteps());
+                        this.setMu2(this.getMu2() + Math.pow(this.getRuns()/(this.getAaSlider().getValue()
                             * Math.pow(this.getSteps(), this.getGamSlider().getValue() - 1.0)), 1.0/this.getSteps()));
-                        this.getFxplot().setS1SawTitle(this.getDim(), this.getMu1()/(this.getRuns()+1), this.getMu2()/(this.getRuns()+1));
-                    } else
-                        this.getFxplot().setS1CbmcTitle(this.getDim(), (double) this.getFailed()/(double) (this.getFailed() + this.getRuns()+1) * 100.0);
+
+                        if (this.getRuns() > 9) this.getCbmcMu().add(this.getMu1()/(this.getRuns() + 1));
+                        else this.getCbmcMu().set((int) this.getRuns(), this.getMu1()/(this.getRuns() + 1));
+
+                        this.getFxplot().setS2SawTitle(this.getDim(), this.getMu1()/(this.getRuns() + 1), this.getMu2() / (this.getRuns() + 1));
+
+                        this.getFxplot().setS1CbmcTitle(this.getDim(), (double) this.getFailed() / (double) (this.getFailed() + this.getRuns() + 1) * 100.0);
+                    }
 
                     /*
                      * MAX VALUES FOR PLOTS
@@ -258,6 +271,8 @@ class SceneRealTimeSaw extends Data {
                      * SET PLOTS
                      */
                     if (this.getRuns() > 9) {
+                        this.getFxplot().setS1MinX((int) this.getRuns() - 9);
+                        this.getFxplot().setS1MaxX((int) this.getRuns() - 1);
                         this.getFxplot().updateS1Data("Rrms",
                             this.getXAxis().subList((int) this.getRuns() - 9, (int) this.getRuns()),
                             this.getSawRmsRuns().subList((int) this.getRuns() - 9, (int) this.getRuns())
@@ -266,8 +281,6 @@ class SceneRealTimeSaw extends Data {
                             this.getXAxis().subList((int) this.getRuns() - 9, (int) this.getRuns()),
                             this.getRmsRuns().subList((int) this.getRuns() - 9, (int) this.getRuns())
                         );
-                        this.getFxplot().setS1MinX((int) this.getRuns() - 9);
-                        this.getFxplot().setS1MaxX((int) this.getRuns());
                     } else {
                         this.getFxplot().updateS1Data("Rrms", this.getXAxis(), this.getSawRmsRuns() );
                         this.getFxplot().updateS1Data("<Rrms>", this.getXAxis(), this.getRmsRuns() );
@@ -296,8 +309,9 @@ class SceneRealTimeSaw extends Data {
                     this.getFxplot().updateS2Data( "<Rrms>",this.getXAxis(), this.getRmsRuns() );
                     this.getFxplot().updateS2Data( this.getLanguage().equals("fin") ? "odotusarvo" : "expected value",this.getXAxis(), this.getExpected() );
                     this.getFxplot().updateS2Data( this.getLanguage().equals("fin") ? "etäisyys" : "distance",this.getXAxis(), this.getSawLengths() );
+                    if (!this.isSaw()) this.getFxplot().updateS2Data( this.getLanguage().equals("fin") ? "µ" : "µ",this.getXAxis(), this.getCbmcMu() );
 
-                    this.getFxplot().updateS3Data( this.getXhistAxis(), calcHistogram(this.getSawLengths(), this.getDim(), this.isSaw()) );
+                    this.getFxplot().updateS3Data( this.getXhistAxis(), calcHistogram(this.getSawLengths(), this.getDim(), this.isSaw(), this.getSteps()) );
 
                     this.setRuns(this.getRuns() + 1);
                 }
@@ -320,7 +334,7 @@ class SceneRealTimeSaw extends Data {
      */
     @NotNull
     @Contract(pure = true)
-    private static List<Double> calcHistogram(@NotNull List<Double> data, int dim, boolean issaw) {
+    private static List<Double> calcHistogram(@NotNull List<Double> data, int dim, boolean issaw, int steps) {
         double bin1 = 0; double bin2 = 0; double bin3 = 0; double bin4 = 0; double bin5 = 0;
         double bin6 = 0; double bin7 = 0; double bin8 = 0; double bin9 = 0; double bin10 = 0;
         double bin11 = 0; double bin12 = 0; double bin13 = 0; double bin14 = 0; double bin15 = 0;
@@ -329,7 +343,7 @@ class SceneRealTimeSaw extends Data {
         List<Double> list = new ArrayList<>();
 
         for (double d : data) {
-            if (dim == 2 && !issaw) {
+            if ( (steps < 30 && !issaw) || (dim == 3 && !issaw) ) {
                 if (d <= 1.0) bin1++;
                 else if (d <= 2.0) bin2++;
                 else if (d <= 3.0) bin3++;
@@ -350,7 +364,7 @@ class SceneRealTimeSaw extends Data {
                 else if (d <= 18.0) bin18++;
                 else if (d <= 19.0) bin19++;
                 else if (d <= 20.0) bin20++;
-            } else if (dim == 2 || (dim == 3 && !issaw)) {
+            } else if (dim == 2) {
                 if (d <= 3.0) bin1++;
                 else if (d <= 6.0) bin2++;
                 else if (d <= 9.0) bin3++;
@@ -421,7 +435,7 @@ class SceneRealTimeSaw extends Data {
      * Create GUI for Real Time Rms
      * @return REAL TIME RMS SCENE
      */
-    Parent getSceneRealTimeSaw(Slider sliderGam, Slider sliderAa, Pane pane, Button runSAW, Button runCBMC){
+    Parent getSceneRealTimeSaw(Slider sliderGam, Slider sliderAa, Pane pane, Button runSAW, @NotNull Button runCBMC){
         GridPane asettelu = new GridPane();
         asettelu.setMaxWidth(getPaneWidth());
         asettelu.setVgap(4);
@@ -433,14 +447,18 @@ class SceneRealTimeSaw extends Data {
 
         DropShadow shadow = new DropShadow();
         GetComponents getComponents = new GetComponents();
-        Image imgSawFI_one = new Image("file:src/main/resources/mathcardSawFI_one.png");
-        Image imgSawEN_one = new Image("file:src/main/resources/mathcardSawEN_one.png");
-        Image imgSawFI_half = new Image("file:src/main/resources/mathcardSawFI_half.png");
-        Image imgSawEN_half = new Image("file:src/main/resources/mathcardSawEN_half.png");
+        Image imgSawFI_one = new Image("file:src/main/resources/mathcards/sawFI_one-1.png");
+        Image imgSawEN_one = new Image("file:src/main/resources/mathcards/sawEN_one-1.png");
+        Image imgSawFI_half = new Image("file:src/main/resources/mathcards/sawFI_half-1.png");
+        Image imgSawEN_half = new Image("file:src/main/resources/mathcards/sawEN_half-1.png");
         ImageView ivSawFI_one = new ImageView(imgSawFI_one);
         ImageView ivSawEN_one = new ImageView(imgSawEN_one);
         ImageView ivSawFI_half = new ImageView(imgSawFI_half);
         ImageView ivSawEN_half = new ImageView(imgSawEN_half);
+        ivSawFI_one.setSmooth(true);
+        ivSawEN_one.setSmooth(true);
+        ivSawFI_half.setSmooth(true);
+        ivSawEN_half.setSmooth(true);
 
         /*
          * COMPONENTS...
@@ -505,8 +523,8 @@ class SceneRealTimeSaw extends Data {
         this.setComps(new HBox(this.getStepComps(), this.getDimComps()));
         this.getComps().setSpacing(10);
 
-        this.vars[5] = "-"; // mmc              n/a
-        this.vars[6] = "-"; // fixed(/spread)   n/a
+        this.vars[5] = "-"; // diffusion        n/a
+        this.vars[6] = "c"; // fixed(/spread)   n/a
         this.vars[7] = "-"; // lattice/(free)   n/a
         this.vars[8] = "-"; // save (off)       n/a
 
@@ -530,18 +548,22 @@ class SceneRealTimeSaw extends Data {
         this.setHalfFact.setMaxWidth(55);
         this.setHalfFact.setFont(Font.font("System Regular",FontWeight.EXTRA_BOLD, 15));
         this.setHalfFact.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.setHalfFact.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setHalfFact.setEffect(shadow));
-        this.setHalfFact.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setHalfFact.setEffect(null));
+        this.setHalfFact.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.setHalfFact.setEffect(shadow));
+        this.setHalfFact.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.setHalfFact.setEffect(null));
         this.setHalf(false);
         this.setHalfFact.setOnMouseClicked(f -> {
             if (this.isHalf()) {
                 pane.getChildren().removeAll();
-                pane.getChildren().add(this.getLanguage().equals("fin") ? getComponents.getPane2(ivSawFI_one) : getComponents.getPane2(ivSawEN_one));
+                pane.getChildren().add(this.getLanguage().equals("fin")
+                    ? getComponents.getPane2(ivSawFI_one, this.getAnimWidth(), this.getAnimHeight())
+                    : getComponents.getPane2(ivSawEN_one, this.getAnimWidth(), this.getAnimHeight()));
                 this.setHalfFact.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.setHalf(false);
             } else {
                 pane.getChildren().removeAll();
-                pane.getChildren().add(this.getLanguage().equals("fin") ? getComponents.getPane2(ivSawFI_half) : getComponents.getPane2(ivSawEN_half));
+                pane.getChildren().add(this.getLanguage().equals("fin")
+                    ? getComponents.getPane2(ivSawFI_half, this.getAnimWidth(), this.getAnimHeight())
+                    : getComponents.getPane2(ivSawEN_half, this.getAnimWidth(), this.getAnimHeight()));
                 this.setHalfFact.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.setHalf(true);
             }
@@ -766,6 +788,17 @@ class SceneRealTimeSaw extends Data {
     private void setSawLengths(List<Double> saw_lengths) { this.saw_lengths = saw_lengths; }
 
     /**
+     * @return the cbmc_mu
+     */
+    @Contract(pure = true)
+    private List <Double> getCbmcMu() { return this.cbmc_mu; }
+
+    /**
+     * @param cbmc_mu the saw_lengths to set
+     */
+    private void setCbmcMu(List<Double> cbmc_mu) { this.cbmc_mu = cbmc_mu; }
+
+    /**
      * @return the saw_rms
      */
     @Contract(pure = true)
@@ -952,4 +985,16 @@ class SceneRealTimeSaw extends Data {
      * issaw to set
      */
     private void setIsSaw(boolean issaw) { this.issaw = issaw; }
+
+    /**
+     * @return the animwidth
+     */
+    @Contract(pure = true)
+    private double getAnimWidth() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
+
+    /**
+     * @return the animheight
+     */
+    @Contract(pure = true)
+    private double getAnimHeight() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
 }

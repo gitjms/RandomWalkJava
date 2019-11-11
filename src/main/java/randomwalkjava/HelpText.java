@@ -246,8 +246,8 @@ class HelpText {
     */
     String calculationFI() {
 
-        return "\n Rms vs. sqrt(S)\n"
-            + " ---------------\n\n"
+        return "\n Neliösummaetäisyys vs. odotusarvo\n"
+            + " ---------------------------------\n\n"
             + " Askelten lukumäärä on positiivinen kokonaisluku.\n\n"
             + " Dimensio on 1, 2 tai 3. Yksi on kulkua x-akselilla, kaksi on\n"
             + " kulkua xy-tasossa, kolme on kulkua kuutiossa akseleilla x, y, ja z.\n\n"
@@ -264,8 +264,8 @@ class HelpText {
      */
     String calculationEN() {
 
-        return "\n Rms vs sqrt(S)\n"
-            + " ---------------\n\n"
+        return "\n Root Mean Squared Distance vs Expected Value\n"
+            + " --------------------------------------------\n\n"
             + " Number of Steps is a positive integer.\n\n"
             + " Dimension is either 1, 2, or 3. One means moving along x-axis, two\n"
             + " means moving on a plane with axes x and y, three means moving in a\n"
@@ -284,8 +284,8 @@ class HelpText {
     */
     String realtimermsFI() {
 
-        return "\n Reaaliaika-rms\n"
-            + " --------------\n\n"
+        return "\n Reaaliaikainen neliösummaetäisyys\n"
+            + " ---------------------------------\n\n"
             + " Hiukkasten lukumäärä on positiivinen kokonaisluku, vähintään 1.\n\n"
             + " Askelten lukumäärä on positiivinen kokonaisluku. Se tarkoittaa\n"
             + " hiukkasten liikkuessa ottamien satunnaisten askelten määrää.\n\n"
@@ -309,8 +309,8 @@ class HelpText {
      */
     String realtimermsEN() {
 
-        return "\n Real Time Rms\n"
-            + " -------------\n\n"
+        return "\n Real Time Root Mean Squared Distance\n"
+            + " ------------------------------------\n\n"
             + " Number of particles is a positive integer, at least 1.\n\n"
             + " Number of steps is a positive integer. It means the repeated random\n"
             + " steps the particles take while moving.\n\n"
@@ -350,8 +350,8 @@ class HelpText {
             + " VAIHTONAPIT:\n\n"
             + " - 'VAPAA'/'HILA' päättää kulkevatko hiukkaset vapaasti vai hila-\n"
             + "    muodossa.\n\n"
-            + " - 'PALLOT'/'YMPYRÄT' päättää hiukkasten kuvaesityksestä (3D-pallot vai\n"
-            + "    2D-tasoympyrät).\n\n"
+            + " - 'PALLOT'/'YMPYRÄT' päättää hiukkasten kuvaesityksestä (3D-pallot\n"
+            + "    vai 2D-tasoympyrät).\n\n"
             + " VALINTANAPIT:\n\n"
             + " - 'ANIMAATIO' (myöhemmin 'JATKA') aloittaa animaation piirtämällä\n"
             + "    ensin hiukkasten alkuasetelman ja odottaen käyttäjää poistamaan\n"
@@ -405,8 +405,8 @@ class HelpText {
      */
     String realtimesawFI() {
 
-        return "\n Reaaliaika-saw\n"
-            + " --------------\n\n"
+        return "\n Reaaliaikainen itseään välttelevä kulku\n"
+            + " ---------------------------------------\n\n"
             + " Askelten lukumäärä on positiivinen kokonaisluku. Se tarkoittaa\n"
             + " hiukkasten liikkuessa ottamien satunnaisten askelten määrää.\n\n"
             + " Ulottuvuus on 2 tai 3. Kaksi on kulkua xy-tasossa, kolme on\n"
@@ -446,8 +446,8 @@ class HelpText {
      */
     String realtimesawEN() {
 
-        return "\n Real Time Saw\n"
-            + " -------------\n\n"
+        return "\n Real Time Self Avoiding Walk\n"
+            + " ----------------------------\n\n"
             + " Steps is a positive integer. It means the repeated random\n"
             + " steps the particles take while moving.\n\n"
             + " Dimension is either 2 or 3. Two means moving on a plane with axes\n"

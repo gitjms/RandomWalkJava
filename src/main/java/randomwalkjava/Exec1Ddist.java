@@ -49,8 +49,8 @@ class Exec1Ddist extends Data {
             Data data = new Data(vars);
             boolean fail = false;
 
-            int particles = parseInt(getVars()[0]);
-            int steps = parseInt(getVars()[3]);
+            int particles = Integer.parseInt(this.getVars()[0]);
+            int steps = Integer.parseInt(this.getVars()[3]);
             String lattice = this.getVars()[7];
 
             if ( particles < 0 ) fail = true;

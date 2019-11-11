@@ -216,13 +216,12 @@ class FXPlot {
                 this.getCalcChartE().getStyler().setToolTipsEnabled(true);
 
                 this.getCalcChartD().getStyler().setLegendVisible(false);
-                this.getCalcChartD().setXAxisTitle(this.getLanguage().equals("fin") ? "Aika, t [ps]" : "Time, t [ps]");
+                this.getCalcChartD().setXAxisTitle(this.getLanguage().equals("fin") ? "Aika, t [ns]" : "Time, t [ns]");
                 this.getCalcChartD().setYAxisTitle(this.getLanguage().equals("fin")
                     ? "Diffuusiokerroin, D [1e-7 cm^2/s]" : "Diffusion Coefficient, D [1e-7 cm^2/s]");
                 this.getCalcChartD().getStyler().setMarkerSize(0);
                 this.getCalcChartD().getStyler().setXAxisDecimalPattern("0");
                 this.getCalcChartD().getStyler().setYAxisDecimalPattern("0.0");
-                this.getCalcChartD().getStyler().setYAxisLogarithmic(false);
                 this.getCalcChartD().getStyler().setToolTipType(Styler.ToolTipType.xAndYLabels);
                 this.getCalcChartD().getStyler().setToolTipFont(new java.awt.Font(null, Font.PLAIN,18));
                 this.getCalcChartD().getStyler().setAxisTickLabelsFont(new Font(null, Font.PLAIN, 15));
@@ -236,7 +235,7 @@ class FXPlot {
                 this.getCalcChartD().getStyler().setToolTipsEnabled(true);
 
                 this.getCalcChartV().getStyler().setLegendVisible(false); // \u03BD=nu
-                this.getCalcChartV().setXAxisTitle(this.getLanguage().equals("fin") ? "Aika, t [ps]" : "Time, t [ps]");
+                this.getCalcChartV().setXAxisTitle(this.getLanguage().equals("fin") ? "Aika, t [ns]" : "Time, t [ns]");
                 this.getCalcChartV().setYAxisTitle(this.getLanguage().equals("fin") ? "Viskositeetti, \u03BD [\u00B5Pa s]" : "Viscosity, \u03BD [\u00B5Pa s]");
                 this.getCalcChartV().getStyler().setMarkerSize(0);
                 this.getCalcChartV().getStyler().setXAxisDecimalPattern("0");
@@ -380,13 +379,9 @@ class FXPlot {
         };
         this.getCalcChartN().addSeries("\u03C1(r,t\u2081)", x, y)
             .setLineStyle(BasicStroke[0]).setLineColor(Color.getHSBColor(150.0f / 256.0f, 1f, 1f));
-        this.getCalcChartN().addSeries("\u03C1(r,t\u2082)", x, y)
-            .setLineStyle(BasicStroke[0]).setLineColor(Color.getHSBColor(170.0f / 256.0f, 1f, 1f));
-        this.getCalcChartN().addSeries("\u03C1(r,t\u2083)", x, y)
+                this.getCalcChartN().addSeries("\u03C1(r,t\u2082)", x, y)
             .setLineStyle(BasicStroke[0]).setLineColor(Color.getHSBColor(190.0f / 256.0f, 1f, 1f));
-        this.getCalcChartN().addSeries("\u03C1(r,t\u2084)", x, y)
-            .setLineStyle(BasicStroke[0]).setLineColor(Color.getHSBColor(210.0f / 256.0f, 1f, 1f));
-        this.getCalcChartN().addSeries("\u03C1(r,t\u2085)", x, y)
+                this.getCalcChartN().addSeries("\u03C1(r,t\u2083)", x, y)
             .setLineStyle(BasicStroke[0]).setLineColor(Color.getHSBColor(230.0f / 256.0f, 1f, 1f));
         this.getCalcChartN().addSeries("\u03C1(r,t)", x, y)
             .setLineStyle(BasicStroke[1]).setLineColor(Color.orange);
@@ -506,7 +501,7 @@ class FXPlot {
      * @param x x-axis data
      * @param y y-axis data
      */
-    void setS2Data(List<Integer> x, List<Double> y) { // u208#=subscript
+    void setS2Data(List<Integer> x, List<Double> y, boolean iscbmc) { // u208#=subscript
         BasicStroke[] BasicStroke = new BasicStroke[]{
             new BasicStroke( 2.5f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f ),
             new BasicStroke( 2.0f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f ),
@@ -519,6 +514,8 @@ class FXPlot {
             .setLineStyle(BasicStroke[2]).setLineColor(Color.blue);
         this.getCalcChartS2().addSeries(this.getLanguage().equals("fin") ? "etäisyys" :"distance", x, y)
             .setLineStyle(BasicStroke[3]).setLineColor(Color.orange);
+        if (iscbmc) this.getCalcChartS2().addSeries(this.getLanguage().equals("fin") ? "µ" :"µ", x, y)
+            .setLineStyle(BasicStroke[3]).setLineColor(Color.magenta);
         this.getFrame().getContentPane().add(this.getChartPanelS2(),1);
     }
 
@@ -656,10 +653,13 @@ class FXPlot {
      * method for printing final energy difference
      * @param evalue value
      */
-    void setDeltaT(double evalue) { // \u2146=differential d
+    void setDeltaE(double evalue) { // \u2146=differential d
         this.getCalcChartE().setTitle(this.getLanguage().equals("fin")
-            ? this.getCalcChartE().getTitle()+", \u2146T = "+this.formatter.format(evalue)+" K"
-            : this.getCalcChartE().getTitle()+", \u2146T = "+this.formatter.format(evalue)+" K");
+            ? this.getCalcChartE().getTitle()+", \u2146E = "+this.formatter.format(evalue)+" eV"
+            : this.getCalcChartE().getTitle()+", \u2146E = "+this.formatter.format(evalue)+" eV");
+        this.getFrame().revalidate();
+        this.getFrame().repaint();
+        this.getFrame().pack();
     }
 
     /**
@@ -747,8 +747,11 @@ class FXPlot {
      */
     void setVTitle(int time, double coeff) { // u03BC=μ, u00B5=micro
         this.getCalcChartV().setTitle(this.getLanguage().equals("fin")
-            ? "Dynaaminen viskositeetti, \u03BC(" + time + "ps) = "+this.diffformatter.format(coeff)+" \u00B5Pa s"
-            : "Dynamic viscosity, \u03BC(" + time + "ps) = "+this.diffformatter.format(coeff)+" \u00B5Pa s");
+            ? "Dynaaminen viskositeetti, \u03BC(" + time + "ns) = "+this.diffformatter.format(coeff)+" \u00B5Pa s"
+            : "Dynamic viscosity, \u03BC(" + time + "ns) = "+this.diffformatter.format(coeff)+" \u00B5Pa s");
+        this.getFrame().revalidate();
+        this.getFrame().repaint();
+        this.getFrame().pack();
     }
 
     /**
@@ -756,27 +759,36 @@ class FXPlot {
      */
     void setDTitle(int time, double coeff) {
         this.getCalcChartD().setTitle(this.getLanguage().equals("fin")
-            ? "Diffuusiokerroin, D(" + time + "ps) = "+this.diffformatter.format(coeff)+"E-7 cm^2/s"
-            : "Diffusion Coefficient, D(" + time + "ps) = "+this.diffformatter.format(coeff)+"E-7 cm^2/s");
+            ? "Diffuusiokerroin, D(" + time + "ns) = "+this.diffformatter.format(coeff)+"E-7 cm^2/s"
+            : "Diffusion Coefficient, D(" + time + "ns) = "+this.diffformatter.format(coeff)+"E-7 cm^2/s");
+        this.getFrame().revalidate();
+        this.getFrame().repaint();
+        this.getFrame().pack();
     }
 
     /**
      * @param mu1 the connective constant
      * @param mu2 the connective constant
      */
-    void setS1SawTitle(int dim, double mu1, double mu2) { // u03BC=mu, u208#=subscript
-        this.getCalcChartS1().setTitle(this.getLanguage().equals("fin")
+    void setS2SawTitle(int dim, double mu1, double mu2) { // u03BC=mu, u208#=subscript
+        this.getCalcChartS2().setTitle(this.getLanguage().equals("fin")
             ? "Itseäänvälttelevä kulku, "+dim+"D, \u03BC\u2081="+this.muformatter.format(mu1)+", \u03BC\u2082="+this.muformatter.format(mu2)
             : "Self-avoiding Walk, "+dim+"D, \u03BC\u2081="+this.muformatter.format(mu1)+", \u03BC\u2082="+this.muformatter.format(mu2));
+        this.getFrame().revalidate();
+        this.getFrame().repaint();
+        this.getFrame().pack();
     }
 
     /**
      * @param pros the percent of failed
      */
-    void setS1CbmcTitle(int dim, double pros) { // u03BC=mu, u208#=subscript
+    void setS1CbmcTitle(int dim, double pros) {
         this.getCalcChartS1().setTitle(this.getLanguage().equals("fin")
             ? "Itseäänvälttelevä kulku, "+dim+"D, epäonnistuneita: "+this.diffformatter.format(pros)+"%"
             : "Self-avoiding Walk, "+dim+"D, failed: "+this.diffformatter.format(pros)+"%");
+        this.getFrame().revalidate();
+        this.getFrame().repaint();
+        this.getFrame().pack();
     }
 
     /**

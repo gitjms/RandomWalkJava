@@ -61,7 +61,7 @@ class ScenePathTracing extends Data {
             "0",    // vars[2] charge           USER
             "0",    // vars[3] steps            USER
             "0",    // vars[4] dimension        USER
-            "-",    // vars[5] mmc              n/a
+            "-",    // vars[5] diffusion        n/a
             "f",    // vars[6] fixed(/spread)   USER
             "-",    // vars[7] (lattice/)free   USER
             "s"};   // vars[8] save (on)        n/a
@@ -232,7 +232,7 @@ class ScenePathTracing extends Data {
             this.vars[4] = "3";
         });
 
-        this.vars[5] = "-"; // mmc n/a
+        this.vars[5] = "-"; // diffusion        n/a
 
         /*
         * ...THEIR PLACEMENTS

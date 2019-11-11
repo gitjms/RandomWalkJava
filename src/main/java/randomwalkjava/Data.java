@@ -41,9 +41,11 @@ class Data {
      * method executes Fortan code to get data
      * @param folderPath datafolder "c:/RWDATA"
      * @param executable Fortran executable "walk.exe"
+     * @param iscbmc cbmc or saw
+     * @param issaw saw or not
      * @return true if fortran execution succeeded, false otherwise
      */
-    Boolean createData(File folderPath, String executable, boolean iscbmc) {
+    Boolean createData(File folderPath, String executable, boolean iscbmc, boolean issaw) {
         StringBuilder teksti = new StringBuilder();
         boolean ok = true;
         String msg = "";
@@ -69,7 +71,7 @@ class Data {
             /*
             * print the state of the program
             */
-            System.out.println(" Fortran execution begins...");
+            if (!issaw) System.out.println(" Fortran execution begins...");
             Process process = runtime.exec(command, null, folderPath);
             
             int exitVal;
@@ -92,7 +94,7 @@ class Data {
 
                 exitVal = process.waitFor();
                 if (exitVal == 0) {
-                    msg = " Fortran execution ended.";
+                    if (!issaw) msg = " Fortran execution ended.";
                     System.out.println(msg);
                 } else {
                     msg = " Fortran execution ended with error code " + exitVal + ".";

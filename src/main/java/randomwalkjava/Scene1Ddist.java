@@ -47,7 +47,7 @@ class Scene1Ddist extends Data {
             "0",    // vars[2] charge (0)       n/a
             "0",    // vars[3] steps            USER
             "1",    // vars[4] dimension (1D)   n/a
-            "-",    // vars[5] mmc (off)        n/a
+            "-",    // vars[5] diffusion (off)  n/a
             "f",    // vars[6] fixed            n/a
             "-",    // vars[7] lattice/free     USER
             "s"};   // vars[8] save (on)        n/a
@@ -112,7 +112,7 @@ class Scene1Ddist extends Data {
         });
 
         this.vars[4] = "1"; // dimension
-        this.vars[5] = "-"; // mmc
+        this.vars[5] = "-"; // diffusion
         this.vars[6] = "f"; // fixed
 
         /*

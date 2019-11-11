@@ -197,7 +197,7 @@ public class RandomWalk extends Application {
         * TEXTAREAS
         */
         this.setTextAreaMenu(getComponents.GetTextArea(this.getTextWidth(), this.getTextHeight()));
-        this.setTextAreaPath(getComponents.GetTextArea(this.getTextWidth(), this.getPathHeight()));
+        this.setTextAreaPath(getComponents.GetTextArea(this.getTextWidth(), this.getTextHeight()));
         this.setTextArea1Ddist(getComponents.GetTextArea(this.getTextWidth(), this.getTextHeight()));
         this.setTextAreaCalc(getComponents.GetTextArea(this.getTextWidth(), this.getTextHeight()));
         this.setTextAreaReal(getComponents.GetTextArea(this.getAnimWidth(), this.getAnimHeight()));
@@ -215,10 +215,16 @@ public class RandomWalk extends Application {
         Execution ex = new Execution(this.getLanguage());
 
         /*
+         * CREATE AN INSTANCE FOR HELP TEXTS
+         */
+        HelpText helpText = new HelpText();
+
+        /*
          * FIRST VIEW BUTTONS: HELP & CLOSE
          */
         Button nappiMenuHelp = getButtons.getHelpButton(
-            this.getLanguage(), this.getTextAreaMenu(), null, null, "menu", 0);
+            this.getLanguage(), this.getTextAreaMenu(), null, null, null,
+                null, null,"menu", 0);
         this.getAsettelu().add(nappiMenuHelp, 0, 14, 2, 1);
         Button closeNappiMenu = getButtons.getCloseButton(getRealScene, getDiffScene, getSAWScene,
             0, ex, this.getLanguage(), this.getFrame(), this.getButtonYES(), this.getButtonNO());
@@ -228,20 +234,18 @@ public class RandomWalk extends Application {
          */
         Button executeNappiPath = getButtons.getExecuteButton(this.getLanguage(), 0, "EXEC");
         Button menuNappiPath = getButtons.getMenuButton(this.getLanguage(), 0);
-        Button helpNappiPath = getButtons.getHelpButton(
-            this.getLanguage(), this.getTextAreaPath(), this.getIsovalikkoPath(), null, "path", 0);
         Button closeNappiPath = getButtons.getCloseButton(getRealScene, getDiffScene, getSAWScene,
             0, ex, this.getLanguage(), this.getFrame(), this.getButtonYES(), this.getButtonNO());
+        this.getTextAreaPath().setText(this.getLanguage().equals("fin") ? helpText.pathtracingFI() : helpText.pathtracingEN());
 
         /*
          * OTHER VIEWS BUTTONS: 1D DISTANCE
          */
         Button executeNappi1Ddist = getButtons.getExecuteButton(this.getLanguage(), 0, "EXEC");
         Button menuNappi1Ddist = getButtons.getMenuButton(this.getLanguage(), 0);
-        Button helpNappi1Ddist = getButtons.getHelpButton(
-            this.getLanguage(), this.getTextArea1Ddist(), this.getIsovalikko1Ddist(), null, "1Ddist", 0);
         Button closeNappi1Ddist = getButtons.getCloseButton(getRealScene, getDiffScene, getSAWScene,
             0, ex, this.getLanguage(), this.getFrame(), this.getButtonYES(), this.getButtonNO());
+        this.getTextArea1Ddist().setText(this.getLanguage().equals("fin") ? helpText.distance1DFI() : helpText.distance1DEN());
 
         /*
         * OTHER VIEWS BUTTONS: RMS CALCULATION
@@ -252,13 +256,18 @@ public class RandomWalk extends Application {
             0, ex, this.getLanguage(), this.getFrame(), this.getButtonYES(), this.getButtonNO());
         // CALCULATION COMPONENTS
         // MATH CARD
-        Image imgCalcFI = new Image("file:src/main/resources/mathcardCalcFI.png");
-        Image imgCalcEN = new Image("file:src/main/resources/mathcardCalcEN.png");
+        Image imgCalcFI = new Image("file:src/main/resources/mathcards/calcFI-1.png");
+        Image imgCalcEN = new Image("file:src/main/resources/mathcards/calcEN-1.png");
         ImageView ivCalcFI = new ImageView(imgCalcFI);
         ImageView ivCalcEN = new ImageView(imgCalcEN);
-        this.setCalcPane(this.getLanguage().equals("fin") ? getComponents.getPane2(ivCalcFI) : getComponents.getPane2(ivCalcEN));
+        ivCalcFI.setSmooth(true);
+        ivCalcEN.setSmooth(true);
+        this.setCalcPane(this.getLanguage().equals("fin")
+            ? getComponents.getPane2(ivCalcFI, this.getTextWidth(), this.getTextHeight())
+            : getComponents.getPane2(ivCalcEN, this.getTextWidth(), this.getTextHeight()));
         Button helpNappiCalc = getButtons.getHelpButton(
-            this.getLanguage(), this.getTextAreaCalc(), this.getIsovalikkoCalc(), this.getCalcPane(), "calc", 0);
+            this.getLanguage(), this.getTextAreaCalc(), this.getIsovalikkoCalc(),
+                this.getCalcPane(), null, null, null, "calc", 0);
 
         /*
         * OTHER VIEWS BUTTONS: REAL TIME RMS
@@ -274,9 +283,40 @@ public class RandomWalk extends Application {
         GraphicsContext piirturi = rtrmsAlusta.getGraphicsContext2D();
         piirturi.setFill(Color.BLACK);
         piirturi.fillRect(0, 0, this.getAnimWidth(), this.getAnimHeight());
-        this.setRealPane(getComponents.getPane(rtrmsAlusta));
+        this.setRealPane(getComponents.getPane(rtrmsAlusta, this.getAnimWidth(), this.getAnimHeight()));
+        Image imgRms1aFI = new Image("file:src/main/resources/mathcards/rms1aFI-1.png");
+        Image imgRms1aEN = new Image("file:src/main/resources/mathcards/rms1aEN-1.png");
+        Image imgRms1bFI = new Image("file:src/main/resources/mathcards/rms1bFI-1.png");
+        Image imgRms1bEN = new Image("file:src/main/resources/mathcards/rms1bEN-1.png");
+        Image imgRms2aFI = new Image("file:src/main/resources/mathcards/rms2aFI-1.png");
+        Image imgRms2aEN = new Image("file:src/main/resources/mathcards/rms2aEN-1.png");
+        Image imgRms2bFI = new Image("file:src/main/resources/mathcards/rms2bFI-1.png");
+        Image imgRms2bEN = new Image("file:src/main/resources/mathcards/rms2bEN-1.png");
+        Image imgRms2cFI = new Image("file:src/main/resources/mathcards/rms2cFI-1.png");
+        Image imgRms2cEN = new Image("file:src/main/resources/mathcards/rms2cEN-1.png");
+        ImageView ivRms1aFI = new ImageView(imgRms1aFI);
+        ImageView ivRms1aEN = new ImageView(imgRms1aEN);
+        ImageView ivRms1bFI = new ImageView(imgRms1bFI);
+        ImageView ivRms1bEN = new ImageView(imgRms1bEN);
+        ImageView ivRms2aFI = new ImageView(imgRms2aFI);
+        ImageView ivRms2aEN = new ImageView(imgRms2aEN);
+        ImageView ivRms2bFI = new ImageView(imgRms2bFI);
+        ImageView ivRms2bEN = new ImageView(imgRms2bEN);
+        ImageView ivRms2cFI = new ImageView(imgRms2cFI);
+        ImageView ivRms2cEN = new ImageView(imgRms2cEN);
+        ivRms1aFI.setSmooth(true);
+        ivRms1aEN.setSmooth(true);
+        ivRms1bFI.setSmooth(true);
+        ivRms1bEN.setSmooth(true);
+        ivRms2aFI.setSmooth(true);
+        ivRms2aEN.setSmooth(true);
+        ivRms2bFI.setSmooth(true);
+        ivRms2bEN.setSmooth(true);
+        ivRms2cFI.setSmooth(true);
+        ivRms2cEN.setSmooth(true);
         Button helpNappiReal = getButtons.getHelpButton(
-            this.getLanguage(), this.getTextAreaReal(), this.getIsovalikkoReal(), this.getRealPane(), "real", 0);
+            this.getLanguage(), this.getTextAreaReal(), this.getIsovalikkoReal(),
+                null, this.getRealPane(), null, null, "real", 0);
 
         /*
         * OTHER VIEWS BUTTONS: DIFFUSION
@@ -284,8 +324,6 @@ public class RandomWalk extends Application {
         Button runDiff = getButtons.getExecuteButton(this.getLanguage(), 0, "ANIM");
         Button plotDiff = getButtons.getExecuteButton(this.getLanguage(), 0, "PLOT");
         Button menuNappiDiff = getButtons.getMenuButton(this.getLanguage(), 0);
-        Button helpNappiDiff = getButtons.getHelpButton(
-            this.getLanguage(), this.getTextAreaDiff(), this.getIsovalikkoDiff(), this.getDiffPane(), "diff", 0);
         Button remBarNappiDiff = getButtons.getDiffBarrierButton(this.getLanguage());
         Button closeNappiDiff = getButtons.getCloseDiffButton(this.getLanguage(), getDiffScene, this.getFrame());
 
@@ -295,7 +333,20 @@ public class RandomWalk extends Application {
         GraphicsContext diffpiirturi = diffAlusta.getGraphicsContext2D();
         diffpiirturi.setFill(Color.BLACK);
         diffpiirturi.fillRect(0, 0, this.getAnimWidth(), this.getAnimHeight());
-        this.setDiffPane(getComponents.getPane(diffAlusta));
+        // MATH CARD
+        Image imgDiffFI = new Image("file:src/main/resources/mathcards/diffFI-1.png");
+        Image imgDiffEN = new Image("file:src/main/resources/mathcards/diffEN-1.png");
+        ImageView ivDiffFI = new ImageView(imgDiffFI);
+        ImageView ivDiffEN = new ImageView(imgDiffEN);
+        ivDiffFI.setSmooth(true);
+        ivDiffEN.setSmooth(true);
+        this.setDiffPane(this.getLanguage().equals("fin")
+            ? getComponents.getPane2(ivDiffFI, this.getAnimWidth(), this.getAnimHeight())
+            : getComponents.getPane2(ivDiffEN, this.getAnimWidth(), this.getAnimHeight()));
+        this.getDiffPane().setId("image");
+        Button helpNappiDiff = getButtons.getHelpButton(
+            this.getLanguage(), this.getTextAreaDiff(), this.getIsovalikkoDiff(),
+            null, null, this.getDiffPane(), null, "diff", 0);
 
         /*
          * OTHER VIEWS BUTTONS: REAL TIME SAW
@@ -313,7 +364,7 @@ public class RandomWalk extends Application {
         // SLIDERS
         final Label labgam = new Label("\u03B3 :");
         final Label labelgam = new Label();
-        Slider sliderGam = new Slider(0.0, 2.0, 0.0);
+        Slider sliderGam = new Slider(1.0, 2, 0.0);
         sliderGam.setOrientation(Orientation.HORIZONTAL);
         sliderGam.setMaxSize(this.getSawCompWidth(), this.getSawCompHeight());
         sliderGam.setShowTickLabels(true);
@@ -341,18 +392,22 @@ public class RandomWalk extends Application {
         sliderBox.getChildren().addAll(labgam, labelgam, sliderGam, labaa, labelaa, sliderAa);
 
         // MATH CARD
-        Image imgSawFI_one = new Image("file:src/main/resources/mathcardSawFI_one.png");
-        Image imgSawEN_one = new Image("file:src/main/resources/mathcardSawEN_one.png");
+        Image imgSawFI_one = new Image("file:src/main/resources/mathcards/sawFI_one-1.png");
+        Image imgSawEN_one = new Image("file:src/main/resources/mathcards/sawEN_one-1.png");
         ImageView ivSawFI_one = new ImageView(imgSawFI_one);
         ImageView ivSawEN_one = new ImageView(imgSawEN_one);
-        this.setSawPane(this.getLanguage().equals("fin") ? getComponents.getPane2(ivSawFI_one) : getComponents.getPane2(ivSawEN_one));
+        ivSawFI_one.setSmooth(true);
+        ivSawEN_one.setSmooth(true);
+        this.setSawPane(this.getLanguage().equals("fin")
+            ? getComponents.getPane2(ivSawFI_one, this.getSawTextWidth(), this.getSawTextHeight())
+            : getComponents.getPane2(ivSawEN_one, this.getSawTextWidth(), this.getSawTextHeight()));
         Button helpNappiSAW = getButtons.getHelpButton(
-            this.getLanguage(), this.getTextAreaSAW(), this.getIsovalikkoSAW(), this.getSawPane(), "saw", 1);
+            this.getLanguage(), this.getTextAreaSAW(), this.getIsovalikkoSAW(),
+                null, null, null, this.getSawPane(), "saw", 1);
 
         /*
         * SET FIRST VIEW BORDERPANE
         */
-        HelpText helpText = new HelpText();
         this.getTextAreaMenu().setText(this.getLanguage().equals("fin") ? helpText.welcomeFI() : helpText.welcomeEN());
         this.getValikkoMenu().getChildren().addAll(this.getAsettelu(), nappiMenuHelp, closeNappiMenu);
         this.getIsovalikkoMenu().getChildren().addAll(this.getValikkoMenu(), this.getTextAreaMenu());
@@ -363,7 +418,7 @@ public class RandomWalk extends Application {
          * SET PATH TRACING BORDERPANE
          */
         this.getValikkoPath().getChildren().addAll(
-            menuNappiPath, helpNappiPath, getPathScene.getScenePath(), executeNappiPath, closeNappiPath);
+            menuNappiPath, getPathScene.getScenePath(), executeNappiPath, closeNappiPath);
         this.getIsovalikkoPath().getChildren().addAll(this.getValikkoPath(), this.getTextAreaPath());
         BorderPane asetteluPath = new BorderPane();
         asetteluPath.setCenter(this.getIsovalikkoPath());
@@ -372,7 +427,7 @@ public class RandomWalk extends Application {
          * SET 1D DISTANCE BORDERPANE
          */
         this.getValikko1Ddist().getChildren().addAll(
-            menuNappi1Ddist, helpNappi1Ddist, get1DdistScene.getScene1Ddist(), executeNappi1Ddist, closeNappi1Ddist);
+            menuNappi1Ddist, get1DdistScene.getScene1Ddist(), executeNappi1Ddist, closeNappi1Ddist);
         this.getIsovalikko1Ddist().getChildren().addAll(this.getValikko1Ddist(), this.getTextArea1Ddist());
         BorderPane asettelu1Ddist = new BorderPane();
         asettelu1Ddist.setCenter(this.getIsovalikko1Ddist());
@@ -381,7 +436,7 @@ public class RandomWalk extends Application {
         * SET CALCULATION BORDERPANE
         */
         this.getValikkoCalc().getChildren().addAll(
-            menuNappiCalc, helpNappiCalc, getCalcScene.getSceneCalc(), executeNappiCalc, closeNappiCalc);
+            menuNappiCalc, helpNappiCalc, getCalcScene.getSceneCalc(this.getCalcPane()), executeNappiCalc, closeNappiCalc);
         this.getIsovalikkoCalc().getChildren().addAll(this.getValikkoCalc(), this.getCalcPane());
         BorderPane asetteluCalc = new BorderPane();
         asetteluCalc.setCenter(this.getIsovalikkoCalc());
@@ -390,7 +445,10 @@ public class RandomWalk extends Application {
         * SET REAL TIME RMS BORDERPANE
         */
         this.getValikkoReal().getChildren().addAll(
-            menuNappiReal, helpNappiReal, getRealScene.getSceneReal(), runReal, closeNappiReal);
+            menuNappiReal, helpNappiReal, getRealScene.getSceneReal(
+                this.getIsovalikkoReal(), this.getRealPane(), ivRms1aFI, ivRms1aEN, ivRms1bFI,
+                ivRms1bEN, ivRms2aFI, ivRms2aEN, ivRms2bFI, ivRms2bEN),
+            runReal, closeNappiReal);
         this.getIsovalikkoReal().getChildren().addAll(this.getValikkoReal(),
             this.getTextAreaReal());
         BorderPane asetteluReal = new BorderPane();
@@ -401,7 +459,7 @@ public class RandomWalk extends Application {
         */
         this.getValikkoDiff().getChildren().addAll(
             menuNappiDiff, helpNappiDiff, getDiffScene.getSceneDiff(), runDiff, plotDiff, closeNappiDiff);
-        this.getIsovalikkoDiff().getChildren().addAll(this.getValikkoDiff(), this.getTextAreaDiff());
+        this.getIsovalikkoDiff().getChildren().addAll(this.getValikkoDiff(), this.getDiffPane());
         BorderPane asetteluDiff = new BorderPane();
         asetteluDiff.setCenter(this.getIsovalikkoDiff());
 
@@ -421,8 +479,7 @@ public class RandomWalk extends Application {
         Scene firstScene = new Scene(asetteluMenu, this.getStageWidth(), this.getStageHeight());
         firstScene.getStylesheets().add("/Styles.css");
 
-        Scene pathScene = new Scene(asetteluPath, this.getStageWidth(),this.getStageHeight()
-            + (this.getPathHeight()-this.getTextHeight()));
+        Scene pathScene = new Scene(asetteluPath, this.getStageWidth(),this.getStageHeight());
         pathScene.getStylesheets().add("/Styles.css");
 
         Scene dist1DScene = new Scene(asettelu1Ddist, this.getStageWidth(), this.getStageHeight());
@@ -451,7 +508,7 @@ public class RandomWalk extends Application {
          */
         SetSceneChoices setChoices = new SetSceneChoices(stage);
 
-        setChoices.setSemiSceneEffects(this.getLanguage(), nappiScene1, pathScene, "path");
+        setChoices.setSceneEffects(this.getLanguage(), nappiScene1, pathScene, "Liikeradat", "Path Tracing");
         setChoices.setMenuEffects(this.getLanguage(), menuNappiPath, "path",
             this.getTextAreaPath(), this.getTextAreaMenu(), firstScene, 1);
 
@@ -471,7 +528,7 @@ public class RandomWalk extends Application {
         setChoices.setMenuEffects(this.getLanguage(), menuNappiDiff, "diff",
             this.getTextAreaDiff(), this.getTextAreaMenu(), firstScene, 2);
 
-        setChoices.setSemiSceneEffects(this.getLanguage(), nappiScene6, sawScene, "saw");
+        setChoices.setSawSceneEffects(this.getLanguage(), nappiScene6, sawScene);
         setChoices.setMenuEffects(this.getLanguage(), menuNappiSAW, "saw",
             this.getTextAreaSAW(), this.getTextAreaMenu(), firstScene, 1);
 
@@ -499,8 +556,8 @@ public class RandomWalk extends Application {
          * PLOT & RUN BUTTONS REAL TIME RMS
          */
         ExecReal execReal = new ExecReal(this.getLanguage());
-        execReal.setRmsClick(datafolder, fexec, runReal, getRealScene, closeNappiReal, menuNappiReal,
-            helpNappiReal, this.getIsovalikkoReal(), this.getTextAreaReal(), this.getRealPane(), piirturi);
+        execReal.setRmsClick(datafolder, fexec, runReal, getRealScene, closeNappiReal, menuNappiReal, helpNappiReal,
+            this.getIsovalikkoReal(), this.getTextAreaReal(), this.getRealPane(), rtrmsAlusta, piirturi);
 
         /*
         * PLOT & EXECUTE BUTTONS DIFFUSION
@@ -510,8 +567,8 @@ public class RandomWalk extends Application {
             fexec, pyexecdiff2d, pyexecdiff3d, ex);
         execDIFF.setExecClick(runDiff, getDiffScene, diffpiirturi,
             this.getDiffScalefactor(), this.getAnimWidth(), this.getAnimHeight(),
-            this.newdata, this.isovalikkoDiff, this.valikkoDiff, this.textAreaDiff, this.diffpane, datapath, datafolder,
-            fexec, remBarNappiDiff, plotDiff, closeNappiDiff, menuNappiDiff, helpNappiDiff);
+            this.newdata, this.isovalikkoDiff, this.valikkoDiff, this.diffpane, datapath, datafolder,
+            fexec, remBarNappiDiff, plotDiff, closeNappiDiff, menuNappiDiff, helpNappiDiff, diffAlusta);
 
         /*
          * PLOT & RUN BUTTONS REAL TIME SAW
@@ -612,12 +669,6 @@ public class RandomWalk extends Application {
      */
     @Contract(pure = true)
     private double getAnimHeight() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the pathheight
-     */
-    @Contract(pure = true)
-    private double getPathHeight() { return 660.0 / Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the pathheight

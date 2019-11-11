@@ -1,8 +1,9 @@
 package randomwalkjava;
 
+import com.sun.glass.ui.Screen;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -34,7 +35,10 @@ class ExecDiff extends Data {
     private List <Double> energy_y;
     private List <Double> visc_x;
     private List <Double> visc_y;
-    private double diffscalefactor;
+    private HBox isovalikko;
+    private Pane pane;
+    private Canvas alusta;
+    private double scalefactor;
     private double linewidth;
     private boolean newdata;
 
@@ -48,11 +52,14 @@ class ExecDiff extends Data {
 
     void setExecClick(@NotNull Button execNappi, SceneDiff diffScene,
                       GraphicsContext diffpiirturi, double scalefactor, double animwidth, double animheight,
-                      boolean newdata, HBox isovalikkoDiff, VBox valikkoDiff, TextArea textAreaDiff, Pane diffpane,
+                      boolean newdata, HBox isovalikkoDiff, VBox valikkoDiff, Pane diffpane,
                       String datapath, File datafolder, String fexec, Button remBarNappiDiff, Button plotDiff,
-                      Button closeNappiDiff, Button menuNappiDiff, Button helpNappiDiff) {
+                      Button closeNappiDiff, Button menuNappiDiff, Button helpNappiDiff, Canvas diffAlusta) {
 
-        this.setDiffScalefactor(scalefactor);
+        this.setIsoValikko(isovalikkoDiff);
+        this.setPane(diffpane);
+        this.setScalefactor(scalefactor);
+        this.setAlusta(diffAlusta);
         this.setNewdata(newdata);
 
         execNappi.setOnMouseClicked((MouseEvent event) -> {
@@ -60,10 +67,10 @@ class ExecDiff extends Data {
             diffScene.setSave("-");
             String[] vars = diffScene.getVars();
             this.setVars(vars);
-            int particles = parseInt(getVars()[0]);
-            double diam = parseDouble(getVars()[1]);
-            int charge = parseInt(getVars()[2]);
-            int dim = parseInt(getVars()[4]);
+            int particles = Integer.parseInt(this.getVars()[0]);
+            double diam = Double.parseDouble(this.getVars()[1]);
+            int charge = Integer.parseInt(this.getVars()[2]);
+            int dim = Integer.parseInt(this.getVars()[4]);
             String lattice = this.getVars()[7];
             boolean fail = false;
 
@@ -82,6 +89,15 @@ class ExecDiff extends Data {
                     diffScene.getFxplot().getFrame().dispose();
             }
 
+            GetComponents getComponents = new GetComponents();
+
+            if (this.getIsoValikko().getChildren().size() > 1) {
+                this.getIsoValikko().getChildren().remove(1);
+                this.setPane(getComponents.getPane(this.getAlusta(), this.getAnimWidth(), this.getAnimHeight()));
+                this.getIsoValikko().getChildren().add(this.getPane());
+                helpNappiDiff.setText(this.getLanguage().equals("fin") ? "OHJE" : "HELP");
+            }
+
             diffScene.setFxplot( new FXPlot());
             diffScene.getFxplot().setFXPlot(this.getLanguage(),"energy&diffusion");
 
@@ -92,7 +108,7 @@ class ExecDiff extends Data {
             this.setVisc_x(new ArrayList<>());
             this.setVisc_y(new ArrayList<>());
 
-            diffpiirturi.scale(1.0/this.getDiffScalefactor(), 1.0/this.getDiffScalefactor());
+            diffpiirturi.scale(1.0/this.getScalefactor(), 1.0/this.getScalefactor());
 
             double measure;
             double diff;
@@ -117,23 +133,17 @@ class ExecDiff extends Data {
                 }
             }
 
-            this.setDiffScalefactor((animwidth - 83.3) / measure);
-            if ( dim == 2 ) this.setLinewidth(1.0 / this.getDiffScalefactor());
-            else this.setLinewidth(diam / this.getDiffScalefactor());
+            this.setScalefactor((animwidth - 83.3) / measure);
+            if ( dim == 2 ) this.setLinewidth(1.0 / this.getScalefactor());
+            else this.setLinewidth(diam / this.getScalefactor());
 
-            diffpiirturi.scale(this.getDiffScalefactor(), this.getDiffScalefactor());
+            diffpiirturi.scale(this.getScalefactor(), this.getScalefactor());
 
             this.setNewdata(true);
 
-            if ( isovalikkoDiff.getChildren().contains(textAreaDiff)) {
-                textAreaDiff.clear();
-                isovalikkoDiff.getChildren().remove(textAreaDiff);
-                isovalikkoDiff.getChildren().add(diffpane);
-            }
-
             diffpiirturi.setGlobalAlpha(1.0);
             diffpiirturi.setFill(Color.BLACK);
-            diffpiirturi.fillRect(0, 0, 1.0/this.getDiffScalefactor()*animwidth, 1.0/this.getDiffScalefactor()*animheight);
+            diffpiirturi.fillRect(0, 0, 1.0/this.getScalefactor()*animwidth, 1.0/this.getScalefactor()*animheight);
             diffpiirturi.fill();
 
             /*
@@ -158,7 +168,7 @@ class ExecDiff extends Data {
             /*
              * DRAW DIFFUSION ANIMATION
              */
-            diffScene.refresh(datafolder, initialDataFile, fexec, diffpiirturi, this.getDiffScalefactor(),
+            diffScene.refresh(datafolder, initialDataFile, fexec, diffpiirturi, this.getScalefactor(),
                 animwidth, this.getLinewidth(), remBarNappiDiff, execNappi, valikkoDiff,
                 plotDiff, closeNappiDiff, menuNappiDiff, helpNappiDiff, this.getEnergy_x(), this.getEnergy_y(),
                 this.getDiffusion_x(), this.getDiffusion_y(), this.getVisc_x(), this.getVisc_y(),
@@ -218,6 +228,39 @@ class ExecDiff extends Data {
      * @param vars the vars to set
      */
     private void setVars(@NotNull String[] vars) { this.vars = vars.clone(); }
+
+    /**
+     * @return the isovalikko
+     */
+    @Contract(pure = true)
+    private HBox getIsoValikko() { return this.isovalikko; }
+
+    /**
+     * @param isovalikko the isovalikko to set
+     */
+    private void setIsoValikko(HBox isovalikko) { this.isovalikko = isovalikko; }
+
+    /**
+     * @return the pane
+     */
+    @Contract(pure = true)
+    private Pane getPane() { return this.pane; }
+
+    /**
+     * @param pane the pane to set
+     */
+    private void setPane(Pane pane) { this.pane = pane; }
+
+    /**
+     * @return the alusta
+     */
+    @Contract(pure = true)
+    private Canvas getAlusta() { return this.alusta; }
+
+    /**
+     * @param alusta the alusta to set
+     */
+    private void setAlusta(Canvas alusta) { this.alusta = alusta; }
 
     /**
      * @return the diffusion_x
@@ -286,15 +329,15 @@ class ExecDiff extends Data {
     private void setVisc_y(List<Double> visc_y) { this.visc_y = visc_y; }
 
     /**
-     * @return the diffscalefactor
+     * @return the scalefactor
      */
     @Contract(pure = true)
-    private double getDiffScalefactor() { return diffscalefactor; }
+    private double getScalefactor() { return scalefactor; }
 
     /**
-     * @param diffscalefactor the diffscalefactor to set
+     * @param scalefactor the scalefactor to set
      */
-    private void setDiffScalefactor(double diffscalefactor) { this.diffscalefactor = diffscalefactor; }
+    private void setScalefactor(double scalefactor) { this.scalefactor = scalefactor; }
 
     /**
      * @return the linewidth
@@ -317,5 +360,17 @@ class ExecDiff extends Data {
      * @param newdata the newdata to set
      */
     private void setNewdata(boolean newdata) { this.newdata = newdata; }
+
+    /**
+     * @return the animwidth
+     */
+    @Contract(pure = true)
+    private double getAnimWidth() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
+
+    /**
+     * @return the animheight
+     */
+    @Contract(pure = true)
+    private double getAnimHeight() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
 
 }

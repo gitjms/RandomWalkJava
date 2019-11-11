@@ -50,8 +50,8 @@ class ExecCalc extends Data {
             Data data = new Data(vars);
             boolean fail = false;
 
-            int steps = parseInt(getVars()[3]);
-            int dim = parseInt(this.getVars()[4]);
+            int steps = Integer.parseInt(this.getVars()[3]);
+            int dim = Integer.parseInt(this.getVars()[4]);
             String lattice = this.getVars()[7];
 
             if ( steps < 1 ) fail = true;

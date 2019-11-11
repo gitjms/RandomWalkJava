@@ -4,8 +4,12 @@ import com.sun.glass.ui.Screen;
 import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -30,7 +34,13 @@ class GetButtons extends HelpText {
     private DropShadow shadow;
     private String language;
     private String text;
-    private Pane mempane;
+    private Pane calcpane;
+    private Pane realpane;
+    private Pane diffpane;
+    private Pane sawpane;
+    private Pane realmempane;
+    private Pane diffmempane;
+    private Pane sawmempane;
     private TextArea newTextArea;
     private ButtonType buttonYES;
     private ButtonType buttonNO;
@@ -284,12 +294,20 @@ class GetButtons extends HelpText {
      * @param language GUI language
      * @param textArea textarea of the scene
      * @param isovalikko HBox of the scene
-     * @param pane pane for javafx Canvas
+     * @param calcpane pane for javafx Canvas
+     * @param realpane pane for javafx Canvas
+     * @param diffpane pane for javafx Canvas
+     * @param sawpane pane for javafx Canvas
      * @param which which scene
      * @return button
      */
-    Button getHelpButton(String language, TextArea textArea, HBox isovalikko, Pane pane, @NotNull String which, int width) {
+    Button getHelpButton(String language, TextArea textArea, HBox isovalikko, Pane calcpane, Pane realpane,
+                         Pane diffpane, Pane sawpane, @NotNull String which, int width) {
         this.setLanguage(language);
+        if (calcpane != null) this.setCalcPane(calcpane);
+        if (realpane != null) this.setRealPane(realpane);
+        if (diffpane != null) this.setDiffPane(diffpane);
+        if (sawpane != null) this.setSawPane(sawpane);
 
         GetComponents getComponents = new GetComponents();
 
@@ -304,101 +322,127 @@ class GetButtons extends HelpText {
             case "menu":
                 button.setOnAction(event -> textArea.setText(this.getLanguage().equals("fin") ? super.menuFI() : super.menuEN()));
                 break;
-            case "path":
-                button.setOnAction(event -> textArea.setText(this.getLanguage().equals("fin") ? super.pathtracingFI() : super.pathtracingEN()));
-                break;
-            case "1Ddist":
-                button.setOnAction(event -> textArea.setText(this.getLanguage().equals("fin") ? super.distance1DFI() : super.distance1DEN()));
-                break;
             case "calc":
                 button.setOnAction(event -> {
                     assert isovalikko != null;
-                    if (isovalikko.getChildren().contains(pane) && (button.getText().equals("OHJE") || button.getText().equals("HELP"))) {
-                        this.mempane = new Pane();
-                        this.mempane.getChildren().addAll(pane.getChildren());
-                        isovalikko.getChildren().removeAll(pane);
+                    if (button.getText().equals("OHJE") || button.getText().equals("HELP")) {
+                        isovalikko.getChildren().remove(1);
                         this.newTextArea = getComponents.GetTextArea(this.getTextWidth(), this.getTextHeight());
                         this.newTextArea.setText(this.getLanguage().equals("fin") ? super.calculationFI() : super.calculationEN());
                         this.newTextArea.setVisible(true);
                         isovalikko.getChildren().add(this.newTextArea);
                         button.setText(this.getLanguage().equals("fin") ? "PALAA" : "BACK");
-                    } else if (isovalikko.getChildren().contains(this.newTextArea) && (button.getText().equals("PALAA") || button.getText().equals("BACK"))) {
-                        if (this.mempane != null) {
-                            isovalikko.getChildren().remove(this.newTextArea);
-                            pane.getChildren().addAll(this.mempane.getChildren());
-                            isovalikko.getChildren().add(pane);
-                            button.setText(this.getLanguage().equals("fin") ? "OHJE" : "HELP");
-                        }
-                    } else if (isovalikko.getChildren().contains(textArea) && (button.getText().equals("OHJE") || button.getText().equals("HELP"))) {
-                        textArea.setText(this.getLanguage().equals("fin") ? super.calculationFI() : super.calculationEN());
+                    } else if (button.getText().equals("PALAA") || button.getText().equals("BACK")) {
+                        isovalikko.getChildren().remove(this.newTextArea);
+                        isovalikko.getChildren().add(this.getCalcPane());
+                        button.setText(this.getLanguage().equals("fin") ? "OHJE" : "HELP");
                     }
                 });
                 break;
             case "real":
                 button.setOnAction(event -> {
                     assert isovalikko != null;
-                    if (isovalikko.getChildren().contains(pane) && (button.getText().equals("OHJE") || button.getText().equals("HELP"))) {
-                        this.mempane = new Pane();
-                        this.mempane.getChildren().addAll(pane.getChildren());
-                        isovalikko.getChildren().removeAll(pane);
+                    if (button.getText().equals("OHJE") || button.getText().equals("HELP")) {
+                        this.setRealMemPane(new Pane());
+                        this.getRealMemPane().getChildren().addAll(isovalikko.getChildren().get(1));
                         this.newTextArea = getComponents.GetTextArea(this.getAnimWidth(), this.getAnimHeight());
                         this.newTextArea.setText(this.getLanguage().equals("fin") ? super.realtimermsFI() : super.realtimermsEN());
                         this.newTextArea.setVisible(true);
                         isovalikko.getChildren().add(this.newTextArea);
                         button.setText(this.getLanguage().equals("fin") ? "PALAA" : "BACK");
-                    } else if (isovalikko.getChildren().contains(this.newTextArea) && (button.getText().equals("PALAA") || button.getText().equals("BACK"))) {
-                        if (this.mempane != null) {
-                            isovalikko.getChildren().remove(this.newTextArea);
-                            pane.getChildren().addAll(this.mempane.getChildren());
-                            isovalikko.getChildren().add(pane);
-                            button.setText(this.getLanguage().equals("fin") ? "OHJE" : "HELP");
-                        }
-                    } else if (isovalikko.getChildren().contains(textArea) && (button.getText().equals("OHJE") || button.getText().equals("HELP"))) {
-                        textArea.setText(this.getLanguage().equals("fin") ? super.realtimermsFI() : super.realtimermsEN());
+                    } else if (button.getText().equals("PALAA") || button.getText().equals("BACK")) {
+                        Canvas rtrmsAlusta = new Canvas(this.getAnimWidth(), this.getAnimHeight());
+                        rtrmsAlusta.setVisible(true);
+                        GraphicsContext piirturi = rtrmsAlusta.getGraphicsContext2D();
+                        piirturi.setFill(Color.BLACK);
+                        piirturi.fillRect(0, 0, this.getAnimWidth(), this.getAnimHeight());
+                        isovalikko.getChildren().remove(1);
+                        this.setRealPane(getComponents.getPane(rtrmsAlusta, this.getAnimWidth(), this.getAnimHeight()));
+                        isovalikko.getChildren().add(this.getRealPane());
+                        button.setText(this.getLanguage().equals("fin") ? "OHJE" : "HELP");
                     }
                 });
                 break;
             case "diff":
                 button.setOnAction(event -> {
                     assert isovalikko != null;
-                    if (isovalikko.getChildren().contains(pane) && (button.getText().equals("OHJE") || button.getText().equals("HELP"))) {
-                        this.mempane = new Pane();
-                        this.mempane.getChildren().addAll(pane.getChildren());
-                        isovalikko.getChildren().removeAll(pane);
-                        this.newTextArea = getComponents.GetTextArea(this.getTextWidth(), this.getTextHeight());
-                        this.newTextArea.setText(this.getLanguage().equals("fin") ? super.diffFI() : super.diffEN());
-                        this.newTextArea.setVisible(true);
-                        isovalikko.getChildren().add(this.newTextArea);
-                        button.setText(this.getLanguage().equals("fin") ? "PALAA" : "BACK");
-                    } else if (isovalikko.getChildren().contains(this.newTextArea) && (button.getText().equals("PALAA") || button.getText().equals("BACK"))) {
-                        if (this.mempane != null) {
-                            isovalikko.getChildren().remove(this.newTextArea);
-                            pane.getChildren().addAll(this.mempane.getChildren());
-                            isovalikko.getChildren().add(pane);
+                    Image imgDiffFI = new Image("file:src/main/resources/mathcards/diffFI-1.png");
+                    Image imgDiffEN = new Image("file:src/main/resources/mathcards/diffEN-1.png");
+                    ImageView ivDiffFI = new ImageView(imgDiffFI);
+                    ImageView ivDiffEN = new ImageView(imgDiffEN);
+                    switch (button.getText()) {
+                        case "OHJE":
+                        case "HELP":
+                            if (isovalikko.getChildren().size() > 1 && isovalikko.getChildren().get(1).getId() != null) {
+                                if (!isovalikko.getChildren().get(1).getId().equals("image")) {
+                                    this.setDiffMemPane(new Pane());
+                                    this.getDiffMemPane().getChildren().addAll(isovalikko.getChildren().get(1));
+                                    this.getDiffMemPane().getChildren().get(0).setLayoutX(0);
+                                } else if (isovalikko.getChildren().size() > 1) {
+                                    isovalikko.getChildren().remove(1);
+                                }
+                            } else if (isovalikko.getChildren().get(1).getId() == null) {
+                                this.setDiffMemPane(new Pane());
+                                this.getDiffMemPane().getChildren().addAll(isovalikko.getChildren().get(1));
+                                this.getDiffMemPane().getChildren().get(0).setLayoutX(0);
+                            }
+                            this.newTextArea = getComponents.GetTextArea(this.getTextWidth(), this.getAnimHeight());
+                            this.newTextArea.setText(this.getLanguage().equals("fin") ? super.diffFI() : super.diffEN());
+                            this.newTextArea.setVisible(true);
+                            isovalikko.getChildren().add(this.newTextArea);
+                            button.setText(this.getLanguage().equals("fin") ? "KAAVAT" : "MATH");
+                            break;
+                        case "KAAVAT":
+                        case "MATH":
+                            this.setDiffPane(this.getLanguage().equals("fin")
+                                ? getComponents.getPane2(ivDiffFI, this.getAnimWidth(), this.getAnimHeight())
+                                : getComponents.getPane2(ivDiffEN, this.getAnimWidth(), this.getAnimHeight()));
+                            if (isovalikko.getChildren().size() > 1) isovalikko.getChildren().remove(1);
+                            isovalikko.getChildren().add(this.getDiffPane());
+                            this.getDiffPane().setId("image");
+                            if (this.getDiffMemPane() != null)
+                                button.setText(this.getLanguage().equals("fin") ? "PALAA" : "BACK");
+                            else
+                                button.setText(this.getLanguage().equals("fin") ? "OHJE" : "HELP");
+                            break;
+                        case "PALAA":
+                        case "BACK":
+                            if (this.getDiffMemPane().getChildren().size() > 0) {
+                                isovalikko.getChildren().remove(1);
+                                this.getDiffPane().getChildren().clear();
+                                this.setDiffPane(this.getDiffMemPane());
+                            } else {
+                                Canvas diffAlusta = new Canvas(this.getAnimWidth(), this.getAnimHeight());
+                                diffAlusta.setVisible(true);
+                                GraphicsContext piirturi = diffAlusta.getGraphicsContext2D();
+                                piirturi.setFill(Color.BLACK);
+                                piirturi.fillRect(0, 0, this.getAnimWidth(), this.getAnimHeight());
+                                isovalikko.getChildren().remove(1);
+                                this.setDiffPane(getComponents.getPane(diffAlusta, this.getAnimWidth(), this.getAnimHeight()));
+                            }
+                            isovalikko.getChildren().add(this.getDiffPane());
                             button.setText(this.getLanguage().equals("fin") ? "OHJE" : "HELP");
-                        }
-                    } else if (isovalikko.getChildren().contains(textArea) && (button.getText().equals("OHJE") || button.getText().equals("HELP"))) {
-                        textArea.setText(this.getLanguage().equals("fin") ? super.diffFI() : super.diffEN());
+                            break;
                     }
                 });
                 break;
             case "saw":
                 button.setOnAction(event -> {
                     assert isovalikko != null;
-                    if (isovalikko.getChildren().contains(pane) && (button.getText().equals("OHJE") || button.getText().equals("HELP"))) {
-                        this.mempane = new Pane();
-                        this.mempane.getChildren().addAll(pane.getChildren());
-                        isovalikko.getChildren().removeAll(pane);
+                    if (isovalikko.getChildren().contains(this.getSawPane()) && (button.getText().equals("OHJE") || button.getText().equals("HELP"))) {
+                        this.setSawMemPane(new Pane());
+                        this.getSawMemPane().getChildren().addAll(this.getSawPane().getChildren());
+                        isovalikko.getChildren().removeAll(this.getSawPane());
                         this.newTextArea = getComponents.GetTextArea(this.getSawTextWidth(), this.getSawTextHeight());
                         this.newTextArea.setText(this.getLanguage().equals("fin") ? super.realtimesawFI() : super.realtimesawEN());
                         this.newTextArea.setVisible(true);
                         isovalikko.getChildren().add(this.newTextArea);
                         button.setText(this.getLanguage().equals("fin") ? "PALAA" : "BACK");
                     } else if (isovalikko.getChildren().contains(this.newTextArea) && (button.getText().equals("PALAA") || button.getText().equals("BACK"))) {
-                        if (this.mempane != null) {
+                        if (this.getSawMemPane() != null) {
                             isovalikko.getChildren().remove(this.newTextArea);
-                            pane.getChildren().addAll(this.mempane.getChildren());
-                            isovalikko.getChildren().add(pane);
+                            this.getSawPane().getChildren().addAll(this.getSawMemPane().getChildren());
+                            isovalikko.getChildren().add(this.getSawPane());
                             button.setText(this.getLanguage().equals("fin") ? "OHJE" : "HELP");
                         }
                     } else if (isovalikko.getChildren().contains(textArea) && (button.getText().equals("OHJE") || button.getText().equals("HELP"))) {
@@ -473,6 +517,83 @@ class GetButtons extends HelpText {
      * @param language the language to set
      */
     private void setLanguage(String language) { this.language = language; }
+
+    /**
+     * @return the realmempane
+     */
+    @Contract(pure = true)
+    private Pane getRealMemPane() { return this.realmempane; }
+
+    /**
+     * @param realmempane the realmempane to set
+     */
+    private void setRealMemPane(Pane realmempane) { this.realmempane = realmempane; }
+
+    /**
+     * @return the diffmempane
+     */
+    @Contract(pure = true)
+    private Pane getDiffMemPane() { return this.diffmempane; }
+
+    /**
+     * @param diffmempane the diffmempane to set
+     */
+    private void setDiffMemPane(Pane diffmempane) { this.diffmempane = diffmempane; }
+
+    /**
+     * @return the sawmempane
+     */
+    @Contract(pure = true)
+    private Pane getSawMemPane() { return this.sawmempane; }
+
+    /**
+     * @param sawmempane the sawmempane to set
+     */
+    private void setSawMemPane(Pane sawmempane) { this.sawmempane = sawmempane; }
+
+    /**
+     * @return the calcpane
+     */
+    @Contract(pure = true)
+    private Pane getCalcPane() { return this.calcpane; }
+
+    /**
+     * @param calcpane the calcpane to set
+     */
+    private void setCalcPane(Pane calcpane) { this.calcpane = calcpane; }
+
+    /**
+     * @return the sawpane
+     */
+    @Contract(pure = true)
+    private Pane getSawPane() { return this.sawpane; }
+
+    /**
+     * @param sawpane the sawpane to set
+     */
+    private void setSawPane(Pane sawpane) { this.sawpane = sawpane; }
+
+    /**
+     * @return the diffpane
+     */
+    @Contract(pure = true)
+    private Pane getDiffPane() { return this.diffpane; }
+
+    /**
+     * @param diffpane the diffpane to set
+     */
+    private void setDiffPane(Pane diffpane) { this.diffpane = diffpane; }
+
+    /**
+     * @return the realpane
+     */
+    @Contract(pure = true)
+    private Pane getRealPane() { return this.realpane; }
+
+    /**
+     * @param realpane the realpane to set
+     */
+    private void setRealPane(Pane realpane) { this.realpane = realpane; }
 
     /**
      * @return the text
