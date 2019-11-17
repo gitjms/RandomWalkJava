@@ -33,6 +33,7 @@ class SceneCalculation extends Data {
     private Button setFix;
     private boolean fix;
     private Pane pane;
+    private boolean islattice;
 
     /**
      * main class gets vars via this
@@ -94,16 +95,22 @@ class SceneCalculation extends Data {
         GetComponents getComponents = new GetComponents();
         Image imgCalcFI = new Image("file:src/main/resources/mathcards/calcFI-1.png");
         Image imgCalcEN = new Image("file:src/main/resources/mathcards/calcEN-1.png");
-        Image imgCalcFixFI = new Image("file:src/main/resources/mathcards/calcFixFI-1.png");
-        Image imgSalcFixEN = new Image("file:src/main/resources/mathcards/calcFixEN-1.png");
+        Image imgCalcFixFreeFI = new Image("file:src/main/resources/mathcards/calcFixFreeFI-1.png");
+        Image imgSalcFixFreeEN = new Image("file:src/main/resources/mathcards/calcFixFreeEN-1.png");
+        Image imgCalcFixLattFI = new Image("file:src/main/resources/mathcards/calcFixLattFI-1.png");
+        Image imgSalcFixLattEN = new Image("file:src/main/resources/mathcards/calcFixLattEN-1.png");
         ImageView ivCalcFI = new ImageView(imgCalcFI);
         ImageView ivCalcEN = new ImageView(imgCalcEN);
-        ImageView ivCalcFixFI = new ImageView(imgCalcFixFI);
-        ImageView ivCalcFixEN = new ImageView(imgSalcFixEN);
+        ImageView ivCalcFixFreeFI = new ImageView(imgCalcFixFreeFI);
+        ImageView ivCalcFixFreeEN = new ImageView(imgSalcFixFreeEN);
+        ImageView ivCalcFixLattFI = new ImageView(imgCalcFixLattFI);
+        ImageView ivCalcFixLattEN = new ImageView(imgSalcFixLattEN);
         ivCalcFI.setSmooth(true);
         ivCalcEN.setSmooth(true);
-        ivCalcFixFI.setSmooth(true);
-        ivCalcFixEN.setSmooth(true);
+        ivCalcFixFreeFI.setSmooth(true);
+        ivCalcFixFreeEN.setSmooth(true);
+        ivCalcFixLattFI.setSmooth(true);
+        ivCalcFixLattEN.setSmooth(true);
 
         /*
         * COMPONENTS...
@@ -180,14 +187,60 @@ class SceneCalculation extends Data {
                 this.vars[5] = "-";
             } else {
                 this.getPane().getChildren().clear();
-                this.getPane().getChildren().add(this.getLanguage().equals("fin")
-                    ? getComponents.getPane2(ivCalcFixFI, this.getTextWidth(), this.getTextHeight())
-                    : getComponents.getPane2(ivCalcFixEN, this.getTextWidth(), this.getTextHeight()));
+                if (!this.getIsLattice()) {
+                    this.getPane().getChildren().add(this.getLanguage().equals("fin")
+                        ? getComponents.getPane2(ivCalcFixFreeFI, this.getTextWidth(), this.getTextHeight())
+                        : getComponents.getPane2(ivCalcFixFreeEN, this.getTextWidth(), this.getTextHeight()));
+                } else {
+                    this.getPane().getChildren().add(this.getLanguage().equals("fin")
+                        ? getComponents.getPane2(ivCalcFixLattFI, this.getTextWidth(), this.getTextHeight())
+                        : getComponents.getPane2(ivCalcFixLattEN, this.getTextWidth(), this.getTextHeight()));
+                }
                 this.setFix.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.setFix(true);
                 this.vars[5] = "b";
             }
         });
+
+        this.vars[6] = "f"; // fixed(/spread)
+
+        /*
+         * BUTTON: LATTICE (TOGGLE)
+         */
+        this.getNappiLattice().setMinWidth(this.getCompwidth());
+        this.getNappiLattice().setMaxWidth(this.getCompwidth());
+        this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.getNappiLattice().setId("lattice");
+        this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getNappiLattice().setEffect(shadow));
+        this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getNappiLattice().setEffect(null));
+        this.getNappiLattice().setOnMouseClicked((MouseEvent event) -> {
+            if (this.getNappiLattice().getText().equals("LATTICE") || this.getNappiLattice().getText().equals("HILA")){
+                this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
+                this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.vars[7] = "-";
+                this.setIsLattice(false);
+                if (this.isFix()) {
+                    this.getPane().getChildren().clear();
+                    this.getPane().getChildren().add(this.getLanguage().equals("fin")
+                        ? getComponents.getPane2(ivCalcFixFreeFI, this.getTextWidth(), this.getTextHeight())
+                        : getComponents.getPane2(ivCalcFixFreeEN, this.getTextWidth(), this.getTextHeight()));
+                }
+            } else if (this.getNappiLattice().getText().equals("FREE") || this.getNappiLattice().getText().equals("VAPAA")){
+                this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "HILA" : "LATTICE");
+                this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.vars[7] = "l";
+                this.setIsLattice(true);
+                if (this.isFix()) {
+                    this.getPane().getChildren().clear();
+                    this.getPane().getChildren().add(this.getLanguage().equals("fin")
+                        ? getComponents.getPane2(ivCalcFixLattFI, this.getTextWidth(), this.getTextHeight())
+                        : getComponents.getPane2(ivCalcFixLattEN, this.getTextWidth(), this.getTextHeight()));
+                }
+            }
+        });
+        valikko.getChildren().add(this.getNappiLattice());
+
+        this.vars[8] = "s"; // save on
 
         /*
         * ...THEIR PLACEMENTS
@@ -205,32 +258,6 @@ class SceneCalculation extends Data {
         setDimension.setMinWidth(this.getCompwidth());
         setDimension.setMaxWidth(this.getCompwidth());
         asettelu.add(setDimension, 0, 3);
-
-        this.vars[6] = "f"; // fixed(/spread)
-
-        /*
-        * BUTTON: LATTICE (TOGGLE)
-        */
-        this.getNappiLattice().setMinWidth(this.getCompwidth());
-        this.getNappiLattice().setMaxWidth(this.getCompwidth());
-        this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.getNappiLattice().setId("lattice");
-        this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getNappiLattice().setEffect(shadow));
-        this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getNappiLattice().setEffect(null));
-        this.getNappiLattice().setOnMouseClicked((MouseEvent event) -> {
-            if (this.getNappiLattice().getText().equals("LATTICE") || this.getNappiLattice().getText().equals("HILA")){
-                this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
-                this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[7] = "-";
-            } else if (this.getNappiLattice().getText().equals("FREE") || this.getNappiLattice().getText().equals("VAPAA")){
-                this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "HILA" : "LATTICE");
-                this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[7] = "l";
-            }
-        });
-        valikko.getChildren().add(this.getNappiLattice());
-
-        this.vars[8] = "s"; // save on
 
         GridPane.setHalignment(valikko, HPos.LEFT);
         asettelu.add(valikko, 0, 4, 2, 1);
@@ -314,4 +341,15 @@ class SceneCalculation extends Data {
      * @param pane the pane to set
      */
     private void setPane(Pane pane) { this.pane = pane; }
+
+    /**
+     * @return the islattice
+     */
+    @Contract(pure = true)
+    private boolean getIsLattice() { return this.islattice; }
+
+    /**
+     * @param islattice the islattice to set
+     */
+    private void setIsLattice(boolean islattice) { this.islattice = islattice; }
 }

@@ -54,10 +54,10 @@ class SceneRealTimeSaw extends Data {
     private double mu2;
     private List<Double> saw_lengths;
     private List<Double> cbmc_mu;
+    private List<Double> saw_expd;
     private List<Double> saw_rms;
-    private List<Double> saw_rmsruns;
+    private List<Double> expd_runs;
     private List<Double> rms_runs;
-    private List<Double> expected;
     private List<Integer> xAxis;
     private List<Integer> xhistAxis;
     private double[] greatestY;
@@ -66,13 +66,8 @@ class SceneRealTimeSaw extends Data {
     private int exitVal;
     private ToggleButton setDim2;
     private ToggleButton setDim3;
-    private Button setFactors;
-    private Button setHalfFact;
     private HBox dim_choice;
-    private HBox opt_choice;
-    private Slider gamSlider;
-    private Slider aaSlider;
-    private boolean half;
+    private Slider ceeSlider;
 
     /**
      * main class gets vars via this
@@ -97,6 +92,7 @@ class SceneRealTimeSaw extends Data {
             "-",    // vars[7] lattice/(free)   n/a
             "-"};   // vars[8] save (off)       n/a
         this.running = false;
+        this.setIsSaw(true);
     }
 
     /**
@@ -106,19 +102,18 @@ class SceneRealTimeSaw extends Data {
      * @param firstdata true if is first run
      * @param saw_lengths data container
      * @param cbmc_mu data container
-     * @param expected data container
+     * @param saw_expd data container
      * @param saw_rms data container
-     * @param saw_rmsruns data container
+     * @param expd_runs data container
      * @param rms_runs data container
      * @param xAxis data container
      * @param xHistAxis data container
      * @param issaw saw or cbmc
-     * @param gamSlider Slider
-     * @param aaSlider Slider
+     * @param ceeSlider Slider
      */
     void refresh(File folder, String executable, boolean firstdata, List<Double> saw_lengths, List<Double> cbmc_mu,
-                 List<Double> expected, List<Double> saw_rms, List<Double> saw_rmsruns, List<Double> rms_runs,
-                 List<Integer> xAxis, List<Integer> xHistAxis, boolean issaw, Slider gamSlider, Slider aaSlider) {
+                 List<Double> saw_expd, List<Double> saw_rms, List<Double> expd_runs, List<Double> rms_runs,
+                 List<Integer> xAxis, List<Integer> xHistAxis, boolean issaw, Slider ceeSlider) {
 
 
         this.setFirstData(firstdata);
@@ -132,15 +127,14 @@ class SceneRealTimeSaw extends Data {
                 this.setMu1(0.0);
                 this.setMu2(0.0);
             }
-            this.setGamSlider(gamSlider);
-            this.setAaSlider(aaSlider);
-            this.setExpected(expected);
+            this.setCeeSlider(ceeSlider);
             this.setBiggDist(0.0);
-            this.setRmsRuns(rms_runs);
             this.setXAxis(xAxis);
             this.setXhistAxis(xHistAxis);
+            this.setSawExpd(saw_expd);
             this.setSawRms(saw_rms);
-            this.setSawRmsRuns(saw_rmsruns);
+            this.setExpdRuns(expd_runs);
+            this.setRmsRuns(rms_runs);
             this.setSawLengths(saw_lengths);
             this.setCbmcMu(cbmc_mu);
             this.setGreatestY(new double[10]);
@@ -181,36 +175,25 @@ class SceneRealTimeSaw extends Data {
                         this.setSteps(Integer.parseInt(valStr[0].trim()));
 
                         /*
-                         * EXPECTED (BLUE)
+                         * RMS EXPECTED SQRT(B)*S^NU (RED LINE)
                          */
-                        double expd = Double.parseDouble(valStr[1].trim());
-                        if (this.getRuns() > 9) this.getExpected().add(this.isHalf() ? 0.5*expd : expd);
-                        else this.getExpected().set((int) this.getRuns(), this.isHalf() ? 0.5*expd : expd);
-
-                        double bigger = Math.max(this.isHalf() ? 0.5*expd : expd, this.getBiggDist());
+                        double rms_expd = Double.parseDouble(valStr[1].trim());
+                        this.getSawExpd().add(Math.sqrt(1.0/this.getCeeSlider().getValue()) * rms_expd);
 
                         /*
-                         * RMS
+                         * RMS <R^2> (BLUE LINE)
                          */
                         double rms = Double.parseDouble(valStr[2].trim());
-                        this.getSawRms().add(this.isHalf() ? 0.5*rms : rms);
-
-                        double bigger2 = Math.max(bigger, this.isHalf() ? 0.5*rms : rms);
-
-                        /*
-                         * SAW DATA (RED LINE)
-                         */
-                        if (this.getRuns() > 9) this.getSawRmsRuns().add(this.isHalf() ? 0.5*rms : rms);
-                        else this.getSawRmsRuns().set((int) this.getRuns(), this.isHalf() ? 0.5*rms : rms);
+                        this.getSawRms().add(rms);
 
                         /*
                          * LENGTH (YELLOW)
                          */
-                        double length = Double.parseDouble(valStr[3].trim());
+                        double length = Math.sqrt(Double.parseDouble(valStr[2].trim()));
                         if (this.getRuns() > 9) this.getSawLengths().add(length);
                         else this.getSawLengths().set((int) this.getRuns(), length);
 
-                        this.setBiggDist(Math.max(bigger2, length));
+                        this.setBiggDist(length);
 
                     } catch (NumberFormatException ignored) {
                     }
@@ -218,50 +201,63 @@ class SceneRealTimeSaw extends Data {
                     if (this.getRuns() > 9) this.getXAxis().add((int) this.getRuns());
 
                     /*
-                     * SAW DATA (GREEN LINE)
+                     * RMS EXPECTED SQRT(B)*S^NU (RED LINE)
+                     */
+                    double expdsum = 0.0;
+                    for ( int i = 0; i < this.getSawExpd().size(); i++ ) expdsum += this.getSawExpd().get(i);
+                    double expdruns = expdsum/(this.getRuns()+1);
+                    if (this.getRuns() > 9) {
+                        this.getExpdRuns().add(expdruns);
+                    } else {
+                        this.getExpdRuns().set((int) this.getRuns(), expdruns);
+                    }
+
+                    /*
+                     * RMS <R^2> (BLUE LINE)
                      */
                     double rmssum = 0.0;
                     for ( int i = 0; i < this.getSawRms().size(); i++ ) rmssum += this.getSawRms().get(i);
-                    double rmssum2 = rmssum/(this.getRuns()+1);
+                    double rmsruns = Math.sqrt(rmssum/(this.getRuns()+1));
                     if (this.getRuns() > 9) {
-                        this.getRmsRuns().add(rmssum2);
+                        this.getRmsRuns().add(rmsruns);
                     } else {
-                        //if (this.getRuns() == 0)
-                        //    this.getRmsRuns().set((int) this.getRuns(), 0.0);
-                        //else
-                            this.getRmsRuns().set((int) this.getRuns(), rmssum2);
+                        this.getRmsRuns().set((int) this.getRuns(), rmsruns);
                     }
 
-                    double biggest = Math.max(rmssum2, this.getBiggDist());
+                    double bigger = Math.max(expdruns, rmsruns);
+                    double biggest = Math.max(bigger, this.getBiggDist());
 
+                    /*
+                     * CONNECTIVE CONSTANT µ
+                     */
                     if (!this.isSaw()) {
-                        /*
-                         * CONNECTIVE CONSTANT µ
-                         */
-                        //this.setMu1(this.getMu1() + Math.sqrt(rmssum2)*Math.exp(-(this.getGamSlider().getValue()-1)/this.getSteps()));
-                        //this.setMu1(this.getMu1() + Math.sqrt(rmssum2) + (this.getGamSlider().getValue()-1)/this.getSteps() + 1.0/this.getSteps());
-                        //this.setMu1(this.getMu1() + Math.sqrt(rmssum2)*(1.0+(this.getGamSlider().getValue()-1)/this.getSteps())));
-                        this.setMu1(this.getMu1() + Math.pow(this.getRuns(), 1.0 / this.getSteps()));
-                        //this.setMu2(this.getMu2() + Math.pow(this.getRuns()*this.getSteps(),
-                        //    this.getGamSlider().getValue() - 1.0)/this.getSteps());
-                        this.setMu2(this.getMu2() + Math.pow(this.getRuns()/(this.getAaSlider().getValue()
-                            * Math.pow(this.getSteps(), this.getGamSlider().getValue() - 1.0)), 1.0/this.getSteps()));
+                        this.setMu1(this.getMu1() + 2.0*Math.pow(this.getRuns()+1, 1.0 / this.getSteps()));
+                        this.setMu2(this.getMu2() + 2.0*Math.pow((this.getRuns()+1)/(this.getAa()
+                            * Math.pow(this.getSteps(), this.getGam() - 1.0)), 1.0/this.getSteps()));
 
                         if (this.getRuns() > 9) this.getCbmcMu().add(this.getMu1()/(this.getRuns() + 1));
                         else this.getCbmcMu().set((int) this.getRuns(), this.getMu1()/(this.getRuns() + 1));
 
-                        this.getFxplot().setS2SawTitle(this.getDim(), this.getMu1()/(this.getRuns() + 1), this.getMu2() / (this.getRuns() + 1));
-
+                        // FIRST GRAPH TITLE
                         this.getFxplot().setS1CbmcTitle(this.getDim(), (double) this.getFailed() / (double) (this.getFailed() + this.getRuns() + 1) * 100.0);
+                        // SECOND GRAPH TITLE
+                        this.getFxplot().setS2SawTitle(expdruns, rmsruns, this.getMu1()/(this.getRuns() + 1), this.getMu2()/(this.getRuns() + 1));
                     }
 
                     /*
                      * MAX VALUES FOR PLOTS
                      */
-                    arraycopy(this.getGreatestY(), 1, this.getGreatestY(), 0, 9);
-                    this.getGreatestY()[9] = biggest;
                     double greatest = 0.0;
-                    for (double i : this.getGreatestY()) if ( i > greatest) greatest = i > greatest ? i + 10.0 : greatest;
+                    double fact = this.isSaw() ? 10.0 : 5.0;
+                    if (this.getRuns() <= 9) {
+                        this.getGreatestY()[(int) this.getRuns()] = biggest;
+                        if (biggest > greatest) greatest = biggest + fact;
+                    } else {
+                        arraycopy(this.getGreatestY(), 1, this.getGreatestY(), 0, 9);
+                        this.getGreatestY()[9] = biggest;
+                        for (double i : this.getGreatestY())
+                            if (i > greatest) greatest = i > greatest ? i + fact : greatest;
+                    }
 
                     this.setGreatestY2(biggest > this.getGreatestY2() ? biggest : this.getGreatestY2());
                     this.getFxplot().setS1MaxY(greatest);
@@ -273,28 +269,19 @@ class SceneRealTimeSaw extends Data {
                     if (this.getRuns() > 9) {
                         this.getFxplot().setS1MinX((int) this.getRuns() - 9);
                         this.getFxplot().setS1MaxX((int) this.getRuns() - 1);
-                        this.getFxplot().updateS1Data("Rrms",
+
+                        this.getFxplot().updateS1Data("<Rexp>",
                             this.getXAxis().subList((int) this.getRuns() - 9, (int) this.getRuns()),
-                            this.getSawRmsRuns().subList((int) this.getRuns() - 9, (int) this.getRuns())
+                            this.getExpdRuns().subList((int) this.getRuns() - 9, (int) this.getRuns())
                         );
                         this.getFxplot().updateS1Data("<Rrms>",
                             this.getXAxis().subList((int) this.getRuns() - 9, (int) this.getRuns()),
                             this.getRmsRuns().subList((int) this.getRuns() - 9, (int) this.getRuns())
                         );
-                    } else {
-                        this.getFxplot().updateS1Data("Rrms", this.getXAxis(), this.getSawRmsRuns() );
-                        this.getFxplot().updateS1Data("<Rrms>", this.getXAxis(), this.getRmsRuns() );
-                    }
-
-                    if (this.getRuns() > 9) {
-                        this.getFxplot().updateS1Data(this.getLanguage().equals("fin") ? "odotusarvo" : "expected value",
-                            this.getXAxis().subList((int) this.getRuns() - 9, (int) this.getRuns()),
-                            this.getExpected().subList((int) this.getRuns() - 9, (int) this.getRuns())
-                        );
                         this.getFxplot().setS2MaxX(this.getRuns());
                     } else {
-                        this.getFxplot().updateS1Data(
-                            this.getLanguage().equals("fin") ? "odotusarvo" : "expected value", this.getXAxis(), this.getExpected() );
+                        this.getFxplot().updateS1Data("<Rexp>", this.getXAxis(), this.getExpdRuns() );
+                        this.getFxplot().updateS1Data("<Rrms>", this.getXAxis(), this.getRmsRuns() );
                     }
 
                     if (this.getRuns() > 9)
@@ -305,9 +292,8 @@ class SceneRealTimeSaw extends Data {
                     else this.getFxplot().updateS1Data(
                         this.getLanguage().equals("fin") ? "etäisyys" : "distance", this.getXAxis(), this.getSawLengths() );
 
-                    this.getFxplot().updateS2Data( "Rrms",this.getXAxis(), this.getSawRmsRuns() );
+                    this.getFxplot().updateS2Data( "<Rexp>",this.getXAxis(), this.getExpdRuns() );
                     this.getFxplot().updateS2Data( "<Rrms>",this.getXAxis(), this.getRmsRuns() );
-                    this.getFxplot().updateS2Data( this.getLanguage().equals("fin") ? "odotusarvo" : "expected value",this.getXAxis(), this.getExpected() );
                     this.getFxplot().updateS2Data( this.getLanguage().equals("fin") ? "etäisyys" : "distance",this.getXAxis(), this.getSawLengths() );
                     if (!this.isSaw()) this.getFxplot().updateS2Data( this.getLanguage().equals("fin") ? "µ" : "µ",this.getXAxis(), this.getCbmcMu() );
 
@@ -435,7 +421,8 @@ class SceneRealTimeSaw extends Data {
      * Create GUI for Real Time Rms
      * @return REAL TIME RMS SCENE
      */
-    Parent getSceneRealTimeSaw(Slider sliderGam, Slider sliderAa, Pane pane, Button runSAW, @NotNull Button runCBMC){
+    Parent getSceneRealTimeSaw(VBox sliderBox, @NotNull Slider sliderCee, Pane pane, Button runSAW,
+                               @NotNull Button runCBMC){
         GridPane asettelu = new GridPane();
         asettelu.setMaxWidth(getPaneWidth());
         asettelu.setVgap(4);
@@ -447,18 +434,18 @@ class SceneRealTimeSaw extends Data {
 
         DropShadow shadow = new DropShadow();
         GetComponents getComponents = new GetComponents();
-        Image imgSawFI_one = new Image("file:src/main/resources/mathcards/sawFI_one-1.png");
-        Image imgSawEN_one = new Image("file:src/main/resources/mathcards/sawEN_one-1.png");
-        Image imgSawFI_half = new Image("file:src/main/resources/mathcards/sawFI_half-1.png");
-        Image imgSawEN_half = new Image("file:src/main/resources/mathcards/sawEN_half-1.png");
-        ImageView ivSawFI_one = new ImageView(imgSawFI_one);
-        ImageView ivSawEN_one = new ImageView(imgSawEN_one);
-        ImageView ivSawFI_half = new ImageView(imgSawFI_half);
-        ImageView ivSawEN_half = new ImageView(imgSawEN_half);
-        ivSawFI_one.setSmooth(true);
-        ivSawEN_one.setSmooth(true);
-        ivSawFI_half.setSmooth(true);
-        ivSawEN_half.setSmooth(true);
+        Image imgSawFI = new Image("file:src/main/resources/mathcards/sawFI-1.png");
+        Image imgSawEN = new Image("file:src/main/resources/mathcards/sawEN-1.png");
+        Image imgSawFI_corr = new Image("file:src/main/resources/mathcards/sawFI_corr-1.png");
+        Image imgSawEN_corr = new Image("file:src/main/resources/mathcards/sawEN_corr-1.png");
+        ImageView ivSawFI = new ImageView(imgSawFI);
+        ImageView ivSawEN = new ImageView(imgSawEN);
+        ImageView ivSawFI_corr = new ImageView(imgSawFI_corr);
+        ImageView ivSawEN_corr = new ImageView(imgSawEN_corr);
+        ivSawFI.setSmooth(true);
+        ivSawEN.setSmooth(true);
+        ivSawFI_corr.setSmooth(true);
+        ivSawEN_corr.setSmooth(true);
 
         /*
          * COMPONENTS...
@@ -475,13 +462,29 @@ class SceneRealTimeSaw extends Data {
                 this.vars[3] = setNumSteps.getText().trim();
                 runSAW.setDisable(true);
                 runCBMC.setDisable(false);
+                this.setIsSaw(false);
+                //getComponents.getPaneView(pane, this.getLanguage().equals("fin")
+                //    ? ivSawcbmcFI : ivSawcbmcEN, this.getSawTextWidth(), this.getSawTextHeight());
             } else {
                 this.vars[3] = "0";
                 runSAW.setDisable(false);
                 runCBMC.setDisable(true);
+                this.setIsSaw(true);
+                //getComponents.getPaneView(pane, this.getLanguage().equals("fin")
+                //    ? ivSawFI : ivSawEN, this.getSawTextWidth(), this.getSawTextHeight());
             }
         });
         runCBMC.setDisable(true);
+
+        sliderCee.setOnMouseDragged(e -> {
+            if (sliderCee.getValue() > 1.0) {
+                getComponents.getPaneView(pane, this.getLanguage().equals("fin")
+                    ? ivSawFI_corr : ivSawEN_corr, this.getSawTextWidth(), this.getSawTextHeight());
+            } else if (sliderCee.getValue() == 1.0) {
+                getComponents.getPaneView(pane, this.getLanguage().equals("fin")
+                    ? ivSawFI : ivSawEN, this.getSawTextWidth(), this.getSawTextHeight());
+            }
+        });
 
         Label labNumDimensions = new Label(this.getLanguage().equals("fin") ? "ulottuvuus:" : "dimension:");
 
@@ -504,16 +507,14 @@ class SceneRealTimeSaw extends Data {
         this.setDim2.setOnMouseClicked(f -> {
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            sliderGam.setValue(43.0/32.0);
-            sliderAa.setValue(1.1771);
+            sliderCee.setValue(1.0);
             this.vars[4] = "2";
             this.dim(2);
         });
         this.setDim3.setOnMouseClicked(f -> {
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
-            sliderGam.setValue(7.0/6.0);
-            sliderAa.setValue(1.205);
+            sliderCee.setValue(1.0);
             this.vars[4] = "3";
             this.dim(3);
         });
@@ -528,49 +529,6 @@ class SceneRealTimeSaw extends Data {
         this.vars[7] = "-"; // lattice/(free)   n/a
         this.vars[8] = "-"; // save (off)       n/a
 
-        Label labOptions = new Label(this.getLanguage().equals("fin") ? "säätöä:" : "adjustment:");
-
-        this.setFactors = new Button(this.getLanguage().equals("fin") ? "OLETUSARVOT" : "DEFAULTS");
-        this.setFactors.setMinWidth(130);
-        this.setFactors.setMaxWidth(130);
-        this.setFactors.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        this.setFactors.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.setFactors.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setFactors.setEffect(shadow));
-        this.setFactors.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setFactors.setEffect(null));
-        this.setFactors.setOnMouseClicked(f -> {
-            if (this.getDim() == 2 || this.getDim() == 3) {
-                sliderGam.setValue(this.getDim() == 2 ? 43.0/32.0 : 7.0/6.0);
-                sliderAa.setValue(this.getDim() == 2 ? 1.1771 : 1.205);
-            }
-        });
-        this.setHalfFact = new Button("\u00B7 \u00BD"); // 1/2
-        this.setHalfFact.setMinWidth(55);
-        this.setHalfFact.setMaxWidth(55);
-        this.setHalfFact.setFont(Font.font("System Regular",FontWeight.EXTRA_BOLD, 15));
-        this.setHalfFact.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.setHalfFact.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.setHalfFact.setEffect(shadow));
-        this.setHalfFact.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.setHalfFact.setEffect(null));
-        this.setHalf(false);
-        this.setHalfFact.setOnMouseClicked(f -> {
-            if (this.isHalf()) {
-                pane.getChildren().removeAll();
-                pane.getChildren().add(this.getLanguage().equals("fin")
-                    ? getComponents.getPane2(ivSawFI_one, this.getAnimWidth(), this.getAnimHeight())
-                    : getComponents.getPane2(ivSawEN_one, this.getAnimWidth(), this.getAnimHeight()));
-                this.setHalfFact.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.setHalf(false);
-            } else {
-                pane.getChildren().removeAll();
-                pane.getChildren().add(this.getLanguage().equals("fin")
-                    ? getComponents.getPane2(ivSawFI_half, this.getAnimWidth(), this.getAnimHeight())
-                    : getComponents.getPane2(ivSawEN_half, this.getAnimWidth(), this.getAnimHeight()));
-                this.setHalfFact.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.setHalf(true);
-            }
-        });
-        this.setOptions(new HBox(this.setFactors, this.setHalfFact));
-        this.getOptions().setSpacing(15);
-
         /*
          * ...THEIR PLACEMENTS
          */
@@ -581,13 +539,11 @@ class SceneRealTimeSaw extends Data {
         GridPane.setHalignment(empty1, HPos.CENTER);
         asettelu.add(empty1, 0, 1, 2, 1);
 
-        GridPane.setHalignment(valikko, HPos.LEFT);
-        asettelu.add(valikko, 0, 2, 2, 1);
+        GridPane.setHalignment(sliderBox, HPos.LEFT);
+        asettelu.add(sliderBox, 0, 2, 2, 1);
 
-        GridPane.setHalignment(labOptions, HPos.LEFT);
-        asettelu.add(labOptions, 0, 3);
-        GridPane.setHalignment(this.getOptions(), HPos.LEFT);
-        asettelu.add(this.getOptions(), 0, 4);
+        GridPane.setHalignment(valikko, HPos.LEFT);
+        asettelu.add(valikko, 0, 3, 2, 1);
 
         return asettelu;
     }
@@ -689,37 +645,15 @@ class SceneRealTimeSaw extends Data {
     private List<Integer> getXAxis() { return this.xAxis; }
 
     /**
-     * @param expected y-axis data array for walk plot to set
+     * @param ceeSlider to set
      */
-    private void setExpected(List<Double> expected) { this.expected = expected; }
+    private void setCeeSlider(Slider ceeSlider) { this.ceeSlider = ceeSlider; }
 
     /**
-     * @return y-axis data array for walk plot
+     * @return ceeSlider
      */
     @Contract(pure = true)
-    private List<Double> getExpected() { return this.expected; }
-
-    /**
-     * @param gamSlider to set
-     */
-    private void setGamSlider(Slider gamSlider) { this.gamSlider = gamSlider; }
-
-    /**
-     * @return gamSlider
-     */
-    @Contract(pure = true)
-    private Slider getGamSlider() { return this.gamSlider; }
-
-    /**
-     * @param aaSlider to set
-     */
-    private void setAaSlider(Slider aaSlider) { this.aaSlider = aaSlider; }
-
-    /**
-     * @return aaSlider
-     */
-    @Contract(pure = true)
-    private Slider getAaSlider() { return this.aaSlider; }
+    private Slider getCeeSlider() { return this.ceeSlider; }
 
     /**
      * @param xhistAxis x-axis data array for walk plot to set
@@ -788,6 +722,18 @@ class SceneRealTimeSaw extends Data {
     private void setSawLengths(List<Double> saw_lengths) { this.saw_lengths = saw_lengths; }
 
     /**
+     * @return the gamma
+     */
+    @Contract(pure = true)
+    private double getGam() { return this.getDim() == 2 ? 43.0 / 32.0 : 7.0 / 6.0; }
+
+    /**
+     * @return the aa
+     */
+    @Contract(pure = true)
+    private double getAa() { return this.getDim() == 2 ? 1.1771 : 1.205; }
+
+    /**
      * @return the cbmc_mu
      */
     @Contract(pure = true)
@@ -797,6 +743,17 @@ class SceneRealTimeSaw extends Data {
      * @param cbmc_mu the saw_lengths to set
      */
     private void setCbmcMu(List<Double> cbmc_mu) { this.cbmc_mu = cbmc_mu; }
+
+    /**
+     * @return the saw_expd
+     */
+    @Contract(pure = true)
+    private List <Double> getSawExpd() { return this.saw_expd; }
+
+    /**
+     * @param saw_expd the saw_expd to set
+     */
+    private void setSawExpd(List<Double> saw_expd) { this.saw_expd = saw_expd; }
 
     /**
      * @return the saw_rms
@@ -810,24 +767,24 @@ class SceneRealTimeSaw extends Data {
     private void setSawRms(List<Double> saw_rms) { this.saw_rms = saw_rms; }
 
     /**
-     * @return the saw_rmsruns
+     * @return the expd_runs
      */
     @Contract(pure = true)
-    private List <Double> getSawRmsRuns() { return this.saw_rmsruns; }
+    private List<Double> getExpdRuns() { return this.expd_runs; }
 
     /**
-     * @param saw_rmsruns the saw_rmsruns to set
+     * expd_runs to set
      */
-    private void setSawRmsRuns(List<Double> saw_rmsruns) { this.saw_rmsruns = saw_rmsruns; }
+    private void setExpdRuns(List<Double> expd_runs) { this.expd_runs = expd_runs; }
 
     /**
      * @return the rms_runs
      */
     @Contract(pure = true)
-    private List<Double> getRmsRuns() { return this.rms_runs; }
+    private List <Double> getRmsRuns() { return this.rms_runs; }
 
     /**
-     * rms_runs to set
+     * @param rms_runs the rms_runs to set
      */
     private void setRmsRuns(List<Double> rms_runs) { this.rms_runs = rms_runs; }
 
@@ -909,17 +866,6 @@ class SceneRealTimeSaw extends Data {
     private HBox getComps() { return this.comps; }
 
     /**
-     * @return the opt_choice
-     */
-    @Contract(pure = true)
-    private HBox getOptions() { return this.opt_choice; }
-
-    /**
-     * @param opt_choice the opt_choice to set
-     */
-    private void setOptions(HBox opt_choice) { this.opt_choice = opt_choice; }
-
-    /**
      * @return the bigg_dist
      */
     @Contract(pure = true)
@@ -964,18 +910,6 @@ class SceneRealTimeSaw extends Data {
     private void setMu2(double mu2) { this.mu2 = mu2; }
 
     /**
-     * @return half
-     */
-    @Contract(pure = true)
-    private boolean isHalf() { return this.half; }
-
-    /**
-     * half to set
-     */
-    @Contract(pure = true)
-    private void setHalf(boolean half) { this.half = half; }
-
-    /**
      * @return the issaw
      */
     @Contract(pure = true)
@@ -987,14 +921,14 @@ class SceneRealTimeSaw extends Data {
     private void setIsSaw(boolean issaw) { this.issaw = issaw; }
 
     /**
-     * @return the animwidth
+     * @return the textwidth
      */
     @Contract(pure = true)
-    private double getAnimWidth() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
+    private double getSawTextWidth() { return 675.0 / Screen.getMainScreen().getRenderScale(); }
 
     /**
-     * @return the animheight
+     * @return the textheight
      */
     @Contract(pure = true)
-    private double getAnimHeight() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
+    private double getSawTextHeight() { return 615.0 / Screen.getMainScreen().getRenderScale(); }
 }

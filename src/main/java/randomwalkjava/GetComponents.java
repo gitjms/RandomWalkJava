@@ -75,6 +75,18 @@ class GetComponents {
     }
 
     /**
+     * method for setting ImageView to Pane for Real Time Saw
+     * @param image javafx ImageView
+     */
+    void getPaneView(@NotNull Pane pane, @NotNull ImageView image, double width, double height) {
+        pane.getChildren().remove(0);
+        pane.setMaxSize(width, height);
+        image.setFitWidth(width);
+        image.setFitHeight(height);
+        pane.getChildren().add(image);
+    }
+
+    /**
      * method for setting buttons to GridPane
      * @param nappi1 button for 'Path Tracing'
      * @param nappi2 button for '1D Distance'

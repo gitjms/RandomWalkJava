@@ -132,6 +132,10 @@ class ExecReal extends Data {
                 helpNappiReal.setDisable(false);
                 closeNappiReal.setDisable(false);
                 execNappi.setText(this.getLanguage().equals("fin") ? "UUSI AJO" : "NEW RUN");
+                rmsScene.setNorm1.setDisable(false);
+                rmsScene.setNorm2.setDisable(false);
+                rmsScene.setDiff1.setDisable(false);
+                rmsScene.setDiff2.setDisable(false);
 
             } else {
                 this.setVars(rmsScene.getVars());
@@ -190,6 +194,10 @@ class ExecReal extends Data {
                 closeNappiReal.setDisable(true);
                 rmsScene.getDimension().setDisable(true);
                 rmsScene.getPlotChoice().setDisable(true);
+                rmsScene.setNorm1.setDisable(true);
+                rmsScene.setNorm2.setDisable(true);
+                rmsScene.setDiff1.setDisable(true);
+                rmsScene.setDiff2.setDisable(true);
             }
         });
     }

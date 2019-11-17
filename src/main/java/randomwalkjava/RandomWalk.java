@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Orientation;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -13,10 +14,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
@@ -202,7 +205,7 @@ public class RandomWalk extends Application {
         this.setTextAreaCalc(getComponents.GetTextArea(this.getTextWidth(), this.getTextHeight()));
         this.setTextAreaReal(getComponents.GetTextArea(this.getAnimWidth(), this.getAnimHeight()));
         this.setTextAreaDiff(getComponents.GetTextArea(this.getAnimWidth(), this.getAnimHeight()));
-        this.setTextAreaSAW(getComponents.GetTextArea(this.getSawTextWidth(), this.getSawTextHeight()));
+        this.setTextAreaSAW(getComponents.GetTextArea(this.getSawTextWidth(), this.getTextHeight()));
 
         /*
          * CREATE A FRAME FOR CALCULATION AND PATH TRACING PLOTS
@@ -355,55 +358,51 @@ public class RandomWalk extends Application {
         Button runCBMC = getButtons.getExecuteButton(this.getLanguage(), 0, "CBMC");
         HBox sawButtonBox = new HBox(5);
         sawButtonBox.getChildren().addAll(runSAW, runCBMC);
-        Button plotSAW = getButtons.getExecuteButton(this.getLanguage(), 1, "SAWPLOT");
+        Button plotSAW = getButtons.getExecuteButton(this.getLanguage(), 1, "PLOT");
         Button menuNappiSAW = getButtons.getMenuButton(this.getLanguage(), 1);
         Button closeNappiSAW = getButtons.getCloseButton(getRealScene, getDiffScene, getSAWScene,
             1, ex, this.getLanguage(), this.getFrame(), this.getButtonYES(), this.getButtonNO());
 
         // REAL TIME SAW COMPONENTS
-        // SLIDERS
-        final Label labgam = new Label("\u03B3 :");
-        final Label labelgam = new Label();
-        Slider sliderGam = new Slider(1.0, 2, 0.0);
-        sliderGam.setOrientation(Orientation.HORIZONTAL);
-        sliderGam.setMaxSize(this.getSawCompWidth(), this.getSawCompHeight());
-        sliderGam.setShowTickLabels(true);
-        sliderGam.setMinorTickCount(4);
-        sliderGam.setMajorTickUnit(0.5);
-        sliderGam.setShowTickMarks(true);
-        sliderGam.setSnapToTicks(false);
-        labelgam.textProperty().bind(
-            Bindings.format( "%.2f", sliderGam.valueProperty() )
-        );
-        final Label labaa = new Label("A :");
-        final Label labelaa = new Label();
-        Slider sliderAa = new Slider(0.0, 2.0, 0.0);
-        sliderAa.setOrientation(Orientation.HORIZONTAL);
-        sliderAa.setMaxSize(this.getSawCompWidth(), this.getSawCompHeight());
-        sliderAa.setShowTickLabels(true);
-        sliderAa.setMinorTickCount(4);
-        sliderAa.setMajorTickUnit(0.5);
-        sliderAa.setShowTickMarks(true);
-        sliderAa.setSnapToTicks(false);
-        labelaa.textProperty().bind(
-            Bindings.format( "%.2f", sliderAa.valueProperty() )
+        // SLIDER C
+        final Label labcee = new Label("C :");
+        final Label labelcee = new Label();
+        Slider sliderCee = new Slider(1.0, 4.0, 1.0);
+        sliderCee.setOrientation(Orientation.HORIZONTAL);
+        sliderCee.setMaxSize(this.getSawCompWidth(), this.getSawCompHeight());
+        sliderCee.setShowTickLabels(true);
+        sliderCee.setMinorTickCount(9);
+        sliderCee.setMajorTickUnit(1.0);
+        sliderCee.setShowTickMarks(true);
+        sliderCee.setSnapToTicks(true);
+        labelcee.textProperty().bind(
+            Bindings.format( "%.1f", sliderCee.valueProperty() )
         );
         VBox sliderBox = new VBox(5);
-        sliderBox.getChildren().addAll(labgam, labelgam, sliderGam, labaa, labelaa, sliderAa);
+        sliderBox.getChildren().addAll(labcee, labelcee, sliderCee);
 
         // MATH CARD
-        Image imgSawFI_one = new Image("file:src/main/resources/mathcards/sawFI_one-1.png");
-        Image imgSawEN_one = new Image("file:src/main/resources/mathcards/sawEN_one-1.png");
-        ImageView ivSawFI_one = new ImageView(imgSawFI_one);
-        ImageView ivSawEN_one = new ImageView(imgSawEN_one);
-        ivSawFI_one.setSmooth(true);
-        ivSawEN_one.setSmooth(true);
+        Image imgSawFI = new Image("file:src/main/resources/mathcards/sawFI-1.png");
+        Image imgSawEN = new Image("file:src/main/resources/mathcards/sawEN-1.png");
+        ImageView ivSawFI = new ImageView(imgSawFI);
+        ImageView ivSawEN = new ImageView(imgSawEN);
+        ivSawFI.setSmooth(true);
+        ivSawEN.setSmooth(true);
         this.setSawPane(this.getLanguage().equals("fin")
-            ? getComponents.getPane2(ivSawFI_one, this.getSawTextWidth(), this.getSawTextHeight())
-            : getComponents.getPane2(ivSawEN_one, this.getSawTextWidth(), this.getSawTextHeight()));
+            ? getComponents.getPane2(ivSawFI, this.getSawTextWidth(), this.getTextHeight())
+            : getComponents.getPane2(ivSawEN, this.getSawTextWidth(), this.getTextHeight()));
         Button helpNappiSAW = getButtons.getHelpButton(
             this.getLanguage(), this.getTextAreaSAW(), this.getIsovalikkoSAW(),
                 null, null, null, this.getSawPane(), "saw", 1);
+
+        VBox maxBox = new VBox(5);
+        maxBox.setPadding(new Insets(0, 0, 15, 0));
+        Label labMax = new Label(this.getLanguage().equals("fin") ? "kuvaaja-ajoja max: (oletus 100)" : "plot runs max: (default 100)");
+        TextField setMax = new TextField("");
+        TextFlow result = new TextFlow();
+        result.setMinSize(this.getWidth(),10);
+        result.setMaxSize(this.getWidth(),10);
+        maxBox.getChildren().addAll(labMax,setMax,result);
 
         /*
         * SET FIRST VIEW BORDERPANE
@@ -468,7 +467,8 @@ public class RandomWalk extends Application {
          */
         this.getValikkoSAW().getChildren().addAll(
             menuNappiSAW, helpNappiSAW, getSAWScene.getSceneRealTimeSaw(
-                sliderGam, sliderAa, this.getSawPane(), runSAW, runCBMC), sliderBox, sawButtonBox, plotSAW, closeNappiSAW);
+                sliderBox, sliderCee, this.getSawPane(), runSAW, runCBMC),
+            sawButtonBox, plotSAW, maxBox, closeNappiSAW);
         this.getIsovalikkoSAW().getChildren().addAll(this.getValikkoSAW(), this.getSawPane());
         BorderPane asetteluSAW = new BorderPane();
         asetteluSAW.setCenter(this.getIsovalikkoSAW());
@@ -498,9 +498,9 @@ public class RandomWalk extends Application {
             this.getStageHeight() + (this.getAnimHeight()-this.getTextHeight()));
         diffScene.getStylesheets().add("/Styles.css");
 
-        Scene sawScene = new Scene(asetteluSAW,
-            this.getStageWidth() + (this.getAnimWidth()-this.getTextWidth()),
-            this.getStageHeight() + (this.getSawHeight()-this.getTextHeight()));
+        Scene sawScene = new Scene(asetteluSAW, this.getStageWidth(),this.getStageHeight());
+            //this.getStageWidth() + (this.getAnimWidth()-this.getTextWidth()),
+            //this.getStageHeight() + (this.getSawHeight()-this.getTextHeight()));
         sawScene.getStylesheets().add("/Styles.css");
 
         /*
@@ -528,7 +528,7 @@ public class RandomWalk extends Application {
         setChoices.setMenuEffects(this.getLanguage(), menuNappiDiff, "diff",
             this.getTextAreaDiff(), this.getTextAreaMenu(), firstScene, 2);
 
-        setChoices.setSawSceneEffects(this.getLanguage(), nappiScene6, sawScene);
+        setChoices.setSceneEffects(this.getLanguage(), nappiScene6, sawScene,"Reaaliaika-saw", "Real Time saw");
         setChoices.setMenuEffects(this.getLanguage(), menuNappiSAW, "saw",
             this.getTextAreaSAW(), this.getTextAreaMenu(), firstScene, 1);
 
@@ -574,10 +574,11 @@ public class RandomWalk extends Application {
          * PLOT & RUN BUTTONS REAL TIME SAW
          */
         ExecSAW execSAW = new ExecSAW(this.getLanguage());
-        execSAW.setPlotClick(plotSAW, runSAW, getSAWScene, this.valikkoSAW, datapath, datafolder,
-            fexec, pyexecsaw2d, pyexecsaw3d, ex);
-        execSAW.setSawClick(datafolder, fexec, runSAW, runCBMC, getSAWScene, this.getIsovalikkoSAW(), this.getSawPane(),
-            this.getTextAreaSAW(), plotSAW, closeNappiSAW, menuNappiSAW, helpNappiSAW, sliderGam, sliderAa);
+        execSAW.setPlotClick(plotSAW, runSAW, getSAWScene, this.getValikkoSAW(), datapath, datafolder,
+           fexec, pyexecsaw2d, pyexecsaw3d, ex, setMax, result);
+        execSAW.setSawClick(datafolder, fexec, runSAW, runCBMC, getSAWScene, this.getIsovalikkoSAW(),
+            this.getSawPane(), this.getTextAreaSAW(), plotSAW, closeNappiSAW, menuNappiSAW, helpNappiSAW,
+            sliderCee);
 
         /*
         * CLOSE STAGE
@@ -653,12 +654,6 @@ public class RandomWalk extends Application {
     private double getSawTextWidth() { return 675.0 / Screen.getMainScreen().getRenderScale(); }
 
     /**
-     * @return the textheight
-     */
-    @Contract(pure = true)
-    private double getSawTextHeight() { return 615.0 / Screen.getMainScreen().getRenderScale(); }
-
-    /**
      * @return the animwidth
      */
     @Contract(pure = true)
@@ -669,12 +664,6 @@ public class RandomWalk extends Application {
      */
     @Contract(pure = true)
     private double getAnimHeight() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the pathheight
-     */
-    @Contract(pure = true)
-    private double getSawHeight() { return 625.0 / Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the buttonWidth
@@ -1045,4 +1034,10 @@ public class RandomWalk extends Application {
     @NotNull
     @Contract(pure = true)
     private ButtonType getButtonNO() { return new ButtonType( this.getLanguage().equals("fin") ? "EI" : "NO", ButtonBar.ButtonData.NO); }
+
+    /**
+     * @return the Width
+     */
+    @Contract(pure = true)
+    private double getWidth() { return 200.0 / Screen.getMainScreen().getRenderScale(); }
 }

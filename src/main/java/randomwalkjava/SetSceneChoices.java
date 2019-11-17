@@ -35,25 +35,6 @@ class SetSceneChoices {
     }
 
     /**
-     * method for setting scene button effects for scene 'Real Time SAW'
-     * @param language GUI language
-     * @param button button of the scene
-     * @param scene scene
-     */
-    void setSawSceneEffects(String language, @NotNull Button button, Scene scene) {
-        this.setLanguage(language);
-
-        button.setOnMouseClicked(event -> {
-            this.getStage().setTitle(this.getLanguage().equals("fin") ? "Reaaliaika-saw" : "Real Time saw");
-            if ( this.getStage().getHeight() == this.getStageHeight() ){
-                this.getStage().setHeight(this.getStageHeight()+(this.getSawHeight()-this.getSawTextHeight()));
-                this.getStage().setY((this.getScreenHeight()-this.getStageHeight())/2.0 - (this.getSawHeight()-this.getSawTextHeight())/2.0);
-            }
-            this.getStage().setScene(scene);
-        });
-    }
-
-    /**
      * method for setting scene button effects for scenes '1D Distance' and 'Rms calculation'
      * @param language GUI language
      * @param button button of the scene
@@ -202,24 +183,6 @@ class SetSceneChoices {
      */
     @Contract(pure = true)
     private double getStageHeight() { return 660.0 / Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the pathheight
-     */
-    @Contract(pure = true)
-    private double getPathHeight() { return 660.0 / Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the pathheight
-     */
-    @Contract(pure = true)
-    private double getSawHeight() { return 625.0 / Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the textheight
-     */
-    @Contract(pure = true)
-    private double getSawTextHeight() { return 615.0 / Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the textheight

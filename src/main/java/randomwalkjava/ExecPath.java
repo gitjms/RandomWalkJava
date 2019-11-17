@@ -10,9 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
-import static java.lang.Double.parseDouble;
-import static java.lang.Integer.parseInt;
-
 /**
  * @author Jari Sunnari
  * jari.sunnari@gmail.com

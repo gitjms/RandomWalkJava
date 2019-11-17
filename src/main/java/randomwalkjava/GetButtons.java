@@ -114,12 +114,6 @@ class GetButtons extends HelpText {
                 button.setMinWidth(width == 0 ? this.getButtonWidth() : this.getSawButtonWidth());
                 button.setMaxWidth(width == 0 ? this.getButtonWidth() : this.getSawButtonWidth());
                 break;
-            case "SAWPLOT":
-                button = this.getLanguage().equals("fin") ? new Button("SAW KUVAAJA") : new Button("SAW PLOT");
-                button.setStyle("-fx-background-color: Blue");
-                button.setMinWidth(width == 0 ? this.getButtonWidth() : this.getSawButtonWidth());
-                button.setMaxWidth(width == 0 ? this.getButtonWidth() : this.getSawButtonWidth());
-                break;
             default:
                 button = this.getLanguage().equals("fin") ? new Button("SUORITA") : new Button("EXECUTE");
                 button.setStyle("-fx-background-color: Red");
@@ -142,6 +136,7 @@ class GetButtons extends HelpText {
      * @param getRealScene scene
      * @param getDiffScene scene
      * @param getSAWScene scene
+     * @param width width
      * @param ex Python execution class
      * @param language GUI language
      * @param frame JFrame for plots
@@ -433,7 +428,7 @@ class GetButtons extends HelpText {
                         this.setSawMemPane(new Pane());
                         this.getSawMemPane().getChildren().addAll(this.getSawPane().getChildren());
                         isovalikko.getChildren().removeAll(this.getSawPane());
-                        this.newTextArea = getComponents.GetTextArea(this.getSawTextWidth(), this.getSawTextHeight());
+                        this.newTextArea = getComponents.GetTextArea(this.getSawTextWidth(), this.getTextHeight());
                         this.newTextArea.setText(this.getLanguage().equals("fin") ? super.realtimesawFI() : super.realtimesawEN());
                         this.newTextArea.setVisible(true);
                         isovalikko.getChildren().add(this.newTextArea);
@@ -696,12 +691,6 @@ class GetButtons extends HelpText {
      */
     @Contract(pure = true)
     private double getSawTextWidth() { return 690.0 / Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the textheight
-     */
-    @Contract(pure = true)
-    private double getSawTextHeight() { return 615.0 / Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the animwidth

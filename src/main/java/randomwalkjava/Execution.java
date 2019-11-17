@@ -128,13 +128,12 @@ class Execution {
             zDataPath =  "z_path" + dimension + "D_" + particles + "N_" + steps + "S.xy";
             command = new String[]{"cmd","/c", pyexec3d, xDataPath, yDataPath, zDataPath};
         }
-        System.out.println("hep1");
+
         /*
          * GET IMAGE
          */
-        BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension);
+        BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension, 500);
 
-        System.out.println("hep2");
         this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Satunnaiskulku - liikeradat" : "Random Walk - Path Tracing");
         JLabel titleLabel = new JLabel(titletext + "N=" + particles + ", " + steps + (this.getLanguage().equals("fin") ? " askelta\n" :" steps\n"));
         java.awt.Font labelFont = titleLabel.getFont();
@@ -226,7 +225,7 @@ class Execution {
         /*
          * GET IMAGE
          */
-        BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension);
+        BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension, 500);
 
         this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Satunnaiskulku - diffuusiokuvaaja" : "Random Walk - Diffusion Plot");
 
@@ -308,7 +307,7 @@ class Execution {
         /*
          * GET IMAGE
          */
-        BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension);
+        BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension, 500);
 
         this.getFrame().setTitle(this.getLanguage()
             .equals("fin") ? "Satunnaiskulku - rms-laskenta - " + titletext : "Random Walk - R_rms Calculation - " + titletext);
@@ -381,7 +380,7 @@ class Execution {
         /*
          * GET IMAGE
          */
-        BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension);
+        BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension, 500);
 
         this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Satunnaiskulku - 1D-etäisyys - " + titletext : "Random Walk - 1D Distance - " + titletext);
 
@@ -423,6 +422,7 @@ class Execution {
          * vars[7] = lattice,    n/a
          * vars[8] = save        n/a
          */
+
         pyexecsaw2d = "python ".concat(pyexecsaw2d);
         pyexecsaw3d = "python ".concat(pyexecsaw3d);
         this.setFrame();
@@ -463,7 +463,7 @@ class Execution {
         /*
          * GET IMAGE
          */
-        BufferedImage image = createPdf(folder, command, pdfFile, 1, 1, dimension);
+        BufferedImage image = createPdf(folder, command, pdfFile, 1, 1, dimension, 50);
 
         this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Satunnaiskulku - SAW-liikeradat" : "Random Walk - SAW Path Tracing");
         /*
@@ -491,11 +491,11 @@ class Execution {
      * @param pdfFile image file to get
      * @param particles number of particles from vars
      * @param steps number of steps from vars
-     * @param dimension dimension from vars
-     * @param issaw whether is saw or cbmc saw
+     * @param dim dimension from vars
+     * @param fac time factor
      * @return pdf image file
      */
-    BufferedImage createPdf(File folder, String[] command, File pdfFile, int particles, int steps, int dimension) {
+    BufferedImage createPdf(File folder, String[] command, File pdfFile, int particles, int steps, int dim, int fac) {
 
         BufferedImage image;
 
@@ -531,7 +531,7 @@ class Execution {
                          * WAIT FOR THE PDF FILE
                          */
                         try {
-                            Thread.sleep((long) (Math.log10(particles*steps)*Math.pow(dimension,2.0))*500);
+                            Thread.sleep((long) (Math.log10(particles*steps)*Math.pow(dim,2.0))*fac);
                         } catch (InterruptedException ex) {
                             System.out.println(ex.getMessage());
                         }

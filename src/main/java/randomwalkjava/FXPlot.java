@@ -51,6 +51,7 @@ class FXPlot {
     private JFrame frame;
     private NumberFormat formatter;
     private NumberFormat diffformatter;
+    private NumberFormat rmsformatter;
     private NumberFormat muformatter;
 
     /**
@@ -67,6 +68,7 @@ class FXPlot {
 
         this.formatter = new DecimalFormat("#.#E0");
         this.diffformatter = new DecimalFormat("0.0");
+        this.rmsformatter = new DecimalFormat("0.00");
         this.muformatter = new DecimalFormat("0.0000");
 
         switch (which) {
@@ -216,7 +218,7 @@ class FXPlot {
                 this.getCalcChartE().getStyler().setToolTipsEnabled(true);
 
                 this.getCalcChartD().getStyler().setLegendVisible(false);
-                this.getCalcChartD().setXAxisTitle(this.getLanguage().equals("fin") ? "Aika, t [ns]" : "Time, t [ns]");
+                this.getCalcChartD().setXAxisTitle(this.getLanguage().equals("fin") ? "Viive, t [ns]" : "Lag, t [ns]");
                 this.getCalcChartD().setYAxisTitle(this.getLanguage().equals("fin")
                     ? "Diffuusiokerroin, D [1e-7 cm^2/s]" : "Diffusion Coefficient, D [1e-7 cm^2/s]");
                 this.getCalcChartD().getStyler().setMarkerSize(0);
@@ -235,7 +237,7 @@ class FXPlot {
                 this.getCalcChartD().getStyler().setToolTipsEnabled(true);
 
                 this.getCalcChartV().getStyler().setLegendVisible(false); // \u03BD=nu
-                this.getCalcChartV().setXAxisTitle(this.getLanguage().equals("fin") ? "Aika, t [ns]" : "Time, t [ns]");
+                this.getCalcChartV().setXAxisTitle(this.getLanguage().equals("fin") ? "Viive, t [ns]" : "Lag, t [ns]");
                 this.getCalcChartV().setYAxisTitle(this.getLanguage().equals("fin") ? "Viskositeetti, \u03BD [\u00B5Pa s]" : "Viscosity, \u03BD [\u00B5Pa s]");
                 this.getCalcChartV().getStyler().setMarkerSize(0);
                 this.getCalcChartV().getStyler().setXAxisDecimalPattern("0");
@@ -485,10 +487,8 @@ class FXPlot {
             new BasicStroke( 1.5f, CAP_SQUARE, JOIN_MITER, 10.0f, new float[]{5, 5}, 2.0f ),
             new BasicStroke( 2.0f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f )
         };
-        this.getCalcChartS1().addSeries("Rrms", x, y).setLineStyle(BasicStroke[0]).setLineColor(Color.red);
-        this.getCalcChartS1().addSeries("<Rrms>", x, y).setLineStyle(BasicStroke[1]).setLineColor(Color.getHSBColor(100.0f / 256.0f, 1f, 1f));
-        this.getCalcChartS1().addSeries(this.getLanguage().equals("fin") ? "odotusarvo" : "expected value", x, y)
-            .setLineStyle(BasicStroke[2]).setLineColor(Color.blue);
+        this.getCalcChartS1().addSeries("<Rexp>", x, y).setLineStyle(BasicStroke[0]).setLineColor(Color.red);
+        this.getCalcChartS1().addSeries("<Rrms>", x, y).setLineStyle(BasicStroke[1]).setLineColor(Color.blue);
         this.getCalcChartS1().addSeries(this.getLanguage().equals("fin") ? "etäisyys" : "distance", x, y)
             .setLineStyle(BasicStroke[3]).setLineColor(Color.orange);
         this.getCalcChartS1().setTitle(this.getLanguage().equals("fin")
@@ -508,15 +508,13 @@ class FXPlot {
             new BasicStroke( 1.5f, CAP_SQUARE, JOIN_MITER, 10.0f, new float[]{5, 5}, 2.0f ),
             new BasicStroke( 1.5f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f )
         };
-        this.getCalcChartS2().addSeries("Rrms", x, y).setLineStyle(BasicStroke[0]).setLineColor(Color.red);
-        this.getCalcChartS2().addSeries("<Rrms>", x, y).setLineStyle(BasicStroke[1]).setLineColor(Color.getHSBColor(100.0f / 256.0f, 1f, 1f));
-        this.getCalcChartS2().addSeries(this.getLanguage().equals("fin") ? "odotusarvo" : "expected value", x, y)
-            .setLineStyle(BasicStroke[2]).setLineColor(Color.blue);
+        this.getCalcChartS2().addSeries("<Rexp>", x, y).setLineStyle(BasicStroke[0]).setLineColor(Color.red);
+        this.getCalcChartS2().addSeries("<Rrms>", x, y).setLineStyle(BasicStroke[1]).setLineColor(Color.blue);
+        if (iscbmc) this.getCalcChartS2().addSeries(this.getLanguage().equals("fin") ? "µ" :"µ", x, y)
+            .setLineStyle(BasicStroke[2]).setLineColor(Color.magenta);
+        this.getFrame().getContentPane().add(this.getChartPanelS2(),1);
         this.getCalcChartS2().addSeries(this.getLanguage().equals("fin") ? "etäisyys" :"distance", x, y)
             .setLineStyle(BasicStroke[3]).setLineColor(Color.orange);
-        if (iscbmc) this.getCalcChartS2().addSeries(this.getLanguage().equals("fin") ? "µ" :"µ", x, y)
-            .setLineStyle(BasicStroke[3]).setLineColor(Color.magenta);
-        this.getFrame().getContentPane().add(this.getChartPanelS2(),1);
     }
 
     /**
@@ -767,25 +765,28 @@ class FXPlot {
     }
 
     /**
-     * @param mu1 the connective constant
-     * @param mu2 the connective constant
-     */
-    void setS2SawTitle(int dim, double mu1, double mu2) { // u03BC=mu, u208#=subscript
-        this.getCalcChartS2().setTitle(this.getLanguage().equals("fin")
-            ? "Itseäänvälttelevä kulku, "+dim+"D, \u03BC\u2081="+this.muformatter.format(mu1)+", \u03BC\u2082="+this.muformatter.format(mu2)
-            : "Self-avoiding Walk, "+dim+"D, \u03BC\u2081="+this.muformatter.format(mu1)+", \u03BC\u2082="+this.muformatter.format(mu2));
-        this.getFrame().revalidate();
-        this.getFrame().repaint();
-        this.getFrame().pack();
-    }
-
-    /**
+     * @param dim the dimension
      * @param pros the percent of failed
      */
     void setS1CbmcTitle(int dim, double pros) {
         this.getCalcChartS1().setTitle(this.getLanguage().equals("fin")
             ? "Itseäänvälttelevä kulku, "+dim+"D, epäonnistuneita: "+this.diffformatter.format(pros)+"%"
             : "Self-avoiding Walk, "+dim+"D, failed: "+this.diffformatter.format(pros)+"%");
+        this.getFrame().revalidate();
+        this.getFrame().repaint();
+        this.getFrame().pack();
+    }
+
+    /**
+     * @param rexpd the expected value
+     * @param rrms the root mean squared distance
+     * @param mu1 the connective constant
+     * @param mu2 the connective constant
+     */
+    void setS2SawTitle(double rexpd, double rrms, double mu1, double mu2) { // u03BC=mu, u208#=subscript
+        this.getCalcChartS2().setTitle(
+            "<Rexp>="+this.rmsformatter.format(rexpd)+", <Rrms>="+this.rmsformatter.format(rrms)+
+                ", \u03BC\u2081="+this.muformatter.format(mu1)+", \u03BC\u2082="+this.muformatter.format(mu2));
         this.getFrame().revalidate();
         this.getFrame().repaint();
         this.getFrame().pack();

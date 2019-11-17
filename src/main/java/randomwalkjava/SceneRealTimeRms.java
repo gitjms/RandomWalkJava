@@ -12,8 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
+import javafx.scene.text.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -94,10 +93,10 @@ class SceneRealTimeRms extends Data {
     private HBox diff_choice;
     private Map<String,double[]> others;
     private double sigSeed;
-    private ToggleButton setNorm1;
-    private ToggleButton setNorm2;
-    private ToggleButton setDiff1;
-    private ToggleButton setDiff2;
+    ToggleButton setNorm1;
+    ToggleButton setNorm2;
+    ToggleButton setDiff1;
+    ToggleButton setDiff2;
     private int whichnorm;
     private int whichdiff;
     private HBox isovalikko;
@@ -259,7 +258,7 @@ class SceneRealTimeRms extends Data {
                     if (line.trim().startsWith("S") || line.isEmpty()) continue;
                     if (!line.substring(0,1).matches("([0-9]|-|\\+)")) continue;
                     if ( !(line.trim().split("(\\s+)")[0].trim().equals("+")) ) {
-                        switch (this.getDim()) {
+                         switch (this.getDim()) {
                             case 1: {
                                 try {
                                     this.getValues()[0][i] = Double.parseDouble(line.trim()) + this.getCenterX()/this.getScalefactor();
@@ -348,7 +347,7 @@ class SceneRealTimeRms extends Data {
                             j++;
                         }
 
-                        if ( j == this.getSteps() + 1) {
+                        if ( j == this.getSteps() + 2) {
                             i = 0;
                             j = 0;
                         }
@@ -361,11 +360,13 @@ class SceneRealTimeRms extends Data {
                         try {
                             dataVal = Double.parseDouble(line.split("(\\s+)")[1].trim());
                             this.getPlotData()[j] = dataVal;
-
                             this.setBiggDist(Math.max(this.getBiggDist(), Math.sqrt(dataVal)));
 
-                            if (this.getRuns() > 1) this.getSawLengths().add(Math.sqrt(dataVal));
-                            else this.getSawLengths().set(this.getInitPart(), Math.sqrt(dataVal));
+                            if (this.getRuns() > 1) {
+                                this.getSawLengths().add(Math.sqrt(dataVal));
+                            } else {
+                                this.getSawLengths().set(this.getInitPart(), Math.sqrt(dataVal));
+                            }
                             this.setInitPart(this.getInitPart() + 1);
 
                         } catch (NumberFormatException e) {
@@ -397,7 +398,7 @@ class SceneRealTimeRms extends Data {
                             double avg = this.getRms_sum()/this.getRuns();
                             this.setSigSeed(this.getSigSeed() + (rrms_walk - avg));
 
-                            if ( this.getRuns() < 11 ) {
+                            if (this.getRuns() < 11) {
                                 this.getRms_runs()[(int) this.getRuns() - 1] = rrms_walk;
                             } else {
                                 arraycopy(this.getRms_runs(), 1, this.getRms_runs(), 0, 9);
@@ -408,11 +409,11 @@ class SceneRealTimeRms extends Data {
                             /*
                              * find greatest value for y-axis max limit
                              */
-                            if ( rrms_walk + Math.log10(this.getSteps()) > this.getGreatest() || rrms_walk > this.getExpected() )
+                            if (rrms_walk + Math.log10(this.getSteps()) > this.getGreatest() || rrms_walk > this.getExpected())
                                 this.setGreatest(rrms_walk + Math.log10(this.getSteps()));
 
                             this.getFxplot().setWMinY(this.getSmallest());
-                            this.getFxplot().setWMaxY(this.getGreatest() + 1.0 );
+                            this.getFxplot().setWMaxY(this.getGreatest() + 1.0);
                             this.getFxplot().updateWData("Rrms", this.getXAxis(), this.getYAxis(), this.getExpected(), rrms_walk);
                             this.getFxplot().updateWData(this.getLanguage().equals("fin") ? "\u221Aaskeleet" : "\u221Asteps",
                                 this.getXAxis(), this.getY2Axis(), this.getExpected(), rrms_walk);
@@ -423,10 +424,10 @@ class SceneRealTimeRms extends Data {
                                     double sigma = (this.getSigSeed()/this.getRuns());
                                     if (this.whichNorm() == 1)
                                         ynorm = 1.0 / (Math.sqrt(2.0 * Math.PI) * sigma)
-                                            * Math.exp(-Math.pow(this.getXnormAxis()[h], 2.0) / (2.0 * Math.pow(sigma,2)));
+                                            * Math.exp(-Math.pow(this.getXnormAxis()[h], 2.0) / (2.0 * Math.pow(sigma, 2)));
                                     else if (this.whichNorm() == 2)
-                                        ynorm = 1.0 / Math.pow(2.0 * Math.PI * rrms_walk/this.getDim(), this.getDim()/2.0)
-                                            * Math.exp(-3.0*Math.pow(this.getXnormAxis()[h], 2.0) / (2.0 * Math.pow(rrms_walk,2.0)));
+                                        ynorm = 1.0 / Math.pow(2.0 * Math.PI * rrms_walk / this.getDim(), this.getDim() / 2.0)
+                                            * Math.exp(-3.0 * Math.pow(this.getXnormAxis()[h], 2.0) / (2.0 * Math.pow(rrms_walk, 2.0)));
                                     this.setGreatestDN(ynorm > this.getGreatestDN() ? ynorm : this.getGreatestDN());
                                     this.getFxplot().setNMaxY(this.getGreatestDN());
                                 } else if (this.isDiffPlot()) {
@@ -436,11 +437,11 @@ class SceneRealTimeRms extends Data {
                                         ynorm = 1.0 / Math.sqrt(2.0 * Math.PI * sigma2)
                                             * Math.exp(-Math.pow(this.getXnormAxis()[h], 2.0) / (2.0 * sigma2));
                                     else if (this.whichDiff() == 2)
-                                        ynorm = 1.0 / Math.pow(2.0 * Math.PI * sigma2, this.getDim()/2.0)
+                                        ynorm = 1.0 / Math.pow(2.0 * Math.PI * sigma2, this.getDim() / 2.0)
                                             * Math.exp(-Math.pow(this.getXnormAxis()[h], 2.0) / (2.0 * sigma2));
 
-                                    if ( ynorm > this.getGreatestDN() ) this.setGreatestDN(ynorm);
-                                    if ( ynorm > this.getGreatestDN() ) this.setGreatestDN(ynorm);
+                                    if (ynorm > this.getGreatestDN()) this.setGreatestDN(ynorm);
+                                    if (ynorm > this.getGreatestDN()) this.setGreatestDN(ynorm);
                                     this.getFxplot().setNMaxY(this.getGreatestDN());
                                 }
                                 this.getYnormAxis()[h] = ynorm;
@@ -450,21 +451,22 @@ class SceneRealTimeRms extends Data {
                              * DISTANCE HISTOGRAM
                              */
                             int size = (int) this.getBiggDist();
-                            if ( size > this.getHistoXAxis().length ) {
-                                this.setHistoYAxis(calcHistogram(this.getSawLengths(), size+2, size+1));
+                            if (size > this.getHistoXAxis().length) {
+                                this.setHistoYAxis(calcHistogram(this.getSawLengths(), size + 2, size + 1));
                                 Thread.sleep(100);
-                                this.setHistoXAxis(new double[size+1]);
-                                for (int x = 0; x < size+1; x++) this.getHistoXAxis()[x] = x;
-                            } else if ( size > (int) this.getExpected() * 2 + 6 ) {
-                                this.setHistoYAxis(calcHistogram(this.getSawLengths(), size+2, this.getHistoYAxis().length));
+                                this.setHistoXAxis(new double[size + 1]);
+                                for (int x = 0; x < size + 1; x++) this.getHistoXAxis()[x] = x;
+                            } else if (size > (int) this.getExpected() * 2 + 6) {
+                                this.setHistoYAxis(calcHistogram(this.getSawLengths(), size + 2, this.getHistoYAxis().length));
                                 Thread.sleep(100);
-                            } else this.setHistoYAxis(calcHistogram( this.getSawLengths(),
+                            } else this.setHistoYAxis(calcHistogram(this.getSawLengths(),
                                 (int) this.getExpected() * 2 + 7, (int) this.getExpected() * 2 + 6));
+
                         }
                     }
                 }
 
-                if ( this.getRuns() < 4 ) {
+                if (this.getRuns() < 4) {
                     String mapkey;
                     String mapkey1 = "\u03C1(r,t\u2081)";
                     String mapkey2 = "\u03C1(r,t\u2082)";
@@ -486,8 +488,7 @@ class SceneRealTimeRms extends Data {
                     this.getFxplot().updateNData(String.valueOf(((Map.Entry) longEntry).getKey()), this.getXnormAxis(), (double[]) ((Map.Entry) longEntry).getValue());
                 }
 
-                this.getFxplot().updateHData( this.getHistoXAxis(), this.getHistoYAxis() );
-
+                this.getFxplot().updateHData(this.getHistoXAxis(), this.getHistoYAxis());
                 this.setRuns(this.getRuns() + 1);
 
                 this.setExitVal(process.waitFor());
@@ -815,8 +816,12 @@ class SceneRealTimeRms extends Data {
         GridPane.setHalignment(this.getDiffChoice(), HPos.LEFT);
         asettelu.add(this.getDiffChoice(), 0, 11);
 
+        final Pane empty3 = new Pane();
+        GridPane.setHalignment(empty3, HPos.CENTER);
+        asettelu.add(empty3, 0, 12, 2, 2);
+
         GridPane.setHalignment(valikko, HPos.LEFT);
-        asettelu.add(valikko, 0, 12, 2, 1);
+        asettelu.add(valikko, 0, 13, 2, 1);
 
         return asettelu;
     }

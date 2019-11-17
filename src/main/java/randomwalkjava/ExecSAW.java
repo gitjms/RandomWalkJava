@@ -1,11 +1,13 @@
 package randomwalkjava;
 
 import javafx.animation.AnimationTimer;
-import javafx.scene.control.Button;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,8 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static java.lang.Integer.parseInt;
 
 /**
  * @author Jari Sunnari
@@ -29,15 +29,16 @@ class ExecSAW extends Data {
     private boolean issaw;
     private boolean iscbmc;
     private boolean first;
+    private List <Double> saw_expd;
     private List <Double> saw_rms;
-    private List<Double> saw_rmsruns;
+    private List <Double> expd_runs;
+    private List<Double> rms_runs;
     private List <Double> saw_lengths;
     private List<Double> cbmc_mu;
-    private List<Double> saw_expd;
-    private List <Double> rms_runs;
     private List <Integer> xAxis;
     private List <Integer> xhistAxis;
     private List <Double> yhistAxis;
+    private int prevAlign;
 
     /**
      * Initiating class
@@ -47,9 +48,10 @@ class ExecSAW extends Data {
         this.setLanguage(language);
     }
 
-    void setSawClick(File folder, String executable, @NotNull Button execSAW, @NotNull Button execBMC, SceneRealTimeSaw sawScene,
-                     HBox isovalikkoSaw, Pane sawPane, TextArea sawText, Button plotSAW, Button closeNappiSAW,
-                     Button menuNappiSAW, Button helpNappiSAW, Slider gamSlider, Slider aaSlider) {
+    void setSawClick(File folder, String executable, @NotNull Button execSAW, @NotNull Button execCBMC,
+                     SceneRealTimeSaw sawScene, HBox isovalikkoSaw, Pane sawPane, TextArea sawText,
+                     Button plotSAW, Button closeNappiSAW, Button menuNappiSAW, Button helpNappiSAW,
+                     Slider ceeSlider) {
 
         new AnimationTimer() {
             private long prevTime = 0;
@@ -75,7 +77,7 @@ class ExecSAW extends Data {
                     return;
 
                 sawScene.refresh(folder, executable, getFirst(), getSawLengths(), getCbmcMu(), getSawExpd(), getSawRms(),
-                    getSawRmsRuns(), getRmsRuns(), getXAxis(), getXhistAxis(), isSaw(), gamSlider, aaSlider);
+                    getExpdRuns(), getRmsRuns(), getXAxis(), getXhistAxis(), isSaw(), ceeSlider);
 
                 if (getFirst()) setFirst(false);
 
@@ -98,10 +100,10 @@ class ExecSAW extends Data {
                 sawScene.setSave("-");
                 boolean fail = false;
 
-                int steps = parseInt(this.getVars()[3]);
+                int steps = Integer.parseInt(this.getVars()[3]);
                 if (steps > 0) fail = true;
 
-                int dim = parseInt(this.getVars()[4]);
+                int dim = Integer.parseInt(this.getVars()[4]);
 
                 if (dim < 2 || dim > 3) fail = true;
 
@@ -119,19 +121,17 @@ class ExecSAW extends Data {
                 sawScene.setFxplot(new FXPlot());
                 sawScene.getFxplot().setFXPlot(this.getLanguage(), "saw");
 
+                this.setSawExpd(new ArrayList<>());
                 this.setSawRms(new ArrayList<>());
+
+                this.setExpdRuns(new ArrayList<>());
+                for (int x = 0; x < 10; x++) this.getExpdRuns().add(0.0);
 
                 this.setRmsRuns(new ArrayList<>());
                 for (int x = 0; x < 10; x++) this.getRmsRuns().add(0.0);
 
-                this.setSawRmsRuns(new ArrayList<>());
-                for (int x = 0; x < 10; x++) this.getSawRmsRuns().add(0.0);
-
                 this.setSawLengths(new ArrayList<>());
                 for (int x = 0; x < 10; x++) this.getSawLengths().add(0.0);
-
-                this.setSawExpd(new ArrayList<>());
-                for (int x = 0; x < 10; x++) this.getSawExpd().add(0.0);
 
                 this.setXAxis(new ArrayList<>());
                 for (int x = 0; x < 10; x++) this.getXAxis().add(x);
@@ -147,7 +147,7 @@ class ExecSAW extends Data {
                 if (dim == 2) for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*3));
                 else for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*10));
 
-                sawScene.getFxplot().setS1Data(this.getXAxis(), this.getRmsRuns(), dim);
+                sawScene.getFxplot().setS1Data(this.getXAxis(), this.getExpdRuns(), dim);
                 sawScene.getFxplot().setS2Data(this.getXAxis(), this.getRmsRuns(), false);
                 sawScene.getFxplot().setS3Data(labelMap, this.getXhistAxis(), this.getYhistAxis());
 
@@ -158,12 +158,12 @@ class ExecSAW extends Data {
                 helpNappiSAW.setDisable(true);
                 closeNappiSAW.setDisable(true);
                 plotSAW.setDisable(true);
-                execBMC.setDisable(true);
+                execCBMC.setDisable(true);
                 sawScene.getDimension().setDisable(true);
             }
         });
 
-        execBMC.setOnMouseClicked((MouseEvent event) -> {
+        execCBMC.setOnMouseClicked((MouseEvent event) -> {
             if (sawScene.isRunning()) {
                 sawScene.stop();
                 sawScene.getDimension().setDisable(false);
@@ -171,17 +171,17 @@ class ExecSAW extends Data {
                 helpNappiSAW.setDisable(false);
                 closeNappiSAW.setDisable(false);
                 plotSAW.setDisable(false);
-                execBMC.setText(this.getLanguage().equals("fin") ? "AJA CBMC" : "RUN CBMC");
+                execCBMC.setText(this.getLanguage().equals("fin") ? "AJA CBMC" : "RUN CBMC");
             } else {
                 this.setVars(sawScene.getVars());
                 sawScene.setSawCbmc("c");
                 sawScene.setSave("-");
                 boolean fail = false;
 
-                int steps = parseInt(this.getVars()[3]);
+                int steps = Integer.parseInt(this.getVars()[3]);
                 if (this.getVars()[3].isEmpty() || steps == 0) fail = true;
 
-                int dim = parseInt(this.getVars()[4]);
+                int dim = Integer.parseInt(this.getVars()[4]);
 
                 if (dim < 2 || dim > 3) fail = true;
 
@@ -199,22 +199,20 @@ class ExecSAW extends Data {
                 sawScene.setFxplot(new FXPlot());
                 sawScene.getFxplot().setFXPlot(this.getLanguage(), "saw");
 
+                this.setSawExpd(new ArrayList<>());
                 this.setSawRms(new ArrayList<>());
+
+                this.setExpdRuns(new ArrayList<>());
+                for (int x = 0; x < 10; x++) this.getExpdRuns().add(0.0);
 
                 this.setRmsRuns(new ArrayList<>());
                 for (int x = 0; x < 10; x++) this.getRmsRuns().add(0.0);
-
-                this.setSawRmsRuns(new ArrayList<>());
-                for (int x = 0; x < 10; x++) this.getSawRmsRuns().add(0.0);
 
                 this.setSawLengths(new ArrayList<>());
                 for (int x = 0; x < 10; x++) this.getSawLengths().add(0.0);
 
                 this.setCbmcMu(new ArrayList<>());
                 for (int x = 0; x < 10; x++) this.getCbmcMu().add(0.0);
-
-                this.setSawExpd(new ArrayList<>());
-                for (int x = 0; x < 10; x++) this.getSawExpd().add(0.0);
 
                 this.setXAxis(new ArrayList<>());
                 for (int x = 0; x < 10; x++) this.getXAxis().add(x);
@@ -234,13 +232,13 @@ class ExecSAW extends Data {
                     else for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)));
                 }
 
-                sawScene.getFxplot().setS1Data(this.getXAxis(), this.getRmsRuns(), dim);
+                sawScene.getFxplot().setS1Data(this.getXAxis(), this.getExpdRuns(), dim);
                 sawScene.getFxplot().setS2Data(this.getXAxis(), this.getRmsRuns(), true);
                 sawScene.getFxplot().setS3Data(labelMap, this.getXhistAxis(), this.getYhistAxis());
 
                 sawScene.start();
 
-                execBMC.setText(this.getLanguage().equals("fin") ? "SEIS" : "STOP");
+                execCBMC.setText(this.getLanguage().equals("fin") ? "SEIS" : "STOP");
                 menuNappiSAW.setDisable(true);
                 helpNappiSAW.setDisable(true);
                 closeNappiSAW.setDisable(true);
@@ -251,37 +249,88 @@ class ExecSAW extends Data {
         });
     }
 
-        void setPlotClick (@NotNull Button plotNappi, @NotNull Button runSAW, SceneRealTimeSaw sawScene, VBox valikkoSAW, String datapath,
-                           File datafolder, String fexec, String pyexecsaw2d, String pyexecsaw3d, Execution ex){
-
-            plotNappi.setOnMouseClicked((MouseEvent event) -> {
-                if (runSAW.isDisabled()) {
-                    sawScene.setSawCbmc("c");
-                    this.setIsCbmc(true);
-                } else {
-                    sawScene.setSawCbmc("-");
-                    this.setIsCbmc(false);
-                }
-                sawScene.setSave("s");
-                String[] vars = sawScene.getVars();
-                this.setVars(vars);
-                Data data = new Data(vars);
-                int dim = parseInt(getVars()[4]);
-                boolean fail = false;
-
-                if ( dim < 2 || dim > 3 ) fail = true;
-                if ( fail ) return;
-
-                valikkoSAW.setDisable(true);
-
-                boolean ok = false;
-                while (!ok) {
-                    ok = ex.executeSAW(datafolder, datapath, fexec, pyexecsaw2d,
-                        pyexecsaw3d, valikkoSAW, data, this.getVars(), this.isCbmc());
-                }
-                valikkoSAW.setDisable(false);
-            });
+    /**
+     * method for checking if user input in GUI is an integer
+     * @param str GUI input string
+     * @return true if input is an integer, false otherwise
+     */
+    private static boolean isNumInteger(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch(NumberFormatException e){
+            return false;
         }
+    }
+
+    void setPlotClick (@NotNull Button plotNappi, @NotNull Button execSAW, SceneRealTimeSaw sawScene, VBox valikkoSAW,
+                       String datapath, File datafolder, String fexec, String pyexecsaw2d, String pyexecsaw3d,
+                       Execution ex, TextField setMax, TextFlow result){
+
+        final Text noresult = new Text(this.getLanguage().equals("fin") ? "Ei tulosta" : "No result");
+        noresult.setFill(Color.RED);
+        noresult.setStyle("-fx-font-size: 20px;");
+        String txt1 = this.getLanguage().equals("fin") ? " ajo" : " run";
+        String txt2 = this.getLanguage().equals("fin") ? " ajoa" : " runs";
+
+        plotNappi.setOnMouseClicked((MouseEvent event) -> {
+            result.getChildren().clear();
+
+            if (execSAW.isDisabled()) {
+                sawScene.setSawCbmc("c");
+                this.setIsCbmc(true);
+            } else {
+                sawScene.setSawCbmc("-");
+                this.setIsCbmc(false);
+            }
+            sawScene.setSave("s");
+            String[] vars = sawScene.getVars();
+            this.setVars(vars);
+            Data data = new Data(vars);
+            int dim = Integer.parseInt(getVars()[4]);
+            boolean fail = false;
+
+            if ( dim < 2 || dim > 3 ) fail = true;
+            if ( fail ) return;
+
+            valikkoSAW.setDisable(true);
+
+            int count = 0;
+            int max = 100;
+            if (isNumInteger(setMax.getText().trim())){
+                max = Integer.parseInt(setMax.getText());
+            }
+
+            boolean ok = false;
+            while (!ok && count < max) {
+                ok = ex.executeSAW(datafolder, datapath, fexec, pyexecsaw2d,
+                    pyexecsaw3d, valikkoSAW, data, this.getVars(), this.isCbmc());
+                count += 1;
+            }
+
+            if(!ok) {
+                if (this.getPrevAlign() == 1) {
+                    result.setTextAlignment(TextAlignment.CENTER);
+                    this.setPrevAlign(2);
+                } else if (this.getPrevAlign() == 2) {
+                    result.setTextAlignment(TextAlignment.RIGHT);
+                    this.setPrevAlign(3);
+                } else {
+                    result.setTextAlignment(TextAlignment.LEFT);
+                    this.setPrevAlign(1);
+                }
+                result.getChildren().add(noresult);
+            } else {
+                Text resulttext = new Text(count + (count == 1 ? txt1 : txt2));
+                resulttext.setFill(Color.GREEN);
+                resulttext.setStyle("-fx-font-size: 20px;");
+                result.setTextAlignment(TextAlignment.LEFT);
+                this.setPrevAlign(3);
+                result.getChildren().add(resulttext);
+            }
+            valikkoSAW.setDisable(false);
+        });
+    }
 
     /**
      * @return the language
@@ -352,7 +401,7 @@ class ExecSAW extends Data {
      * @return the saw_expd
      */
     @Contract(pure = true)
-    private List<Double> getSawExpd() { return this.saw_expd; }
+    private List <Double> getSawExpd() { return this.saw_expd; }
 
     /**
      * @param saw_expd the saw_expd to set
@@ -371,15 +420,15 @@ class ExecSAW extends Data {
     private void setSawRms(List<Double> saw_rms) { this.saw_rms = saw_rms; }
 
     /**
-     * @return the saw_rmsruns
+     * @return the expd_runs
      */
     @Contract(pure = true)
-    private List <Double> getSawRmsRuns() { return this.saw_rmsruns; }
+    private List <Double> getExpdRuns() { return this.expd_runs; }
 
     /**
-     * @param saw_rmsruns the saw_rmsruns to set
+     * @param expd_runs the expd_runs to set
      */
-    private void setSawRmsRuns(List<Double> saw_rmsruns) { this.saw_rmsruns = saw_rmsruns; }
+    private void setExpdRuns(List<Double> expd_runs) { this.expd_runs = expd_runs; }
 
     /**
      * @return the rms_runs
@@ -435,4 +484,15 @@ class ExecSAW extends Data {
      *  the first to set
      */
     private void setFirst(boolean first) { this.first = first; }
+
+    /**
+     * @return the prevAlign
+     */
+    @Contract(pure = true)
+    private int getPrevAlign() { return prevAlign; }
+
+    /**
+     *  the prevAlign to set
+     */
+    private void setPrevAlign(int prevAlign) { this.prevAlign = prevAlign; }
 }
