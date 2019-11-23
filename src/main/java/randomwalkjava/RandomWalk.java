@@ -327,7 +327,8 @@ public class RandomWalk extends Application {
         Button runDiff = getButtons.getExecuteButton(this.getLanguage(), 0, "ANIM");
         Button plotDiff = getButtons.getExecuteButton(this.getLanguage(), 0, "PLOT");
         Button menuNappiDiff = getButtons.getMenuButton(this.getLanguage(), 0);
-        Button remBarNappiDiff = getButtons.getDiffBarrierButton(this.getLanguage());
+        Button remBarNappiDiff = getButtons.getDiffBarCanButtons(this.getLanguage(), 1);
+        Button cancelNappiDiff = getButtons.getDiffBarCanButtons(this.getLanguage(), 2);
         Button closeNappiDiff = getButtons.getCloseDiffButton(this.getLanguage(), getDiffScene, this.getFrame());
 
         // DIFFUSION COMPONENTS
@@ -568,7 +569,7 @@ public class RandomWalk extends Application {
         execDIFF.setExecClick(runDiff, getDiffScene, diffpiirturi,
             this.getDiffScalefactor(), this.getAnimWidth(), this.getAnimHeight(),
             this.newdata, this.isovalikkoDiff, this.valikkoDiff, this.diffpane, datapath, datafolder,
-            fexec, remBarNappiDiff, plotDiff, closeNappiDiff, menuNappiDiff, helpNappiDiff, diffAlusta);
+            fexec, remBarNappiDiff, cancelNappiDiff, plotDiff, closeNappiDiff, menuNappiDiff, helpNappiDiff, diffAlusta);
 
         /*
          * PLOT & RUN BUTTONS REAL TIME SAW

@@ -10,8 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
-import static java.lang.Integer.parseInt;
-
 /**
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
@@ -34,7 +32,7 @@ class ExecCalc extends Data {
      * method for setting execute path mouseclicked
      * @param execNappi button
      * @param calcScene scene
-     * @param ex INSTANCE FOR CODE EXECUTIONS
+     * @param ex instance for code executions
      * @param datafolder data folder
      * @param datapath data path
      * @param fexec fexec
@@ -50,9 +48,9 @@ class ExecCalc extends Data {
             Data data = new Data(vars);
             boolean fail = false;
 
-            int steps = Integer.parseInt(this.getVars()[3]);
-            int dim = Integer.parseInt(this.getVars()[4]);
-            String lattice = this.getVars()[7];
+            int steps = Integer.parseInt(this.getVars()[4]);
+            int dim = Integer.parseInt(this.getVars()[5]);
+            String lattice = this.getVars()[8];
 
             if ( steps < 1 ) fail = true;
             if ( dim < 1 || dim > 3 ) fail = true;
@@ -60,14 +58,9 @@ class ExecCalc extends Data {
 
             if ( fail ) return;
 
-            int hours = (int) (steps * dim * 0.00005)/60;
-            int mins = (int) (steps * dim * 0.00005)%60;
             String warnText = "";
             if (Math.log10(steps) > 4) {
-                if (hours > 1)
-                    warnText = this.getLanguage().equals("fin") ? "Datankäsittely voi kestää " + hours + "h." : "Data processing may take " + hours + "h.";
-                else if (hours > 0)
-                    warnText = this.getLanguage().equals("fin") ? "Datankäsittely voi kestää " + mins + "min." : "Data processing may take " + mins + "min.";
+                warnText = this.getLanguage().equals("fin") ? "Datankäsittely voi kestää kauan." : "Data processing may take a long time.";
             }
 
             if (Math.log10(steps) < 5) {
@@ -80,7 +73,7 @@ class ExecCalc extends Data {
                 Alert alertRms = getDialogs.getAlert(this.getLanguage(), this.getButtonYES(), this.getButtonNO(), alertText);
                 alertRms.showAndWait();
 
-                if ( alertRms.getResult() == ButtonType.YES) {
+                if ( alertRms.getResult().getButtonData().equals(this.getButtonYES().getButtonData()) ) {
                     ex.executeRms(datafolder, datapath, fexec, pyexecrms, data, this.getVars());
                     alertRms.close();
                 } else alertRms.close();

@@ -10,8 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
-import static java.lang.Integer.parseInt;
-
 /**
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
@@ -49,9 +47,9 @@ class Exec1Ddist extends Data {
             Data data = new Data(vars);
             boolean fail = false;
 
-            int particles = Integer.parseInt(this.getVars()[0]);
-            int steps = Integer.parseInt(this.getVars()[3]);
-            String lattice = this.getVars()[7];
+            int particles = Integer.parseInt(this.getVars()[1]);
+            int steps = Integer.parseInt(this.getVars()[4]);
+            String lattice = this.getVars()[8];
 
             if ( particles < 0 ) fail = true;
             if ( steps < 1 ) fail = true;
@@ -59,15 +57,9 @@ class Exec1Ddist extends Data {
 
             if ( fail ) return;
 
-            int hours = (int) (particles * steps * 0.0000005)/60;
-            int mins = (int) (particles * steps * 0.0000005)%60;
             String warnText = "";
-            if (Math.log10(particles * steps) > 6) {
-                if (hours > 1)
-                    warnText = this.getLanguage().equals("fin") ? "Datankäsittely voi kestää " + hours + "h." : "Data processing may take " + hours + "h.";
-                else
-                    warnText = this.getLanguage().equals("fin") ? "Datankäsittely voi kestää " + mins + "min." : "Data processing may take " + mins + "min.";
-            }
+            if (Math.log10(particles * steps) > 6)
+                warnText = this.getLanguage().equals("fin") ? "Datankäsittely voi kestää kauan." : "Data processing may take a long time.";
 
             if (Math.log10(particles * steps) <= 6) {
                 ex.execute1Ddist(datafolder, datapath, fexec, pyexec1Ddist, data, this.getVars());
@@ -79,7 +71,7 @@ class Exec1Ddist extends Data {
                 Alert alert1Ddist = getDialogs.getAlert(this.getLanguage(), this.getButtonYES(), this.getButtonNO(), alertText);
                 alert1Ddist.showAndWait();
 
-                if ( alert1Ddist.getResult() == ButtonType.YES) {
+                if ( alert1Ddist.getResult().getButtonData().equals(this.getButtonYES().getButtonData()) ) {
                     ex.execute1Ddist(datafolder, datapath, fexec, pyexec1Ddist, data, this.getVars());
                     alert1Ddist.close();
                 } else alert1Ddist.close();

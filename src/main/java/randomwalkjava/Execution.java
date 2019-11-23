@@ -58,15 +58,16 @@ class Execution {
         /*
         * FROM SCENEPATHTRACING
         * vars from user:
-        * vars[0] = particles,  USER
-        * vars[1] = diameter,   USER
-        * vars[2] = charge,     USER
-        * vars[3] = steps,      USER
-        * vars[4] = dimension,  USER
-        * vars[5] = diff,       USER
-        * vars[6] = fixed,      USER
-        * vars[7] = lattice,    USER
-        * vars[8] = save        n/a
+        * vars[0] = which simulation,   USER
+        * vars[1] = particles,          USER
+        * vars[2] = diameter,           USER
+        * vars[3] = charge,             USER
+        * vars[4] = steps,              USER
+        * vars[5] = dimension,          USER
+        * vars[6] = calcfix or sawplot, USER
+        * vars[7] = fixed,              USER
+        * vars[8] = lattice,            USER
+        * vars[9] = save                n/a
         */
         pyexec1d = "python ".concat(pyexec1d);
         pyexec2d = "python ".concat(pyexec2d);
@@ -85,17 +86,17 @@ class Execution {
         }
         if (!result) return;
 
-        int particles = Integer.parseInt(vars[0]);
-        int steps = Integer.parseInt(vars[3]);
-        int dimension = Integer.parseInt(vars[4]);
+        int particles = Integer.parseInt(vars[1]);
+        int steps = Integer.parseInt(vars[4]);
+        int dimension = Integer.parseInt(vars[5]);
 
-        if ( vars[6].equals("f") && vars[7].equals("l") ) {
+        if ( vars[7].equals("f") && vars[8].equals("l") ) {
             titletext = this.getLanguage().equals("fin") ? "Keskitetyn lähteen hilahiukkaset, " : "Fixed source lattice particles, ";
-        } else if ( vars[6].equals("f") && vars[7].equals("-") ) {
+        } else if ( vars[7].equals("f") && vars[8].equals("-") ) {
             titletext = this.getLanguage().equals("fin") ? "Keskitetyn lähteen vapaat hiukkaset, " : "Fixed source free particles, ";
-        } else if ( vars[6].equals("-") && vars[7].equals("l") ) {
+        } else if ( vars[7].equals("-") && vars[8].equals("l") ) {
             titletext = this.getLanguage().equals("fin") ? "Hajautetut hilahiukkaset, " : "Spread out lattice particles, ";
-        } else if ( vars[6].equals("-") && vars[7].equals("-") ) {
+        } else if ( vars[7].equals("-") && vars[8].equals("-") ) {
             titletext = this.getLanguage().equals("fin") ? "Hajautetut vapaat hiukkaset, " : "Spread out free particles, ";
         }
 
@@ -132,7 +133,7 @@ class Execution {
         /*
          * GET IMAGE
          */
-        BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension, 500);
+        BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension, 500, 200);
 
         this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Satunnaiskulku - liikeradat" : "Random Walk - Path Tracing");
         JLabel titleLabel = new JLabel(titletext + "N=" + particles + ", " + steps + (this.getLanguage().equals("fin") ? " askelta\n" :" steps\n"));
@@ -179,15 +180,16 @@ class Execution {
         /*
         * FROM SCENEDIFFUSION
         * vars from user:
-        * vars[0] = particles,     USER
-        * vars[1] = diameter,      USER
-        * vars[2] = charge,        USER
-        * vars[3] = steps,         n/a
-        * vars[4] = dimension,     USER
-        * vars[5] = diff,          n/a
-        * vars[6] = fixed,         n/a
-        * vars[7] = lattice,       USER
-        * vars[8] = save           n/a
+        * vars[0] = which simulation,   USER
+        * vars[1] = particles,          USER
+        * vars[2] = diameter,           USER
+        * vars[3] = charge,             USER
+        * vars[4] = steps,              n/a
+        * vars[5] = dimension,          USER
+        * vars[6] = calcfix or sawplot, n/a
+        * vars[7] = fixed,              n/a
+        * vars[8] = lattice,            USER
+        * vars[9] = save                n/a
         */
         pyexecdiff2d = "python ".concat(pyexecdiff2d);
         pyexecdiff3d = "python ".concat(pyexecdiff3d);
@@ -204,10 +206,10 @@ class Execution {
         if (!result)
             return;
 
-        int particles = Integer.parseInt(vars[0]);
-        double diameter = Double.parseDouble(vars[1]);
-        int steps = Integer.parseInt(vars[3]);
-        final int dimension = Integer.parseInt(vars[4]);
+        int particles = Integer.parseInt(vars[1]);
+        double diameter = Double.parseDouble(vars[2]);
+        int steps = Integer.parseInt(vars[4]);
+        final int dimension = Integer.parseInt(vars[5]);
 
         String startDataDiff = "startDiff_" + dimension + "D_" + particles + "N.xy";
         String finalDataDiff = "finalDiff_" + dimension + "D_" + particles + "N.xy";
@@ -225,7 +227,7 @@ class Execution {
         /*
          * GET IMAGE
          */
-        BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension, 500);
+        BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension, 500, 300);
 
         this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Satunnaiskulku - diffuusiokuvaaja" : "Random Walk - Diffusion Plot");
 
@@ -260,15 +262,16 @@ class Execution {
         /*
         * FROM SCENEREALTIMERMS
         * vars from user:
-        * vars[0] = particles,     n/a
-        * vars[1] = diameter,      n/a
-        * vars[2] = charge,        n/a
-        * vars[3] = steps,         USER
-        * vars[4] = dimension,     USER
-        * vars[5] = diff,          n/a
-        * vars[6] = fixed,         n/a
-        * vars[7] = lattice,       USER
-        * vars[8] = save           n/a
+        * vars[0] = which simulation,   n/a
+        * vars[1] = particles,          n/a
+        * vars[2] = diameter,           n/a
+        * vars[3] = charge,             USER
+        * vars[4] = steps,              USER
+        * vars[5] = dimension,          n/a
+        * vars[6] = calcfix or sawplot, n/a
+        * vars[7] = fixed,              USER
+        * vars[8] = lattice             n/a
+        * vars[9] = save                n/a
         */
         pyexecrms = "python ".concat(pyexecrms);
         this.setFrame();
@@ -283,17 +286,17 @@ class Execution {
 
         if (!result) return;
 
-        int particles = Integer.parseInt(vars[0]);
-        int steps = Integer.parseInt(vars[3]);
-        int dimension = Integer.parseInt(vars[4]);
+        int particles = Integer.parseInt(vars[1]);
+        int steps = Integer.parseInt(vars[4]);
+        int dimension = Integer.parseInt(vars[5]);
 
-        if ( vars[6].equals("f") && vars[7].equals("l") ) {
+        if ( vars[7].equals("f") && vars[8].equals("l") ) {
             titletext = this.getLanguage().equals("fin") ? "Keskitetyn lähteen hilahiukkaset" : "Fixed source lattice particles";
-        } else if ( vars[6].equals("f") && vars[7].equals("-") ) {
+        } else if ( vars[7].equals("f") && vars[8].equals("-") ) {
             titletext = this.getLanguage().equals("fin") ? "Keskitetyn lähteen vapaat hiukkaset" : "Fixed source free particles";
-        } else if ( vars[6].equals("-") && vars[7].equals("l") ) {
+        } else if ( vars[7].equals("-") && vars[8].equals("l") ) {
             titletext = this.getLanguage().equals("fin") ? "Hajautetut hilahiukkaset" : "Spread out lattice particles";
-        } else if ( vars[6].equals("-") && vars[7].equals("-") ) {
+        } else if ( vars[7].equals("-") && vars[8].equals("-") ) {
             titletext = this.getLanguage().equals("fin") ? "Hajautetut vapaat hiukkaset" : "Spread out free particles";
         }
 
@@ -307,7 +310,7 @@ class Execution {
         /*
          * GET IMAGE
          */
-        BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension, 500);
+        BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension, 500, 300);
 
         this.getFrame().setTitle(this.getLanguage()
             .equals("fin") ? "Satunnaiskulku - rms-laskenta - " + titletext : "Random Walk - R_rms Calculation - " + titletext);
@@ -338,15 +341,16 @@ class Execution {
         /*
          * FROM SCENE1Ddist
          * vars from user:
-         * vars[0] = particles,     USER
-         * vars[1] = diameter,      n/a
-         * vars[2] = charge,        n/a
-         * vars[3] = steps,         USER
-         * vars[4] = dimension,     n/a
-         * vars[5] = diff,          n/a
-         * vars[6] = fixed,         n/a
-         * vars[7] = lattice,       USER
-         * vars[8] = save           n/a
+         * vars[0] = which simulation,  USER
+         * vars[1] = particles,         USER
+         * vars[2] = diameter,          n/a
+         * vars[3] = charge,            n/a
+         * vars[4] = steps,             USER
+         * vars[5] = dimension,         n/a
+         * vars[6] = calcfix or sawplot,n/a
+         * vars[7] = fixed,             n/a
+         * vars[8] = lattice,           USER
+         * vars[9] = save               n/a
          */
         pyexec1d = "python ".concat(pyexec1d);
         this.setFrame();
@@ -360,13 +364,13 @@ class Execution {
         }
         if (!result) return;
 
-        int particles = Integer.parseInt(vars[0]);
-        int steps = Integer.parseInt(vars[3]);
-        int dimension = Integer.parseInt(vars[4]);
+        int particles = Integer.parseInt(vars[1]);
+        int steps = Integer.parseInt(vars[4]);
+        int dimension = Integer.parseInt(vars[5]);
 
-        if ( vars[7].equals("l") ) {
+        if ( vars[8].equals("l") ) {
             titletext = this.getLanguage().equals("fin") ? "Hilahiukkaset" : "Lattice particles";
-        } else if ( vars[7].equals("-") ) {
+        } else if ( vars[8].equals("-") ) {
             titletext = this.getLanguage().equals("fin") ? "Vapaat hiukkaset" : "Free particles";
         }
 
@@ -380,7 +384,7 @@ class Execution {
         /*
          * GET IMAGE
          */
-        BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension, 500);
+        BufferedImage image = createPdf(folder, command, pdfFile, particles, steps, dimension, 500, 200);
 
         this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Satunnaiskulku - 1D-etäisyys - " + titletext : "Random Walk - 1D Distance - " + titletext);
 
@@ -412,15 +416,16 @@ class Execution {
         /*
          * FROM SCENEPATHTRACING
          * vars from user:
-         * vars[0] = particles,  n/a
-         * vars[1] = diameter,   n/a
-         * vars[2] = charge,     n/a
-         * vars[3] = steps,      USER
-         * vars[4] = dimension,  USER
-         * vars[5] = diff,       n/a
-         * vars[6] = fixed,      n/a
-         * vars[7] = lattice,    n/a
-         * vars[8] = save        n/a
+         * vars[0] = which simulation,  n/a
+         * vars[1] = particles,         n/a
+         * vars[2] = diameter,          n/a
+         * vars[3] = charge,            n/a
+         * vars[4] = steps,             USER
+         * vars[5] = dimension,         USER
+         * vars[6] = calcfix or sawplot,n/a
+         * vars[7] = fixed,             n/a
+         * vars[8] = lattice,           n/a
+         * vars[9] = save               n/a
          */
 
         pyexecsaw2d = "python ".concat(pyexecsaw2d);
@@ -436,8 +441,8 @@ class Execution {
         }
         if (!result) return false;
 
-        int steps = Integer.parseInt(vars[3]);
-        int dimension = Integer.parseInt(vars[4]);
+        int steps = Integer.parseInt(vars[4]);
+        int dimension = Integer.parseInt(vars[5]);
 
         String dataPath;
         if (iscbmc) dataPath = "cbmc_" + dimension + "D_" + steps + "S.xy";
@@ -463,7 +468,7 @@ class Execution {
         /*
          * GET IMAGE
          */
-        BufferedImage image = createPdf(folder, command, pdfFile, 1, 1, dimension, 50);
+        BufferedImage image = createPdf(folder, command, pdfFile, 1, 1, dimension, 50, 300);
 
         this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Satunnaiskulku - SAW-liikeradat" : "Random Walk - SAW Path Tracing");
         /*
@@ -495,7 +500,7 @@ class Execution {
      * @param fac time factor
      * @return pdf image file
      */
-    BufferedImage createPdf(File folder, String[] command, File pdfFile, int particles, int steps, int dim, int fac) {
+    BufferedImage createPdf(File folder, String[] command, File pdfFile, int particles, int steps, int dim, int fac, int dpi) {
 
         BufferedImage image;
 
@@ -538,7 +543,7 @@ class Execution {
                         try {
                             PDDocument document = PDDocument.load(pdfFile);
                             PDFRenderer renderer = new PDFRenderer(document);
-                            image = renderer.renderImageWithDPI(0, 300, ImageType.RGB);
+                            image = renderer.renderImageWithDPI(0, dpi, ImageType.RGB);
                             document.close();
                         } catch (IOException ex) {
                             //System.out.println(ex.getMessage());

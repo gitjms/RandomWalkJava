@@ -51,19 +51,20 @@ class Data {
         String msg = "";
         /*
         * vars from user:
-        * vars[0] = particles,
-        * vars[1] = diameter,
-        * vars[2] = charge,
-        * vars[3] = steps,
-        * vars[4] = dimension,
-        * vars[5] = mmc,
-        * vars[6] = fixed,
-        * vars[7] = lattice,
-        * vars[8] = save
+        * vars[0] = which simulation,
+        * vars[1] = particles,
+        * vars[2] = diameter,
+        * vars[3] = charge,
+        * vars[4] = steps,
+        * vars[5] = dimension,
+        * vars[6] = calcfix or sawplot,
+        * vars[7] = fixed,
+        * vars[8] = lattice
+          vars[9] = save
         */
         String[] command = new String[]{"cmd","/c",executable,
             this.vars[0], this.vars[1], this.vars[2], this.vars[3], this.vars[4],
-            this.vars[5], this.vars[6], this.vars[7], this.vars[8]};
+            this.vars[5], this.vars[6], this.vars[7], this.vars[8], this.vars[9]};
 
         Runtime runtime = Runtime.getRuntime();
 
@@ -163,12 +164,12 @@ class Data {
      * method for setting the save parameter in vars array
      * @param var the vars array to set
      */
-    void setSave(String var) { this.vars[8]=var; }
+    void setSave(String var) { this.vars[9]=var; }
 
     /**
-     * method for setting the cbmc parameter in vars array
+     * method for setting the parameter for plotting in vars array
      * @param var the vars array to set
      */
-    void setSawCbmc(String var) { this.vars[5]=var; }
+    void setSawCbmc(String var) { this.vars[6]=var; }
 
 }

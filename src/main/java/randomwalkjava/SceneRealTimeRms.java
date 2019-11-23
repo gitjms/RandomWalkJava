@@ -23,10 +23,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import static java.lang.Double.parseDouble;
-import static java.lang.Integer.parseInt;
-import static java.lang.System.arraycopy;
-
 /**
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
@@ -115,15 +111,16 @@ class SceneRealTimeRms extends Data {
         super();
         this.setLanguage(language);
         this.vars = new String[]{
-            "0",    // vars[0] particles        USER
-            "0.1",  // vars[1] diameter         n/a
-            "0",    // vars[2] charge           n/a
-            "0",    // vars[3] steps            USER
-            "0",    // vars[4] dimension        USER
-            "-",    // vars[5] diffusion        n/a
-            "f",    // vars[6] fixed(/spread)   n/a
-            "-",    // vars[7] (lattice/)free   n/a
-            "-"};   // vars[8] save (off)       n/a
+            "-",    // vars[0] which simulation     USER
+            "0",    // vars[1] particles            USER
+            "0.1",  // vars[2] diameter             n/a
+            "0",    // vars[3] charge               n/a
+            "0",    // vars[4] steps                USER
+            "0",    // vars[5] dimension            USER
+            "-",    // vars[6] calcfix or sawplot   n/a
+            "f",    // vars[7] fixed(/spread)       n/a
+            "-",    // vars[8] (lattice/)free       n/a
+            "-"};   // vars[9] save (off)           n/a
         this.running = false;
     }
 
@@ -156,14 +153,15 @@ class SceneRealTimeRms extends Data {
         if (newdata) {
             this.setBiggDist(0.0);
             this.setRuns(1);
-            this.setSigSeed(0.0);
+            if ( this.isStandPlot() ) this.setSigSeed(1.0);
+            else this.setSigSeed(0.0);
             this.setInitPart(0);
             this.setRms_runs();
             this.setRms_norm();
             this.setMeasure(measure);
-            this.numParts(parseInt(this.vars[0]));
-            this.setSteps(parseDouble(this.vars[3]));
-            this.dim(parseInt(this.vars[4]));
+            this.numParts(Integer.parseInt(this.vars[1]));
+            this.setSteps(Double.parseDouble(this.vars[4]));
+            this.dim(Integer.parseInt(this.vars[5]));
             this.setExpected(Math.sqrt(this.getSteps()));
             this.setGreatest(this.getExpected() + Math.log10(this.getSteps()));
             String standdiff = "";
@@ -173,8 +171,8 @@ class SceneRealTimeRms extends Data {
             if ( this.isStandPlot() ){
                 /*this.setMincount(-3.0);
                 this.setMaxcount(3.0);*/
-                this.setMincount(-this.getExpected()*2.5);
-                this.setMaxcount(this.getExpected()*2.5);
+                this.setMincount(-this.getExpected()*2.0);
+                this.setMaxcount(this.getExpected()*2.0);
             } else if ( this.isDiffPlot() ){
                 /*this.setMincount(-(7.0+65.0*(1.0-Math.exp(-0.001*this.getSteps()))));
                 this.setMaxcount(7.0+65.0*(1.0-Math.exp(-0.001*this.getSteps())));*/
@@ -241,7 +239,7 @@ class SceneRealTimeRms extends Data {
 
         command = new String[]{"cmd","/c",executable,
             this.vars[0], this.vars[1], this.vars[2], this.vars[3], this.vars[4],
-            this.vars[5], this.vars[6], this.vars[7], this.vars[8]};
+            this.vars[5], this.vars[6], this.vars[7], this.vars[8], this.vars[9]};
 
         try {
             this.setRuntime(Runtime.getRuntime());
@@ -393,15 +391,15 @@ class SceneRealTimeRms extends Data {
                             for (int m = 0; m < this.getNumParts(); m++)
                                 this.setSumParts(this.getSumParts() + this.getSum()[m]);
 
-                            double rrms_walk = Math.sqrt(this.getSumParts()/(this.getNumParts()*this.getRuns()));
+                            double rrms_walk = Math.sqrt(this.getSumParts()/(this.getNumParts()*(this.getRuns())));
                             this.setRms_sum(this.getRms_sum() + rrms_walk);
-                            double avg = this.getRms_sum()/this.getRuns();
+                            double avg = this.getRms_sum()/(this.getRuns());
                             this.setSigSeed(this.getSigSeed() + (rrms_walk - avg));
 
                             if (this.getRuns() < 11) {
                                 this.getRms_runs()[(int) this.getRuns() - 1] = rrms_walk;
                             } else {
-                                arraycopy(this.getRms_runs(), 1, this.getRms_runs(), 0, 9);
+                                System.arraycopy(this.getRms_runs(), 1, this.getRms_runs(), 0, 9);
                                 this.getRms_runs()[9] = rrms_walk;
                             }
                             this.setYAxis(this.getRms_runs().clone());
@@ -421,7 +419,7 @@ class SceneRealTimeRms extends Data {
                             double ynorm = 0.0;
                             for (int h = 0; h < 100; h++) {
                                 if (this.isStandPlot()) {
-                                    double sigma = (this.getSigSeed()/this.getRuns());
+                                    double sigma = this.getSigSeed()/this.getRuns();
                                     if (this.whichNorm() == 1)
                                         ynorm = 1.0 / (Math.sqrt(2.0 * Math.PI) * sigma)
                                             * Math.exp(-Math.pow(this.getXnormAxis()[h], 2.0) / (2.0 * Math.pow(sigma, 2)));
@@ -431,7 +429,7 @@ class SceneRealTimeRms extends Data {
                                     this.setGreatestDN(ynorm > this.getGreatestDN() ? ynorm : this.getGreatestDN());
                                     this.getFxplot().setNMaxY(this.getGreatestDN());
                                 } else if (this.isDiffPlot()) {
-                                    double diff = rrms_walk / (2.0 * this.getDim() * this.getSteps());
+                                    double diff = Math.pow(rrms_walk, 2.0) / (2.0 * this.getDim() * this.getSteps());
                                     double sigma2 = 2.0 * diff * this.getSteps();
                                     if (this.whichDiff() == 1)
                                         ynorm = 1.0 / Math.sqrt(2.0 * Math.PI * sigma2)
@@ -466,6 +464,7 @@ class SceneRealTimeRms extends Data {
                     }
                 }
 
+                // FIRST THREE DISTRIBUTION GRAPHS
                 if (this.getRuns() < 4) {
                     String mapkey;
                     String mapkey1 = "\u03C1(r,t\u2081)";
@@ -515,7 +514,7 @@ class SceneRealTimeRms extends Data {
         final double binSize = max / numBins;
 
         for (double d : data) {
-            int bin = (int) Math.ceil(d / binSize);
+            int bin = (int) Math.ceil(d / binSize) - 1;
             if (bin >= 0 && bin < numBins) result[bin] += 1;
         }
         return result;
@@ -565,24 +564,24 @@ class SceneRealTimeRms extends Data {
             if (isNumInteger(this.setNumParticles.getText().trim())){
                 if (this.setNumParticles.getText().trim().equals("0")){
                     this.setNumParticles.setText("1");
-                    this.vars[0] = "1";
+                    this.vars[1] = "1";
                 } else {
-                    this.vars[0] = this.setNumParticles.getText().trim();
+                    this.vars[1] = this.setNumParticles.getText().trim();
                 }
             } else
-                this.vars[0] = "0";
+                this.vars[1] = "0";
         });
 
-        this.vars[1] = "0.1"; // (diameter of particle)
-        this.vars[2] = "0"; // (charge of particles)
+        this.vars[2] = "0.1"; // (diameter of particle)
+        this.vars[3] = "0"; // (charge of particles)
 
         Label labNumSteps = new Label(this.getLanguage().equals("fin") ? "askelten lukumäärä:" : "number of steps:");
         this.setNumSteps = new TextField("");
         this.setNumSteps.setOnKeyReleased(e -> {
             if (isNumInteger(this.setNumSteps.getText().trim())){
-                this.vars[3] = this.setNumSteps.getText().trim();
+                this.vars[4] = this.setNumSteps.getText().trim();
             } else
-                this.vars[3] = "0";
+                this.vars[4] = "0";
         });
 
         Label labNumDimensions = new Label(this.getLanguage().equals("fin") ? "ulottuvuus:" : "dimension:");
@@ -613,25 +612,25 @@ class SceneRealTimeRms extends Data {
             this.setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[4] = "1";
+            this.vars[5] = "1";
         });
         this.setDim2.setOnMouseClicked(f -> {
             this.setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[4] = "2";
+            this.vars[5] = "2";
         });
         this.setDim3.setOnMouseClicked(f -> {
             this.setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[4] = "3";
+            this.vars[5] = "3";
         });
 
-        this.vars[5] = "-"; // diffusion        n/a
-        this.vars[6] = "f"; // fixed(/spread)   n/a
-        this.vars[7] = "-"; // (lattice/)free   n/a
-        this.vars[8] = "-"; // save (off)       n/a
+        this.vars[6] = "-"; // calcfix or sawplot   n/a
+        this.vars[7] = "f"; // fixed(/spread)       n/a
+        this.vars[8] = "-"; // (lattice/)free       n/a
+        this.vars[9] = "-"; // save (off)           n/a
 
         Label labPlotChoice = new Label(this.getLanguage().equals("fin") ? "Kuvaaja:" : "Plot type:");
         this.setStandPlot = new ToggleButton(this.getLanguage().equals("fin") ? "NORM. JAKAUMA" : "NORM. DISTRIB.");

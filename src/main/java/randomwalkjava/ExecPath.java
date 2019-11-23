@@ -50,13 +50,13 @@ class ExecPath extends Data {
             Data data = new Data(vars);
             boolean fail = false;
 
-            int particles = Integer.parseInt(this.getVars()[0]);
-            double diam = Double.parseDouble(this.getVars()[1]);
-            int charge = Integer.parseInt(this.getVars()[2]);
-            int steps = Integer.parseInt(this.getVars()[3]);
-            int dim = Integer.parseInt(this.getVars()[4]);
-            String fixed = this.getVars()[6];
-            String lattice = this.getVars()[7];
+            int particles = Integer.parseInt(this.getVars()[1]);
+            double diam = Double.parseDouble(this.getVars()[2]);
+            int charge = Integer.parseInt(this.getVars()[3]);
+            int steps = Integer.parseInt(this.getVars()[4]);
+            int dim = Integer.parseInt(this.getVars()[5]);
+            String fixed = this.getVars()[7];
+            String lattice = this.getVars()[8];
 
             if ( particles < 0 ) fail = true;
             if ( diam <= 0.0 || diam >= 1.0 ) fail = true;
@@ -68,13 +68,11 @@ class ExecPath extends Data {
 
             if ( fail ) return;
 
-            String warnText;
+            String warnText = "";
             int cost = (int) Math.log10(particles*steps);
 
-            if (cost < 8) {
-                warnText = this.getLanguage().equals("fin") ? "Ajon kesto yli puoli tuntia." : "Time estimate is over half an hour.";
-            } else {
-                warnText = this.getLanguage().equals("fin") ? "Ajon kesto tunteja." : "Time estimate is hours.";
+            if (cost > 10) {
+                warnText = this.getLanguage().equals("fin") ? "Ajo voi kestää kauan." : "Run may take a long time.";
             }
 
             if ( cost < 6 ) {
@@ -87,7 +85,7 @@ class ExecPath extends Data {
                 Alert alertPath = getDialogs.getAlert(this.getLanguage(), this.getButtonYES(), this.getButtonNO(), alertText);
                 alertPath.showAndWait();
 
-                if ( alertPath.getResult() == ButtonType.YES) {
+                if ( alertPath.getResult().getButtonData().equals(this.getButtonYES().getButtonData()) ) {
                     ex.executePath(datafolder, datapath, fexec, pyexec1d, pyexec2d, pyexec3d, data, this.getVars());
                     alertPath.close();
                 } else alertPath.close();

@@ -51,15 +51,16 @@ class SceneCalculation extends Data {
         this.setLanguage(language);
         this.nappiLattice = new Button(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
         this.vars = new String[]{
-            "0",    // vars[0] particles        n/a
-            "0",    // vars[1] diameter         n/a
-            "0",    // vars[2] charge           n/a
-            "0",    // vars[3] steps            USER
-            "0",    // vars[4] dimension        USER
-            "-",    // vars[5] diffusion        n/a
-            "f",    // vars[6] fixed(/spread)   n/a
-            "-",    // vars[7] (lattice/)free   USER
-            "s"};   // vars[8] save (on)        n/a
+            "C",    // vars[0] which simulation     n/a
+            "0",    // vars[1] particles            n/a
+            "0",    // vars[2] diameter             n/a
+            "0",    // vars[3] charge               n/a
+            "0",    // vars[4] steps                USER
+            "0",    // vars[5] dimension            USER
+            "-",    // vars[6] calcfix or sawplot   n/a
+            "f",    // vars[7] fixed(/spread)       n/a
+            "-",    // vars[8] (lattice/)free       USER
+            "s"};   // vars[9] save (on)            n/a
     }
 
     /**
@@ -115,17 +116,17 @@ class SceneCalculation extends Data {
         /*
         * COMPONENTS...
         */
-        this.vars[0] = "0"; // (amount of particles)
-        this.vars[1] = "0"; // (diameter of particl)
-        this.vars[2] = "0"; // (charge of particles)
+        this.vars[1] = "0"; // (amount of particles)
+        this.vars[2] = "0"; // (diameter of particl)
+        this.vars[3] = "0"; // (charge of particles)
 
         Label labNumSteps = new Label(this.getLanguage().equals("fin") ? "askelten lukumäärä:" : "number of steps:");
         TextField setNumSteps = new TextField("");
         setNumSteps.setOnKeyReleased(e -> {
             if (isNumInteger(setNumSteps.getText().trim())){
-                this.vars[3] = setNumSteps.getText().trim();
+                this.vars[4] = setNumSteps.getText().trim();
             } else
-                this.vars[3] = "0";
+                this.vars[4] = "0";
         });
 
         Label labNumDimensions = new Label(this.getLanguage().equals("fin") ? "ulottuvuus:" : "dimension:");
@@ -153,19 +154,19 @@ class SceneCalculation extends Data {
             setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[4] = "1";
+            this.vars[5] = "1";
         });
         setDim2.setOnMouseClicked(f -> {
             setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[4] = "2";
+            this.vars[5] = "2";
         });
         setDim3.setOnMouseClicked(f -> {
             setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[4] = "3";
+            this.vars[5] = "3";
         });
 
         this.setFix = new Button(this.getLanguage().equals("fin") ? "KORJAUS" : "FIX");
@@ -184,7 +185,7 @@ class SceneCalculation extends Data {
                     : getComponents.getPane2(ivCalcEN, this.getTextWidth(), this.getTextHeight()));
                 this.setFix.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.setFix(false);
-                this.vars[5] = "-";
+                this.vars[6] = "-";
             } else {
                 this.getPane().getChildren().clear();
                 if (!this.getIsLattice()) {
@@ -198,11 +199,11 @@ class SceneCalculation extends Data {
                 }
                 this.setFix.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.setFix(true);
-                this.vars[5] = "b";
+                this.vars[6] = "b";
             }
         });
 
-        this.vars[6] = "f"; // fixed(/spread)
+        this.vars[7] = "f"; // fixed(/spread)
 
         /*
          * BUTTON: LATTICE (TOGGLE)
@@ -217,7 +218,7 @@ class SceneCalculation extends Data {
             if (this.getNappiLattice().getText().equals("LATTICE") || this.getNappiLattice().getText().equals("HILA")){
                 this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
                 this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[7] = "-";
+                this.vars[8] = "-";
                 this.setIsLattice(false);
                 if (this.isFix()) {
                     this.getPane().getChildren().clear();
@@ -228,7 +229,7 @@ class SceneCalculation extends Data {
             } else if (this.getNappiLattice().getText().equals("FREE") || this.getNappiLattice().getText().equals("VAPAA")){
                 this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "HILA" : "LATTICE");
                 this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[7] = "l";
+                this.vars[8] = "l";
                 this.setIsLattice(true);
                 if (this.isFix()) {
                     this.getPane().getChildren().clear();
@@ -240,7 +241,7 @@ class SceneCalculation extends Data {
         });
         valikko.getChildren().add(this.getNappiLattice());
 
-        this.vars[8] = "s"; // save on
+        this.vars[9] = "s"; // save on
 
         /*
         * ...THEIR PLACEMENTS

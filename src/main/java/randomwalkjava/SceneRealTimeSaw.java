@@ -24,9 +24,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import static java.lang.Integer.parseInt;
-import static java.lang.System.arraycopy;
-
 /**
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
@@ -82,15 +79,16 @@ class SceneRealTimeSaw extends Data {
         super();
         this.setLanguage(language);
         this.vars = new String[]{
-            "0",    // vars[0] particles        n/a
-            "0",    // vars[1] diameter         n/a
-            "0",    // vars[2] charge           n/a
-            "0",    // vars[3] steps            USER
-            "0",    // vars[4] dimension        USER
-            "-",    // vars[5] diffusion        n/a
-            "c",    // vars[6] fixed(/spread)   n/a
-            "-",    // vars[7] lattice/(free)   n/a
-            "-"};   // vars[8] save (off)       n/a
+            "E",    // vars[0] which simulation     n/a
+            "0",    // vars[1] particles            n/a
+            "0",    // vars[2] diameter             n/a
+            "0",    // vars[3] charge               n/a
+            "0",    // vars[4] steps                USER
+            "0",    // vars[5] dimension            USER
+            "-",    // vars[6] calcfix or sawplot   n/a
+            "-",    // vars[7] fixed(/spread)       n/a
+            "-",    // vars[8] lattice/(free)       n/a
+            "-"};   // vars[9] save (off)           n/a
         this.running = false;
         this.setIsSaw(true);
     }
@@ -117,7 +115,7 @@ class SceneRealTimeSaw extends Data {
 
 
         this.setFirstData(firstdata);
-        this.dim(parseInt(this.vars[4]));
+        this.dim(Integer.parseInt(this.vars[5]));
         this.setSteps(0);
         this.setIsSaw(issaw);
         if (this.isFirstData()) {
@@ -147,7 +145,7 @@ class SceneRealTimeSaw extends Data {
 
         command = new String[]{"cmd","/c",executable,
             this.vars[0], this.vars[1], this.vars[2], this.vars[3], this.vars[4],
-            this.vars[5], this.vars[6], this.vars[7], this.vars[8]};
+            this.vars[5], this.vars[6], this.vars[7], this.vars[8], this.vars[9]};
 
         try {
             this.setRuntime(Runtime.getRuntime());
@@ -253,7 +251,7 @@ class SceneRealTimeSaw extends Data {
                         this.getGreatestY()[(int) this.getRuns()] = biggest;
                         if (biggest > greatest) greatest = biggest + fact;
                     } else {
-                        arraycopy(this.getGreatestY(), 1, this.getGreatestY(), 0, 9);
+                        System.arraycopy(this.getGreatestY(), 1, this.getGreatestY(), 0, 9);
                         this.getGreatestY()[9] = biggest;
                         for (double i : this.getGreatestY())
                             if (i > greatest) greatest = i > greatest ? i + fact : greatest;
@@ -450,23 +448,23 @@ class SceneRealTimeSaw extends Data {
         /*
          * COMPONENTS...
          */
-        this.vars[0] = "0"; // (number of particles)
-        this.vars[1] = "0"; // (diameter of particle)
-        this.vars[2] = "0"; // (charge of particles)
+        this.vars[1] = "0"; // (number of particles)
+        this.vars[2] = "0"; // (diameter of particle)
+        this.vars[3] = "0"; // (charge of particles)
 
         Label labNumSteps = new Label(this.getLanguage().equals("fin") ? "askeleet:" : "steps:");
         TextField setNumSteps = new TextField("");
         setNumSteps.setMaxWidth(this.getBigCompwidth());
         setNumSteps.setOnKeyReleased(e -> {
             if (isNumInteger(setNumSteps.getText().trim())){
-                this.vars[3] = setNumSteps.getText().trim();
+                this.vars[4] = setNumSteps.getText().trim();
                 runSAW.setDisable(true);
                 runCBMC.setDisable(false);
                 this.setIsSaw(false);
                 //getComponents.getPaneView(pane, this.getLanguage().equals("fin")
                 //    ? ivSawcbmcFI : ivSawcbmcEN, this.getSawTextWidth(), this.getSawTextHeight());
             } else {
-                this.vars[3] = "0";
+                this.vars[4] = "0";
                 runSAW.setDisable(false);
                 runCBMC.setDisable(true);
                 this.setIsSaw(true);
@@ -508,14 +506,14 @@ class SceneRealTimeSaw extends Data {
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             sliderCee.setValue(1.0);
-            this.vars[4] = "2";
+            this.vars[5] = "2";
             this.dim(2);
         });
         this.setDim3.setOnMouseClicked(f -> {
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             sliderCee.setValue(1.0);
-            this.vars[4] = "3";
+            this.vars[5] = "3";
             this.dim(3);
         });
 
@@ -524,10 +522,10 @@ class SceneRealTimeSaw extends Data {
         this.setComps(new HBox(this.getStepComps(), this.getDimComps()));
         this.getComps().setSpacing(10);
 
-        this.vars[5] = "-"; // diffusion        n/a
-        this.vars[6] = "c"; // fixed(/spread)   n/a
-        this.vars[7] = "-"; // lattice/(free)   n/a
-        this.vars[8] = "-"; // save (off)       n/a
+        this.vars[6] = "-"; // calcfix or sawplot   n/a
+        this.vars[7] = "-"; // fixed(/spread)       n/a
+        this.vars[8] = "-"; // lattice/(free)       n/a
+        this.vars[9] = "-"; // save (off)           n/a
 
         /*
          * ...THEIR PLACEMENTS

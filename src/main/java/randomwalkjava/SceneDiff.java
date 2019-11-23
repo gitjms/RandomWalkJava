@@ -26,9 +26,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static java.lang.Double.parseDouble;
-import static java.lang.Integer.parseInt;
-
 /**
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
@@ -67,6 +64,7 @@ class SceneDiff extends Data {
     private GraphicsContext piirturi;
     private FXPlot fxplot;
     private Button remBarNappiDiff;
+    private Button cancelNappiDiff;
     private VBox valikkoDiff;
     private Button runDiff;
     private final Button nappiBalls3D;
@@ -75,7 +73,7 @@ class SceneDiff extends Data {
     private Button menuNappiDiff;
     private Button helpNappiDiff;
 
-    private boolean platfRunning;
+    private boolean platfNotRunning;
     private Process process;
     private Runtime runtime;
     private int exitVal;
@@ -106,6 +104,7 @@ class SceneDiff extends Data {
     private List<Double> visc_y;
     private double measure;
     private double differ;
+    private boolean iscancel;
 
     /**
      * main class gets vars via this
@@ -124,15 +123,16 @@ class SceneDiff extends Data {
         this.balls3D = true;
         this.formatter = new DecimalFormat("0.00");
         this.vars = new String[]{
-            "0",    // vars[0] particles        USER
-            "0.0",  // vars[1] diameter         USER
-            "0",    // vars[2] charge           USER
-            "0",    // vars[3] steps            n/a
-            "0",    // vars[4] dimension        USER
-            "m",    // vars[5] diff             n/a
-            "-",    // vars[6] (fixed/)spread   n/a
-            "-",    // vars[7] (lattice/)free   USER
-            "-"};   // vars[8] save (off)       n/a
+            "D",    // vars[0] which simulation     USER
+            "0",    // vars[1] particles            USER
+            "0.0",  // vars[2] diameter             USER
+            "0",    // vars[3] charge               USER
+            "0",    // vars[4] steps                n/a
+            "0",    // vars[5] dimension            USER
+            "-",    // vars[6] calcfix or sawplot   n/a
+            "-",    // vars[7] (fixed/)spread       n/a
+            "-",    // vars[8] (lattice/)free       USER
+            "-"};   // vars[9] save (off)           n/a
     }
 
     /**
@@ -145,6 +145,7 @@ class SceneDiff extends Data {
      * @param animwidth drawing area width
      * @param linewidth width for lines
      * @param remBarNappiDiff removing barrier in animation
+     * @param cancelNappiDiff removing barrier in animation
      * @param runDiff run animation, no plot
      * @param valikkoDiff valikkoDiff
      * @param plotDiff plot initial and final particle configurations, no animation
@@ -163,7 +164,7 @@ class SceneDiff extends Data {
      */
     void refresh(File folder, File initialDataFile, String executable,
                  GraphicsContext piirturi, double scalefactor, double animwidth, double linewidth,
-                 Button remBarNappiDiff, Button runDiff, VBox valikkoDiff, Button plotDiff,
+                 Button remBarNappiDiff, Button cancelNappiDiff, Button runDiff, VBox valikkoDiff, Button plotDiff,
                  Button closeNappiDiff, Button menuNappiDiff, Button helpNappiDiff, List<Double> energy_x,
                  List<Double> energy_y, List<Double> diffusion_x, List<Double> diffusion_y, List<Double> visc_x,
                  List<Double> visc_y, boolean newdata, double measure, double differ) {
@@ -177,6 +178,7 @@ class SceneDiff extends Data {
         this.setLinewidth(linewidth);
         this.setAnimwidth(animwidth);
         this.setRemBarNappiDiff(remBarNappiDiff);
+        this.setCancelNappiDiff(cancelNappiDiff);
         this.setRunDiff(runDiff);
         this.setValikkoDiff(valikkoDiff);
         this.setPlotDiff(plotDiff);
@@ -190,11 +192,11 @@ class SceneDiff extends Data {
 
         if (newdata) {
             this.setInitE(0);
-            this.setNumPart(parseInt(this.vars[0]));
-            this.setDiam(parseDouble(this.vars[1]));
-            this.setCharge(parseInt(this.vars[2]));
-            this.setDim(parseInt(this.vars[4]));
-            this.setLattice(this.vars[7].equals("l"));
+            this.setNumPart(Integer.parseInt(this.vars[1]));
+            this.setDiam(Double.parseDouble(this.vars[2]));
+            this.setCharge(Integer.parseInt(this.vars[3]));
+            this.setDim(Integer.parseInt(this.vars[5]));
+            this.setLattice(this.vars[8].equals("l"));
             this.setBalls3D(this.isBalls3D());
             this.setPhaseEnergy(0);
             this.setPhaseDiffus(0);
@@ -218,10 +220,10 @@ class SceneDiff extends Data {
             this.setValues(new double[this.getDim() + 1][this.getNumPart()]);
             clearDots();
             this.setWalkTime(0.0);
+            this.getPlotDiff().setVisible(false);
+            this.setIsCancel(false);
         }
 
-        this.getRemBarNappiDiff().setVisible(true);
-        this.getPlotDiff().setVisible(false);
         this.getMenuNappiDiff().setDisable(true);
         this.getHelpNappiDiff().setDisable(true);
         this.getCharge1().setDisable(true);
@@ -231,14 +233,30 @@ class SceneDiff extends Data {
         this.getNappiLattice().setDisable(true);
         this.getNappiBalls3D().setDisable(true);
         this.getValikkoDiff().getChildren().set(3, this.getRemBarNappiDiff());
+        this.getValikkoDiff().getChildren().set(4, this.getCancelNappiDiff());
+        this.getRemBarNappiDiff().setVisible(true);
+        this.getCancelNappiDiff().setVisible(true);
 
         this.getRemBarNappiDiff().setOnMouseClicked(event -> {
             barrierOff();
             this.getValikkoDiff().getChildren().set(3, this.getRunDiff());
             this.getRunDiff().setDisable(true);
             this.getRemBarNappiDiff().setVisible(false);
+            this.getCancelNappiDiff().setVisible(false);
             this.getCloseNappiDiff().setDisable(true);
             this.getFxplot().setFrameVis();
+        });
+
+        this.getCancelNappiDiff().setOnMouseClicked(event -> {
+            barrierOff();
+            this.setIsCancel(true);
+            this.getValikkoDiff().getChildren().set(3, this.getRunDiff());
+            this.getRunDiff().setDisable(true);
+            this.getRemBarNappiDiff().setVisible(false);
+            this.getCancelNappiDiff().setVisible(false);
+            this.getCloseNappiDiff().setDisable(true);
+            this.getValikkoDiff().getChildren().set(4, this.getPlotDiff());
+            this.getPlotDiff().setVisible(true);
         });
 
         piirturi.setLineWidth(linewidth);
@@ -249,7 +267,7 @@ class SceneDiff extends Data {
         {
         command = new String[]{"cmd","/c",executable,
             this.vars[0], this.vars[1], this.vars[2], this.vars[3], this.vars[4],
-            this.vars[5], this.vars[6], this.vars[7], this.vars[8]};
+            this.vars[5], this.vars[6], this.vars[7], this.vars[8], this.vars[9]};
 
         this.setRuntime(Runtime.getRuntime());
         runtimeStart();
@@ -288,6 +306,7 @@ class SceneDiff extends Data {
 
                 if ( !timerIsRunning()) return;
 
+                // WAIT FOR BARRIER REMOVAL
                 while ( barrierIsOn() ) {
                     try {
                         Thread.sleep(500);
@@ -295,13 +314,14 @@ class SceneDiff extends Data {
                         System.out.println(ex.getMessage());
                     }
                 }
-
+                // CONTINUE
                 if ( !barrierIsOn() ) {
                     setOutput(new BufferedWriter(new OutputStreamWriter(getProcess().getOutputStream())));
                     PrintWriter pw = null;
                     if (getOutput() != null) pw = new PrintWriter(getOutput());
                     if (pw != null) {
-                        pw.println("x");
+                        if (isCancel()) pw.println("-");
+                        else pw.println("x");
                         pw.flush();
                         pw.close();
                     }
@@ -313,230 +333,251 @@ class SceneDiff extends Data {
                     }
                 }
 
-                try (BufferedReader input = new BufferedReader(new InputStreamReader(
-                    getProcess().getInputStream()))) {
-                    String line;
+                if (!isCancel()) {
+                    try (BufferedReader input = new BufferedReader(new InputStreamReader(
+                        getProcess().getInputStream()))) {
+                        String line;
 
-                    while ((line = input.readLine()) != null){
-                        if (line.trim().startsWith("S") || line.isEmpty()) {
-                            continue;
-                        }
-                        if (!line.substring(0,1).matches("([0-9]|-|\\+|\\*)|E|D|V|T"))
-                            continue;
-                        if ( !(line.trim().split("(\\s+)")[0].trim().equals("E")
-                            || line.trim().split("(\\s+)")[0].trim().equals("D")
-                            || line.trim().split("(\\s+)")[0].trim().equals("V")
-                            || line.trim().split("(\\s+)")[0].trim().equals("T")) ) {
-                            if (getDim() == 2) {
-                                String[] valStr = line.split("(\\s+)");
-                                String sign = valStr[0].trim();
-                                try {
-                                    getValues()[0][i] = Double.parseDouble(valStr[1].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
-                                    getValues()[1][i] = Double.parseDouble(valStr[2].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
-                                    switch (sign) {
-                                        case "+":
-                                            getValues()[2][i] = 1.0; // red ball
-                                            break;
-                                        case "-":
-                                            getValues()[2][i] = 2.0; // blue ball
-                                            break;
-                                        case "*":
-                                            getValues()[2][i] = 3.0; // yellow ball
-                                            break;
-                                    }
-                                } catch (NumberFormatException e) {
-                                    continue;
-                                }
-                            } else if (getDim() == 3) {
-                                String[] valStr = line.split("(\\s+)");
-                                String sign = valStr[0].trim();
-                                try {
-                                    getValues()[0][i] = Double.parseDouble(valStr[1].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
-                                    getValues()[1][i] = Double.parseDouble(valStr[2].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
-                                    getValues()[2][i] = Double.parseDouble(valStr[3].trim()) + getCenter() / getScalefactor();
-                                    switch (sign) {
-                                        case "+":
-                                            getValues()[3][i] = 1.0; // red ball
-                                            break;
-                                        case "-":
-                                            getValues()[3][i] = 2.0; // blue ball
-                                            break;
-                                        case "*":
-                                            getValues()[3][i] = 3.0; // yellow ball
-                                            break;
-                                    }
-                                } catch (NumberFormatException e) {
-                                    continue;
-                                }
+                        while ((line = input.readLine()) != null) {
+                            if (line.trim().startsWith("S") || line.isEmpty()) {
+                                continue;
                             }
-
-                            platfStart();
-                            javafx.application.Platform.runLater(() -> {
-                                if ( !platfIsRunning()) return;
-
-                                // DRAW
-                                clearDots();
-                                if ( getDim() == 2 && isLattice() ) drawLattice();
-                                for (int k = 0; k < getNumPart(); k++){
-                                    if ( getDim() == 2 ) {
-                                        draw2Dots(getValues()[0][k], getValues()[1][k], getValues()[2][k]);
-                                    } else if ( getDim() == 3 ) {
-                                        draw3Dots(getValues()[0][k], getValues()[1][k], getValues()[2][k], getValues()[3][k]);
+                            if (!line.substring(0, 1).matches("([0-9]|-|\\+|\\*)|E|D|V|T"))
+                                continue;
+                            if (!(line.trim().split("(\\s+)")[0].trim().equals("E")
+                                || line.trim().split("(\\s+)")[0].trim().equals("D")
+                                || line.trim().split("(\\s+)")[0].trim().equals("V")
+                                || line.trim().split("(\\s+)")[0].trim().equals("T"))) {
+                                if (getDim() == 2) {
+                                    String[] valStr = line.split("(\\s+)");
+                                    String sign = valStr[0].trim();
+                                    try {
+                                        getValues()[0][i] = Double.parseDouble(valStr[1].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
+                                        getValues()[1][i] = Double.parseDouble(valStr[2].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
+                                        switch (sign) {
+                                            case "+":
+                                                getValues()[2][i] = 1.0; // red ball
+                                                break;
+                                            case "-":
+                                                getValues()[2][i] = 2.0; // blue ball
+                                                break;
+                                            case "*":
+                                                getValues()[2][i] = 3.0; // yellow ball
+                                                break;
+                                        }
+                                    } catch (NumberFormatException e) {
+                                        continue;
+                                    }
+                                } else if (getDim() == 3) {
+                                    String[] valStr = line.split("(\\s+)");
+                                    String sign = valStr[0].trim();
+                                    try {
+                                        getValues()[0][i] = Double.parseDouble(valStr[1].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
+                                        getValues()[1][i] = Double.parseDouble(valStr[2].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
+                                        getValues()[2][i] = Double.parseDouble(valStr[3].trim()) + getCenter() / getScalefactor();
+                                        switch (sign) {
+                                            case "+":
+                                                getValues()[3][i] = 1.0; // red ball
+                                                break;
+                                            case "-":
+                                                getValues()[3][i] = 2.0; // blue ball
+                                                break;
+                                            case "*":
+                                                getValues()[3][i] = 3.0; // yellow ball
+                                                break;
+                                        }
+                                    } catch (NumberFormatException e) {
+                                        continue;
                                     }
                                 }
-                            });
 
-                            i++;
+                                platfStart();
+                                javafx.application.Platform.runLater(() -> {
+                                    if (platfNotRunning()) return;
 
-                            if ( i == getNumPart() ) i = 0;
+                                    // DRAW
+                                    clearDots();
+                                    if (getDim() == 2 && isLattice()) drawLattice();
+                                    for (int k = 0; k < getNumPart(); k++) {
+                                        if (getDim() == 2) {
+                                            draw2Dots(getValues()[0][k], getValues()[1][k], getValues()[2][k]);
+                                        } else if (getDim() == 3) {
+                                            draw3Dots(getValues()[0][k], getValues()[1][k], getValues()[2][k], getValues()[3][k]);
+                                        }
+                                    }
+                                });
 
-                        } else {
-                            String firstLetter = line.trim().split("(\\s+)")[0].trim();
-                            boolean nanFound = false;
-                            try {
-                                if ( firstLetter.equals("E") && !isFirstEnergy() ) {
-                                    double firstNum = Double.parseDouble(line.split("(\\s+)")[1].trim());
-                                    setFirstEnergy(true);
+                                i++;
 
-                                    if ( isFirstEnergy() ) {
-                                        if (!Double.isNaN(firstNum) && !Double.isInfinite(firstNum)
+                                if (i == getNumPart()) i = 0;
+
+                            } else {
+                                String firstLetter = line.trim().split("(\\s+)")[0].trim();
+                                boolean nanFound = false;
+                                try {
+                                    if (firstLetter.equals("E") && !isFirstEnergy()) {
+                                        double firstNum = Double.parseDouble(line.split("(\\s+)")[1].trim());
+                                        setFirstEnergy(true);
+
+                                        if (isFirstEnergy()) {
+                                            if (!Double.isNaN(firstNum) && !Double.isInfinite(firstNum)
+                                                && !Double.isNaN(getPhaseEnergy()) && !Double.isInfinite(getPhaseEnergy())) {
+                                                getEnergyY().add(firstNum);
+                                                getEnergyX().add((double) getPhaseEnergy());
+                                            } else
+                                                nanFound = true;
+                                            if (!nanFound) {
+                                                setPhaseEnergy(getPhaseEnergy() + 1);
+                                                setSmallest(0.0);
+                                                setGreatest(getEnergyY().get(0));
+                                                getFxplot().setEData(getEnergyX(), getEnergyY());
+                                            }
+                                        }
+                                    } else if (firstLetter.equals("E")) {
+                                        double number = Double.parseDouble(line.split("(\\s+)")[1].trim());
+                                        if (!Double.isNaN(number) && !Double.isInfinite(number)
                                             && !Double.isNaN(getPhaseEnergy()) && !Double.isInfinite(getPhaseEnergy())) {
-                                            getEnergyY().add(firstNum);
+                                            getEnergyY().add(number);
                                             getEnergyX().add((double) getPhaseEnergy());
                                         } else
                                             nanFound = true;
-                                        if (!nanFound) {
+                                        if (!nanFound)
                                             setPhaseEnergy(getPhaseEnergy() + 1);
-                                            setSmallest(0.0);
-                                            setGreatest(getEnergyY().get(0));
-                                            getFxplot().setEData(getEnergyX(), getEnergyY());
-                                        }
-                                    }
-                                } else if ( firstLetter.equals("E") ) {
-                                    double number = Double.parseDouble(line.split("(\\s+)")[1].trim());
-                                    if ( !Double.isNaN(number) && !Double.isInfinite(number)
-                                        && !Double.isNaN(getPhaseEnergy()) && !Double.isInfinite(getPhaseEnergy()) ) {
-                                        getEnergyY().add(number);
-                                        getEnergyX().add((double) getPhaseEnergy());
-                                    } else
-                                        nanFound = true;
-                                    if (!nanFound)
-                                        setPhaseEnergy(getPhaseEnergy() + 1);
-                                } else if ( firstLetter.equals("D") && !isFirstDiffus() ) {
-                                    double firstNum = Double.parseDouble(line.split("(\\s+)")[1].trim());
-                                    setFirstDiffus(true);
+                                    } else if (firstLetter.equals("D") && !isFirstDiffus()) {
+                                        double firstNum = Double.parseDouble(line.split("(\\s+)")[1].trim());
+                                        setFirstDiffus(true);
 
-                                    if ( isFirstDiffus() ) {
-                                        if (!Double.isNaN(firstNum) && !Double.isInfinite(firstNum)
+                                        if (isFirstDiffus()) {
+                                            if (!Double.isNaN(firstNum) && !Double.isInfinite(firstNum)
+                                                && !Double.isNaN(getPhaseDiffus()) && !Double.isInfinite(getPhaseDiffus())) {
+                                                getDiffusionY().add(firstNum);
+                                                getDiffusionX().add((double) getPhaseDiffus());
+                                            } else
+                                                nanFound = true;
+
+                                            if (!nanFound) {
+                                                setPhaseDiffus(getPhaseDiffus() + 1);
+                                                setGreatestDiff(getDiffusionY().get(0));
+                                                getFxplot().setDData(getDiffusionX(), getDiffusionY());
+                                            }
+                                        }
+                                    } else if (firstLetter.equals("D")) {
+                                        double number = Double.parseDouble(line.split("(\\s+)")[1].trim());
+                                        if (!Double.isNaN(number) && !Double.isInfinite(number) && number > 0.0
                                             && !Double.isNaN(getPhaseDiffus()) && !Double.isInfinite(getPhaseDiffus())) {
-                                            getDiffusionY().add(firstNum);
+                                            getDiffusionY().add(number);
                                             getDiffusionX().add((double) getPhaseDiffus());
                                         } else
                                             nanFound = true;
-
-                                        if (!nanFound) {
+                                        if (!nanFound)
                                             setPhaseDiffus(getPhaseDiffus() + 1);
-                                            setGreatestDiff(getDiffusionY().get(0));
-                                            getFxplot().setDData(getDiffusionX(), getDiffusionY());
-                                        }
-                                    }
-                                } else if ( firstLetter.equals("D") ) {
-                                    double number = Double.parseDouble(line.split("(\\s+)")[1].trim());
-                                    if ( !Double.isNaN(number) && !Double.isInfinite(number) && number > 0.0
-                                        && !Double.isNaN(getPhaseDiffus()) && !Double.isInfinite(getPhaseDiffus()) ) {
-                                        getDiffusionY().add(number);
-                                        getDiffusionX().add((double) getPhaseDiffus());
-                                    } else
-                                        nanFound = true;
-                                    if (!nanFound)
-                                        setPhaseDiffus(getPhaseDiffus() + 1);
-                                } else if ( firstLetter.equals("V") && !isFirstVisc() ) {
-                                    double firstNum = 0.0;
-                                    if (getDiffusionY().get((int) getPhaseDiffus() - 1) != 0.0)
-                                        // 1.0e10: 1e4 (cm^2 to m^2) * 1e6 (micro-Pascal)
-                                        firstNum = 1.0e10 * Double.parseDouble(line.split("(\\s+)")[1].trim()) /
-                                            getDiffusionY().get((int) getPhaseDiffus() - 1);
-                                    setFirstVisc(true);
+                                    } else if (firstLetter.equals("V") && !isFirstVisc()) {
+                                        double firstNum = 0.0;
+                                        if (getDiffusionY().get((int) getPhaseDiffus() - 1) != 0.0)
+                                            // 1.0e10: 1e4 (cm^2 to m^2) * 1e6 (micro-Pascal)
+                                            firstNum = 1.0e10 * Double.parseDouble(line.split("(\\s+)")[1].trim()) /
+                                                getDiffusionY().get((int) getPhaseDiffus() - 1);
+                                        setFirstVisc(true);
 
-                                    if ( isFirstVisc() ) {
-                                        if (!Double.isNaN(firstNum) && !Double.isInfinite(firstNum)
+                                        if (isFirstVisc()) {
+                                            if (!Double.isNaN(firstNum) && !Double.isInfinite(firstNum)
+                                                && !Double.isNaN(getPhaseVisc()) && !Double.isInfinite(getPhaseVisc())) {
+                                                getViscY().add(firstNum);
+                                                getViscX().add((double) getPhaseVisc());
+                                            } else
+                                                nanFound = true;
+
+                                            if (!nanFound) {
+                                                setPhaseVisc(getPhaseVisc() + 1);
+                                                setGreatestVisc(getViscY().get(0));
+                                                getFxplot().setVData(getViscX(), getViscY());
+                                            }
+                                        }
+                                    } else if (firstLetter.equals("V")) {
+                                        double number = 0.0;
+                                        if (getDiffusionY().get((int) getPhaseDiffus() - 1) != 0.0)
+                                            // 1.0e10: 1e4 (cm^2 to m^2) * 1e6 (micro-Pascal)
+                                            number = 1.0e10 * Double.parseDouble(line.split("(\\s+)")[1].trim()) /
+                                                getDiffusionY().get((int) getPhaseDiffus() - 1);
+                                        if (!Double.isNaN(number) && !Double.isInfinite(number) && number > 0.0
                                             && !Double.isNaN(getPhaseVisc()) && !Double.isInfinite(getPhaseVisc())) {
-                                            getViscY().add(firstNum);
+                                            getViscY().add(number);
                                             getViscX().add((double) getPhaseVisc());
                                         } else
                                             nanFound = true;
-
-                                        if (!nanFound) {
+                                        if (!nanFound)
                                             setPhaseVisc(getPhaseVisc() + 1);
-                                            setGreatestVisc(getViscY().get(0));
-                                            getFxplot().setVData(getViscX(), getViscY());
-                                        }
+                                    } else if (firstLetter.equals("T")) {
+                                        setWalkTime(Double.parseDouble(line.split("(\\s+)")[1].trim()));
                                     }
-                                } else if ( firstLetter.equals("V") ) {
-                                    double number = 0.0;
-                                    if (getDiffusionY().get((int) getPhaseDiffus() - 1) != 0.0)
-                                        // 1.0e10: 1e4 (cm^2 to m^2) * 1e6 (micro-Pascal)
-                                        number = 1.0e10 * Double.parseDouble(line.split("(\\s+)")[1].trim()) /
-                                            getDiffusionY().get((int) getPhaseDiffus() - 1);
-                                    if ( !Double.isNaN(number) && !Double.isInfinite(number) && number > 0.0
-                                        && !Double.isNaN(getPhaseVisc()) && !Double.isInfinite(getPhaseVisc()) ) {
-                                        getViscY().add(number);
-                                        getViscX().add((double) getPhaseVisc());
-                                    } else
-                                        nanFound = true;
-                                    if (!nanFound)
-                                        setPhaseVisc(getPhaseVisc() + 1);
-                                } else if ( firstLetter.equals("T") ) {
-                                    setWalkTime(Double.parseDouble(line.split("(\\s+)")[1].trim()));
+                                } catch (NumberFormatException e) {
+                                    continue;
                                 }
-                            } catch (NumberFormatException e) {
-                                continue;
-                            }
 
-                            if (!nanFound) {
-                                Thread.sleep(50);
-                                if ( firstLetter.equals("E") && isFirstEnergy() ) {
-                                    if (getEnergyY().get((int) getPhaseEnergy() - 1) > getGreatest()) {
-                                        setGreatest(getEnergyY().get((int) getPhaseEnergy() - 1));
-                                        getFxplot().setEMaxY(getGreatest());
-                                    }
-                                    if (getCharge() == 2) {
-                                        if (getEnergyY().get((int) getPhaseEnergy() - 1) < getSmallest()) {
-                                            setSmallest(getEnergyY().get((int) getPhaseEnergy() - 1));
-                                            getFxplot().setEMinY(getSmallest());
+                                if (!nanFound) {
+                                    Thread.sleep(50);
+                                    if (firstLetter.equals("E") && isFirstEnergy()) {
+                                        if (getEnergyY().get((int) getPhaseEnergy() - 1) > getGreatest()) {
+                                            setGreatest(getEnergyY().get((int) getPhaseEnergy() - 1));
+                                            getFxplot().setEMaxY(getGreatest());
                                         }
-                                    }
-                                    setInitE(getEnergyY().get(0));
-                                    getFxplot().updateEData(getEnergyX(), getEnergyY());
-                                } else if ( firstLetter.equals("D") && isFirstDiffus() ) {
-                                    if (getDiffusionY().get((int) getPhaseDiffus() - 1) > getGreatestDiff()) {
-                                        setGreatestDiff(getDiffusionY().get((int) getPhaseDiffus() - 1));
-                                        getFxplot().setDMaxY(getGreatestDiff());
-                                    }
+                                        if (getCharge() == 2) {
+                                            if (getEnergyY().get((int) getPhaseEnergy() - 1) < getSmallest()) {
+                                                setSmallest(getEnergyY().get((int) getPhaseEnergy() - 1));
+                                                getFxplot().setEMinY(getSmallest());
+                                            }
+                                        }
+                                        setInitE(getEnergyY().get(0));
+                                        getFxplot().updateEData(getEnergyX(), getEnergyY());
+                                    } else if (firstLetter.equals("D") && isFirstDiffus()) {
+                                        if (getDiffusionY().get((int) getPhaseDiffus() - 1) > getGreatestDiff()) {
+                                            setGreatestDiff(getDiffusionY().get((int) getPhaseDiffus() - 1));
+                                            getFxplot().setDMaxY(getGreatestDiff());
+                                        }
 
-                                    getFxplot().updateDData(getDiffusionX(), getDiffusionY());
-                                } else if ( firstLetter.equals("V") && isFirstVisc() ) {
-                                    if (getViscY().get((int) getPhaseVisc() - 1) > getGreatestVisc()) {
-                                        setGreatestVisc(getViscY().get((int) getPhaseVisc() - 1));
-                                        getFxplot().setVMaxY(getGreatestVisc());
-                                    }
+                                        getFxplot().updateDData(getDiffusionX(), getDiffusionY());
+                                    } else if (firstLetter.equals("V") && isFirstVisc()) {
+                                        if (getViscY().get((int) getPhaseVisc() - 1) > getGreatestVisc()) {
+                                            setGreatestVisc(getViscY().get((int) getPhaseVisc() - 1));
+                                            getFxplot().setVMaxY(getGreatestVisc());
+                                        }
 
-                                    getFxplot().updateVData(getViscX(), getViscY());
+                                        getFxplot().updateVData(getViscX(), getViscY());
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    int titletime = getViscX().size() - 1;
-                    getFxplot().setVTitle(titletime, getViscY().get(getViscY().size() - 1));
-                    getFxplot().setDTitle(titletime, getDiffusionY().get(getDiffusionY().size() - 1));
-                    setFinE(getEnergyY().get((int) getPhaseEnergy() - 1));
-                    double deltaE = getFinE() - getInitE();
-                    getFxplot().setDeltaE(deltaE);
+                        int titletime = getViscX().size() - 1;
+                        if (getViscY().size() > 0)
+                            getFxplot().setVTitle(titletime, getViscY().get(getViscY().size() - 1));
+                        if (getDiffusionY().size() > 0)
+                            getFxplot().setDTitle(titletime, getDiffusionY().get(getDiffusionY().size() - 1));
+                        if (getEnergyY().size() > 0)
+                            setFinE(getEnergyY().get((int) getPhaseEnergy() - 1));
+                        double deltaE = getFinE() - getInitE();
+                        getFxplot().setDeltaE(deltaE);
 
-                    setExitVal(getProcess().waitFor());
-                    if (getExitVal() != 0) {
-                        walkStop();
+                        setExitVal(getProcess().waitFor());
+                        if (getExitVal() != 0) {
+                            walkStop();
+                            platfStop();
+                            timerStop();
+                            getMenuNappiDiff().setDisable(false);
+                            getHelpNappiDiff().setDisable(false);
+                            getRunDiff().setDisable(false);
+                            getPlotDiff().setVisible(true);
+                            getCharge1().setDisable(false);
+                            getCharge2().setDisable(false);
+                            getDim2().setDisable(false);
+                            getDim3().setDisable(false);
+                            getNappiLattice().setDisable(false);
+                            getNappiBalls3D().setDisable(false);
+                            getCloseNappiDiff().setDisable(false);
+                            getRuntime().gc();
+                            getRuntime().exit(getExitVal());
+                        }
+                    } catch (IOException | InterruptedException e) {
                         platfStop();
                         timerStop();
                         getMenuNappiDiff().setDisable(false);
@@ -551,9 +592,21 @@ class SceneDiff extends Data {
                         getNappiBalls3D().setDisable(false);
                         getCloseNappiDiff().setDisable(false);
                         getRuntime().gc();
-                        getRuntime().exit(getExitVal());
+                        Platform.runLater(() -> {
+                            getValikkoDiff().getChildren().set(4, getPlotDiff());
+                            getPlotDiff().setVisible(true);
+                            /*
+                             * INFO DIALOG
+                             */
+                            GetDialogs getDialogs = new GetDialogs();
+                            Alert alert = getDialogs.getInfo(getLanguage().equals("fin")
+                                ? "Ajo on päättynyt.\nKulkukesto: " + formatter.format(getWalkTime()) + "s"
+                                : "Run is finished.\nWalk Time: " + formatter.format(getWalkTime()) + "s");
+                            walkStop();
+                            alert.show();
+                        });
                     }
-                } catch (IOException | InterruptedException e) {
+                } else {
                     platfStop();
                     timerStop();
                     getMenuNappiDiff().setDisable(false);
@@ -568,17 +621,6 @@ class SceneDiff extends Data {
                     getNappiBalls3D().setDisable(false);
                     getCloseNappiDiff().setDisable(false);
                     getRuntime().gc();
-                    Platform.runLater(() -> {
-                        /*
-                         * INFO DIALOG
-                         */
-                        GetDialogs getDialogs = new GetDialogs();
-                        Alert alert = getDialogs.getInfo(getLanguage().equals("fin")
-                            ? "Ajo on päättynyt.\nKulkukesto: " + formatter.format(getWalkTime()) + "s"
-                            : "Run is finished.\nWalk Time: " + formatter.format(getWalkTime()) + "s");
-                        walkStop();
-                        alert.show();
-                    });
                 }
             /*
             * timer run ends
@@ -592,6 +634,7 @@ class SceneDiff extends Data {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
+
     }
 
      /**
@@ -770,21 +813,21 @@ class SceneDiff extends Data {
             if (isNumInteger(this.setNumParticles.getText().trim())){
                 if (this.setNumParticles.getText().trim().equals("0")){
                     this.setNumParticles.setText("1");
-                    this.vars[0] = "1";
+                    this.vars[1] = "1";
                 } else {
-                    this.vars[0] = this.setNumParticles.getText().trim();
+                    this.vars[1] = this.setNumParticles.getText().trim();
                 }
             } else
-                this.vars[0] = "0";
+                this.vars[1] = "0";
         });
 
         Label labSizeParticles = new Label(this.getLanguage().equals("fin") ? "hiukkasten halkaisija:" : "diameter of particle:");
         this.setSizeParticles = new TextField("");
         this.setSizeParticles.setOnKeyReleased(e -> {
             if (isNumDouble(this.setSizeParticles.getText().trim())){
-                this.vars[1] = this.setSizeParticles.getText().trim();
+                this.vars[2] = this.setSizeParticles.getText().trim();
             } else
-                this.vars[1] = "0.0";
+                this.vars[2] = "0.0";
         });
 
         Label labCharge = new Label(this.getLanguage().equals("fin") ? "hiukkasten varaus:" : "charge of particles:");
@@ -808,15 +851,15 @@ class SceneDiff extends Data {
         this.setCharge1.setOnMouseClicked(f -> {
             this.setCharge1.setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setCharge2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[2] = "1";
+            this.vars[3] = "1";
         });
         this.setCharge2.setOnMouseClicked(f -> {
             this.setCharge1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setCharge2.setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[2] = "2";
+            this.vars[3] = "2";
         });
 
-        this.vars[3] = "0"; // steps
+        this.vars[4] = "0"; // steps
 
         Label labNumDimensions = new Label(this.getLanguage().equals("fin") ? "ulottuvuus:" : "dimension:");
         this.setDim2 = new ToggleButton("2");
@@ -838,12 +881,12 @@ class SceneDiff extends Data {
         this.setDim2.setOnMouseClicked(f -> {
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[4] = "2";
+            this.vars[5] = "2";
         });
         this.setDim3.setOnMouseClicked(f -> {
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[4] = "3";
+            this.vars[5] = "3";
         });
 
         /*
@@ -877,8 +920,8 @@ class SceneDiff extends Data {
         setDimension.setMaxWidth(this.getCompwidth());
         asettelu.add(setDimension, 0, 7);
 
-        this.vars[5] = "d"; // diff
-        this.vars[6] = "-"; // spread out
+        this.vars[6] = "-"; // calcfix or sawplot
+        this.vars[7] = "-"; // spread out
 
 
         /*
@@ -894,16 +937,16 @@ class SceneDiff extends Data {
             if (this.getNappiLattice().getText().equals("LATTICE") || this.getNappiLattice().getText().equals("HILA")){
                 this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
                 this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[7] = "-";
+                this.vars[8] = "-";
             } else if (this.getNappiLattice().getText().equals("FREE") || this.getNappiLattice().getText().equals("VAPAA")){
                 this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "HILA" : "LATTICE");
                 this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[7] = "l";
+                this.vars[8] = "l";
             }
         });
         valikko.getChildren().add(this.getNappiLattice());
 
-        this.vars[8] = "-"; // save off
+        this.vars[9] = "-"; // save off
 
         GridPane.setHalignment(valikko, HPos.LEFT);
         asettelu.add(valikko, 0, 8, 2, 1);
@@ -1161,24 +1204,18 @@ class SceneDiff extends Data {
     BufferedWriter getProcOut() { return getOutput(); }
 
     /**
-     * sets setPlatfRunning to true
+     * sets platfNotRunning to false
      */
-    private void platfStart() { this.setPlatfRunning(true); }
+    private void platfStart() { this.platfNotRunning(false); }
 
     /**
      * destroys process
-     * sets setPlatfRunning to false
+     * sets platfNotRunning to true
      */
     private void platfStop() {
         this.getProcess().destroyForcibly();
-        this.setPlatfRunning(false);
+        this.platfNotRunning(true);
     }
-
-    /**
-     * @return isPlatfRunning
-     */
-    @Contract(pure = true)
-    private boolean platfIsRunning() { return isPlatfRunning(); }
 
     /**
      * @return the compwidth
@@ -1249,6 +1286,17 @@ class SceneDiff extends Data {
      * @param remBarNappiDiff the remBarNappiDiff to set
      */
     private void setRemBarNappiDiff(Button remBarNappiDiff ) { this.remBarNappiDiff = remBarNappiDiff; }
+
+    /**
+     * @return the cancelNappiDiff
+     */
+    @Contract(pure = true)
+    private Button getCancelNappiDiff() { return cancelNappiDiff; }
+
+    /**
+     * @param cancelNappiDiff the cancelNappiDiff to set
+     */
+    private void setCancelNappiDiff(Button cancelNappiDiff ) { this.cancelNappiDiff = cancelNappiDiff; }
 
     /**
      * @return the runDiff
@@ -1491,15 +1539,15 @@ class SceneDiff extends Data {
     private void setPiirturi( GraphicsContext piirturi ) { this.piirturi = piirturi; }
 
     /**
-     * @return the platfRunning
+     * @return the platfNotRunning
      */
     @Contract(pure = true)
-    private boolean isPlatfRunning() { return platfRunning; }
+    private boolean platfNotRunning() { return platfNotRunning; }
 
     /**
-     * @param platfRunning the platfRunning to set
+     * @param platfNotRunning the platfNotRunning to set
      */
-    private void setPlatfRunning( boolean platfRunning ) { this.platfRunning = platfRunning; }
+    private void platfNotRunning( boolean platfNotRunning ) { this.platfNotRunning = platfNotRunning; }
 
     /**
      * @return the process
@@ -1708,5 +1756,16 @@ class SceneDiff extends Data {
      * @param walktime the walktime to set
      */
     private void setWalkTime(double walktime) { this.walktime = walktime; }
+
+    /**
+     * @return the iscancel
+     */
+    @Contract(pure = true)
+    private boolean isCancel() { return this.iscancel; }
+
+    /**
+     * @param iscancel the iscancel to set
+     */
+    private void setIsCancel(boolean iscancel) { this.iscancel = iscancel; }
 
 }

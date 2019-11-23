@@ -17,9 +17,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.lang.Double.parseDouble;
-import static java.lang.Integer.parseInt;
-
 /**
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
@@ -50,11 +47,11 @@ class ExecDiff extends Data {
         this.setLanguage(language);
     }
 
-    void setExecClick(@NotNull Button execNappi, SceneDiff diffScene,
-                      GraphicsContext diffpiirturi, double scalefactor, double animwidth, double animheight,
-                      boolean newdata, HBox isovalikkoDiff, VBox valikkoDiff, Pane diffpane,
-                      String datapath, File datafolder, String fexec, Button remBarNappiDiff, Button plotDiff,
-                      Button closeNappiDiff, Button menuNappiDiff, Button helpNappiDiff, Canvas diffAlusta) {
+    void setExecClick(@NotNull Button execNappi, SceneDiff diffScene, GraphicsContext diffpiirturi,
+                      double scalefactor, double animwidth, double animheight, boolean newdata, HBox isovalikkoDiff,
+                      VBox valikkoDiff, Pane diffpane, String datapath, File datafolder, String fexec,
+                      Button remBarNappiDiff, Button cancelNappiDiff, Button plotDiff, Button closeNappiDiff,
+                      Button menuNappiDiff, Button helpNappiDiff, Canvas diffAlusta) {
 
         this.setIsoValikko(isovalikkoDiff);
         this.setPane(diffpane);
@@ -67,11 +64,11 @@ class ExecDiff extends Data {
             diffScene.setSave("-");
             String[] vars = diffScene.getVars();
             this.setVars(vars);
-            int particles = Integer.parseInt(this.getVars()[0]);
-            double diam = Double.parseDouble(this.getVars()[1]);
-            int charge = Integer.parseInt(this.getVars()[2]);
-            int dim = Integer.parseInt(this.getVars()[4]);
-            String lattice = this.getVars()[7];
+            int particles = Integer.parseInt(this.getVars()[1]);
+            double diam = Double.parseDouble(this.getVars()[2]);
+            int charge = Integer.parseInt(this.getVars()[3]);
+            int dim = Integer.parseInt(this.getVars()[5]);
+            String lattice = this.getVars()[8];
             boolean fail = false;
 
             if ( particles < 0 ) fail = true;
@@ -164,12 +161,13 @@ class ExecDiff extends Data {
             }
 
             valikkoDiff.getChildren().set(3, remBarNappiDiff);
+            valikkoDiff.getChildren().set(4, cancelNappiDiff);
 
             /*
              * DRAW DIFFUSION ANIMATION
              */
             diffScene.refresh(datafolder, initialDataFile, fexec, diffpiirturi, this.getScalefactor(),
-                animwidth, this.getLinewidth(), remBarNappiDiff, execNappi, valikkoDiff,
+                animwidth, this.getLinewidth(), remBarNappiDiff, cancelNappiDiff, execNappi, valikkoDiff,
                 plotDiff, closeNappiDiff, menuNappiDiff, helpNappiDiff, this.getEnergy_x(), this.getEnergy_y(),
                 this.getDiffusion_x(), this.getDiffusion_y(), this.getVisc_x(), this.getVisc_y(),
                 this.isNewdata(), measure, diff
@@ -188,11 +186,11 @@ class ExecDiff extends Data {
             String[] vars = diffScene.getVars();
             this.setVars(vars);
             Data data = new Data(vars);
-            int particles = parseInt(getVars()[0]);
-            double diam = parseDouble(getVars()[1]);
-            int charge = parseInt(getVars()[2]);
-            int dim = parseInt(getVars()[4]);
-            String lattice = this.getVars()[7];
+            int particles = Integer.parseInt(getVars()[1]);
+            double diam = Double.parseDouble(getVars()[2]);
+            int charge = Integer.parseInt(getVars()[3]);
+            int dim = Integer.parseInt(getVars()[5]);
+            String lattice = this.getVars()[8];
             boolean fail = false;
 
             if ( particles < 0 ) fail = true;

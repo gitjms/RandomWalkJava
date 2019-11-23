@@ -56,15 +56,16 @@ class ScenePathTracing extends Data {
         this.nappiFixed = new Button(this.getLanguage().equals("fin") ? "KESKITETTY" : "FIXED");
         this.nappiLattice = new Button(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
         this.vars = new String[]{
-            "0",    // vars[0] particles        USER
-            "0.0",  // vars[1] diameter         USER
-            "0",    // vars[2] charge           USER
-            "0",    // vars[3] steps            USER
-            "0",    // vars[4] dimension        USER
-            "-",    // vars[5] diffusion        n/a
-            "f",    // vars[6] fixed(/spread)   USER
-            "-",    // vars[7] (lattice/)free   USER
-            "s"};   // vars[8] save (on)        n/a
+            "A",    // vars[0] which simulation     USER
+            "0",    // vars[1] particles            USER
+            "0.0",  // vars[2] diameter             USER
+            "0",    // vars[3] charge               USER
+            "0",    // vars[4] steps                USER
+            "0",    // vars[5] dimension            USER
+            "-",    // vars[6] calcfix or sawplot   n/a
+            "f",    // vars[7] fixed(/spread)       USER
+            "-",    // vars[8] (lattice/)free       USER
+            "s"};   // vars[9] save (on)            n/a
     }
 
     /**
@@ -120,21 +121,21 @@ class ScenePathTracing extends Data {
             if (isNumInteger(this.setNumParticles.getText().trim())){
                 if (this.setNumParticles.getText().trim().equals("0")){
                     this.setNumParticles.setText("1");
-                    this.vars[0] = "1";
+                    this.vars[1] = "1";
                 } else {
-                    this.vars[0] = this.setNumParticles.getText().trim();
+                    this.vars[1] = this.setNumParticles.getText().trim();
                 }
             } else
-                this.vars[0] = "0";
+                this.vars[1] = "0";
         });
 
         Label labSizeParticles = new Label(this.getLanguage().equals("fin") ? "hiukkasten halkaisija:" : "diameter of particle:");
         this.setSizeParticles = new TextField("");
         this.setSizeParticles.setOnKeyReleased(e -> {
             if (isNumDouble(this.setSizeParticles.getText().trim()))
-                this.vars[1] = this.setSizeParticles.getText().trim();
+                this.vars[2] = this.setSizeParticles.getText().trim();
             else
-                this.vars[1] = "0.0";
+                this.vars[2] = "0.0";
         });
 
         Label labCharge = new Label(this.getLanguage().equals("fin") ? "hiukkasten varaus:" : "charge of particles:");
@@ -165,28 +166,28 @@ class ScenePathTracing extends Data {
             this.setCharge0.setBackground(new Background(new BackgroundFill(Color.CYAN,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setCharge1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setCharge2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[2] = "0";
+            this.vars[3] = "0";
         });
         this.setCharge1.setOnMouseClicked(f -> {
             this.setCharge0.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setCharge1.setBackground(new Background(new BackgroundFill(Color.CYAN,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setCharge2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[2] = "1";
+            this.vars[3] = "1";
         });
         this.setCharge2.setOnMouseClicked(f -> {
             this.setCharge0.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setCharge1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setCharge2.setBackground(new Background(new BackgroundFill(Color.CYAN,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[2] = "2";
+            this.vars[3] = "2";
         });
 
         Label labNumSteps = new Label(this.getLanguage().equals("fin") ? "askelten lukumäärä:" : "number of steps:");
         this.setNumSteps = new TextField("");
         this.setNumSteps.setOnKeyReleased(e -> {
             if (isNumInteger(this.setNumSteps.getText().trim())){
-                this.vars[3] = this.setNumSteps.getText().trim();
+                this.vars[4] = this.setNumSteps.getText().trim();
             } else
-                this.vars[3] = "0";
+                this.vars[4] = "0";
         });
 
         Label labNumDimensions = new Label(this.getLanguage().equals("fin") ? "ulottuvuus:" : "dimension:");
@@ -217,22 +218,22 @@ class ScenePathTracing extends Data {
             this.setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[4] = "1";
+            this.vars[5] = "1";
         });
         this.setDim2.setOnMouseClicked(f -> {
             this.setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[4] = "2";
+            this.vars[5] = "2";
         });
         this.setDim3.setOnMouseClicked(f -> {
             this.setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[4] = "3";
+            this.vars[5] = "3";
         });
 
-        this.vars[5] = "-"; // diffusion        n/a
+        this.vars[6] = "-"; // calcfix or sawplot        n/a
 
         /*
         * ...THEIR PLACEMENTS
@@ -285,11 +286,11 @@ class ScenePathTracing extends Data {
             if (this.getNappiFixed().getText().equals("HAJAUTETTU") || this.getNappiFixed().getText().equals("SPREAD")){
                 this.getNappiFixed().setText(this.getLanguage().equals("fin") ? "KESKITETTY" : "FIXED");
                 this.getNappiFixed().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[6] = "f";
+                this.vars[7] = "f";
             } else if (this.getNappiFixed().getText().equals("KESKITETTY") || this.getNappiFixed().getText().equals("FIXED")){
                 this.getNappiFixed().setText(this.getLanguage().equals("fin") ? "HAJAUTETTU" : "SPREAD");
                 this.getNappiFixed().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[6] = "-";
+                this.vars[7] = "-";
             }
         });
         valikko.getChildren().add(this.getNappiFixed());
@@ -307,16 +308,16 @@ class ScenePathTracing extends Data {
             if (this.getNappiLattice().getText().equals("HILA") || this.getNappiLattice().getText().equals("LATTICE")){
                 this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
                 this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[7] = "-";
+                this.vars[8] = "-";
             } else if (this.getNappiLattice().getText().equals("VAPAA") || this.getNappiLattice().getText().equals("FREE")){
                 this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "HILA" : "LATTICE");
                 this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[7] = "l";
+                this.vars[8] = "l";
             }
         });
         valikko.getChildren().add(this.getNappiLattice());
 
-        this.vars[8] = "s"; // save on
+        this.vars[9] = "s"; // save on
 
         GridPane.setHalignment(valikko, HPos.LEFT);
         asettelu.add(valikko, 0, 10, 2, 1);

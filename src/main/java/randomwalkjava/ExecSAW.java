@@ -277,7 +277,7 @@ class ExecSAW extends Data {
             result.getChildren().clear();
 
             if (execSAW.isDisabled()) {
-                sawScene.setSawCbmc("c");
+                sawScene.setSawCbmc("p");
                 this.setIsCbmc(true);
             } else {
                 sawScene.setSawCbmc("-");
@@ -287,7 +287,7 @@ class ExecSAW extends Data {
             String[] vars = sawScene.getVars();
             this.setVars(vars);
             Data data = new Data(vars);
-            int dim = Integer.parseInt(getVars()[4]);
+            int dim = Integer.parseInt(getVars()[5]);
             boolean fail = false;
 
             if ( dim < 2 || dim > 3 ) fail = true;

@@ -475,14 +475,21 @@ class GetButtons extends HelpText {
      * @param language GUI language
      * @return button
      */
-    Button getDiffBarrierButton(String language) {
+    Button getDiffBarCanButtons(String language, int which) {
         this.setLanguage(language);
 
-        Button button = this.getLanguage().equals("fin") ? new Button("JATKA") : new Button("CONTINUE");
+        Button button;
+        if (which == 1) {
+            button = this.getLanguage().equals("fin") ? new Button("JATKA") : new Button("CONTINUE");
+            button.setBackground(new Background(new BackgroundFill(Color.LIME, CornerRadii.EMPTY, Insets.EMPTY)));
+            button.setTextFill(Color.BLACK);
+        } else {
+            button = this.getLanguage().equals("fin") ? new Button("PERUUTA") : new Button("CANCEL");
+            button.setBackground(new Background(new BackgroundFill(Color.RED,CornerRadii.EMPTY,Insets.EMPTY)));
+            button.setTextFill(Color.WHITE);
+        }
         button.setMinWidth(this.getButtonWidth());
         button.setMaxWidth(this.getButtonWidth());
-        button.setTextFill(Color.BLACK);
-        button.setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
         GridPane.setHalignment(button, HPos.LEFT);
         button.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> button.setEffect(this.getShadow()));
         button.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> button.setEffect(null));
