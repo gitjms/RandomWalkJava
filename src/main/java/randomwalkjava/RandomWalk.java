@@ -366,9 +366,9 @@ public class RandomWalk extends Application {
 
         // REAL TIME SAW COMPONENTS
         // SLIDER C
-        final Label labcee = new Label("C :");
+        final Label labcee = new Label("Korjauskerroin C :");
         final Label labelcee = new Label();
-        Slider sliderCee = new Slider(1.0, 4.0, 1.0);
+        Slider sliderCee = new Slider(1.0, 10.0, 1.0);
         sliderCee.setOrientation(Orientation.HORIZONTAL);
         sliderCee.setMaxSize(this.getSawCompWidth(), this.getSawCompHeight());
         sliderCee.setShowTickLabels(true);

@@ -95,15 +95,16 @@ class ExecSAW extends Data {
                 plotSAW.setDisable(false);
                 execSAW.setText(this.getLanguage().equals("fin") ? "AJA SAW" : "RUN SAW");
             } else {
-                this.setVars(sawScene.getVars());
-                sawScene.setSawCbmc("-");
+                sawScene.setSawCbmc("E");
+                sawScene.setSawPlot("-");
                 sawScene.setSave("-");
+                this.setVars(sawScene.getVars());
                 boolean fail = false;
 
-                int steps = Integer.parseInt(this.getVars()[3]);
+                int steps = Integer.parseInt(this.getVars()[4]);
                 if (steps > 0) fail = true;
 
-                int dim = Integer.parseInt(this.getVars()[4]);
+                int dim = Integer.parseInt(this.getVars()[5]);
 
                 if (dim < 2 || dim > 3) fail = true;
 
@@ -173,15 +174,16 @@ class ExecSAW extends Data {
                 plotSAW.setDisable(false);
                 execCBMC.setText(this.getLanguage().equals("fin") ? "AJA CBMC" : "RUN CBMC");
             } else {
-                this.setVars(sawScene.getVars());
-                sawScene.setSawCbmc("c");
+                sawScene.setSawCbmc("F");
+                sawScene.setSawPlot("-");
                 sawScene.setSave("-");
+                this.setVars(sawScene.getVars());
                 boolean fail = false;
 
-                int steps = Integer.parseInt(this.getVars()[3]);
-                if (this.getVars()[3].isEmpty() || steps == 0) fail = true;
+                int steps = Integer.parseInt(this.getVars()[4]);
+                if (this.getVars()[4].isEmpty() || steps == 0) fail = true;
 
-                int dim = Integer.parseInt(this.getVars()[4]);
+                int dim = Integer.parseInt(this.getVars()[5]);
 
                 if (dim < 2 || dim > 3) fail = true;
 
@@ -275,14 +277,14 @@ class ExecSAW extends Data {
 
         plotNappi.setOnMouseClicked((MouseEvent event) -> {
             result.getChildren().clear();
-
             if (execSAW.isDisabled()) {
-                sawScene.setSawCbmc("p");
+                sawScene.setSawCbmc("F");
                 this.setIsCbmc(true);
             } else {
-                sawScene.setSawCbmc("-");
+                sawScene.setSawCbmc("E");
                 this.setIsCbmc(false);
             }
+            sawScene.setSawPlot("p");
             sawScene.setSave("s");
             String[] vars = sawScene.getVars();
             this.setVars(vars);

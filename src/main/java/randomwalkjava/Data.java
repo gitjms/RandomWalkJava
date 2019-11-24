@@ -167,9 +167,15 @@ class Data {
     void setSave(String var) { this.vars[9]=var; }
 
     /**
+     * method for setting the parameter for setting saw or cbmc in vars array
+     * @param var the vars array to set
+     */
+    void setSawCbmc(String var) { this.vars[0]=var; }
+
+    /**
      * method for setting the parameter for plotting in vars array
      * @param var the vars array to set
      */
-    void setSawCbmc(String var) { this.vars[6]=var; }
+    void setSawPlot(String var) { this.vars[6]=var; }
 
 }

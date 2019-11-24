@@ -113,7 +113,6 @@ class SceneRealTimeSaw extends Data {
                  List<Double> saw_expd, List<Double> saw_rms, List<Double> expd_runs, List<Double> rms_runs,
                  List<Integer> xAxis, List<Integer> xHistAxis, boolean issaw, Slider ceeSlider) {
 
-
         this.setFirstData(firstdata);
         this.dim(Integer.parseInt(this.vars[5]));
         this.setSteps(0);
@@ -176,7 +175,7 @@ class SceneRealTimeSaw extends Data {
                          * RMS EXPECTED SQRT(B)*S^NU (RED LINE)
                          */
                         double rms_expd = Double.parseDouble(valStr[1].trim());
-                        this.getSawExpd().add(Math.sqrt(1.0/this.getCeeSlider().getValue()) * rms_expd);
+                        this.getSawExpd().add(this.getCeeSlider().getValue() * Math.sqrt( rms_expd));
 
                         /*
                          * RMS <R^2> (BLUE LINE)
@@ -229,7 +228,7 @@ class SceneRealTimeSaw extends Data {
                      * CONNECTIVE CONSTANT µ
                      */
                     if (!this.isSaw()) {
-                        this.setMu1(this.getMu1() + 2.0*Math.pow(this.getRuns()+1, 1.0 / this.getSteps()));
+                        this.setMu1(this.getMu1() + 2.0*Math.pow(this.getRuns()+1, 1.0/this.getSteps()));
                         this.setMu2(this.getMu2() + 2.0*Math.pow((this.getRuns()+1)/(this.getAa()
                             * Math.pow(this.getSteps(), this.getGam() - 1.0)), 1.0/this.getSteps()));
 
@@ -419,8 +418,9 @@ class SceneRealTimeSaw extends Data {
      * Create GUI for Real Time Rms
      * @return REAL TIME RMS SCENE
      */
-    Parent getSceneRealTimeSaw(VBox sliderBox, @NotNull Slider sliderCee, Pane pane, Button runSAW,
+    Parent getSceneRealTimeSaw(VBox sliderBox, @NotNull Slider ceeSlider, Pane pane, Button runSAW,
                                @NotNull Button runCBMC){
+        this.setCeeSlider(ceeSlider);
         GridPane asettelu = new GridPane();
         asettelu.setMaxWidth(getPaneWidth());
         asettelu.setVgap(4);
@@ -436,14 +436,20 @@ class SceneRealTimeSaw extends Data {
         Image imgSawEN = new Image("file:src/main/resources/mathcards/sawEN-1.png");
         Image imgSawFI_corr = new Image("file:src/main/resources/mathcards/sawFI_corr-1.png");
         Image imgSawEN_corr = new Image("file:src/main/resources/mathcards/sawEN_corr-1.png");
+        //Image imgSawFI_CBMCcorr = new Image("file:src/main/resources/mathcards/sawFI_CBMCcorr-1.png");
+        //Image imgSawEN_CBMCcorr = new Image("file:src/main/resources/mathcards/sawEN_CBMCcorr-1.png");
         ImageView ivSawFI = new ImageView(imgSawFI);
         ImageView ivSawEN = new ImageView(imgSawEN);
         ImageView ivSawFI_corr = new ImageView(imgSawFI_corr);
         ImageView ivSawEN_corr = new ImageView(imgSawEN_corr);
+        //ImageView ivSawFI_CBMCcorr = new ImageView(imgSawFI_CBMCcorr);
+        //ImageView ivSawEN_CBMCcorr = new ImageView(imgSawEN_CBMCcorr);
         ivSawFI.setSmooth(true);
         ivSawEN.setSmooth(true);
         ivSawFI_corr.setSmooth(true);
         ivSawEN_corr.setSmooth(true);
+        //ivSawFI_CBMCcorr.setSmooth(true);
+        //ivSawEN_CBMCcorr.setSmooth(true);
 
         /*
          * COMPONENTS...
@@ -474,11 +480,11 @@ class SceneRealTimeSaw extends Data {
         });
         runCBMC.setDisable(true);
 
-        sliderCee.setOnMouseDragged(e -> {
-            if (sliderCee.getValue() > 1.0) {
+        this.getCeeSlider().setOnMouseDragged(e -> {
+            if (this.getCeeSlider().getValue() > 1.0) {
                 getComponents.getPaneView(pane, this.getLanguage().equals("fin")
                     ? ivSawFI_corr : ivSawEN_corr, this.getSawTextWidth(), this.getSawTextHeight());
-            } else if (sliderCee.getValue() == 1.0) {
+            } else if (this.getCeeSlider().getValue() == 1.0) {
                 getComponents.getPaneView(pane, this.getLanguage().equals("fin")
                     ? ivSawFI : ivSawEN, this.getSawTextWidth(), this.getSawTextHeight());
             }
@@ -505,14 +511,14 @@ class SceneRealTimeSaw extends Data {
         this.setDim2.setOnMouseClicked(f -> {
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            sliderCee.setValue(1.0);
+            this.getCeeSlider().setValue(1.0);
             this.vars[5] = "2";
             this.dim(2);
         });
         this.setDim3.setOnMouseClicked(f -> {
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
-            sliderCee.setValue(1.0);
+            this.getCeeSlider().setValue(1.0);
             this.vars[5] = "3";
             this.dim(3);
         });
