@@ -20,8 +20,12 @@ def main():
 	particles = int(facts[3].split('=')[1].replace(',',''))
 	steps = int(facts[4].split('=')[1])
 
-	miny = np.min(y_data) - np.sqrt(steps)/4.0
-	maxy = np.max(y_data) + np.sqrt(steps)/1.5
+	if (np.abs(np.min(y_data)) > np.abs(np.max(y_data))):
+		maxval = np.abs(np.min(y_data))
+	else:
+		maxval = np.abs(np.max(y_data))
+	miny = -1.1*maxval
+	maxy = 1.2*maxval
 
 	linew = 2.0/np.log10(steps)
 	x_data = np.linspace(0,steps+1,steps+1)
@@ -45,12 +49,7 @@ def main():
 		for i in range(0,particles):
 				plt.plot(x_data,y_data[:,i],'-',lw=linew,antialiased=True)
 
-	if (language == 'fin'):
-		legtext = r"Odotusarvo, $\sqrt{S}$"
-	else:
-		legtext = r"Expected value, $\sqrt{S}$"
-
-	plt.plot(x_data,y2_data,'k-',lw=2,antialiased=True,label=legtext)
+	plt.plot(x_data,y2_data,'k-',lw=2,antialiased=True,label=r"$\pm\;\sqrt{S}$")
 	plt.plot(x_data,-y2_data,'k-',lw=2,antialiased=True)
 
 	plt.xlim(0,steps)
@@ -65,9 +64,9 @@ def main():
 	else:
 		plt.ylabel(r"Distance", fontsize=14)
 	if (language == 'fin'):
-		text=r"Etäisyys askelten funktiona, %d askelta"%(int(steps))
+		text=r"Etäisyys askelten funktiona, N=%d, %d askelta"%(int(particles),int(steps))
 	else:
-		text=r"Distance as a function of steps, %d steps"%(int(steps))
+		text=r"Distance as a function of steps, N=%d,, %d steps"%(int(particles),int(steps))
 	plt.title(text,fontsize=16)
 	plt.grid(axis='y')
 	plt.legend(loc='upper left')

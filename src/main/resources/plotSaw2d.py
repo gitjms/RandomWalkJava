@@ -21,13 +21,14 @@ def main():
 	xmax = np.max(xdata_saw) + 1
 	ymin = np.min(ydata_saw) - 1
 	ymax = np.max(ydata_saw) + 1
-	dx = np.abs(xmax-xmin)
-	dy = np.abs(ymax-ymin)
-	if (dx > dy):
-		chart_size = dx
+
+	if (np.abs(xmax-xmin) > np.abs(ymax-ymin)):
+		chart_size = np.abs(xmax-xmin)
 	else:
-		chart_size = dy
-	print(chart_size)
+		chart_size = np.abs(ymax-ymin)
+
+	d_size = chart_size/10.0
+
 #!----------------------------------------------------------------------
 #!	PLOT
 #!----------------------------------------------------------------------
@@ -61,19 +62,19 @@ def main():
 	plt.plot(xdata_saw[0],ydata_saw[0],'ro',ms=20,antialiased=True,label=label2)
 	plt.plot(xdata_saw[steps],ydata_saw[steps],'r*',ms=30,antialiased=True,label=label3)
 
-	plt.xlim(xmin - (chart_size-dx)/2, xmax + (chart_size-dx)/2)
-	plt.ylim(ymin - (chart_size-dy)/2, ymax + (chart_size-dy)/2)
+	plt.xlim(xmin - d_size/2, xmax + d_size/2)
+	plt.ylim(ymin - d_size/2, ymax + d_size/2)
 	
 	if (chart_size > 5.0):
 		dxtick = np.floor(chart_size/5.0)
 	else:
-		dxtick = dx
+		dxtick = chart_size
 	ax.xaxis.set_ticks(np.arange(xmin-1, xmax+2, dxtick))
 
 	if (chart_size > 5.0):
 		dytick = np.floor(chart_size/5.0)
 	else:
-		dytick = dy
+		dytick = chart_size
 	ax.yaxis.set_ticks(np.arange(ymin-1, ymax+3, dytick))
 
 	if (language == 'fin'):
