@@ -94,12 +94,12 @@ class SceneCalculation extends Data {
 
         DropShadow shadow = new DropShadow();
         GetComponents getComponents = new GetComponents();
-        Image imgCalcFI = new Image("file:src/main/resources/mathcards/calcFI-1.png");
-        Image imgCalcEN = new Image("file:src/main/resources/mathcards/calcEN-1.png");
-        Image imgCalcFixFreeFI = new Image("file:src/main/resources/mathcards/calcFixFreeFI-1.png");
-        Image imgSalcFixFreeEN = new Image("file:src/main/resources/mathcards/calcFixFreeEN-1.png");
-        Image imgCalcFixLattFI = new Image("file:src/main/resources/mathcards/calcFixLattFI-1.png");
-        Image imgSalcFixLattEN = new Image("file:src/main/resources/mathcards/calcFixLattEN-1.png");
+        Image imgCalcFI = new Image("/calcFI.png");
+        Image imgCalcEN = new Image("/calcEN.png");
+        Image imgCalcFixFreeFI = new Image("/calcFixFreeFI.png");
+        Image imgSalcFixFreeEN = new Image("/calcFixFreeEN.png");
+        Image imgCalcFixLattFI = new Image("/calcFixLattFI.png");
+        Image imgSalcFixLattEN = new Image("/calcFixLattEN.png");
         ImageView ivCalcFI = new ImageView(imgCalcFI);
         ImageView ivCalcEN = new ImageView(imgCalcEN);
         ImageView ivCalcFixFreeFI = new ImageView(imgCalcFixFreeFI);

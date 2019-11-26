@@ -41,6 +41,10 @@ class SceneDiff extends Data {
     private ToggleButton setDim2;
     private ToggleButton setDim3;
     private final Button nappiLattice;
+    private ToggleButton setLatt1;
+    private ToggleButton setLatt2;
+    private int whichlatt;
+    private HBox latt_choice;
     private TextField setNumParticles;
     private TextField setSizeParticles;
 
@@ -123,16 +127,16 @@ class SceneDiff extends Data {
         this.balls3D = true;
         this.formatter = new DecimalFormat("0.00");
         this.vars = new String[]{
-            "D",    // vars[0] which simulation     USER
-            "0",    // vars[1] particles            USER
-            "0.0",  // vars[2] diameter             USER
-            "0",    // vars[3] charge               USER
-            "0",    // vars[4] steps                n/a
-            "0",    // vars[5] dimension            USER
-            "-",    // vars[6] calcfix or sawplot   n/a
-            "-",    // vars[7] (fixed/)spread       n/a
-            "-",    // vars[8] (lattice/)free       USER
-            "-"};   // vars[9] save (off)           n/a
+            "D",    // vars[0] which simulation                 USER
+            "0",    // vars[1] particles                        USER
+            "0.0",  // vars[2] diameter                         USER
+            "0",    // vars[3] charge                           USER
+            "0",    // vars[4] steps                            n/a
+            "0",    // vars[5] dimension                        USER
+            "-",    // vars[6] calcfix, fcclattice, or sawplot  n/a
+            "-",    // vars[7] (fixed/)spread                   n/a
+            "-",    // vars[8] (lattice/)free                   USER
+            "-"};   // vars[9] save (off)                       n/a
     }
 
     /**
@@ -232,6 +236,8 @@ class SceneDiff extends Data {
         this.getDim3().setDisable(true);
         this.getNappiLattice().setDisable(true);
         this.getNappiBalls3D().setDisable(true);
+        this.getLatt1().setDisable(true);
+        this.getLatt2().setDisable(true);
         this.getValikkoDiff().getChildren().set(3, this.getRemBarNappiDiff());
         this.getValikkoDiff().getChildren().set(4, this.getCancelNappiDiff());
         this.getRemBarNappiDiff().setVisible(true);
@@ -573,6 +579,8 @@ class SceneDiff extends Data {
                             getDim3().setDisable(false);
                             getNappiLattice().setDisable(false);
                             getNappiBalls3D().setDisable(false);
+                            getLatt1().setDisable(false);
+                            getLatt2().setDisable(false);
                             getCloseNappiDiff().setDisable(false);
                             getRuntime().gc();
                             getRuntime().exit(getExitVal());
@@ -590,6 +598,8 @@ class SceneDiff extends Data {
                         getDim3().setDisable(false);
                         getNappiLattice().setDisable(false);
                         getNappiBalls3D().setDisable(false);
+                        getLatt1().setDisable(false);
+                        getLatt2().setDisable(false);
                         getCloseNappiDiff().setDisable(false);
                         getRuntime().gc();
                         Platform.runLater(() -> {
@@ -619,6 +629,9 @@ class SceneDiff extends Data {
                     getDim3().setDisable(false);
                     getNappiLattice().setDisable(false);
                     getNappiBalls3D().setDisable(false);
+                    getLattChoice().setDisable(false);
+                    getLatt1().setDisable(false);
+                    getLatt2().setDisable(false);
                     getCloseNappiDiff().setDisable(false);
                     getRuntime().gc();
                 }
@@ -684,7 +697,7 @@ class SceneDiff extends Data {
         this.getPiirturi().setFill(Color.BLACK);
         if ( this.getDim() == 2 )
             this.getPiirturi().fillRect(0, 0,
-                this.getAnimwidth() / this.getScalefactor(), this.getAnimwidth() / this.getScalefactor());
+                this.getAnimwidth()/this.getScalefactor(), this.getAnimwidth()/this.getScalefactor());
         else if ( this.getDim() == 3 )
             this.getPiirturi().fillRect(0, 0,
                 1.0/this.getScalefactor()*this.getAnimwidth(), 1.0/this.getScalefactor()*this.getAnimwidth());
@@ -695,6 +708,7 @@ class SceneDiff extends Data {
      * method for drawing the 2D particles
      * @param x x-coordinate of a particle
      * @param y y-coordinate of a particle
+     * @param ball which ball color
      */
     private void draw2Dots(double x, double y, double ball){
         if (isBalls3D()) {
@@ -704,6 +718,7 @@ class SceneDiff extends Data {
             else if ( ball == 3.0 ) ballImg = this.getYellowP();
             this.getPiirturi().drawImage(ballImg,
                 x - this.getDiam()/2.0, y - this.getDiam()/2.0, this.getDiam(), this.getDiam());
+                    //x - this.getDiam()/2.0, y - this.getDiam()/2.0, this.getDiam(), this.getDiam());
         } else {
             if ( ball == 1 ) this.getPiirturi().setFill(Color.rgb(255,80,80,1)); // red
             else if ( ball == 2 ) this.getPiirturi().setFill(Color.rgb(100,100,255,1)); // blue
@@ -719,6 +734,7 @@ class SceneDiff extends Data {
      * @param x x-coordinate of a particle
      * @param y y-coordinate of a particle
      * @param z z-coordinate of a particle
+     * @param ball which ball color
      */
     private void draw3Dots(double x, double y, double z, double ball) {
         final double xypos = this.getDiam() / (Math.log(2.0 * z));
@@ -745,16 +761,48 @@ class SceneDiff extends Data {
      * method for drawing the lattice structue (only in 2D)
      */
     private void drawLattice() {
-        for ( int i = 0; i < (int) this.getMeasure() + 2; i+=2 ) {
-            for ( int j = 0; j < (int) this.getMeasure() + 2; j+=2 ) {
-                if (isBalls3D()) {
-                    this.getPiirturi().drawImage(this.getGrayP(),
-                        (double) i + this.getDiffer(), (double) j + this.getDiffer(), 1.0, 1.0);
+        if (this.whichLatt() == 1) {
+            for ( int i = 0; i < (int) this.getMeasure() + 2; i+=2 ) {
+                for (int j = 0; j < (int) this.getMeasure() + 2; j += 2) {
+                    if (isBalls3D()) {
+                        this.getPiirturi().drawImage(this.getGrayP(),
+                            (double) i + this.getDiffer(), (double) j + this.getDiffer(), 1.0, 1.0);
+                    } else {
+                        this.getPiirturi().setFill(Color.rgb(60, 60, 60));
+                        this.getPiirturi().fillRoundRect(
+                            (double) i + this.getDiffer(), (double) j + this.getDiffer(),
+                            this.getDiam(), this.getDiam(), this.getDiam(), this.getDiam());
+                    }
+                }
+            }
+        } else {
+            for ( int i = 0; i < (int) this.getMeasure() + 2; i+=1 ) {
+                if (i % 2 != 0) {
+                    for (int j = 0; j < (int) this.getMeasure() + 2; j += 2) {
+                        if (isBalls3D()) {
+                            this.getPiirturi().drawImage(this.getGrayP(),
+                                (double) j + 0.8 * this.getDiffer(),
+                                (double) i + 0.8 * this.getDiffer(), 0.75, 0.75);
+                        } else {
+                            this.getPiirturi().setFill(Color.rgb(60, 60, 60));
+                            this.getPiirturi().fillRoundRect(
+                                (double) j + this.getDiffer(), (double) i + this.getDiffer(),
+                                this.getDiam(), this.getDiam(), this.getDiam(), this.getDiam());
+                        }
+                    }
                 } else {
-                    this.getPiirturi().setFill(Color.rgb(60,60,60));
-                    this.getPiirturi().fillRoundRect(
-                        (double) i + this.getDiffer(), (double) j + this.getDiffer(),
-                        this.getDiam(), this.getDiam(), this.getDiam(), this.getDiam());
+                    for (int j = 1; j < (int) this.getMeasure() + 2; j += 2) {
+                        if (isBalls3D()) {
+                            this.getPiirturi().drawImage(this.getGrayP(),
+                                (double) j + 0.8 * this.getDiffer(),
+                                (double) i + 0.8 * this.getDiffer(), 0.75, 0.75);
+                        } else {
+                            this.getPiirturi().setFill(Color.rgb(60, 60, 60));
+                            this.getPiirturi().fillRoundRect(
+                                (double) j + 1.0 + this.getDiffer(), (double) i + this.getDiffer(),
+                                this.getDiam(), this.getDiam(), this.getDiam(), this.getDiam());
+                        }
+                    }
                 }
             }
         }
@@ -889,71 +937,8 @@ class SceneDiff extends Data {
             this.vars[5] = "3";
         });
 
-        /*
-        * ...THEIR PLACEMENTS
-        */
-        GridPane.setHalignment(labNumParticles, HPos.LEFT);
-        asettelu.add(labNumParticles, 0, 0);
-        GridPane.setHalignment(this.setNumParticles, HPos.CENTER);
-        this.setNumParticles.setMinWidth(this.getCompwidth());
-        this.setNumParticles.setMaxWidth(this.getCompwidth());
-        asettelu.add(this.setNumParticles, 0, 1);
-        
-        GridPane.setHalignment(labSizeParticles, HPos.LEFT);
-        asettelu.add(labSizeParticles, 0, 2);
-        GridPane.setHalignment(this.setSizeParticles, HPos.CENTER);
-        this.setSizeParticles.setMinWidth(this.getCompwidth());
-        this.setSizeParticles.setMaxWidth(this.getCompwidth());
-        asettelu.add(this.setSizeParticles, 0, 3);
-
-        GridPane.setHalignment(labCharge, HPos.LEFT);
-        asettelu.add(labCharge, 0, 4);
-        GridPane.setHalignment(setCharge, HPos.CENTER);
-        setCharge.setMinWidth(this.getCompwidth());
-        setCharge.setMaxWidth(this.getCompwidth());
-        asettelu.add(setCharge, 0, 5);
-
-        GridPane.setHalignment(labNumDimensions, HPos.LEFT);
-        asettelu.add(labNumDimensions, 0, 6);
-        GridPane.setHalignment(setDimension, HPos.CENTER);
-        setDimension.setMinWidth(this.getCompwidth());
-        setDimension.setMaxWidth(this.getCompwidth());
-        asettelu.add(setDimension, 0, 7);
-
-        this.vars[6] = "-"; // calcfix or sawplot
+        this.vars[6] = "-"; // calcfix, fcclattice, or sawplot
         this.vars[7] = "-"; // spread out
-
-
-        /*
-        * BUTTON: LATTICE
-        */
-        this.getNappiLattice().setMinWidth(this.getCompwidth());
-        this.getNappiLattice().setMaxWidth(this.getCompwidth());
-        this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.getNappiLattice().setId("lattice");
-        this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getNappiLattice().setEffect(shadow));
-        this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getNappiLattice().setEffect(null));
-        this.getNappiLattice().setOnMouseClicked((MouseEvent event) -> {
-            if (this.getNappiLattice().getText().equals("LATTICE") || this.getNappiLattice().getText().equals("HILA")){
-                this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
-                this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[8] = "-";
-            } else if (this.getNappiLattice().getText().equals("FREE") || this.getNappiLattice().getText().equals("VAPAA")){
-                this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "HILA" : "LATTICE");
-                this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[8] = "l";
-            }
-        });
-        valikko.getChildren().add(this.getNappiLattice());
-
-        this.vars[9] = "-"; // save off
-
-        GridPane.setHalignment(valikko, HPos.LEFT);
-        asettelu.add(valikko, 0, 8, 2, 1);
-
-        final Pane empty = new Pane();
-        GridPane.setHalignment(empty, HPos.CENTER);
-        asettelu.add(empty, 0, 9, 2, 2);
 
         /*
          * BUTTON: BALLS3D
@@ -977,9 +962,111 @@ class SceneDiff extends Data {
         });
         valikko.getChildren().add(this.getNappiBalls3D());
 
-        final Pane empty2 = new Pane();
-        GridPane.setHalignment(empty2, HPos.CENTER);
-        asettelu.add(empty2, 0, 10, 2, 1);
+        /*
+        * BUTTON: LATTICE
+        */
+        Label labLattChoice = new Label(this.getLanguage().equals("fin") ? "hilamuoto:" : "lattice form:");
+
+        this.getNappiLattice().setMinWidth(this.getCompwidth());
+        this.getNappiLattice().setMaxWidth(this.getCompwidth());
+        this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.getNappiLattice().setId("lattice");
+        this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getNappiLattice().setEffect(shadow));
+        this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getNappiLattice().setEffect(null));
+        this.getNappiLattice().setOnMouseClicked((MouseEvent event) -> {
+            if (this.getNappiLattice().getText().equals("LATTICE") || this.getNappiLattice().getText().equals("HILA")){
+                this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
+                this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.setLatt1.setVisible(false);
+                this.setLatt2.setVisible(false);
+                labLattChoice.setVisible(false);
+                this.getLattChoice().setVisible(false);
+                this.vars[8] = "-";
+            } else if (this.getNappiLattice().getText().equals("FREE") || this.getNappiLattice().getText().equals("VAPAA")){
+                this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "HILA" : "LATTICE");
+                this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.setLatt1.setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.setLatt2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.setLatt1.setVisible(true);
+                this.setLatt2.setVisible(true);
+                labLattChoice.setVisible(true);
+                this.getLattChoice().setVisible(true);
+                this.vars[8] = "l";
+            }
+        });
+        valikko.getChildren().add(this.getNappiLattice());
+
+        this.setLatt1 = new ToggleButton("SC");
+        this.setLatt1.setMinWidth(65);
+        this.setLatt1.setMaxWidth(65);
+        this.setLatt1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.setLatt1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setLatt1.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.setLatt1.setEffect(shadow));
+        this.setLatt1.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.setLatt1.setEffect(null));
+
+        this.setLatt2 = new ToggleButton("FCC");
+        this.setLatt2.setMinWidth(65);
+        this.setLatt2.setMaxWidth(65);
+        this.setLatt2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.setLatt2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setLatt2.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.setLatt2.setEffect(shadow));
+        this.setLatt2.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.setLatt2.setEffect(null));
+
+        this.setLattChoice(new HBox(this.setLatt1,this.setLatt2));
+        this.getLattChoice().setSpacing(20);
+        this.setLatt1.setOnMouseClicked(f -> {
+            this.setLatt1.setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setLatt2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.vars[6] = "-";
+            this.setWhichLatt(1);
+        });
+        this.setLatt2.setOnMouseClicked(f -> {
+            this.setLatt1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setLatt2.setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.vars[6] = "c";
+            this.setWhichLatt(2);
+        });
+        valikko.getChildren().addAll(labLattChoice, this.getLattChoice());
+
+        this.setWhichLatt(1);
+        labLattChoice.setVisible(false);
+        this.getLattChoice().setVisible(false);
+
+        this.vars[9] = "-"; // save off
+
+        /*
+         * ...THEIR PLACEMENTS
+         */
+        GridPane.setHalignment(labNumParticles, HPos.LEFT);
+        asettelu.add(labNumParticles, 0, 0);
+        GridPane.setHalignment(this.setNumParticles, HPos.CENTER);
+        this.setNumParticles.setMinWidth(this.getCompwidth());
+        this.setNumParticles.setMaxWidth(this.getCompwidth());
+        asettelu.add(this.setNumParticles, 0, 1);
+
+        GridPane.setHalignment(labSizeParticles, HPos.LEFT);
+        asettelu.add(labSizeParticles, 0, 2);
+        GridPane.setHalignment(this.setSizeParticles, HPos.CENTER);
+        this.setSizeParticles.setMinWidth(this.getCompwidth());
+        this.setSizeParticles.setMaxWidth(this.getCompwidth());
+        asettelu.add(this.setSizeParticles, 0, 3);
+
+        GridPane.setHalignment(labCharge, HPos.LEFT);
+        asettelu.add(labCharge, 0, 4);
+        GridPane.setHalignment(setCharge, HPos.CENTER);
+        setCharge.setMinWidth(this.getCompwidth());
+        setCharge.setMaxWidth(this.getCompwidth());
+        asettelu.add(setCharge, 0, 5);
+
+        GridPane.setHalignment(labNumDimensions, HPos.LEFT);
+        asettelu.add(labNumDimensions, 0, 6);
+        GridPane.setHalignment(setDimension, HPos.CENTER);
+        setDimension.setMinWidth(this.getCompwidth());
+        setDimension.setMaxWidth(this.getCompwidth());
+        asettelu.add(setDimension, 0, 7);
+
+        GridPane.setHalignment(valikko, HPos.LEFT);
+        asettelu.add(valikko, 0, 8, 2, 1);
 
        return asettelu;
     }
@@ -1767,5 +1854,40 @@ class SceneDiff extends Data {
      * @param iscancel the iscancel to set
      */
     private void setIsCancel(boolean iscancel) { this.iscancel = iscancel; }
+
+    /**
+     * @return whichlatt
+     */
+    @Contract(pure = true)
+    private int whichLatt() { return this.whichlatt; }
+
+    /**
+     * whichnorm to set
+     */
+    @Contract(pure = true)
+    private void setWhichLatt(int whichlatt) { this.whichlatt = whichlatt; }
+
+    /**
+     * @return the latt_choice
+     */
+    @Contract(pure = true)
+    private HBox getLattChoice() { return this.latt_choice; }
+
+    /**
+     * @param latt_choice the latt_choice to set
+     */
+    private void setLattChoice(HBox latt_choice) { this.latt_choice = latt_choice; }
+
+    /**
+     * @return the setLatt1
+     */
+    @Contract(pure = true)
+    private ToggleButton getLatt1() { return setLatt1; }
+
+    /**
+     * @return the setLatt2
+     */
+    @Contract(pure = true)
+    private ToggleButton getLatt2() { return setLatt2; }
 
 }

@@ -361,8 +361,8 @@ class GetButtons extends HelpText {
             case "diff":
                 button.setOnAction(event -> {
                     assert isovalikko != null;
-                    Image imgDiffFI = new Image("file:src/main/resources/mathcards/diffFI-1.png");
-                    Image imgDiffEN = new Image("file:src/main/resources/mathcards/diffEN-1.png");
+                    Image imgDiffFI = new Image("/diffFI.png");
+                    Image imgDiffEN = new Image("/diffEN.png");
                     ImageView ivDiffFI = new ImageView(imgDiffFI);
                     ImageView ivDiffEN = new ImageView(imgDiffEN);
                     switch (button.getText()) {

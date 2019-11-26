@@ -259,8 +259,8 @@ public class RandomWalk extends Application {
             0, ex, this.getLanguage(), this.getFrame(), this.getButtonYES(), this.getButtonNO());
         // CALCULATION COMPONENTS
         // MATH CARD
-        Image imgCalcFI = new Image("file:src/main/resources/mathcards/calcFI-1.png");
-        Image imgCalcEN = new Image("file:src/main/resources/mathcards/calcEN-1.png");
+        Image imgCalcFI = new Image("/calcFI.png");
+        Image imgCalcEN = new Image("/calcEN.png");
         ImageView ivCalcFI = new ImageView(imgCalcFI);
         ImageView ivCalcEN = new ImageView(imgCalcEN);
         ivCalcFI.setSmooth(true);
@@ -287,16 +287,14 @@ public class RandomWalk extends Application {
         piirturi.setFill(Color.BLACK);
         piirturi.fillRect(0, 0, this.getAnimWidth(), this.getAnimHeight());
         this.setRealPane(getComponents.getPane(rtrmsAlusta, this.getAnimWidth(), this.getAnimHeight()));
-        Image imgRms1aFI = new Image("file:src/main/resources/mathcards/rms1aFI-1.png");
-        Image imgRms1aEN = new Image("file:src/main/resources/mathcards/rms1aEN-1.png");
-        Image imgRms1bFI = new Image("file:src/main/resources/mathcards/rms1bFI-1.png");
-        Image imgRms1bEN = new Image("file:src/main/resources/mathcards/rms1bEN-1.png");
-        Image imgRms2aFI = new Image("file:src/main/resources/mathcards/rms2aFI-1.png");
-        Image imgRms2aEN = new Image("file:src/main/resources/mathcards/rms2aEN-1.png");
-        Image imgRms2bFI = new Image("file:src/main/resources/mathcards/rms2bFI-1.png");
-        Image imgRms2bEN = new Image("file:src/main/resources/mathcards/rms2bEN-1.png");
-        Image imgRms2cFI = new Image("file:src/main/resources/mathcards/rms2cFI-1.png");
-        Image imgRms2cEN = new Image("file:src/main/resources/mathcards/rms2cEN-1.png");
+        Image imgRms1aFI = new Image("/rms1aFI.png");
+        Image imgRms1aEN = new Image("/rms1aEN.png");
+        Image imgRms1bFI = new Image("/rms1bFI.png");
+        Image imgRms1bEN = new Image("/rms1bEN.png");
+        Image imgRms2aFI = new Image("/rms2aFI.png");
+        Image imgRms2aEN = new Image("/rms2aEN.png");
+        Image imgRms2bFI = new Image("/rms2bFI.png");
+        Image imgRms2bEN = new Image("/rms2bEN.png");
         ImageView ivRms1aFI = new ImageView(imgRms1aFI);
         ImageView ivRms1aEN = new ImageView(imgRms1aEN);
         ImageView ivRms1bFI = new ImageView(imgRms1bFI);
@@ -305,8 +303,6 @@ public class RandomWalk extends Application {
         ImageView ivRms2aEN = new ImageView(imgRms2aEN);
         ImageView ivRms2bFI = new ImageView(imgRms2bFI);
         ImageView ivRms2bEN = new ImageView(imgRms2bEN);
-        ImageView ivRms2cFI = new ImageView(imgRms2cFI);
-        ImageView ivRms2cEN = new ImageView(imgRms2cEN);
         ivRms1aFI.setSmooth(true);
         ivRms1aEN.setSmooth(true);
         ivRms1bFI.setSmooth(true);
@@ -315,8 +311,6 @@ public class RandomWalk extends Application {
         ivRms2aEN.setSmooth(true);
         ivRms2bFI.setSmooth(true);
         ivRms2bEN.setSmooth(true);
-        ivRms2cFI.setSmooth(true);
-        ivRms2cEN.setSmooth(true);
         Button helpNappiReal = getButtons.getHelpButton(
             this.getLanguage(), this.getTextAreaReal(), this.getIsovalikkoReal(),
                 null, this.getRealPane(), null, null, "real", 0);
@@ -338,8 +332,8 @@ public class RandomWalk extends Application {
         diffpiirturi.setFill(Color.BLACK);
         diffpiirturi.fillRect(0, 0, this.getAnimWidth(), this.getAnimHeight());
         // MATH CARD
-        Image imgDiffFI = new Image("file:src/main/resources/mathcards/diffFI-1.png");
-        Image imgDiffEN = new Image("file:src/main/resources/mathcards/diffEN-1.png");
+        Image imgDiffFI = new Image("/diffFI.png");
+        Image imgDiffEN = new Image("/diffEN.png");
         ImageView ivDiffFI = new ImageView(imgDiffFI);
         ImageView ivDiffEN = new ImageView(imgDiffEN);
         ivDiffFI.setSmooth(true);
@@ -383,8 +377,8 @@ public class RandomWalk extends Application {
         sliderBox.getChildren().addAll(labcee, labelcee, sliderCee);
 
         // MATH CARD
-        Image imgSawFI = new Image("file:src/main/resources/mathcards/sawFI-1.png");
-        Image imgSawEN = new Image("file:src/main/resources/mathcards/sawEN-1.png");
+        Image imgSawFI = new Image("/sawFI.png");
+        Image imgSawEN = new Image("/sawEN.png");
         ImageView ivSawFI = new ImageView(imgSawFI);
         ImageView ivSawEN = new ImageView(imgSawEN);
         ivSawFI.setSmooth(true);

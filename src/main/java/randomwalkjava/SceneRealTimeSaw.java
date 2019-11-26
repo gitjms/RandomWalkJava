@@ -432,24 +432,24 @@ class SceneRealTimeSaw extends Data {
 
         DropShadow shadow = new DropShadow();
         GetComponents getComponents = new GetComponents();
-        Image imgSawFI = new Image("file:src/main/resources/mathcards/sawFI-1.png");
-        Image imgSawEN = new Image("file:src/main/resources/mathcards/sawEN-1.png");
-        Image imgSawFI_corr = new Image("file:src/main/resources/mathcards/sawFI_corr-1.png");
-        Image imgSawEN_corr = new Image("file:src/main/resources/mathcards/sawEN_corr-1.png");
-        //Image imgSawFI_CBMCcorr = new Image("file:src/main/resources/mathcards/sawFI_CBMCcorr-1.png");
-        //Image imgSawEN_CBMCcorr = new Image("file:src/main/resources/mathcards/sawEN_CBMCcorr-1.png");
+        Image imgSawFI = new Image("/sawFI.png");
+        Image imgSawEN = new Image("/sawEN.png");
+        Image imgSawFI_SAWcorr = new Image("/sawFI_SAWcorr.png");
+        Image imgSawEN_SAWcorr = new Image("/sawEN_SAWcorr.png");
+        Image imgSawFI_CBMCcorr = new Image("/sawFI_CBMCcorr.png");
+        Image imgSawEN_CBMCcorr = new Image("/sawEN_CBMCcorr.png");
         ImageView ivSawFI = new ImageView(imgSawFI);
         ImageView ivSawEN = new ImageView(imgSawEN);
-        ImageView ivSawFI_corr = new ImageView(imgSawFI_corr);
-        ImageView ivSawEN_corr = new ImageView(imgSawEN_corr);
-        //ImageView ivSawFI_CBMCcorr = new ImageView(imgSawFI_CBMCcorr);
-        //ImageView ivSawEN_CBMCcorr = new ImageView(imgSawEN_CBMCcorr);
+        ImageView ivSawFI_SAWcorr = new ImageView(imgSawFI_SAWcorr);
+        ImageView ivSawEN_SAWcorr = new ImageView(imgSawEN_SAWcorr);
+        ImageView ivSawFI_CBMCcorr = new ImageView(imgSawFI_CBMCcorr);
+        ImageView ivSawEN_CBMCcorr = new ImageView(imgSawEN_CBMCcorr);
         ivSawFI.setSmooth(true);
         ivSawEN.setSmooth(true);
-        ivSawFI_corr.setSmooth(true);
-        ivSawEN_corr.setSmooth(true);
-        //ivSawFI_CBMCcorr.setSmooth(true);
-        //ivSawEN_CBMCcorr.setSmooth(true);
+        ivSawFI_SAWcorr.setSmooth(true);
+        ivSawEN_SAWcorr.setSmooth(true);
+        ivSawFI_CBMCcorr.setSmooth(true);
+        ivSawEN_CBMCcorr.setSmooth(true);
 
         /*
          * COMPONENTS...
@@ -482,11 +482,15 @@ class SceneRealTimeSaw extends Data {
 
         this.getCeeSlider().setOnMouseDragged(e -> {
             if (this.getCeeSlider().getValue() > 1.0) {
-                getComponents.getPaneView(pane, this.getLanguage().equals("fin")
-                    ? ivSawFI_corr : ivSawEN_corr, this.getSawTextWidth(), this.getSawTextHeight());
+                if (this.isSaw())
+                    getComponents.getPaneView(pane, this.getLanguage().equals("fin")
+                        ? ivSawFI_SAWcorr : ivSawEN_SAWcorr, this.getSawTextWidth(), this.getTextHeight());
+                else
+                    getComponents.getPaneView(pane, this.getLanguage().equals("fin")
+                        ? ivSawFI_CBMCcorr : ivSawEN_CBMCcorr, this.getSawTextWidth(), this.getTextHeight());
             } else if (this.getCeeSlider().getValue() == 1.0) {
                 getComponents.getPaneView(pane, this.getLanguage().equals("fin")
-                    ? ivSawFI : ivSawEN, this.getSawTextWidth(), this.getSawTextHeight());
+                    ? ivSawFI : ivSawEN, this.getSawTextWidth(), this.getTextHeight());
             }
         });
 
@@ -934,5 +938,5 @@ class SceneRealTimeSaw extends Data {
      * @return the textheight
      */
     @Contract(pure = true)
-    private double getSawTextHeight() { return 615.0 / Screen.getMainScreen().getRenderScale(); }
+    private double getTextHeight() { return 600.0 / Screen.getMainScreen().getRenderScale(); }
 }
