@@ -36,22 +36,16 @@ import java.util.TimerTask;
 class SceneDiff extends Data {
 
     private String language;
-    private ToggleButton setCharge1;
-    private ToggleButton setCharge2;
     private ToggleButton setDim2;
     private ToggleButton setDim3;
     private final Button nappiLattice;
-    private ToggleButton setLatt1;
-    private ToggleButton setLatt2;
-    private int whichlatt;
-    private HBox latt_choice;
+    private final Button nappiMobilVisc;
     private TextField setNumParticles;
     private TextField setSizeParticles;
 
     private long phaseEnergy;
     private long phaseDiffus;
     private long phaseVisc;
-    private double smallest;
     private double greatest;
     private double greatestDiff;
     private double greatestVisc;
@@ -88,8 +82,6 @@ class SceneDiff extends Data {
     private boolean walk;
     private boolean lattice;
     private boolean balls3D;
-    private Image redP;
-    private Image blueP;
     private Image yellowP;
     private Image grayP;
     private BufferedWriter output;
@@ -99,7 +91,6 @@ class SceneDiff extends Data {
     private int num_part;
     private double diam;
     private int dim;
-    private int charge;
     private List<Double> energy_x;
     private List<Double> energy_y;
     private List<Double> diffusion_x;
@@ -109,6 +100,7 @@ class SceneDiff extends Data {
     private double measure;
     private double differ;
     private boolean iscancel;
+    private boolean ismobility;
 
     /**
      * main class gets vars via this
@@ -124,19 +116,20 @@ class SceneDiff extends Data {
         this.setLanguage(language);
         this.nappiLattice = new Button(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
         this.nappiBalls3D = new Button(this.getLanguage().equals("fin") ? "PALLOT" : "BALLS");
+        this.nappiMobilVisc = new Button(this.getLanguage().equals("fin") ? "VISKOSITEETTI" : "VISCOSITY");
+        this.ismobility = false;
         this.balls3D = true;
         this.formatter = new DecimalFormat("0.00");
         this.vars = new String[]{
             "D",    // vars[0] which simulation                 USER
             "0",    // vars[1] particles                        USER
             "0.0",  // vars[2] diameter                         USER
-            "0",    // vars[3] charge                           USER
-            "0",    // vars[4] steps                            n/a
-            "0",    // vars[5] dimension                        USER
-            "-",    // vars[6] calcfix, fcclattice, or sawplot  n/a
-            "-",    // vars[7] (fixed/)spread                   n/a
-            "-",    // vars[8] (lattice/)free                   USER
-            "-"};   // vars[9] save (off)                       n/a
+            "0",    // vars[3] steps                            n/a
+            "0",    // vars[4] dimension                        USER
+            "-",    // vars[5] calcfix, fcclattice, or sawplot  n/a
+            "-",    // vars[6] (fixed/)spread                   n/a
+            "-",    // vars[7] (lattice/)free                   USER
+            "-"};   // vars[8] save (off)                       n/a
     }
 
     /**
@@ -160,8 +153,8 @@ class SceneDiff extends Data {
      * @param energy_y fxplot energy graph y-axis container
      * @param diffusion_x fxplot diffusion graph x-axis container
      * @param diffusion_y fxplot diffusion graph y-axis container
-     * @param visc_x fxplot visosity graph x-axis container
-     * @param visc_y fxplot visosity graph y-axis container
+     * @param visc_x fxplot visosity or mobility graph x-axis container
+     * @param visc_y fxplot visosity or mobility graph y-axis container
      * @param newdata if is a new run with new data
      * @param measure area/volume size
      * @param differ difference in between the lattice structure
@@ -173,8 +166,6 @@ class SceneDiff extends Data {
                  List<Double> energy_y, List<Double> diffusion_x, List<Double> diffusion_y, List<Double> visc_x,
                  List<Double> visc_y, boolean newdata, double measure, double differ) {
 
-        this.setRedP(new Image("/Pred.png"));
-        this.setBlueP(new Image("/Pblue.png"));
         this.setYellowP(new Image("/Pyellow.png"));
         this.setGrayP(new Image("/Pgray.png"));
 
@@ -195,12 +186,10 @@ class SceneDiff extends Data {
         barrierOn();
 
         if (newdata) {
-            this.setInitE(0);
             this.setNumPart(Integer.parseInt(this.vars[1]));
             this.setDiam(Double.parseDouble(this.vars[2]));
-            this.setCharge(Integer.parseInt(this.vars[3]));
-            this.setDim(Integer.parseInt(this.vars[5]));
-            this.setLattice(this.vars[8].equals("l"));
+            this.setDim(Integer.parseInt(this.vars[4]));
+            this.setLattice(this.vars[7].equals("l"));
             this.setBalls3D(this.isBalls3D());
             this.setPhaseEnergy(0);
             this.setPhaseDiffus(0);
@@ -230,14 +219,11 @@ class SceneDiff extends Data {
 
         this.getMenuNappiDiff().setDisable(true);
         this.getHelpNappiDiff().setDisable(true);
-        this.getCharge1().setDisable(true);
-        this.getCharge2().setDisable(true);
         this.getDim2().setDisable(true);
         this.getDim3().setDisable(true);
         this.getNappiLattice().setDisable(true);
+        this.getNappiMobilVisc().setDisable(true);
         this.getNappiBalls3D().setDisable(true);
-        this.getLatt1().setDisable(true);
-        this.getLatt2().setDisable(true);
         this.getValikkoDiff().getChildren().set(3, this.getRemBarNappiDiff());
         this.getValikkoDiff().getChildren().set(4, this.getCancelNappiDiff());
         this.getRemBarNappiDiff().setVisible(true);
@@ -273,7 +259,7 @@ class SceneDiff extends Data {
         {
         command = new String[]{"cmd","/c",executable,
             this.vars[0], this.vars[1], this.vars[2], this.vars[3], this.vars[4],
-            this.vars[5], this.vars[6], this.vars[7], this.vars[8], this.vars[9]};
+            this.vars[5], this.vars[6], this.vars[7], this.vars[8]};
 
         this.setRuntime(Runtime.getRuntime());
         runtimeStart();
@@ -348,7 +334,7 @@ class SceneDiff extends Data {
                             if (line.trim().startsWith("S") || line.isEmpty()) {
                                 continue;
                             }
-                            if (!line.substring(0, 1).matches("([0-9]|-|\\+|\\*)|E|D|V|T"))
+                            if (!line.substring(0, 1).matches("([0-9]|-)|E|D|V|T"))
                                 continue;
                             if (!(line.trim().split("(\\s+)")[0].trim().equals("E")
                                 || line.trim().split("(\\s+)")[0].trim().equals("D")
@@ -356,42 +342,22 @@ class SceneDiff extends Data {
                                 || line.trim().split("(\\s+)")[0].trim().equals("T"))) {
                                 if (getDim() == 2) {
                                     String[] valStr = line.split("(\\s+)");
-                                    String sign = valStr[0].trim();
                                     try {
-                                        getValues()[0][i] = Double.parseDouble(valStr[1].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
-                                        getValues()[1][i] = Double.parseDouble(valStr[2].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
-                                        switch (sign) {
-                                            case "+":
-                                                getValues()[2][i] = 1.0; // red ball
-                                                break;
-                                            case "-":
-                                                getValues()[2][i] = 2.0; // blue ball
-                                                break;
-                                            case "*":
-                                                getValues()[2][i] = 3.0; // yellow ball
-                                                break;
-                                        }
-                                    } catch (NumberFormatException e) {
+                                        getValues()[0][i] = Double.parseDouble(valStr[0].trim()) + getCenter() / (getScalefactor()
+                                            * (int) Screen.getMainScreen().getRenderScale());
+                                        getValues()[1][i] = Double.parseDouble(valStr[1].trim()) + getCenter() / (getScalefactor()
+                                            * (int) Screen.getMainScreen().getRenderScale());
+                                     } catch (NumberFormatException e) {
                                         continue;
                                     }
                                 } else if (getDim() == 3) {
                                     String[] valStr = line.split("(\\s+)");
-                                    String sign = valStr[0].trim();
                                     try {
-                                        getValues()[0][i] = Double.parseDouble(valStr[1].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
-                                        getValues()[1][i] = Double.parseDouble(valStr[2].trim()) + getCenter() / (getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
-                                        getValues()[2][i] = Double.parseDouble(valStr[3].trim()) + getCenter() / getScalefactor();
-                                        switch (sign) {
-                                            case "+":
-                                                getValues()[3][i] = 1.0; // red ball
-                                                break;
-                                            case "-":
-                                                getValues()[3][i] = 2.0; // blue ball
-                                                break;
-                                            case "*":
-                                                getValues()[3][i] = 3.0; // yellow ball
-                                                break;
-                                        }
+                                        getValues()[0][i] = Double.parseDouble(valStr[0].trim()) + getCenter() / (getScalefactor()
+                                            * (int) Screen.getMainScreen().getRenderScale());
+                                        getValues()[1][i] = Double.parseDouble(valStr[1].trim()) + getCenter() / (getScalefactor()
+                                            * (int) Screen.getMainScreen().getRenderScale());
+                                        getValues()[2][i] = Double.parseDouble(valStr[2].trim()) + getCenter() / getScalefactor();
                                     } catch (NumberFormatException e) {
                                         continue;
                                     }
@@ -406,9 +372,9 @@ class SceneDiff extends Data {
                                     if (getDim() == 2 && isLattice()) drawLattice();
                                     for (int k = 0; k < getNumPart(); k++) {
                                         if (getDim() == 2) {
-                                            draw2Dots(getValues()[0][k], getValues()[1][k], getValues()[2][k]);
+                                            draw2Dots(getValues()[0][k], getValues()[1][k]);
                                         } else if (getDim() == 3) {
-                                            draw3Dots(getValues()[0][k], getValues()[1][k], getValues()[2][k], getValues()[3][k]);
+                                            draw3Dots(getValues()[0][k], getValues()[1][k], getValues()[2][k]);
                                         }
                                     }
                                 });
@@ -423,6 +389,7 @@ class SceneDiff extends Data {
                                 try {
                                     if (firstLetter.equals("E") && !isFirstEnergy()) {
                                         double firstNum = Double.parseDouble(line.split("(\\s+)")[1].trim());
+                                        setInitE(firstNum);
                                         setFirstEnergy(true);
 
                                         if (isFirstEnergy()) {
@@ -434,7 +401,6 @@ class SceneDiff extends Data {
                                                 nanFound = true;
                                             if (!nanFound) {
                                                 setPhaseEnergy(getPhaseEnergy() + 1);
-                                                setSmallest(0.0);
                                                 setGreatest(getEnergyY().get(0));
                                                 getFxplot().setEData(getEnergyX(), getEnergyY());
                                             }
@@ -450,7 +416,7 @@ class SceneDiff extends Data {
                                         if (!nanFound)
                                             setPhaseEnergy(getPhaseEnergy() + 1);
                                     } else if (firstLetter.equals("D") && !isFirstDiffus()) {
-                                        double firstNum = Double.parseDouble(line.split("(\\s+)")[1].trim());
+                                        double firstNum = 1e8 * Double.parseDouble(line.split("(\\s+)")[1].trim());
                                         setFirstDiffus(true);
 
                                         if (isFirstDiffus()) {
@@ -468,7 +434,7 @@ class SceneDiff extends Data {
                                             }
                                         }
                                     } else if (firstLetter.equals("D")) {
-                                        double number = Double.parseDouble(line.split("(\\s+)")[1].trim());
+                                        double number = 1e8 * Double.parseDouble(line.split("(\\s+)")[1].trim());
                                         if (!Double.isNaN(number) && !Double.isInfinite(number) && number > 0.0
                                             && !Double.isNaN(getPhaseDiffus()) && !Double.isInfinite(getPhaseDiffus())) {
                                             getDiffusionY().add(number);
@@ -480,9 +446,17 @@ class SceneDiff extends Data {
                                     } else if (firstLetter.equals("V") && !isFirstVisc()) {
                                         double firstNum = 0.0;
                                         if (getDiffusionY().get((int) getPhaseDiffus() - 1) != 0.0)
-                                            // 1.0e10: 1e4 (cm^2 to m^2) * 1e6 (micro-Pascal)
-                                            firstNum = 1.0e10 * Double.parseDouble(line.split("(\\s+)")[1].trim()) /
-                                                getDiffusionY().get((int) getPhaseDiffus() - 1);
+                                            if (isMobility()) {
+                                                // electrical mobility eta = 3qD/(2E) 1E-2 [cm^2/(Vs)]
+                                                // eta = 3/2 * 1e2*D[cm^2/s] * q/E[eV] = 3/2 * D[cm^2/s]/E[V] = 1E-2 [cm^2/(Vs)]
+                                                firstNum = 3.0 / 2.0 * 1e2 * getDiffusionY().get((int) getPhaseDiffus() - 1)
+                                                    / getEnergyY().get((int) getPhaseEnergy() - 1);
+                                            } else {
+                                                // µPa s, 1e6: Pa -> µPa
+                                                // 1e-4: D [cm^2/s] -> D [m^2/s]
+                                                firstNum = 1e6 * Double.parseDouble(line.split("(\\s+)")[1].trim()) /
+                                                    (1e-4 * getDiffusionY().get((int) getPhaseDiffus() - 1));
+                                            }
                                         setFirstVisc(true);
 
                                         if (isFirstVisc()) {
@@ -496,15 +470,26 @@ class SceneDiff extends Data {
                                             if (!nanFound) {
                                                 setPhaseVisc(getPhaseVisc() + 1);
                                                 setGreatestVisc(getViscY().get(0));
-                                                getFxplot().setVData(getViscX(), getViscY());
+                                                if (isMobility())
+                                                    getFxplot().setVData(getViscX(), getViscY(),"mobil");
+                                                else
+                                                    getFxplot().setVData(getViscX(), getViscY(),"visc");
                                             }
                                         }
                                     } else if (firstLetter.equals("V")) {
                                         double number = 0.0;
                                         if (getDiffusionY().get((int) getPhaseDiffus() - 1) != 0.0)
-                                            // 1.0e10: 1e4 (cm^2 to m^2) * 1e6 (micro-Pascal)
-                                            number = 1.0e10 * Double.parseDouble(line.split("(\\s+)")[1].trim()) /
-                                                getDiffusionY().get((int) getPhaseDiffus() - 1);
+                                            if (isMobility()) {
+                                                // electrical mobility eta = 3qD/(2E) 1E-2 [cm^2/(Vs)]
+                                                // eta = 3/2 * 1e2*D[cm^2/s] * q/E[eV] = 3/2 * D[cm^2/s]/E[V] = 1E-2 [cm^2/(Vs)]
+                                                number = 3.0 / 2.0 * 1e2 * getDiffusionY().get((int) getPhaseDiffus() - 1)
+                                                    / getEnergyY().get((int) getPhaseEnergy() - 1);
+                                            } else {
+                                                // µPa s, 1e6: Pa -> µPa
+                                                // 1e-4: D [cm^2/s] -> D [m^2/s]
+                                                number = 1e6 * Double.parseDouble(line.split("(\\s+)")[1].trim()) /
+                                                    (1e-4 * getDiffusionY().get((int) getPhaseDiffus() - 1));
+                                            }
                                         if (!Double.isNaN(number) && !Double.isInfinite(number) && number > 0.0
                                             && !Double.isNaN(getPhaseVisc()) && !Double.isInfinite(getPhaseVisc())) {
                                             getViscY().add(number);
@@ -527,13 +512,6 @@ class SceneDiff extends Data {
                                             setGreatest(getEnergyY().get((int) getPhaseEnergy() - 1));
                                             getFxplot().setEMaxY(getGreatest());
                                         }
-                                        if (getCharge() == 2) {
-                                            if (getEnergyY().get((int) getPhaseEnergy() - 1) < getSmallest()) {
-                                                setSmallest(getEnergyY().get((int) getPhaseEnergy() - 1));
-                                                getFxplot().setEMinY(getSmallest());
-                                            }
-                                        }
-                                        setInitE(getEnergyY().get(0));
                                         getFxplot().updateEData(getEnergyX(), getEnergyY());
                                     } else if (firstLetter.equals("D") && isFirstDiffus()) {
                                         if (getDiffusionY().get((int) getPhaseDiffus() - 1) > getGreatestDiff()) {
@@ -548,17 +526,22 @@ class SceneDiff extends Data {
                                             getFxplot().setVMaxY(getGreatestVisc());
                                         }
 
-                                        getFxplot().updateVData(getViscX(), getViscY());
+                                        if (isMobility())
+                                            getFxplot().updateVData(getViscX(), getViscY(),"mobil");
+                                        else
+                                            getFxplot().updateVData(getViscX(), getViscY(),"visc");
                                     }
                                 }
                             }
                         }
 
-                        int titletime = getViscX().size() - 1;
                         if (getViscY().size() > 0)
-                            getFxplot().setVTitle(titletime, getViscY().get(getViscY().size() - 1));
+                            if (isMobility())
+                                getFxplot().setVTitle(getViscY().get(getViscY().size() - 1), "mobil");
+                            else
+                                getFxplot().setVTitle(getViscY().get(getViscY().size() - 1), "visc");
                         if (getDiffusionY().size() > 0)
-                            getFxplot().setDTitle(titletime, getDiffusionY().get(getDiffusionY().size() - 1));
+                            getFxplot().setDTitle(1e-8 * getDiffusionY().get(getDiffusionY().size() - 1));
                         if (getEnergyY().size() > 0)
                             setFinE(getEnergyY().get((int) getPhaseEnergy() - 1));
                         double deltaE = getFinE() - getInitE();
@@ -573,14 +556,11 @@ class SceneDiff extends Data {
                             getHelpNappiDiff().setDisable(false);
                             getRunDiff().setDisable(false);
                             getPlotDiff().setVisible(true);
-                            getCharge1().setDisable(false);
-                            getCharge2().setDisable(false);
                             getDim2().setDisable(false);
                             getDim3().setDisable(false);
                             getNappiLattice().setDisable(false);
+                            getNappiMobilVisc().setDisable(false);
                             getNappiBalls3D().setDisable(false);
-                            getLatt1().setDisable(false);
-                            getLatt2().setDisable(false);
                             getCloseNappiDiff().setDisable(false);
                             getRuntime().gc();
                             getRuntime().exit(getExitVal());
@@ -592,14 +572,11 @@ class SceneDiff extends Data {
                         getHelpNappiDiff().setDisable(false);
                         getRunDiff().setDisable(false);
                         getPlotDiff().setVisible(true);
-                        getCharge1().setDisable(false);
-                        getCharge2().setDisable(false);
                         getDim2().setDisable(false);
                         getDim3().setDisable(false);
                         getNappiLattice().setDisable(false);
+                        getNappiMobilVisc().setDisable(false);
                         getNappiBalls3D().setDisable(false);
-                        getLatt1().setDisable(false);
-                        getLatt2().setDisable(false);
                         getCloseNappiDiff().setDisable(false);
                         getRuntime().gc();
                         Platform.runLater(() -> {
@@ -623,15 +600,11 @@ class SceneDiff extends Data {
                     getHelpNappiDiff().setDisable(false);
                     getRunDiff().setDisable(false);
                     getPlotDiff().setVisible(true);
-                    getCharge1().setDisable(false);
-                    getCharge2().setDisable(false);
                     getDim2().setDisable(false);
                     getDim3().setDisable(false);
                     getNappiLattice().setDisable(false);
+                    getNappiMobilVisc().setDisable(false);
                     getNappiBalls3D().setDisable(false);
-                    getLattChoice().setDisable(false);
-                    getLatt1().setDisable(false);
-                    getLatt2().setDisable(false);
                     getCloseNappiDiff().setDisable(false);
                     getRuntime().gc();
                 }
@@ -675,15 +648,15 @@ class SceneDiff extends Data {
         * Draw initial data spots
         */
         for (int k = 0; k < this.getNumPart(); k++){
-            this.getValues()[0][k] = this.getDiffer()/10.0 + initialData.get(k)[0] + this.getCenter() / (this.getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
-            this.getValues()[1][k] = this.getDiffer()/10.0 + initialData.get(k)[1] + this.getCenter() / (this.getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
+            this.getValues()[0][k] = this.getDiffer()/10.0 + initialData.get(k)[0] + this.getCenter()
+                / (this.getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
+            this.getValues()[1][k] = this.getDiffer()/10.0 + initialData.get(k)[1] + this.getCenter()
+                / (this.getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
             if ( this.getDim() == 2 ) {
-                this.getValues()[2][k] = initialData.get(k)[2];
-                draw2Dots(this.getValues()[0][k], this.getValues()[1][k], this.getValues()[2][k]);
+                draw2Dots(this.getValues()[0][k], this.getValues()[1][k]);
             } else if ( this.getDim() == 3 ) {
                 this.getValues()[2][k] = initialData.get(k)[2] + this.getCenter() / this.getScalefactor();
-                this.getValues()[3][k] = initialData.get(k)[3];
-                draw3Dots(this.getValues()[0][k], this.getValues()[1][k], this.getValues()[2][k], this.getValues()[3][k]);
+                draw3Dots(this.getValues()[0][k], this.getValues()[1][k], this.getValues()[2][k]);
             }
         }
     }
@@ -708,23 +681,17 @@ class SceneDiff extends Data {
      * method for drawing the 2D particles
      * @param x x-coordinate of a particle
      * @param y y-coordinate of a particle
-     * @param ball which ball color
      */
-    private void draw2Dots(double x, double y, double ball){
+    private void draw2Dots(double x, double y){
         if (isBalls3D()) {
-            Image ballImg = null;
-            if ( ball == 1.0 ) ballImg = this.getRedP();
-            else if ( ball == 2.0 ) ballImg = this.getBlueP();
-            else if ( ball == 3.0 ) ballImg = this.getYellowP();
-            this.getPiirturi().drawImage(ballImg,
-                x - this.getDiam()/2.0, y - this.getDiam()/2.0, this.getDiam(), this.getDiam());
-                    //x - this.getDiam()/2.0, y - this.getDiam()/2.0, this.getDiam(), this.getDiam());
+            this.getPiirturi().drawImage(this.getYellowP(),
+                x - this.getDiam()/2.0,y - this.getDiam()/2.0,
+                this.getDiam(), this.getDiam());
         } else {
-            if ( ball == 1 ) this.getPiirturi().setFill(Color.rgb(255,80,80,1)); // red
-            else if ( ball == 2 ) this.getPiirturi().setFill(Color.rgb(100,100,255,1)); // blue
-            else if ( ball == 3 ) this.getPiirturi().setFill(Color.rgb(255,255,50,1)); // yellow
+            this.getPiirturi().setFill(Color.rgb(255,255,50,1)); // yellow
             this.getPiirturi().setLineWidth(this.getLinewidth());
-            this.getPiirturi().fillRoundRect(x - this.getDiam()/2.0, y - this.getDiam()/2.0,
+            this.getPiirturi().fillRoundRect(
+                x - this.getDiam()/2.0, y - this.getDiam()/2.0,
                 this.getDiam(), this.getDiam(), this.getDiam(), this.getDiam());
         }
     }
@@ -734,21 +701,14 @@ class SceneDiff extends Data {
      * @param x x-coordinate of a particle
      * @param y y-coordinate of a particle
      * @param z z-coordinate of a particle
-     * @param ball which ball color
      */
-    private void draw3Dots(double x, double y, double z, double ball) {
-        final double xypos = this.getDiam() / (Math.log(2.0 * z));
+    private void draw3Dots(double x, double y, double z) {
+        final double xypos = this.getDiam() / Math.log(2.0 * z);
         final double widthheight = 2.75 * xypos;
         if (isBalls3D()) {
-            Image ballImg = null;
-            if (ball == 1.0) ballImg = this.getRedP();
-            else if (ball == 2.0) ballImg = this.getBlueP();
-            else if (ball == 3.0) ballImg = this.getYellowP();
-            this.getPiirturi().drawImage(ballImg,x - xypos, y - xypos, widthheight, widthheight);
+            this.getPiirturi().drawImage(this.getYellowP(),x - xypos, y - xypos, widthheight, widthheight);
         } else {
-            if ( ball == 1 ) this.getPiirturi().setFill(Color.rgb(255,80,80,1.0-z/(20.0*this.getScalefactor()))); // red
-            else if ( ball == 2 ) this.getPiirturi().setFill(Color.rgb(100,100,255,1.0-z/(20.0*this.getNumPart()*this.getScalefactor()))); // blue
-            else if ( ball == 3 ) this.getPiirturi().setFill(Color.rgb(255,255,50,1.0-z/(20.0*this.getNumPart()*this.getScalefactor()))); // yellow
+            this.getPiirturi().setFill(Color.rgb(255,255,50,1.0-z/(20.0*this.getNumPart()*this.getScalefactor()))); // yellow
             this.getPiirturi().setGlobalAlpha(1.0-z/(this.getScalefactor()));
             this.getPiirturi().setLineWidth(this.getLinewidth());
             this.getPiirturi().setGlobalBlendMode(BlendMode.DIFFERENCE);
@@ -761,48 +721,18 @@ class SceneDiff extends Data {
      * method for drawing the lattice structue (only in 2D)
      */
     private void drawLattice() {
-        if (this.whichLatt() == 1) {
-            for ( int i = 0; i < (int) this.getMeasure() + 2; i+=2 ) {
-                for (int j = 0; j < (int) this.getMeasure() + 2; j += 2) {
-                    if (isBalls3D()) {
-                        this.getPiirturi().drawImage(this.getGrayP(),
-                            (double) i + this.getDiffer(), (double) j + this.getDiffer(), 1.0, 1.0);
-                    } else {
-                        this.getPiirturi().setFill(Color.rgb(60, 60, 60));
-                        this.getPiirturi().fillRoundRect(
-                            (double) i + this.getDiffer(), (double) j + this.getDiffer(),
-                            this.getDiam(), this.getDiam(), this.getDiam(), this.getDiam());
-                    }
-                }
-            }
-        } else {
-            for ( int i = 0; i < (int) this.getMeasure() + 2; i+=1 ) {
-                if (i % 2 != 0) {
-                    for (int j = 0; j < (int) this.getMeasure() + 2; j += 2) {
-                        if (isBalls3D()) {
-                            this.getPiirturi().drawImage(this.getGrayP(),
-                                (double) j + 0.8 * this.getDiffer(),
-                                (double) i + 0.8 * this.getDiffer(), 0.75, 0.75);
-                        } else {
-                            this.getPiirturi().setFill(Color.rgb(60, 60, 60));
-                            this.getPiirturi().fillRoundRect(
-                                (double) j + this.getDiffer(), (double) i + this.getDiffer(),
-                                this.getDiam(), this.getDiam(), this.getDiam(), this.getDiam());
-                        }
-                    }
+        // SC = simple cubic
+        for ( int i = 0; i < (int) this.getMeasure() + 2; i+=2 ) {
+            for (int j = 0; j < (int) this.getMeasure() + 2; j += 2) {
+                if (isBalls3D()) {
+                    this.getPiirturi().drawImage(this.getGrayP(),
+                        (double) i + this.getDiffer(), (double) j + this.getDiffer(), 1.0, 1.0);
                 } else {
-                    for (int j = 1; j < (int) this.getMeasure() + 2; j += 2) {
-                        if (isBalls3D()) {
-                            this.getPiirturi().drawImage(this.getGrayP(),
-                                (double) j + 0.8 * this.getDiffer(),
-                                (double) i + 0.8 * this.getDiffer(), 0.75, 0.75);
-                        } else {
-                            this.getPiirturi().setFill(Color.rgb(60, 60, 60));
-                            this.getPiirturi().fillRoundRect(
-                                (double) j + 1.0 + this.getDiffer(), (double) i + this.getDiffer(),
-                                this.getDiam(), this.getDiam(), this.getDiam(), this.getDiam());
-                        }
-                    }
+                    this.getPiirturi().setFill(Color.rgb(60, 60, 60));
+                    this.getPiirturi().fillRoundRect(
+                        (double) i + this.getDiffer(), (double) j + this.getDiffer(),
+                        1.0, 1.0, 1.0, 1.0);
+                        //this.getDiam(), this.getDiam(), this.getDiam(), this.getDiam());
                 }
             }
         }
@@ -878,36 +808,7 @@ class SceneDiff extends Data {
                 this.vars[2] = "0.0";
         });
 
-        Label labCharge = new Label(this.getLanguage().equals("fin") ? "hiukkasten varaus:" : "charge of particles:");
-
-        this.setCharge1 = new ToggleButton("1");
-        this.setCharge1.setMinWidth(55);
-        this.setCharge1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        this.setCharge1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.setCharge1.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.setCharge1.setEffect(shadow));
-        this.setCharge1.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.setCharge1.setEffect(null));
-
-        this.setCharge2 = new ToggleButton("2");
-        this.setCharge2.setMinWidth(55);
-        this.setCharge2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        this.setCharge2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.setCharge2.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.setCharge2.setEffect(shadow));
-        this.setCharge2.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) ->this.setCharge2.setEffect(null));
-
-        HBox setCharge = new HBox(this.setCharge1, this.setCharge2);
-        setCharge.setSpacing(40);
-        this.setCharge1.setOnMouseClicked(f -> {
-            this.setCharge1.setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.setCharge2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[3] = "1";
-        });
-        this.setCharge2.setOnMouseClicked(f -> {
-            this.setCharge1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.setCharge2.setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[3] = "2";
-        });
-
-        this.vars[4] = "0"; // steps
+        this.vars[3] = "0"; // steps
 
         Label labNumDimensions = new Label(this.getLanguage().equals("fin") ? "ulottuvuus:" : "dimension:");
         this.setDim2 = new ToggleButton("2");
@@ -929,16 +830,16 @@ class SceneDiff extends Data {
         this.setDim2.setOnMouseClicked(f -> {
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[5] = "2";
+            this.vars[4] = "2";
         });
         this.setDim3.setOnMouseClicked(f -> {
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[5] = "3";
+            this.vars[4] = "3";
         });
 
-        this.vars[6] = "-"; // calcfix, fcclattice, or sawplot
-        this.vars[7] = "-"; // spread out
+        this.vars[5] = "-"; // calcfix, or sawplot
+        this.vars[6] = "-"; // spread out
 
         /*
          * BUTTON: BALLS3D
@@ -965,8 +866,6 @@ class SceneDiff extends Data {
         /*
         * BUTTON: LATTICE
         */
-        Label labLattChoice = new Label(this.getLanguage().equals("fin") ? "hilamuoto:" : "lattice form:");
-
         this.getNappiLattice().setMinWidth(this.getCompwidth());
         this.getNappiLattice().setMaxWidth(this.getCompwidth());
         this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
@@ -977,62 +876,38 @@ class SceneDiff extends Data {
             if (this.getNappiLattice().getText().equals("LATTICE") || this.getNappiLattice().getText().equals("HILA")){
                 this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
                 this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.setLatt1.setVisible(false);
-                this.setLatt2.setVisible(false);
-                labLattChoice.setVisible(false);
-                this.getLattChoice().setVisible(false);
-                this.vars[8] = "-";
+                this.vars[7] = "-";
             } else if (this.getNappiLattice().getText().equals("FREE") || this.getNappiLattice().getText().equals("VAPAA")){
                 this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "HILA" : "LATTICE");
-                this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.setLatt1.setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.setLatt2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.setLatt1.setVisible(true);
-                this.setLatt2.setVisible(true);
-                labLattChoice.setVisible(true);
-                this.getLattChoice().setVisible(true);
-                this.vars[8] = "l";
+                this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIGHTSALMON,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.vars[7] = "l";
             }
         });
         valikko.getChildren().add(this.getNappiLattice());
 
-        this.setLatt1 = new ToggleButton("SC");
-        this.setLatt1.setMinWidth(65);
-        this.setLatt1.setMaxWidth(65);
-        this.setLatt1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        this.setLatt1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.setLatt1.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.setLatt1.setEffect(shadow));
-        this.setLatt1.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.setLatt1.setEffect(null));
-
-        this.setLatt2 = new ToggleButton("FCC");
-        this.setLatt2.setMinWidth(65);
-        this.setLatt2.setMaxWidth(65);
-        this.setLatt2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        this.setLatt2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.setLatt2.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.setLatt2.setEffect(shadow));
-        this.setLatt2.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.setLatt2.setEffect(null));
-
-        this.setLattChoice(new HBox(this.setLatt1,this.setLatt2));
-        this.getLattChoice().setSpacing(20);
-        this.setLatt1.setOnMouseClicked(f -> {
-            this.setLatt1.setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.setLatt2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[6] = "-";
-            this.setWhichLatt(1);
+        /*
+         * BUTTON: MOBILVISC
+         */
+        this.getNappiMobilVisc().setMinWidth(this.getCompwidth());
+        this.getNappiMobilVisc().setMaxWidth(this.getCompwidth());
+        this.getNappiMobilVisc().setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.getNappiMobilVisc().setId("mobilvisc");
+        this.getNappiMobilVisc().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getNappiMobilVisc().setEffect(shadow));
+        this.getNappiMobilVisc().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getNappiMobilVisc().setEffect(null));
+        this.getNappiMobilVisc().setOnMouseClicked((MouseEvent event) -> {
+            if (this.getNappiMobilVisc().getText().equals("LIIKKUVUUS") || this.getNappiMobilVisc().getText().equals("MOBILITY")){
+                this.getNappiMobilVisc().setText(this.getLanguage().equals("fin") ? "VISKOSITEETTI" : "VISCOSITY");
+                this.getNappiMobilVisc().setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.setIsMobility(false);
+            } else if (this.getNappiMobilVisc().getText().equals("VISKOSITEETTI") || this.getNappiMobilVisc().getText().equals("VISCOSITY")){
+                this.getNappiMobilVisc().setText(this.getLanguage().equals("fin") ? "LIIKKUVUUS" : "MOBILITY");
+                this.getNappiMobilVisc().setBackground(new Background(new BackgroundFill(Color.THISTLE,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.setIsMobility(true);
+            }
         });
-        this.setLatt2.setOnMouseClicked(f -> {
-            this.setLatt1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.setLatt2.setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[6] = "c";
-            this.setWhichLatt(2);
-        });
-        valikko.getChildren().addAll(labLattChoice, this.getLattChoice());
+        valikko.getChildren().add(this.getNappiMobilVisc());
 
-        this.setWhichLatt(1);
-        labLattChoice.setVisible(false);
-        this.getLattChoice().setVisible(false);
-
-        this.vars[9] = "-"; // save off
+        this.vars[8] = "-"; // save off
 
         /*
          * ...THEIR PLACEMENTS
@@ -1051,22 +926,15 @@ class SceneDiff extends Data {
         this.setSizeParticles.setMaxWidth(this.getCompwidth());
         asettelu.add(this.setSizeParticles, 0, 3);
 
-        GridPane.setHalignment(labCharge, HPos.LEFT);
-        asettelu.add(labCharge, 0, 4);
-        GridPane.setHalignment(setCharge, HPos.CENTER);
-        setCharge.setMinWidth(this.getCompwidth());
-        setCharge.setMaxWidth(this.getCompwidth());
-        asettelu.add(setCharge, 0, 5);
-
         GridPane.setHalignment(labNumDimensions, HPos.LEFT);
-        asettelu.add(labNumDimensions, 0, 6);
+        asettelu.add(labNumDimensions, 0, 4);
         GridPane.setHalignment(setDimension, HPos.CENTER);
         setDimension.setMinWidth(this.getCompwidth());
         setDimension.setMaxWidth(this.getCompwidth());
-        asettelu.add(setDimension, 0, 7);
+        asettelu.add(setDimension, 0, 5);
 
         GridPane.setHalignment(valikko, HPos.LEFT);
-        asettelu.add(valikko, 0, 8, 2, 1);
+        asettelu.add(valikko, 0, 6, 2, 1);
 
        return asettelu;
     }
@@ -1106,18 +974,6 @@ class SceneDiff extends Data {
      */
     @Contract(pure = true)
     private int getDim() { return dim; }
-
-    /**
-     * @param charge the charge to set
-     */
-    @Contract(pure = true)
-    private void setCharge( int charge ){ this.charge = charge; }
-
-    /**
-     * @return the charge
-     */
-    @Contract(pure = true)
-    private int getCharge() { return charge; }
 
     /**
      *
@@ -1317,18 +1173,6 @@ class SceneDiff extends Data {
     private double getPaneWidth() { return 200.0 / Screen.getMainScreen().getRenderScale(); }
 
     /**
-     * @return the Charge1
-     */
-    @Contract(pure = true)
-    private ToggleButton getCharge1() { return setCharge1; }
-
-    /**
-     * @return the Charge2
-     */
-    @Contract(pure = true)
-    private ToggleButton getCharge2() { return setCharge2; }
-
-    /**
      * @return the Dim2
      */
     @Contract(pure = true)
@@ -1345,6 +1189,12 @@ class SceneDiff extends Data {
      */
     @Contract(pure = true)
     private Button getNappiLattice() { return nappiLattice; }
+
+    /**
+     * @return the nappiMobilVisc
+     */
+    @Contract(pure = true)
+    private Button getNappiMobilVisc() { return nappiMobilVisc; }
 
     /**
      * @return the nappiBalls3D
@@ -1483,17 +1333,6 @@ class SceneDiff extends Data {
      * @param phaseVisc the phaseVisc to set
      */
     private void setPhaseVisc( long phaseVisc ) { this.phaseVisc = phaseVisc; }
-
-    /**
-     * @param smallest the smallest to set
-     */
-    private void setSmallest( double smallest ) { this.smallest = smallest; }
-
-    /**
-     * @return the smallest
-     */
-    @Contract(pure = true)
-    private double getSmallest() { return smallest; }
 
     /**
      * @param greatest the greatest to set
@@ -1747,28 +1586,6 @@ class SceneDiff extends Data {
     private void setBalls3D( boolean balls3D ) { this.balls3D = balls3D; }
 
     /**
-     * @return the redP
-     */
-    @Contract(pure = true)
-    private Image getRedP() { return redP; }
-
-    /**
-     * @param redP the redP to set
-     */
-    private void setRedP( Image redP ) { this.redP = redP; }
-
-    /**
-     * @return the blueP
-     */
-    @Contract(pure = true)
-    private Image getBlueP() { return blueP; }
-
-    /**
-     * @param blueP the blueP to set
-     */
-    private void setBlueP( Image blueP ) { this.blueP = blueP; }
-
-    /**
      * @return the yellowP
      */
     @Contract(pure = true)
@@ -1856,38 +1673,13 @@ class SceneDiff extends Data {
     private void setIsCancel(boolean iscancel) { this.iscancel = iscancel; }
 
     /**
-     * @return whichlatt
+     * @return the ismobility
      */
     @Contract(pure = true)
-    private int whichLatt() { return this.whichlatt; }
+    private boolean isMobility() { return this.ismobility; }
 
     /**
-     * whichnorm to set
+     * @param ismobility the ismobility to set
      */
-    @Contract(pure = true)
-    private void setWhichLatt(int whichlatt) { this.whichlatt = whichlatt; }
-
-    /**
-     * @return the latt_choice
-     */
-    @Contract(pure = true)
-    private HBox getLattChoice() { return this.latt_choice; }
-
-    /**
-     * @param latt_choice the latt_choice to set
-     */
-    private void setLattChoice(HBox latt_choice) { this.latt_choice = latt_choice; }
-
-    /**
-     * @return the setLatt1
-     */
-    @Contract(pure = true)
-    private ToggleButton getLatt1() { return setLatt1; }
-
-    /**
-     * @return the setLatt2
-     */
-    @Contract(pure = true)
-    private ToggleButton getLatt2() { return setLatt2; }
-
+    private void setIsMobility(boolean ismobility) { this.ismobility = ismobility; }
 }

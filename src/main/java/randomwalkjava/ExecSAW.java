@@ -35,6 +35,7 @@ class ExecSAW extends Data {
     private List<Double> rms_runs;
     private List <Double> saw_lengths;
     private List<Double> cbmc_mu;
+    private List<Double> cbmc_mu2;
     private List <Integer> xAxis;
     private List <Integer> xhistAxis;
     private List <Double> yhistAxis;
@@ -76,7 +77,7 @@ class ExecSAW extends Data {
                 if ( !sawScene.isRunning())
                     return;
 
-                sawScene.refresh(folder, executable, getFirst(), getSawLengths(), getCbmcMu(), getSawExpd(), getSawRms(),
+                sawScene.refresh(folder, executable, getFirst(), getSawLengths(), getCbmcMu(), getCbmcMu2(), getSawExpd(), getSawRms(),
                     getExpdRuns(), getRmsRuns(), getXAxis(), getXhistAxis(), isSaw(), ceeSlider);
 
                 if (getFirst()) setFirst(false);
@@ -101,10 +102,10 @@ class ExecSAW extends Data {
                 this.setVars(sawScene.getVars());
                 boolean fail = false;
 
-                int steps = Integer.parseInt(this.getVars()[4]);
+                int steps = Integer.parseInt(this.getVars()[3]);
                 if (steps > 0) fail = true;
 
-                int dim = Integer.parseInt(this.getVars()[5]);
+                int dim = Integer.parseInt(this.getVars()[4]);
 
                 if (dim < 2 || dim > 3) fail = true;
 
@@ -180,8 +181,8 @@ class ExecSAW extends Data {
                 this.setVars(sawScene.getVars());
                 boolean fail = false;
 
-                int steps = Integer.parseInt(this.getVars()[4]);
-                if (this.getVars()[4].isEmpty() || steps == 0) fail = true;
+                int steps = Integer.parseInt(this.getVars()[3]);
+                if (this.getVars()[3].isEmpty() || steps == 0) fail = true;
 
                 int dim = Integer.parseInt(this.getVars()[5]);
 
@@ -216,6 +217,9 @@ class ExecSAW extends Data {
                 this.setCbmcMu(new ArrayList<>());
                 for (int x = 0; x < 10; x++) this.getCbmcMu().add(0.0);
 
+                this.setCbmcMu2(new ArrayList<>());
+                for (int x = 0; x < 10; x++) this.getCbmcMu2().add(0.0);
+
                 this.setXAxis(new ArrayList<>());
                 for (int x = 0; x < 10; x++) this.getXAxis().add(x);
 
@@ -227,12 +231,9 @@ class ExecSAW extends Data {
                 this.setFirst(true);
 
                 Map<Object, Object> labelMap = new HashMap<>();
-                if (steps < 30 ) {
-                    for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)));
-                } else {
-                    if (dim == 2 ) for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*3));
-                    else for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)));
-                }
+                if (steps < 30) for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)));
+                else if (steps < 500) for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*3));
+                else for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*10));
 
                 sawScene.getFxplot().setS1Data(this.getXAxis(), this.getExpdRuns(), dim);
                 sawScene.getFxplot().setS2Data(this.getXAxis(), this.getRmsRuns(), true);
@@ -289,7 +290,7 @@ class ExecSAW extends Data {
             String[] vars = sawScene.getVars();
             this.setVars(vars);
             Data data = new Data(vars);
-            int dim = Integer.parseInt(getVars()[5]);
+            int dim = Integer.parseInt(getVars()[4]);
             boolean fail = false;
 
             if ( dim < 2 || dim > 3 ) fail = true;
@@ -398,6 +399,17 @@ class ExecSAW extends Data {
      * @param cbmc_mu the cbmc_mu to set
      */
     private void setCbmcMu(List<Double> cbmc_mu) { this.cbmc_mu = cbmc_mu; }
+
+    /**
+     * @return the cbmc_mu2
+     */
+    @Contract(pure = true)
+    private List<Double> getCbmcMu2() { return this.cbmc_mu2; }
+
+    /**
+     * @param cbmc_mu2 the cbmc_mu2 to set
+     */
+    private void setCbmcMu2(List<Double> cbmc_mu2) { this.cbmc_mu2 = cbmc_mu2; }
 
     /**
      * @return the saw_expd

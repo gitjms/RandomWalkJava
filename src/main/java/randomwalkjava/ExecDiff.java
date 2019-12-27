@@ -66,14 +66,12 @@ class ExecDiff extends Data {
             this.setVars(vars);
             int particles = Integer.parseInt(this.getVars()[1]);
             double diam = Double.parseDouble(this.getVars()[2]);
-            int charge = Integer.parseInt(this.getVars()[3]);
-            int dim = Integer.parseInt(this.getVars()[5]);
-            String lattice = this.getVars()[8];
+            int dim = Integer.parseInt(this.getVars()[4]);
+            String lattice = this.getVars()[7];
             boolean fail = false;
 
             if ( particles < 0 ) fail = true;
             if ( diam <= 0.0 || diam >= 1.0 ) fail = true;
-            if ( charge < 1 || charge > 2 ) fail = true;
             if ( dim < 2 || dim > 3 ) fail = true;
             if ( !lattice.equals("l") && !lattice.equals("-") ) fail = true;
 
@@ -125,6 +123,7 @@ class ExecDiff extends Data {
                     measure -= 2.0;
                 } else if ( measure%2.0 == 0.0 ) {
                     diff = diff1;
+                    measure -= 0.0;
                 } else {
                     diff = diff2;
                 }
@@ -188,14 +187,12 @@ class ExecDiff extends Data {
             Data data = new Data(vars);
             int particles = Integer.parseInt(getVars()[1]);
             double diam = Double.parseDouble(getVars()[2]);
-            int charge = Integer.parseInt(getVars()[3]);
-            int dim = Integer.parseInt(getVars()[5]);
-            String lattice = this.getVars()[8];
+            int dim = Integer.parseInt(getVars()[4]);
+            String lattice = this.getVars()[7];
             boolean fail = false;
 
             if ( particles < 0 ) fail = true;
             if ( diam <= 0.0 || diam >= 1.0 ) fail = true;
-            if ( charge < 1 || charge > 2 ) fail = true;
             if ( dim < 2 || dim > 3 ) fail = true;
             if ( !lattice.equals("l") && !lattice.equals("-") ) fail = true;
 

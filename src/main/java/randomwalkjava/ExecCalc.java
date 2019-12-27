@@ -48,9 +48,9 @@ class ExecCalc extends Data {
             Data data = new Data(vars);
             boolean fail = false;
 
-            int steps = Integer.parseInt(this.getVars()[4]);
-            int dim = Integer.parseInt(this.getVars()[5]);
-            String lattice = this.getVars()[8];
+            int steps = Integer.parseInt(this.getVars()[3]);
+            int dim = Integer.parseInt(this.getVars()[4]);
+            String lattice = this.getVars()[7];
 
             if ( steps < 1 ) fail = true;
             if ( dim < 1 || dim > 3 ) fail = true;

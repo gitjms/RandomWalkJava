@@ -54,17 +54,16 @@ class Data {
         * vars[0] = which simulation,
         * vars[1] = particles,
         * vars[2] = diameter,
-        * vars[3] = charge,
-        * vars[4] = steps,
-        * vars[5] = dimension,
-        * vars[6] = calcfix or sawplot,
-        * vars[7] = fixed,
-        * vars[8] = lattice
-          vars[9] = save
+        * vars[3] = steps,
+        * vars[4] = dimension,
+        * vars[5] = calcfix or sawplot,
+        * vars[6] = fixed,
+        * vars[7] = lattice,
+        * vars[8] = save
         */
         String[] command = new String[]{"cmd","/c",executable,
             this.vars[0], this.vars[1], this.vars[2], this.vars[3], this.vars[4],
-            this.vars[5], this.vars[6], this.vars[7], this.vars[8], this.vars[9]};
+            this.vars[5], this.vars[6], this.vars[7], this.vars[8]};
 
         Runtime runtime = Runtime.getRuntime();
 
@@ -131,26 +130,15 @@ class Data {
 
         try ( Scanner sc = new Scanner(filePath) ) {
             while (sc.hasNextLine()) {
-                values = new double[dim+1];
+                values = new double[dim];
                 String data = sc.nextLine();
                 String[] osat;
                 osat = data.trim().split("(\\s+)");
                 if (!osat[0].equals("Start")) {
-                    for (int i = 1; i < osat.length; i++) {
-                        values[i-1] = Double.parseDouble(osat[i]);
+                    for (int i = 0; i < osat.length; i++) {
+                        values[i] = Double.parseDouble(osat[i]);
                     }
-                    switch (osat[0].trim()) {
-                        case "+":
-                            values[dim] = 1.0;
-                            break;
-                        case "-":
-                            values[dim] = 2.0;
-                            break;
-                        case "*":
-                            values[dim] = 3.0;
-                            break;
-                    }
-                    dataList.add(values);
+                     dataList.add(values);
                 }
              }
         } catch (FileNotFoundException ex) {
@@ -164,7 +152,7 @@ class Data {
      * method for setting the save parameter in vars array
      * @param var the vars array to set
      */
-    void setSave(String var) { this.vars[9]=var; }
+    void setSave(String var) { this.vars[8]=var; }
 
     /**
      * method for setting the parameter for setting saw or cbmc in vars array
@@ -176,6 +164,6 @@ class Data {
      * method for setting the parameter for plotting in vars array
      * @param var the vars array to set
      */
-    void setSawPlot(String var) { this.vars[6]=var; }
+    void setSawPlot(String var) { this.vars[5]=var; }
 
 }

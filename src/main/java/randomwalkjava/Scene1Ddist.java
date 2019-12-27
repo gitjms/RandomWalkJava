@@ -44,14 +44,13 @@ class Scene1Ddist extends Data {
         this.vars = new String[]{
             "B",    // vars[0] which simulation     USER
             "0",    // vars[1] particles            USER
-            "0.1",  // vars[2] diameter (0.1)       n/a
-            "0",    // vars[3] charge (0)           n/a
-            "0",    // vars[4] steps                USER
-            "1",    // vars[5] dimension (1D)       n/a
-            "-",    // vars[6] calcfix or sawplot   n/a
-            "f",    // vars[7] fixed                n/a
-            "-",    // vars[8] lattice/free         USER
-            "s"};   // vars[9] save (on)            n/a
+            "0.1",  // vars[2] diameter             n/a
+            "0",    // vars[3] steps                USER
+            "1",    // vars[4] dimension (1D)       n/a
+            "-",    // vars[5] calcfix or sawplot   n/a
+            "f",    // vars[6] fixed                n/a
+            "-",    // vars[7] lattice/free         USER
+            "s"};   // vars[8] save (on)            n/a
     }
 
     /**
@@ -100,21 +99,20 @@ class Scene1Ddist extends Data {
             } else
                 this.vars[1] = "0";
         });
-        this.vars[2] = "0.1"; // (diameter of particl)
-        this.vars[3] = "0"; // (charge of particles)
+        this.vars[2] = "0"; // (diameter of particl)
 
         Label labNumSteps = new Label(this.getLanguage().equals("fin") ? "askelten lukumäärä:" : "number of steps:");
         TextField setNumSteps = new TextField("");
         setNumSteps.setOnKeyReleased(e -> {
             if (isNumInteger(setNumSteps.getText().trim())){
-                this.vars[4] = setNumSteps.getText().trim();
+                this.vars[3] = setNumSteps.getText().trim();
             } else
-                this.vars[4] = "0";
+                this.vars[3] = "0";
         });
 
-        this.vars[5] = "1"; // dimension
-        this.vars[6] = "-"; // calcfix or sawplot
-        this.vars[7] = "f"; // fixed
+        this.vars[4] = "1"; // dimension
+        this.vars[5] = "-"; // calcfix or sawplot
+        this.vars[6] = "f"; // fixed
 
         /*
          * ...THEIR PLACEMENTS
@@ -146,16 +144,16 @@ class Scene1Ddist extends Data {
             if (this.getNappiLattice().getText().equals("LATTICE") || this.getNappiLattice().getText().equals("HILA")){
                 this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
                 this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[8] = "-";
+                this.vars[7] = "-";
             } else if (this.getNappiLattice().getText().equals("FREE") || this.getNappiLattice().getText().equals("VAPAA")){
                 this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "HILA" : "LATTICE");
                 this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[8] = "l";
+                this.vars[7] = "l";
             }
         });
         valikko.getChildren().add(this.getNappiLattice());
 
-        this.vars[9] = "s"; // save on
+        this.vars[8] = "s"; // save on
 
         GridPane.setHalignment(valikko, HPos.LEFT);
         asettelu.add(valikko, 0, 4, 2, 1);

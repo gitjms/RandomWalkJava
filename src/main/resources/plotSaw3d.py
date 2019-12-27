@@ -63,13 +63,13 @@ def main():
 	else:
 		text = "Self-avoiding Random Walk, %d steps"%(int(steps))
 
-	plt.title(text,fontsize=20)
+	plt.title(text,fontsize=20, y=1.055)
 	plt.tight_layout()
 	plt.grid(which='both', axis='both', linestyle=':')
 	line1=pylab.Line2D(range(1),range(1),color='red',marker='o',mfc='r',ls='',ms=15)
 	line2=pylab.Line2D(range(1),range(1),color='C0',marker='_',lw=8)
 	line3=pylab.Line2D(range(1),range(1),color='red',marker='*',mfc='r',ls='', ms=23)
-	plt.legend((line1,line2,line3),(label2,label1,label3),ncol=3,bbox_to_anchor=(0.85, 0.92),fontsize=18)
+	plt.legend((line1,line2,line3),(label2,label1,label3),ncol=3,bbox_to_anchor=(0.85, 0.98),fontsize=18)
 
 	savename = "jpyplotSAW3D.pdf"
 	plt.savefig(savename)

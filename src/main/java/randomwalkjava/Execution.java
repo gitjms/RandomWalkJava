@@ -60,14 +60,13 @@ class Execution {
         * vars from user:
         * vars[0] = which simulation,   USER
         * vars[1] = particles,          USER
-        * vars[2] = diameter,           USER
-        * vars[3] = charge,             USER
-        * vars[4] = steps,              USER
-        * vars[5] = dimension,          USER
-        * vars[6] = calcfix or sawplot, USER
-        * vars[7] = fixed,              USER
-        * vars[8] = lattice,            USER
-        * vars[9] = save                n/a
+        * vars[2] = diameter,           n/a
+        * vars[3] = steps,              USER
+        * vars[4] = dimension,          USER
+        * vars[5] = calcfix or sawplot, USER
+        * vars[6] = fixed,              USER
+        * vars[7] = lattice,            USER
+        * vars[8] = save                n/a
         */
         pyexec1d = "python ".concat(pyexec1d);
         pyexec2d = "python ".concat(pyexec2d);
@@ -87,16 +86,16 @@ class Execution {
         if (!result) return;
 
         int particles = Integer.parseInt(vars[1]);
-        int steps = Integer.parseInt(vars[4]);
-        int dimension = Integer.parseInt(vars[5]);
+        int steps = Integer.parseInt(vars[3]);
+        int dimension = Integer.parseInt(vars[4]);
 
-        if ( vars[7].equals("f") && vars[8].equals("l") ) {
+        if ( vars[6].equals("f") && vars[7].equals("l") ) {
             titletext = this.getLanguage().equals("fin") ? "Keskitetyn lähteen hilahiukkaset, " : "Fixed source lattice particles, ";
-        } else if ( vars[7].equals("f") && vars[8].equals("-") ) {
+        } else if ( vars[6].equals("f") && vars[7].equals("-") ) {
             titletext = this.getLanguage().equals("fin") ? "Keskitetyn lähteen vapaat hiukkaset, " : "Fixed source free particles, ";
-        } else if ( vars[7].equals("-") && vars[8].equals("l") ) {
+        } else if ( vars[6].equals("-") && vars[7].equals("l") ) {
             titletext = this.getLanguage().equals("fin") ? "Hajautetut hilahiukkaset, " : "Spread out lattice particles, ";
-        } else if ( vars[7].equals("-") && vars[8].equals("-") ) {
+        } else if ( vars[6].equals("-") && vars[7].equals("-") ) {
             titletext = this.getLanguage().equals("fin") ? "Hajautetut vapaat hiukkaset, " : "Spread out free particles, ";
         }
 
@@ -183,13 +182,12 @@ class Execution {
         * vars[0] = which simulation,   USER
         * vars[1] = particles,          USER
         * vars[2] = diameter,           USER
-        * vars[3] = charge,             USER
-        * vars[4] = steps,              n/a
-        * vars[5] = dimension,          USER
-        * vars[6] = calcfix or sawplot, n/a
-        * vars[7] = fixed,              n/a
-        * vars[8] = lattice,            USER
-        * vars[9] = save                n/a
+        * vars[3] = steps,              n/a
+        * vars[4] = dimension,          USER
+        * vars[5] = calcfix or sawplot, n/a
+        * vars[6] = fixed,              n/a
+        * vars[7] = lattice,            USER
+        * vars[8] = save                n/a
         */
         pyexecdiff2d = "python ".concat(pyexecdiff2d);
         pyexecdiff3d = "python ".concat(pyexecdiff3d);
@@ -208,8 +206,8 @@ class Execution {
 
         int particles = Integer.parseInt(vars[1]);
         double diameter = Double.parseDouble(vars[2]);
-        int steps = Integer.parseInt(vars[4]);
-        final int dimension = Integer.parseInt(vars[5]);
+        int steps = Integer.parseInt(vars[3]);
+        final int dimension = Integer.parseInt(vars[4]);
 
         String startDataDiff = "startDiff_" + dimension + "D_" + particles + "N.xy";
         String finalDataDiff = "finalDiff_" + dimension + "D_" + particles + "N.xy";
@@ -265,13 +263,12 @@ class Execution {
         * vars[0] = which simulation,   n/a
         * vars[1] = particles,          n/a
         * vars[2] = diameter,           n/a
-        * vars[3] = charge,             USER
-        * vars[4] = steps,              USER
-        * vars[5] = dimension,          n/a
-        * vars[6] = calcfix or sawplot, n/a
-        * vars[7] = fixed,              USER
-        * vars[8] = lattice             n/a
-        * vars[9] = save                n/a
+        * vars[3] = steps,              USER
+        * vars[4] = dimension,          n/a
+        * vars[5] = calcfix or sawplot, n/a
+        * vars[6] = fixed,              USER
+        * vars[7] = lattice             n/a
+        * vars[8] = save                n/a
         */
         pyexecrms = "python ".concat(pyexecrms);
         this.setFrame();
@@ -287,16 +284,16 @@ class Execution {
         if (!result) return;
 
         int particles = Integer.parseInt(vars[1]);
-        int steps = Integer.parseInt(vars[4]);
-        int dimension = Integer.parseInt(vars[5]);
+        int steps = Integer.parseInt(vars[3]);
+        int dimension = Integer.parseInt(vars[4]);
 
-        if ( vars[7].equals("f") && vars[8].equals("l") ) {
+        if ( vars[6].equals("f") && vars[7].equals("l") ) {
             titletext = this.getLanguage().equals("fin") ? "Keskitetyn lähteen hilahiukkaset" : "Fixed source lattice particles";
-        } else if ( vars[7].equals("f") && vars[8].equals("-") ) {
+        } else if ( vars[6].equals("f") && vars[7].equals("-") ) {
             titletext = this.getLanguage().equals("fin") ? "Keskitetyn lähteen vapaat hiukkaset" : "Fixed source free particles";
-        } else if ( vars[7].equals("-") && vars[8].equals("l") ) {
+        } else if ( vars[6].equals("-") && vars[7].equals("l") ) {
             titletext = this.getLanguage().equals("fin") ? "Hajautetut hilahiukkaset" : "Spread out lattice particles";
-        } else if ( vars[7].equals("-") && vars[8].equals("-") ) {
+        } else if ( vars[6].equals("-") && vars[7].equals("-") ) {
             titletext = this.getLanguage().equals("fin") ? "Hajautetut vapaat hiukkaset" : "Spread out free particles";
         }
 
@@ -344,13 +341,12 @@ class Execution {
          * vars[0] = which simulation,  USER
          * vars[1] = particles,         USER
          * vars[2] = diameter,          n/a
-         * vars[3] = charge,            n/a
-         * vars[4] = steps,             USER
-         * vars[5] = dimension,         n/a
-         * vars[6] = calcfix or sawplot,n/a
-         * vars[7] = fixed,             n/a
-         * vars[8] = lattice,           USER
-         * vars[9] = save               n/a
+         * vars[3] = steps,             USER
+         * vars[4] = dimension,         n/a
+         * vars[5] = calcfix or sawplot,n/a
+         * vars[6] = fixed,             n/a
+         * vars[7] = lattice,           USER
+         * vars[8] = save               n/a
          */
         pyexec1d = "python ".concat(pyexec1d);
         this.setFrame();
@@ -365,12 +361,12 @@ class Execution {
         if (!result) return;
 
         int particles = Integer.parseInt(vars[1]);
-        int steps = Integer.parseInt(vars[4]);
-        int dimension = Integer.parseInt(vars[5]);
+        int steps = Integer.parseInt(vars[3]);
+        int dimension = Integer.parseInt(vars[4]);
 
-        if ( vars[8].equals("l") ) {
+        if ( vars[7].equals("l") ) {
             titletext = this.getLanguage().equals("fin") ? "Hilahiukkaset" : "Lattice particles";
-        } else if ( vars[8].equals("-") ) {
+        } else if ( vars[7].equals("-") ) {
             titletext = this.getLanguage().equals("fin") ? "Vapaat hiukkaset" : "Free particles";
         }
 
@@ -419,13 +415,12 @@ class Execution {
          * vars[0] = which simulation,  n/a
          * vars[1] = particles,         n/a
          * vars[2] = diameter,          n/a
-         * vars[3] = charge,            n/a
-         * vars[4] = steps,             USER
-         * vars[5] = dimension,         USER
-         * vars[6] = calcfix or sawplot,n/a
-         * vars[7] = fixed,             n/a
-         * vars[8] = lattice,           n/a
-         * vars[9] = save               n/a
+         * vars[3] = steps,             USER
+         * vars[4] = dimension,         USER
+         * vars[5] = calcfix or sawplot,n/a
+         * vars[6] = fixed,             n/a
+         * vars[7] = lattice,           n/a
+         * vars[8] = save               n/a
          */
 
         pyexecsaw2d = "python ".concat(pyexecsaw2d);
@@ -441,8 +436,8 @@ class Execution {
         }
         if (!result) return false;
 
-        int steps = Integer.parseInt(vars[4]);
-        int dimension = Integer.parseInt(vars[5]);
+        int steps = Integer.parseInt(vars[3]);
+        int dimension = Integer.parseInt(vars[4]);
 
         String dataPath;
         if (iscbmc) dataPath = "cbmc_" + dimension + "D_" + steps + "S.xy";

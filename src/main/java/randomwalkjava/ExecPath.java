@@ -51,16 +51,12 @@ class ExecPath extends Data {
             boolean fail = false;
 
             int particles = Integer.parseInt(this.getVars()[1]);
-            double diam = Double.parseDouble(this.getVars()[2]);
-            int charge = Integer.parseInt(this.getVars()[3]);
-            int steps = Integer.parseInt(this.getVars()[4]);
-            int dim = Integer.parseInt(this.getVars()[5]);
-            String fixed = this.getVars()[7];
-            String lattice = this.getVars()[8];
+            int steps = Integer.parseInt(this.getVars()[3]);
+            int dim = Integer.parseInt(this.getVars()[4]);
+            String fixed = this.getVars()[6];
+            String lattice = this.getVars()[7];
 
             if ( particles < 0 ) fail = true;
-            if ( diam <= 0.0 || diam >= 1.0 ) fail = true;
-            if ( charge < 0 || charge > 2 ) fail = true;
             if ( steps < 1 ) fail = true;
             if ( dim < 1 || dim > 3 ) fail = true;
             if ( !fixed.equals("f") && !fixed.equals("-") ) fail = true;

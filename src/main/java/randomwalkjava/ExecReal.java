@@ -85,16 +85,15 @@ class ExecReal extends Data {
                  * vars[0] = which simulation,  USER
                  * vars[1] = particles,         USER
                  * vars[2] = diameter,          n/a
-                 * vars[3] = charge,            n/a
-                 * vars[4] = steps,             USER
-                 * vars[5] = dimension,         USER
-                 * vars[6] = calcfix or sawplot,n/a
-                 * vars[7] = fixed,             n/a
-                 * vars[8] = lattice,           n/a
-                 * vars[9] = save               n/a
+                 * vars[3] = steps,             USER
+                 * vars[4] = dimension,         USER
+                 * vars[5] = calcfix or sawplot,n/a
+                 * vars[6] = fixed,             n/a
+                 * vars[7] = lattice,           n/a
+                 * vars[8] = save               n/a
                  */
 
-                int dim = Integer.parseInt(vars[5]);
+                int dim = Integer.parseInt(vars[4]);
 
                 getPiirturi().setGlobalAlpha(1.0);
                 getPiirturi().setFill(Color.BLACK);
@@ -120,7 +119,7 @@ class ExecReal extends Data {
             if (rmsScene.isRunning()) {
                 rmsScene.stop();
                 if (this.isRealScaled()) {
-                    if (this.getVars()[5].equals("1"))
+                    if (this.getVars()[4].equals("1"))
                         this.getPiirturi().scale(1.0 / this.getRealScalefactor(), 1.0);
                     else
                         this.getPiirturi().scale(1.0 / this.getRealScalefactor(), 1.0 / this.getRealScalefactor());
@@ -131,10 +130,6 @@ class ExecReal extends Data {
                 helpNappiReal.setDisable(false);
                 closeNappiReal.setDisable(false);
                 execNappi.setText(this.getLanguage().equals("fin") ? "UUSI AJO" : "NEW RUN");
-                rmsScene.setNorm1.setDisable(false);
-                rmsScene.setNorm2.setDisable(false);
-                rmsScene.setDiff1.setDisable(false);
-                rmsScene.setDiff2.setDisable(false);
 
             } else {
                 this.setVars(rmsScene.getVars());
@@ -142,8 +137,8 @@ class ExecReal extends Data {
                 boolean fail = false;
 
                 int particles = Integer.parseInt(this.getVars()[1]);
-                int steps = Integer.parseInt(this.getVars()[4]);
-                int dim = Integer.parseInt(this.getVars()[5]);
+                int steps = Integer.parseInt(this.getVars()[3]);
+                int dim = Integer.parseInt(this.getVars()[4]);
 
                 if (particles < 0) fail = true;
                 if (steps < 1) fail = true;
@@ -193,10 +188,6 @@ class ExecReal extends Data {
                 closeNappiReal.setDisable(true);
                 rmsScene.getDimension().setDisable(true);
                 rmsScene.getPlotChoice().setDisable(true);
-                rmsScene.setNorm1.setDisable(true);
-                rmsScene.setNorm2.setDisable(true);
-                rmsScene.setDiff1.setDisable(true);
-                rmsScene.setDiff2.setDisable(true);
             }
         });
     }

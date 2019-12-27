@@ -67,7 +67,7 @@ class FXPlot {
         this.setScreenHeight(Toolkit.getDefaultToolkit().getScreenSize().height);
 
         this.formatter = new DecimalFormat("#.#E0");
-        this.diffformatter = new DecimalFormat("0.0");
+        this.diffformatter = new DecimalFormat("0.0E0");
         this.rmsformatter = new DecimalFormat("0.00");
         this.muformatter = new DecimalFormat("0.0000");
 
@@ -199,7 +199,7 @@ class FXPlot {
 
                 this.getCalcChartE().getStyler().setLegendVisible(false);
                 this.getCalcChartE().setXAxisTitle(this.getLanguage().equals("fin") ? "Askeleet" : "Steps");
-                this.getCalcChartE().setYAxisTitle(this.getLanguage().equals("fin") ? "Energia [eV]" : "Energy [eV]");
+                this.getCalcChartE().setYAxisTitle(this.getLanguage().equals("fin") ? "Energia, \u0394E [eV]" : "Energy, \u0394E [eV]");
                 this.getCalcChartE().getStyler().setMarkerSize(0);
                 this.getCalcChartE().getStyler().setXAxisDecimalPattern("0");
                 this.getCalcChartE().getStyler().setYAxisDecimalPattern("0.0");
@@ -218,9 +218,9 @@ class FXPlot {
                 this.getCalcChartE().getStyler().setToolTipsEnabled(true);
 
                 this.getCalcChartD().getStyler().setLegendVisible(false);
-                this.getCalcChartD().setXAxisTitle(this.getLanguage().equals("fin") ? "Viive, t [ns]" : "Lag, t [ns]");
+                this.getCalcChartD().setXAxisTitle(this.getLanguage().equals("fin") ? "Viive, t" : "Lag, t");
                 this.getCalcChartD().setYAxisTitle(this.getLanguage().equals("fin")
-                    ? "Diffuusiokerroin, D [1e-7 cm^2/s]" : "Diffusion Coefficient, D [1e-7 cm^2/s]");
+                    ? "Diffuusiokerroin, D 1E-8 [cm\u00B2/s]" : "Diffusion Coefficient, D 1E-8 [cm\u00B2/s]");
                 this.getCalcChartD().getStyler().setMarkerSize(0);
                 this.getCalcChartD().getStyler().setXAxisDecimalPattern("0");
                 this.getCalcChartD().getStyler().setYAxisDecimalPattern("0.0");
@@ -236,9 +236,8 @@ class FXPlot {
                 this.getCalcChartD().getStyler().setYAxisMin(0.0);
                 this.getCalcChartD().getStyler().setToolTipsEnabled(true);
 
-                this.getCalcChartV().getStyler().setLegendVisible(false); // \u03BD=nu
-                this.getCalcChartV().setXAxisTitle(this.getLanguage().equals("fin") ? "Viive, t [ns]" : "Lag, t [ns]");
-                this.getCalcChartV().setYAxisTitle(this.getLanguage().equals("fin") ? "Viskositeetti, \u03BD [\u00B5Pa s]" : "Viscosity, \u03BD [\u00B5Pa s]");
+                this.getCalcChartV().getStyler().setLegendVisible(false); // \u03B7=eta
+                this.getCalcChartV().setXAxisTitle(this.getLanguage().equals("fin") ? "Viive, t" : "Lag, t");
                 this.getCalcChartV().getStyler().setMarkerSize(0);
                 this.getCalcChartV().getStyler().setXAxisDecimalPattern("0");
                 this.getCalcChartV().getStyler().setYAxisDecimalPattern("0.0");
@@ -319,7 +318,7 @@ class FXPlot {
                 this.getCalcChartS3().getStyler().setMarkerSize(0);
                 this.getCalcChartS3().setXAxisTitle(this.getLanguage().equals("fin") ? "Etäisyys" : "Distance");
                 this.getCalcChartS3().setYAxisTitle(this.getLanguage().equals("fin") ? "Lukumäärä" : "Frequency");
-                this.getCalcChartS3().getStyler().setXAxisDecimalPattern("10");
+                this.getCalcChartS3().getStyler().setXAxisDecimalPattern("0");
                 this.getCalcChartS3().getStyler().setYAxisDecimalPattern("0");
                 this.getCalcChartS3().getStyler().setYAxisLogarithmic(false);
                 this.getCalcChartS3().getStyler().setAxisTickLabelsFont(new Font(null, Font.PLAIN, 15));
@@ -391,7 +390,7 @@ class FXPlot {
             case "stand":
                 this.getCalcChartN().setTitle(this.getLanguage().equals("fin")
                     ? "Rrms-normaalijakauma" : "Rrms Normal Distribution");
-                //this.getCalcChartN().setXAxisTitle("r");
+                this.getCalcChartN().setXAxisTitle("r");
                 this.getCalcChartN().setYAxisTitle("\u03C1(r)");
                 this.getCalcChartN().getStyler().setYAxisMin(0.0);
                 this.getCalcChartN().getStyler().setYAxisMax(1.0);
@@ -399,7 +398,7 @@ class FXPlot {
             case "diff":
                 this.getCalcChartN().setTitle(this.getLanguage().equals("fin")
                     ? "Diffuusio-normaalijakauma" : "Diffusion Normal distribution");
-                //this.getCalcChartN().setXAxisTitle("r");
+                this.getCalcChartN().setXAxisTitle("r");
                 this.getCalcChartN().getStyler().setYAxisMin(0.0);
                 this.getCalcChartN().setYAxisTitle("\u03C1(r)");
                 break;
@@ -462,16 +461,28 @@ class FXPlot {
      * @param x x-axis data (visc_x)
      * @param y y-axis data (visc_y)
      */
-    void setVData(List<Double> x, List<Double> y) {
+    void setVData(List<Double> x, List<Double> y, @NotNull String which) { // u00B5=micro, u03B7=eta, u22c5=dot
         BasicStroke[] BasicStroke = new BasicStroke[]{
             new BasicStroke( 1.5f, CAP_SQUARE,
                 JOIN_MITER, 10.0f, null, 0.0f )
         };
-        this.getCalcChartV().addSeries(this.getLanguage().equals("fin") ? "viskositeetti" : "viscosity", x, y)
-            .setLineStyle(BasicStroke[0]).setLineColor(Color.orange);
-        this.getCalcChartV().setTitle(this.getLanguage().equals("fin")
-            ? "Dynaaminen viskositeetti" : "Dynamic Viscosity");
-        this.getFrame().getContentPane().add(this.getChartPanelV());
+        if (which.equals("visc")) {
+            this.getCalcChartV().setYAxisTitle(this.getLanguage().equals("fin") ?
+                "Viskositeetti, \u03B7 [\u00B5Pa\u22c5s]" : "Viscosity, \u03B7 [\u00B5Pa\u22c5s]");
+            this.getCalcChartV().addSeries(this.getLanguage().equals("fin") ? "viskositeetti" : "viscosity", x, y)
+                .setLineStyle(BasicStroke[0]).setLineColor(Color.orange);
+            this.getCalcChartV().setTitle(this.getLanguage().equals("fin")
+                ? "Dynaaminen viskositeetti" : "Dynamic Viscosity");
+            this.getFrame().getContentPane().add(this.getChartPanelV());
+        } else if (which.equals("mobil")) {
+            this.getCalcChartV().setYAxisTitle(this.getLanguage().equals("fin") ?
+                "Liikkuvuus, \u00B5 1E-2 [cm\u00B2/Vs]" : "Electrical mobility, \u00B5 1E-2 [cm\u00B2/Vs]");
+            this.getCalcChartV().addSeries(this.getLanguage().equals("fin") ? "liikkuvuus" : "mobility", x, y)
+                .setLineStyle(BasicStroke[0]).setLineColor(Color.orange);
+            this.getCalcChartV().setTitle(this.getLanguage().equals("fin")
+                ? "Liikkuvuus" : "Electrical mobility");
+            this.getFrame().getContentPane().add(this.getChartPanelV());
+        }
     }
 
     /**
@@ -501,7 +512,7 @@ class FXPlot {
      * @param x x-axis data
      * @param y y-axis data
      */
-    void setS2Data(List<Integer> x, List<Double> y, boolean iscbmc) { // u208#=subscript
+    void setS2Data(List<Integer> x, List<Double> y, boolean iscbmc) { // u208#=subscript, u00B5=mu
         BasicStroke[] BasicStroke = new BasicStroke[]{
             new BasicStroke( 2.5f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f ),
             new BasicStroke( 2.0f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f ),
@@ -510,8 +521,12 @@ class FXPlot {
         };
         this.getCalcChartS2().addSeries("<Rexp>", x, y).setLineStyle(BasicStroke[0]).setLineColor(Color.red);
         this.getCalcChartS2().addSeries("<Rrms>", x, y).setLineStyle(BasicStroke[1]).setLineColor(Color.blue);
-        if (iscbmc) this.getCalcChartS2().addSeries(this.getLanguage().equals("fin") ? "µ" :"µ", x, y)
-            .setLineStyle(BasicStroke[2]).setLineColor(Color.magenta);
+        if (iscbmc) {
+            this.getCalcChartS2().addSeries(this.getLanguage().equals("fin") ? "\u00B5" :"\u00B5", x, y)
+                .setLineStyle(BasicStroke[2]).setLineColor(Color.magenta);
+            this.getCalcChartS2().addSeries(this.getLanguage().equals("fin") ? "\u00B52" :"\u00B52", x, y)
+                .setLineStyle(BasicStroke[2]).setLineColor(Color.green);
+        }
         this.getFrame().getContentPane().add(this.getChartPanelS2(),1);
         this.getCalcChartS2().addSeries(this.getLanguage().equals("fin") ? "etäisyys" :"distance", x, y)
             .setLineStyle(BasicStroke[3]).setLineColor(Color.orange);
@@ -525,7 +540,8 @@ class FXPlot {
      */
     void setS3Data(Map<Object,Object> labelMap, List<Integer> x, List<Double> y) {
         this.getCalcChartS3().addSeries("hist", x, y).setFillColor(Color.orange);
-        this.getCalcChartS3().setTitle(this.getLanguage().equals("fin") ? "Etäisyys-histogrammi" : "Distance Histogram");
+        this.getCalcChartS3().setTitle(this.getLanguage().equals("fin") ?
+            "Etäisyys-histogrammi" : "Distance Histogram");
         this.getCalcChartS3().setCustomCategoryLabels(labelMap);
         this.getFrame().getContentPane().add(this.getChartPanelS3(),2);
     }
@@ -579,7 +595,8 @@ class FXPlot {
      * @param y y-axis data
      */
     void updateEData(List<Double> x, List<Double> y) {
-        this.getCalcChartE().updateXYSeries(this.getLanguage().equals("fin") ? "energia" :"energy", x, y, null);
+        this.getCalcChartE().updateXYSeries(this.getLanguage().equals("fin") ?
+            "energia" : "energy", x, y, null);
         this.getFrame().revalidate();
         this.getFrame().repaint();
         this.getFrame().pack();
@@ -591,7 +608,8 @@ class FXPlot {
      * @param y y-axis data
      */
     void updateDData(List<Double> x, List<Double> y) {
-        this.getCalcChartD().updateXYSeries(this.getLanguage().equals("fin") ? "diffuusio" :"diffusion", x, y, null);
+        this.getCalcChartD().updateXYSeries(this.getLanguage().equals("fin") ?
+            "diffuusio" : "diffusion", x, y, null);
         this.getFrame().revalidate();
         this.getFrame().repaint();
         this.getFrame().pack();
@@ -602,8 +620,13 @@ class FXPlot {
      * @param x x-axis data
      * @param y y-axis data
      */
-    void updateVData(List<Double> x, List<Double> y) {
-        this.getCalcChartV().updateXYSeries(this.getLanguage().equals("fin") ? "viskositeetti" :"viscosity", x, y, null);
+    void updateVData(List<Double> x, List<Double> y, @NotNull String which) {
+        if (which.equals("visc"))
+            this.getCalcChartV().updateXYSeries(this.getLanguage().equals("fin") ?
+                "viskositeetti" : "viscosity", x, y, null);
+        else if (which.equals("mobil"))
+            this.getCalcChartV().updateXYSeries(this.getLanguage().equals("fin") ?
+                "liikkuvuus" : "mobility", x, y, null);
         this.getFrame().revalidate();
         this.getFrame().repaint();
         this.getFrame().pack();
@@ -651,10 +674,10 @@ class FXPlot {
      * method for printing final energy difference
      * @param evalue value
      */
-    void setDeltaE(double evalue) { // \u2146=differential d
+    void setDeltaE(double evalue) { // \u0394=delta d
         this.getCalcChartE().setTitle(this.getLanguage().equals("fin")
-            ? this.getCalcChartE().getTitle()+", \u2146E = "+this.formatter.format(evalue)+" eV"
-            : this.getCalcChartE().getTitle()+", \u2146E = "+this.formatter.format(evalue)+" eV");
+            ? this.getCalcChartE().getTitle()+", \u0394E = "+this.formatter.format(evalue)+" eV"
+            : this.getCalcChartE().getTitle()+", \u0394E = "+this.formatter.format(evalue)+" eV");
         this.getFrame().revalidate();
         this.getFrame().repaint();
         this.getFrame().pack();
@@ -680,11 +703,6 @@ class FXPlot {
     void setNMaxY(double maxY) {
         this.getCalcChartN().getStyler().setYAxisMax(maxY);
     }
-
-    /**
-     * @param minY the y-axis min value to set
-     */
-    void setEMinY(double minY) { this.getCalcChartE().getStyler().setYAxisMin(minY); }
 
     /**
      * @param maxY the y-axis max value to set
@@ -743,10 +761,15 @@ class FXPlot {
     /**
      * @param coeff the max viscosity value to set to chart title
      */
-    void setVTitle(int time, double coeff) { // u03BC=μ, u00B5=micro
-        this.getCalcChartV().setTitle(this.getLanguage().equals("fin")
-            ? "Dynaaminen viskositeetti, \u03BC(" + time + "ns) = "+this.diffformatter.format(coeff)+" \u00B5Pa s"
-            : "Dynamic viscosity, \u03BC(" + time + "ns) = "+this.diffformatter.format(coeff)+" \u00B5Pa s");
+    void setVTitle(double coeff, @NotNull String which) { // 03B7=eta, u00B5=micro, u22c5=dot
+        if (which.equals("visc"))
+            this.getCalcChartV().setTitle(this.getLanguage().equals("fin")
+                ? "Dynaaminen viskositeetti, \u03B7 = "+this.diffformatter.format(coeff)+" \u00B5Pa\u22c5s"
+                : "Dynamic viscosity, \u03B7 = "+this.diffformatter.format(coeff)+" \u00B5Pa\u22c5s");
+        else if (which.equals("mobil"))
+            this.getCalcChartV().setTitle(this.getLanguage().equals("fin")
+                ? "Liikkuvuus, \u03BC = "+this.diffformatter.format(coeff)+" cm\u00B2/Vs"
+                : "Electrical mobility, \u03BC = "+this.diffformatter.format(coeff)+" cm\u00B2/Vs");
         this.getFrame().revalidate();
         this.getFrame().repaint();
         this.getFrame().pack();
@@ -755,10 +778,10 @@ class FXPlot {
     /**
      * @param coeff the max diffusion coefficient value to set to chart title
      */
-    void setDTitle(int time, double coeff) {
+    void setDTitle(double coeff) { // ^2 = \u00B2, dot = \u22c5
         this.getCalcChartD().setTitle(this.getLanguage().equals("fin")
-            ? "Diffuusiokerroin, D(" + time + "ns) = "+this.diffformatter.format(coeff)+"E-7 cm^2/s"
-            : "Diffusion Coefficient, D(" + time + "ns) = "+this.diffformatter.format(coeff)+"E-7 cm^2/s");
+            ? "Diffuusiokerroin, D = "+this.diffformatter.format(coeff)+" cm\u00B2/s"
+            : "Diffusion Coefficient, D = "+this.diffformatter.format(coeff)+" cm\u00B2/s");
         this.getFrame().revalidate();
         this.getFrame().repaint();
         this.getFrame().pack();
@@ -770,8 +793,8 @@ class FXPlot {
      */
     void setS1CbmcTitle(int dim, double pros) {
         this.getCalcChartS1().setTitle(this.getLanguage().equals("fin")
-            ? "Itseäänvälttelevä kulku, "+dim+"D, epäonnistuneita: "+this.diffformatter.format(pros)+"%"
-            : "Self-avoiding Walk, "+dim+"D, failed: "+this.diffformatter.format(pros)+"%");
+            ? "Itseäänvälttelevä kulku, "+dim+"D, onnistuneita: "+this.rmsformatter.format(pros)+"%"
+            : "Self-avoiding Walk, "+dim+"D, successed: "+this.rmsformatter.format(pros)+"%");
         this.getFrame().revalidate();
         this.getFrame().repaint();
         this.getFrame().pack();
@@ -780,8 +803,8 @@ class FXPlot {
     /**
      * @param rexpd the expected value
      * @param rrms the root mean squared distance
-     * @param mu1 the connective constant
-     * @param mu2 the connective constant
+     * @param mu1 the growth factor (connective constant)
+     * @param mu2 the growth factor (connective constant)
      */
     void setS2SawTitle(double rexpd, double rrms, double mu1, double mu2) { // u03BC=mu, u208#=subscript
         this.getCalcChartS2().setTitle(

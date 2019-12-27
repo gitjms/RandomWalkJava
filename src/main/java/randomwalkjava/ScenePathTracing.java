@@ -29,15 +29,11 @@ class ScenePathTracing extends Data {
     private String language;
     private final Button nappiFixed;
     private final Button nappiLattice;
-    private ToggleButton setCharge0;
-    private ToggleButton setCharge1;
-    private ToggleButton setCharge2;
     private ToggleButton setDim1;
     private ToggleButton setDim2;
     private ToggleButton setDim3;
     private TextField setNumParticles;
     private TextField setNumSteps;
-    private TextField setSizeParticles;
 
     /**
      * main class gets vars via this
@@ -58,28 +54,13 @@ class ScenePathTracing extends Data {
         this.vars = new String[]{
             "A",    // vars[0] which simulation     USER
             "0",    // vars[1] particles            USER
-            "0.0",  // vars[2] diameter             USER
-            "0",    // vars[3] charge               USER
-            "0",    // vars[4] steps                USER
-            "0",    // vars[5] dimension            USER
-            "-",    // vars[6] calcfix or sawplot   n/a
-            "f",    // vars[7] fixed(/spread)       USER
-            "-",    // vars[8] (lattice/)free       USER
-            "s"};   // vars[9] save (on)            n/a
-    }
-
-    /**
-     * method for checking if user input in GUI is a double
-     * @param str GUI input string
-     * @return true if input is a double, false otherwise
-     */
-    private static boolean isNumDouble(String str) {
-        try {
-            Double.parseDouble(str);
-            return true;
-        } catch(NumberFormatException e){
-            return false;
-        }
+            "0.0",  // vars[2] diameter             n/a
+            "0",    // vars[3] steps                USER
+            "0",    // vars[4] dimension            USER
+            "-",    // vars[5] calcfix or sawplot   n/a
+            "f",    // vars[6] fixed(/spread)       USER
+            "-",    // vars[7] (lattice/)free       USER
+            "s"};   // vars[8] save (on)            n/a
     }
 
     /**
@@ -129,65 +110,15 @@ class ScenePathTracing extends Data {
                 this.vars[1] = "0";
         });
 
-        Label labSizeParticles = new Label(this.getLanguage().equals("fin") ? "hiukkasten halkaisija:" : "diameter of particle:");
-        this.setSizeParticles = new TextField("");
-        this.setSizeParticles.setOnKeyReleased(e -> {
-            if (isNumDouble(this.setSizeParticles.getText().trim()))
-                this.vars[2] = this.setSizeParticles.getText().trim();
-            else
-                this.vars[2] = "0.0";
-        });
-
-        Label labCharge = new Label(this.getLanguage().equals("fin") ? "hiukkasten varaus:" : "charge of particles:");
-        this.setCharge0 = new ToggleButton("0");
-        this.setCharge0.setMinWidth(35);
-        this.setCharge0.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        this.setCharge0.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.setCharge0.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setCharge0.setEffect(shadow));
-        this.setCharge0.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setCharge0.setEffect(null));
-
-        this.setCharge1 = new ToggleButton("1");
-        this.setCharge1.setMinWidth(35);
-        this.setCharge1.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        this.setCharge1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.setCharge1.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setCharge1.setEffect(shadow));
-        this.setCharge1.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setCharge1.setEffect(null));
-
-        this.setCharge2 = new ToggleButton("2");
-        this.setCharge2.setMinWidth(35);
-        this.setCharge2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        this.setCharge2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.setCharge2.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> setCharge2.setEffect(shadow));
-        this.setCharge2.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> setCharge2.setEffect(null));
-
-        HBox setCharge = new HBox(this.setCharge0,this.setCharge1,this.setCharge2);
-        setCharge.setSpacing(20);
-        this.setCharge0.setOnMouseClicked(f -> {
-            this.setCharge0.setBackground(new Background(new BackgroundFill(Color.CYAN,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.setCharge1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.setCharge2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[3] = "0";
-        });
-        this.setCharge1.setOnMouseClicked(f -> {
-            this.setCharge0.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.setCharge1.setBackground(new Background(new BackgroundFill(Color.CYAN,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.setCharge2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[3] = "1";
-        });
-        this.setCharge2.setOnMouseClicked(f -> {
-            this.setCharge0.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.setCharge1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.setCharge2.setBackground(new Background(new BackgroundFill(Color.CYAN,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[3] = "2";
-        });
+        this.vars[2] = "0";
 
         Label labNumSteps = new Label(this.getLanguage().equals("fin") ? "askelten lukumäärä:" : "number of steps:");
         this.setNumSteps = new TextField("");
         this.setNumSteps.setOnKeyReleased(e -> {
             if (isNumInteger(this.setNumSteps.getText().trim())){
-                this.vars[4] = this.setNumSteps.getText().trim();
+                this.vars[3] = this.setNumSteps.getText().trim();
             } else
-                this.vars[4] = "0";
+                this.vars[3] = "0";
         });
 
         Label labNumDimensions = new Label(this.getLanguage().equals("fin") ? "ulottuvuus:" : "dimension:");
@@ -218,22 +149,22 @@ class ScenePathTracing extends Data {
             this.setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[5] = "1";
+            this.vars[4] = "1";
         });
         this.setDim2.setOnMouseClicked(f -> {
             this.setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[5] = "2";
+            this.vars[4] = "2";
         });
         this.setDim3.setOnMouseClicked(f -> {
             this.setDim1.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.vars[5] = "3";
+            this.vars[4] = "3";
         });
 
-        this.vars[6] = "-"; // calcfix or sawplot        n/a
+        this.vars[5] = "-"; // calcfix or sawplot        n/a
 
         /*
         * ...THEIR PLACEMENTS
@@ -244,34 +175,20 @@ class ScenePathTracing extends Data {
         this.setNumParticles.setMinWidth(getCompwidth());
         this.setNumParticles.setMaxWidth(getCompwidth());
         asettelu.add(this.setNumParticles, 0, 1);
-        
-        GridPane.setHalignment(labSizeParticles, HPos.LEFT);
-        asettelu.add(labSizeParticles, 0, 2);
-        GridPane.setHalignment(this.setSizeParticles, HPos.CENTER);
-        this.setSizeParticles.setMinWidth(getCompwidth());
-        this.setSizeParticles.setMaxWidth(getCompwidth());
-        asettelu.add(this.setSizeParticles, 0, 3);
-
-        GridPane.setHalignment(labCharge, HPos.LEFT);
-        asettelu.add(labCharge, 0, 4);
-        GridPane.setHalignment(setCharge, HPos.CENTER);
-        setCharge.setMinWidth(getCompwidth());
-        setCharge.setMaxWidth(getCompwidth());
-        asettelu.add(setCharge, 0, 5);
 
         GridPane.setHalignment(labNumSteps, HPos.LEFT);
-        asettelu.add(labNumSteps, 0, 6);
+        asettelu.add(labNumSteps, 0, 2);
         GridPane.setHalignment(this.setNumSteps, HPos.CENTER);
         this.setNumSteps.setMinWidth(getCompwidth());
         this.setNumSteps.setMaxWidth(getCompwidth());
-        asettelu.add(this.setNumSteps, 0, 7);
+        asettelu.add(this.setNumSteps, 0, 3);
         
         GridPane.setHalignment(labNumDimensions, HPos.LEFT);
-        asettelu.add(labNumDimensions, 0, 8);
+        asettelu.add(labNumDimensions, 0, 4);
         GridPane.setHalignment(setDimension, HPos.CENTER);
         setDimension.setMinWidth(getCompwidth());
         setDimension.setMaxWidth(getCompwidth());
-        asettelu.add(setDimension, 0, 9);
+        asettelu.add(setDimension, 0, 5);
 
         /*
         * BUTTON: FIXED
@@ -286,11 +203,11 @@ class ScenePathTracing extends Data {
             if (this.getNappiFixed().getText().equals("HAJAUTETTU") || this.getNappiFixed().getText().equals("SPREAD")){
                 this.getNappiFixed().setText(this.getLanguage().equals("fin") ? "KESKITETTY" : "FIXED");
                 this.getNappiFixed().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[7] = "f";
+                this.vars[6] = "f";
             } else if (this.getNappiFixed().getText().equals("KESKITETTY") || this.getNappiFixed().getText().equals("FIXED")){
                 this.getNappiFixed().setText(this.getLanguage().equals("fin") ? "HAJAUTETTU" : "SPREAD");
                 this.getNappiFixed().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[7] = "-";
+                this.vars[6] = "-";
             }
         });
         valikko.getChildren().add(this.getNappiFixed());
@@ -308,16 +225,16 @@ class ScenePathTracing extends Data {
             if (this.getNappiLattice().getText().equals("HILA") || this.getNappiLattice().getText().equals("LATTICE")){
                 this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
                 this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[8] = "-";
+                this.vars[7] = "-";
             } else if (this.getNappiLattice().getText().equals("VAPAA") || this.getNappiLattice().getText().equals("FREE")){
                 this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "HILA" : "LATTICE");
                 this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
-                this.vars[8] = "l";
+                this.vars[7] = "l";
             }
         });
         valikko.getChildren().add(this.getNappiLattice());
 
-        this.vars[9] = "s"; // save on
+        this.vars[8] = "s"; // save on
 
         GridPane.setHalignment(valikko, HPos.LEFT);
         asettelu.add(valikko, 0, 10, 2, 1);

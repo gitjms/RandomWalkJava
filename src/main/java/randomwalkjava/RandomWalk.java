@@ -287,30 +287,18 @@ public class RandomWalk extends Application {
         piirturi.setFill(Color.BLACK);
         piirturi.fillRect(0, 0, this.getAnimWidth(), this.getAnimHeight());
         this.setRealPane(getComponents.getPane(rtrmsAlusta, this.getAnimWidth(), this.getAnimHeight()));
-        Image imgRms1aFI = new Image("/rms1aFI.png");
-        Image imgRms1aEN = new Image("/rms1aEN.png");
-        Image imgRms1bFI = new Image("/rms1bFI.png");
-        Image imgRms1bEN = new Image("/rms1bEN.png");
-        Image imgRms2aFI = new Image("/rms2aFI.png");
-        Image imgRms2aEN = new Image("/rms2aEN.png");
-        Image imgRms2bFI = new Image("/rms2bFI.png");
-        Image imgRms2bEN = new Image("/rms2bEN.png");
-        ImageView ivRms1aFI = new ImageView(imgRms1aFI);
-        ImageView ivRms1aEN = new ImageView(imgRms1aEN);
-        ImageView ivRms1bFI = new ImageView(imgRms1bFI);
-        ImageView ivRms1bEN = new ImageView(imgRms1bEN);
-        ImageView ivRms2aFI = new ImageView(imgRms2aFI);
-        ImageView ivRms2aEN = new ImageView(imgRms2aEN);
-        ImageView ivRms2bFI = new ImageView(imgRms2bFI);
-        ImageView ivRms2bEN = new ImageView(imgRms2bEN);
-        ivRms1aFI.setSmooth(true);
-        ivRms1aEN.setSmooth(true);
-        ivRms1bFI.setSmooth(true);
-        ivRms1bEN.setSmooth(true);
-        ivRms2aFI.setSmooth(true);
-        ivRms2aEN.setSmooth(true);
-        ivRms2bFI.setSmooth(true);
-        ivRms2bEN.setSmooth(true);
+        Image imgRms1FI = new Image("/rms1FI.png");
+        Image imgRms1EN = new Image("/rms1EN.png");
+        Image imgRms2FI = new Image("/rms2FI.png");
+        Image imgRms2EN = new Image("/rms2EN.png");
+        ImageView ivRms1FI = new ImageView(imgRms1FI);
+        ImageView ivRms1EN = new ImageView(imgRms1EN);
+        ImageView ivRms2FI = new ImageView(imgRms2FI);
+        ImageView ivRms2EN = new ImageView(imgRms2EN);
+        ivRms1FI.setSmooth(true);
+        ivRms1EN.setSmooth(true);
+        ivRms2FI.setSmooth(true);
+        ivRms2EN.setSmooth(true);
         Button helpNappiReal = getButtons.getHelpButton(
             this.getLanguage(), this.getTextAreaReal(), this.getIsovalikkoReal(),
                 null, this.getRealPane(), null, null, "real", 0);
@@ -440,8 +428,7 @@ public class RandomWalk extends Application {
         */
         this.getValikkoReal().getChildren().addAll(
             menuNappiReal, helpNappiReal, getRealScene.getSceneReal(
-                this.getIsovalikkoReal(), this.getRealPane(), ivRms1aFI, ivRms1aEN, ivRms1bFI,
-                ivRms1bEN, ivRms2aFI, ivRms2aEN, ivRms2bFI, ivRms2bEN),
+                this.getIsovalikkoReal(), this.getRealPane(), ivRms1FI, ivRms1EN, ivRms2FI, ivRms2EN),
             runReal, closeNappiReal);
         this.getIsovalikkoReal().getChildren().addAll(this.getValikkoReal(),
             this.getTextAreaReal());
