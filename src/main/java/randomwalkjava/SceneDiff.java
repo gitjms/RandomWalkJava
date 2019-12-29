@@ -448,6 +448,7 @@ class SceneDiff extends Data {
                                         if (getDiffusionY().get((int) getPhaseDiffus() - 1) != 0.0)
                                             if (isMobility()) {
                                                 // electrical mobility eta = 3qD/(2E) 1E-2 [cm^2/(Vs)]
+                                                // 1E-2 is scaling for the graph
                                                 // eta = 3/2 * 1e2*D[cm^2/s] * q/E[eV] = 3/2 * D[cm^2/s]/E[V] = 1E-2 [cm^2/(Vs)]
                                                 firstNum = 3.0 / 2.0 * 1e2 * getDiffusionY().get((int) getPhaseDiffus() - 1)
                                                     / getEnergyY().get((int) getPhaseEnergy() - 1);
@@ -481,6 +482,7 @@ class SceneDiff extends Data {
                                         if (getDiffusionY().get((int) getPhaseDiffus() - 1) != 0.0)
                                             if (isMobility()) {
                                                 // electrical mobility eta = 3qD/(2E) 1E-2 [cm^2/(Vs)]
+                                                // 1E-2 is scaling for the graph
                                                 // eta = 3/2 * 1e2*D[cm^2/s] * q/E[eV] = 3/2 * D[cm^2/s]/E[V] = 1E-2 [cm^2/(Vs)]
                                                 number = 3.0 / 2.0 * 1e2 * getDiffusionY().get((int) getPhaseDiffus() - 1)
                                                     / getEnergyY().get((int) getPhaseEnergy() - 1);
