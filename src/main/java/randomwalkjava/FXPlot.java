@@ -49,10 +49,10 @@ class FXPlot {
     private XChartPanel<XYChart> chartPanelS2;
     private XChartPanel<CategoryChart> chartPanelS3;
     private JFrame frame;
-    private NumberFormat formatter;
-    private NumberFormat diffformatter;
-    private NumberFormat rmsformatter;
-    private NumberFormat muformatter;
+    //private NumberFormat formatter;
+    private NumberFormat eformatter;
+    private NumberFormat twodecformatter;
+    private NumberFormat threedecformatter;
 
     /**
      * method for creating a plotting element
@@ -66,10 +66,10 @@ class FXPlot {
         this.getFrame().setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.setScreenHeight(Toolkit.getDefaultToolkit().getScreenSize().height);
 
-        this.formatter = new DecimalFormat("#.#E0");
-        this.diffformatter = new DecimalFormat("0.0E0");
-        this.rmsformatter = new DecimalFormat("0.00");
-        this.muformatter = new DecimalFormat("0.0000");
+        //this.eformatter = new DecimalFormat("#.#E0");
+        this.eformatter = new DecimalFormat("0.0E0");
+        this.twodecformatter = new DecimalFormat("0.00");
+        this.threedecformatter = new DecimalFormat("0.0000");
 
         switch (which) {
             case "Walks&norm":
@@ -461,14 +461,14 @@ class FXPlot {
      * @param x x-axis data (visc_x)
      * @param y y-axis data (visc_y)
      */
-    void setVData(List<Double> x, List<Double> y, @NotNull String which) { // u00B5=micro, u03B7=eta, u22c5=dot
+    void setVData(List<Double> x, List<Double> y, @NotNull String which) { // u03B7=eta, u00B5=micro, u22c5=dot
         BasicStroke[] BasicStroke = new BasicStroke[]{
             new BasicStroke( 1.5f, CAP_SQUARE,
                 JOIN_MITER, 10.0f, null, 0.0f )
         };
         if (which.equals("visc")) {
             this.getCalcChartV().setYAxisTitle(this.getLanguage().equals("fin") ?
-                "Viskositeetti, \u03B7 [\u00B5Pa\u22c5s]" : "Viscosity, \u03B7 [\u00B5Pa\u22c5s]");
+                "Dynaaminen viskositeetti, \u03B7 [Pa\u22c5s]" : "Dynamic Viscosity, \u03B7 [Pa\u22c5s]");
             this.getCalcChartV().addSeries(this.getLanguage().equals("fin") ? "viskositeetti" : "viscosity", x, y)
                 .setLineStyle(BasicStroke[0]).setLineColor(Color.orange);
             this.getCalcChartV().setTitle(this.getLanguage().equals("fin")
@@ -476,7 +476,7 @@ class FXPlot {
             this.getFrame().getContentPane().add(this.getChartPanelV());
         } else if (which.equals("mobil")) {
             this.getCalcChartV().setYAxisTitle(this.getLanguage().equals("fin") ?
-                "Liikkuvuus, \u00B5 1E-2 [cm\u00B2/Vs]" : "Electrical mobility, \u00B5 1E-2 [cm\u00B2/Vs]");
+                "Liikkuvuus, \u00B5 [cm\u00B2/Vs]" : "Electrical mobility, \u00B5 [cm\u00B2/Vs]");
             this.getCalcChartV().addSeries(this.getLanguage().equals("fin") ? "liikkuvuus" : "mobility", x, y)
                 .setLineStyle(BasicStroke[0]).setLineColor(Color.orange);
             this.getCalcChartV().setTitle(this.getLanguage().equals("fin")
@@ -512,7 +512,7 @@ class FXPlot {
      * @param x x-axis data
      * @param y y-axis data
      */
-    void setS2Data(List<Integer> x, List<Double> y, boolean iscbmc) { // u208#=subscript, u00B5=mu
+    void setS2Data(List<Integer> x, List<Double> y, boolean ismcsaw) { // u208#=subscript, u00B5=mu
         BasicStroke[] BasicStroke = new BasicStroke[]{
             new BasicStroke( 2.5f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f ),
             new BasicStroke( 2.0f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f ),
@@ -521,7 +521,7 @@ class FXPlot {
         };
         this.getCalcChartS2().addSeries("<Rexp>", x, y).setLineStyle(BasicStroke[0]).setLineColor(Color.red);
         this.getCalcChartS2().addSeries("<Rrms>", x, y).setLineStyle(BasicStroke[1]).setLineColor(Color.blue);
-        if (iscbmc) {
+        if (ismcsaw) {
             this.getCalcChartS2().addSeries(this.getLanguage().equals("fin") ? "\u00B5" :"\u00B5", x, y)
                 .setLineStyle(BasicStroke[2]).setLineColor(Color.magenta);
             this.getCalcChartS2().addSeries(this.getLanguage().equals("fin") ? "\u00B52" :"\u00B52", x, y)
@@ -676,12 +676,86 @@ class FXPlot {
      */
     void setDeltaE(double evalue) { // \u0394=delta d
         this.getCalcChartE().setTitle(this.getLanguage().equals("fin")
-            ? this.getCalcChartE().getTitle()+", \u0394E = "+this.formatter.format(evalue)+" eV"
-            : this.getCalcChartE().getTitle()+", \u0394E = "+this.formatter.format(evalue)+" eV");
+            ? this.getCalcChartE().getTitle()+", \u0394E = "+this.eformatter.format(evalue)+" eV"
+            : this.getCalcChartE().getTitle()+", \u0394E = "+this.eformatter.format(evalue)+" eV");
         this.getFrame().revalidate();
         this.getFrame().repaint();
         this.getFrame().pack();
     }
+
+    /**
+     * @param coeff the max viscosity value to set to chart title
+     */
+    void setVTitle(double coeff, @NotNull String which) { // 03B7=eta, u00B5=micro, u22c5=dot
+        if (which.equals("visc"))
+            this.getCalcChartV().setTitle(this.getLanguage().equals("fin")
+                ? "Dynaaminen viskositeetti, \u03B7 = "+this.twodecformatter.format(coeff)+" Pa\u22c5s"
+                : "Dynamic viscosity, \u03B7 = "+this.twodecformatter.format(coeff)+" Pa\u22c5s");
+        else if (which.equals("mobil"))
+            this.getCalcChartV().setTitle(this.getLanguage().equals("fin")
+                ? "Liikkuvuus, \u03BC = "+this.eformatter.format(coeff)+" cm\u00B2/Vs"
+                : "Electrical mobility, \u03BC = "+this.eformatter.format(coeff)+" cm\u00B2/Vs");
+        this.getFrame().revalidate();
+        this.getFrame().repaint();
+        this.getFrame().pack();
+    }
+
+    /**
+     * @param coeff the max diffusion coefficient value to set to chart title
+     */
+    void setDTitle(double coeff) { // ^2 = \u00B2
+        this.getCalcChartD().setTitle(this.getLanguage().equals("fin")
+            ? "Diffuusiokerroin, D = "+this.eformatter.format(coeff)+" cm\u00B2/s"
+            : "Diffusion Coefficient, D = "+this.eformatter.format(coeff)+" cm\u00B2/s");
+        this.getFrame().revalidate();
+        this.getFrame().repaint();
+        this.getFrame().pack();
+    }
+
+    /**
+     * @param dim the dimension
+     * @param pros the percent of failed
+     */
+    void setS1McsawTitle(int dim, double pros) {
+        this.getCalcChartS1().setTitle(this.getLanguage().equals("fin")
+            ? "Itseäänvälttelevä kulku, "+dim+"D, onnistuneita: "+this.twodecformatter.format(pros)+"%"
+            : "Self-avoiding Walk, "+dim+"D, successed: "+this.twodecformatter.format(pros)+"%");
+        this.getFrame().revalidate();
+        this.getFrame().repaint();
+        this.getFrame().pack();
+    }
+
+    /**
+     * @param rexpd the expected value
+     * @param rrms the root mean squared distance
+     * @param mu1 the growth factor (connective constant)
+     * @param mu2 the growth factor (connective constant)
+     */
+    void setS2SawTitle(double rexpd, double rrms, double mu1, double mu2) { // u03BC=mu, u208#=subscript
+        this.getCalcChartS2().setTitle(
+            "<Rexp>="+this.twodecformatter.format(rexpd)+", <Rrms>="+this.twodecformatter.format(rrms)+
+                ", \u03BC\u2081="+this.threedecformatter.format(mu1)+", \u03BC\u2082="+this.threedecformatter.format(mu2));
+        this.getFrame().revalidate();
+        this.getFrame().repaint();
+        this.getFrame().pack();
+    }
+
+    /**
+     */
+    void setFrameVis() { this.getFrame().setVisible(true); }
+
+    /**
+     * @param frame the frame to set
+     */
+    private void setFrame(JFrame frame) {
+        this.frame = frame;
+        this.frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    }
+
+    /**
+     * @return the frame
+     */
+    JFrame getFrame() { return frame; }
 
     /**
      * @param minY the y-axis min value to set
@@ -757,80 +831,6 @@ class FXPlot {
     void setS2MaxY(double maxY) {
         this.getCalcChartS2().getStyler().setYAxisMax(maxY);
     }
-
-    /**
-     * @param coeff the max viscosity value to set to chart title
-     */
-    void setVTitle(double coeff, @NotNull String which) { // 03B7=eta, u00B5=micro, u22c5=dot
-        if (which.equals("visc"))
-            this.getCalcChartV().setTitle(this.getLanguage().equals("fin")
-                ? "Dynaaminen viskositeetti, \u03B7 = "+this.diffformatter.format(coeff)+" \u00B5Pa\u22c5s"
-                : "Dynamic viscosity, \u03B7 = "+this.diffformatter.format(coeff)+" \u00B5Pa\u22c5s");
-        else if (which.equals("mobil"))
-            this.getCalcChartV().setTitle(this.getLanguage().equals("fin")
-                ? "Liikkuvuus, \u03BC = "+this.diffformatter.format(coeff)+" cm\u00B2/Vs"
-                : "Electrical mobility, \u03BC = "+this.diffformatter.format(coeff)+" cm\u00B2/Vs");
-        this.getFrame().revalidate();
-        this.getFrame().repaint();
-        this.getFrame().pack();
-    }
-
-    /**
-     * @param coeff the max diffusion coefficient value to set to chart title
-     */
-    void setDTitle(double coeff) { // ^2 = \u00B2, dot = \u22c5
-        this.getCalcChartD().setTitle(this.getLanguage().equals("fin")
-            ? "Diffuusiokerroin, D = "+this.diffformatter.format(coeff)+" cm\u00B2/s"
-            : "Diffusion Coefficient, D = "+this.diffformatter.format(coeff)+" cm\u00B2/s");
-        this.getFrame().revalidate();
-        this.getFrame().repaint();
-        this.getFrame().pack();
-    }
-
-    /**
-     * @param dim the dimension
-     * @param pros the percent of failed
-     */
-    void setS1CbmcTitle(int dim, double pros) {
-        this.getCalcChartS1().setTitle(this.getLanguage().equals("fin")
-            ? "Itseäänvälttelevä kulku, "+dim+"D, onnistuneita: "+this.rmsformatter.format(pros)+"%"
-            : "Self-avoiding Walk, "+dim+"D, successed: "+this.rmsformatter.format(pros)+"%");
-        this.getFrame().revalidate();
-        this.getFrame().repaint();
-        this.getFrame().pack();
-    }
-
-    /**
-     * @param rexpd the expected value
-     * @param rrms the root mean squared distance
-     * @param mu1 the growth factor (connective constant)
-     * @param mu2 the growth factor (connective constant)
-     */
-    void setS2SawTitle(double rexpd, double rrms, double mu1, double mu2) { // u03BC=mu, u208#=subscript
-        this.getCalcChartS2().setTitle(
-            "<Rexp>="+this.rmsformatter.format(rexpd)+", <Rrms>="+this.rmsformatter.format(rrms)+
-                ", \u03BC\u2081="+this.muformatter.format(mu1)+", \u03BC\u2082="+this.muformatter.format(mu2));
-        this.getFrame().revalidate();
-        this.getFrame().repaint();
-        this.getFrame().pack();
-    }
-
-    /**
-     */
-    void setFrameVis() { this.getFrame().setVisible(true); }
-
-    /**
-     * @param frame the frame to set
-     */
-    private void setFrame(JFrame frame) {
-        this.frame = frame;
-        this.frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    }
-
-    /**
-     * @return the frame
-     */
-    JFrame getFrame() { return frame; }
 
     /**
      * @return the Width

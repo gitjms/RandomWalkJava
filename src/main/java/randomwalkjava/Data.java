@@ -41,11 +41,11 @@ class Data {
      * method executes Fortan code to get data
      * @param folderPath datafolder "c:/RWDATA"
      * @param executable Fortran executable "walk.exe"
-     * @param iscbmc cbmc or saw
+     * @param ismcsaw mc-saw or saw
      * @param issaw saw or not
      * @return true if fortran execution succeeded, false otherwise
      */
-    Boolean createData(File folderPath, String executable, boolean iscbmc, boolean issaw) {
+    Boolean createData(File folderPath, String executable, boolean ismcsaw, boolean issaw) {
         StringBuilder teksti = new StringBuilder();
         boolean ok = true;
         String msg = "";
@@ -89,7 +89,7 @@ class Data {
                     else
                         teksti.append(line).append("\n");
 
-                    if (iscbmc && line.startsWith("F")) ok = false;
+                    if (ismcsaw && line.startsWith("F")) ok = false;
                 }
 
                 exitVal = process.waitFor();
@@ -155,10 +155,10 @@ class Data {
     void setSave(String var) { this.vars[8]=var; }
 
     /**
-     * method for setting the parameter for setting saw or cbmc in vars array
+     * method for setting the parameter for setting saw or mc-saw in vars array
      * @param var the vars array to set
      */
-    void setSawCbmc(String var) { this.vars[0]=var; }
+    void setSawMc(String var) { this.vars[0]=var; }
 
     /**
      * method for setting the parameter for plotting in vars array

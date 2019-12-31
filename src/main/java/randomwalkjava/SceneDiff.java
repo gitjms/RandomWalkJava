@@ -389,7 +389,6 @@ class SceneDiff extends Data {
                                 try {
                                     if (firstLetter.equals("E") && !isFirstEnergy()) {
                                         double firstNum = Double.parseDouble(line.split("(\\s+)")[1].trim());
-                                        setInitE(firstNum);
                                         setFirstEnergy(true);
 
                                         if (isFirstEnergy()) {
@@ -397,6 +396,7 @@ class SceneDiff extends Data {
                                                 && !Double.isNaN(getPhaseEnergy()) && !Double.isInfinite(getPhaseEnergy())) {
                                                 getEnergyY().add(firstNum);
                                                 getEnergyX().add((double) getPhaseEnergy());
+                                                setInitE(firstNum);
                                             } else
                                                 nanFound = true;
                                             if (!nanFound) {
@@ -416,6 +416,7 @@ class SceneDiff extends Data {
                                         if (!nanFound)
                                             setPhaseEnergy(getPhaseEnergy() + 1);
                                     } else if (firstLetter.equals("D") && !isFirstDiffus()) {
+                                        // 1e8 is scaling for the graph
                                         double firstNum = 1e8 * Double.parseDouble(line.split("(\\s+)")[1].trim());
                                         setFirstDiffus(true);
 
@@ -434,6 +435,7 @@ class SceneDiff extends Data {
                                             }
                                         }
                                     } else if (firstLetter.equals("D")) {
+                                        // 1e8 is scaling for the graph
                                         double number = 1e8 * Double.parseDouble(line.split("(\\s+)")[1].trim());
                                         if (!Double.isNaN(number) && !Double.isInfinite(number) && number > 0.0
                                             && !Double.isNaN(getPhaseDiffus()) && !Double.isInfinite(getPhaseDiffus())) {
@@ -447,16 +449,17 @@ class SceneDiff extends Data {
                                         double firstNum = 0.0;
                                         if (getDiffusionY().get((int) getPhaseDiffus() - 1) != 0.0)
                                             if (isMobility()) {
-                                                // electrical mobility eta = 3qD/(2E) 1E-2 [cm^2/(Vs)]
-                                                // 1E-2 is scaling for the graph
-                                                // eta = 3/2 * 1e2*D[cm^2/s] * q/E[eV] = 3/2 * D[cm^2/s]/E[V] = 1E-2 [cm^2/(Vs)]
-                                                firstNum = 3.0 / 2.0 * 1e2 * getDiffusionY().get((int) getPhaseDiffus() - 1)
+                                                // electrical mobility eta = 3qD/(2E) [cm^2/(Vs)]
+                                                // mu = 3/2 * D[cm^2/s] * q/E[eV] = 3/2 * D[cm^2/s]/E[V] = [cm^2/(Vs)]
+                                                firstNum = 3.0 / 2.0 * getDiffusionY().get((int) getPhaseDiffus() - 1)
                                                     / getEnergyY().get((int) getPhaseEnergy() - 1);
-                                            } else {
-                                                // µPa s, 1e6: Pa -> µPa
+                                            } else { // viscosity
+                                                // eta = [J/m] / [m^2/s] = [kg/m s] = [Pa s]
                                                 // 1e-4: D [cm^2/s] -> D [m^2/s]
-                                                firstNum = 1e6 * Double.parseDouble(line.split("(\\s+)")[1].trim()) /
-                                                    (1e-4 * getDiffusionY().get((int) getPhaseDiffus() - 1));
+                                                // 1e-8: diffusion scaling back to normal
+                                                // 1e-4 * 1e-8 = 1e-12
+                                                firstNum = Double.parseDouble(line.split("(\\s+)")[1].trim()) /
+                                                    (1e-12 * getDiffusionY().get((int) getPhaseDiffus() - 1));
                                             }
                                         setFirstVisc(true);
 
@@ -481,16 +484,17 @@ class SceneDiff extends Data {
                                         double number = 0.0;
                                         if (getDiffusionY().get((int) getPhaseDiffus() - 1) != 0.0)
                                             if (isMobility()) {
-                                                // electrical mobility eta = 3qD/(2E) 1E-2 [cm^2/(Vs)]
-                                                // 1E-2 is scaling for the graph
-                                                // eta = 3/2 * 1e2*D[cm^2/s] * q/E[eV] = 3/2 * D[cm^2/s]/E[V] = 1E-2 [cm^2/(Vs)]
-                                                number = 3.0 / 2.0 * 1e2 * getDiffusionY().get((int) getPhaseDiffus() - 1)
+                                                // electrical mobility eta = 3qD/(2E) [cm^2/(Vs)]
+                                                // mu = 3/2 * D[cm^2/s] * q/E[eV] = 3/2 * D[cm^2/s]/E[V] = [cm^2/(Vs)]
+                                                number = 3.0 / 2.0 * getDiffusionY().get((int) getPhaseDiffus() - 1)
                                                     / getEnergyY().get((int) getPhaseEnergy() - 1);
-                                            } else {
-                                                // µPa s, 1e6: Pa -> µPa
+                                            } else { // viscosity
+                                                // eta = [J/m] / [m^2/s] = [kg/m s] = [Pa s]
                                                 // 1e-4: D [cm^2/s] -> D [m^2/s]
-                                                number = 1e6 * Double.parseDouble(line.split("(\\s+)")[1].trim()) /
-                                                    (1e-4 * getDiffusionY().get((int) getPhaseDiffus() - 1));
+                                                // 1e-8: diffusion scaling back to normal
+                                                // 1e-4 * 1e-8 = 1e-12
+                                                number = Double.parseDouble(line.split("(\\s+)")[1].trim()) /
+                                                    (1e-12 * getDiffusionY().get((int) getPhaseDiffus() - 1));
                                             }
                                         if (!Double.isNaN(number) && !Double.isInfinite(number) && number > 0.0
                                             && !Double.isNaN(getPhaseVisc()) && !Double.isInfinite(getPhaseVisc())) {
@@ -543,6 +547,7 @@ class SceneDiff extends Data {
                             else
                                 getFxplot().setVTitle(getViscY().get(getViscY().size() - 1), "visc");
                         if (getDiffusionY().size() > 0)
+                            // 1e-8 is scaling back to normal
                             getFxplot().setDTitle(1e-8 * getDiffusionY().get(getDiffusionY().size() - 1));
                         if (getEnergyY().size() > 0)
                             setFinE(getEnergyY().get((int) getPhaseEnergy() - 1));

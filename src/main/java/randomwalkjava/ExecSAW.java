@@ -27,15 +27,15 @@ class ExecSAW extends Data {
 
     private String language;
     private boolean issaw;
-    private boolean iscbmc;
+    private boolean ismcsaw;
     private boolean first;
     private List <Double> saw_expd;
     private List <Double> saw_rms;
     private List <Double> expd_runs;
     private List<Double> rms_runs;
     private List <Double> saw_lengths;
-    private List<Double> cbmc_mu;
-    private List<Double> cbmc_mu2;
+    private List<Double> mcsaw_mu;
+    private List<Double> mcsaw_mu2;
     private List <Integer> xAxis;
     private List <Integer> xhistAxis;
     private List <Double> yhistAxis;
@@ -49,7 +49,7 @@ class ExecSAW extends Data {
         this.setLanguage(language);
     }
 
-    void setSawClick(File folder, String executable, @NotNull Button execSAW, @NotNull Button execCBMC,
+    void setSawClick(File folder, String executable, @NotNull Button execSAW, @NotNull Button execMCSAW,
                      SceneRealTimeSaw sawScene, HBox isovalikkoSaw, Pane sawPane, TextArea sawText,
                      Button plotSAW, Button closeNappiSAW, Button menuNappiSAW, Button helpNappiSAW,
                      Slider ceeSlider) {
@@ -77,7 +77,7 @@ class ExecSAW extends Data {
                 if ( !sawScene.isRunning())
                     return;
 
-                sawScene.refresh(folder, executable, getFirst(), getSawLengths(), getCbmcMu(), getCbmcMu2(), getSawExpd(), getSawRms(),
+                sawScene.refresh(folder, executable, getFirst(), getSawLengths(), getMcsawMu(), getMcsawMu2(), getSawExpd(), getSawRms(),
                     getExpdRuns(), getRmsRuns(), getXAxis(), getXhistAxis(), isSaw(), ceeSlider);
 
                 if (getFirst()) setFirst(false);
@@ -96,7 +96,7 @@ class ExecSAW extends Data {
                 plotSAW.setDisable(false);
                 execSAW.setText(this.getLanguage().equals("fin") ? "AJA SAW" : "RUN SAW");
             } else {
-                sawScene.setSawCbmc("E");
+                sawScene.setSawMc("E");
                 sawScene.setSawPlot("-");
                 sawScene.setSave("-");
                 this.setVars(sawScene.getVars());
@@ -160,12 +160,12 @@ class ExecSAW extends Data {
                 helpNappiSAW.setDisable(true);
                 closeNappiSAW.setDisable(true);
                 plotSAW.setDisable(true);
-                execCBMC.setDisable(true);
+                execMCSAW.setDisable(true);
                 sawScene.getDimension().setDisable(true);
             }
         });
 
-        execCBMC.setOnMouseClicked((MouseEvent event) -> {
+        execMCSAW.setOnMouseClicked((MouseEvent event) -> {
             if (sawScene.isRunning()) {
                 sawScene.stop();
                 sawScene.getDimension().setDisable(false);
@@ -173,9 +173,9 @@ class ExecSAW extends Data {
                 helpNappiSAW.setDisable(false);
                 closeNappiSAW.setDisable(false);
                 plotSAW.setDisable(false);
-                execCBMC.setText(this.getLanguage().equals("fin") ? "AJA CBMC" : "RUN CBMC");
+                execMCSAW.setText(this.getLanguage().equals("fin") ? "AJA MC-SAW" : "RUN MC-SAW");
             } else {
-                sawScene.setSawCbmc("F");
+                sawScene.setSawMc("F");
                 sawScene.setSawPlot("-");
                 sawScene.setSave("-");
                 this.setVars(sawScene.getVars());
@@ -184,7 +184,7 @@ class ExecSAW extends Data {
                 int steps = Integer.parseInt(this.getVars()[3]);
                 if (this.getVars()[3].isEmpty() || steps == 0) fail = true;
 
-                int dim = Integer.parseInt(this.getVars()[5]);
+                int dim = Integer.parseInt(this.getVars()[4]);
 
                 if (dim < 2 || dim > 3) fail = true;
 
@@ -214,11 +214,11 @@ class ExecSAW extends Data {
                 this.setSawLengths(new ArrayList<>());
                 for (int x = 0; x < 10; x++) this.getSawLengths().add(0.0);
 
-                this.setCbmcMu(new ArrayList<>());
-                for (int x = 0; x < 10; x++) this.getCbmcMu().add(0.0);
+                this.setMcsawMu(new ArrayList<>());
+                for (int x = 0; x < 10; x++) this.getMcsawMu().add(0.0);
 
-                this.setCbmcMu2(new ArrayList<>());
-                for (int x = 0; x < 10; x++) this.getCbmcMu2().add(0.0);
+                this.setMcsawMu2(new ArrayList<>());
+                for (int x = 0; x < 10; x++) this.getMcsawMu2().add(0.0);
 
                 this.setXAxis(new ArrayList<>());
                 for (int x = 0; x < 10; x++) this.getXAxis().add(x);
@@ -234,6 +234,15 @@ class ExecSAW extends Data {
                 if (steps < 30) for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)));
                 else if (steps < 500) for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*3));
                 else for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*10));
+                if (steps < 30) {
+                    for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)));
+                } else if (steps < 200) {
+                    for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*3));
+                } else if (steps < 400) {
+                    for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*10));
+                } else {
+                    for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*20));
+                }
 
                 sawScene.getFxplot().setS1Data(this.getXAxis(), this.getExpdRuns(), dim);
                 sawScene.getFxplot().setS2Data(this.getXAxis(), this.getRmsRuns(), true);
@@ -241,7 +250,7 @@ class ExecSAW extends Data {
 
                 sawScene.start();
 
-                execCBMC.setText(this.getLanguage().equals("fin") ? "SEIS" : "STOP");
+                execMCSAW.setText(this.getLanguage().equals("fin") ? "SEIS" : "STOP");
                 menuNappiSAW.setDisable(true);
                 helpNappiSAW.setDisable(true);
                 closeNappiSAW.setDisable(true);
@@ -279,11 +288,11 @@ class ExecSAW extends Data {
         plotNappi.setOnMouseClicked((MouseEvent event) -> {
             result.getChildren().clear();
             if (execSAW.isDisabled()) {
-                sawScene.setSawCbmc("F");
-                this.setIsCbmc(true);
+                sawScene.setSawMc("F");
+                this.setIsMcsaw(true);
             } else {
-                sawScene.setSawCbmc("E");
-                this.setIsCbmc(false);
+                sawScene.setSawMc("E");
+                this.setIsMcsaw(false);
             }
             sawScene.setSawPlot("p");
             sawScene.setSave("s");
@@ -307,7 +316,7 @@ class ExecSAW extends Data {
             boolean ok = false;
             while (!ok && count < max) {
                 ok = ex.executeSAW(datafolder, datapath, fexec, pyexecsaw2d,
-                    pyexecsaw3d, valikkoSAW, data, this.getVars(), this.isCbmc());
+                    pyexecsaw3d, valikkoSAW, data, this.getVars(), this.isMcsaw());
                 count += 1;
             }
 
@@ -358,15 +367,15 @@ class ExecSAW extends Data {
     private void setIsSaw(boolean issaw) { this.issaw = issaw; }
 
     /**
-     * @return the iscbmc
+     * @return the ismcsaw
      */
     @Contract(pure = true)
-    private boolean isCbmc() { return this.iscbmc; }
+    private boolean isMcsaw() { return this.ismcsaw; }
 
     /**
-     * @param iscbmc the iscbmc to set
+     * @param ismcsaw the ismcsaw to set
      */
-    private void setIsCbmc(boolean iscbmc) { this.iscbmc = iscbmc; }
+    private void setIsMcsaw(boolean ismcsaw) { this.ismcsaw = ismcsaw; }
 
     /**
      * @return the vars
@@ -390,26 +399,26 @@ class ExecSAW extends Data {
     private void setSawLengths(List<Double> saw_lengths) { this.saw_lengths = saw_lengths; }
 
     /**
-     * @return the cbmc_mu
+     * @return the mcsaw_mu
      */
     @Contract(pure = true)
-    private List<Double> getCbmcMu() { return this.cbmc_mu; }
+    private List<Double> getMcsawMu() { return this.mcsaw_mu; }
 
     /**
-     * @param cbmc_mu the cbmc_mu to set
+     * @param mcsaw_mu the mcsaw_mu to set
      */
-    private void setCbmcMu(List<Double> cbmc_mu) { this.cbmc_mu = cbmc_mu; }
+    private void setMcsawMu(List<Double> mcsaw_mu) { this.mcsaw_mu = mcsaw_mu; }
 
     /**
-     * @return the cbmc_mu2
+     * @return the mcsaw_mu2
      */
     @Contract(pure = true)
-    private List<Double> getCbmcMu2() { return this.cbmc_mu2; }
+    private List<Double> getMcsawMu2() { return this.mcsaw_mu2; }
 
     /**
-     * @param cbmc_mu2 the cbmc_mu2 to set
+     * @param mcsaw_mu2 the mcsaw_mu2 to set
      */
-    private void setCbmcMu2(List<Double> cbmc_mu2) { this.cbmc_mu2 = cbmc_mu2; }
+    private void setMcsawMu2(List<Double> mcsaw_mu2) { this.mcsaw_mu2 = mcsaw_mu2; }
 
     /**
      * @return the saw_expd

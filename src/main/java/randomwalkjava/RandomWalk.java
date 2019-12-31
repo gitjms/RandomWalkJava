@@ -338,9 +338,9 @@ public class RandomWalk extends Application {
          * OTHER VIEWS BUTTONS: REAL TIME SAW
          */
         Button runSAW = getButtons.getExecuteButton(this.getLanguage(), 0, "SAW");
-        Button runCBMC = getButtons.getExecuteButton(this.getLanguage(), 0, "CBMC");
+        Button runMCSAW = getButtons.getExecuteButton(this.getLanguage(), 0, "MCSAW");
         HBox sawButtonBox = new HBox(5);
-        sawButtonBox.getChildren().addAll(runSAW, runCBMC);
+        sawButtonBox.getChildren().addAll(runSAW, runMCSAW);
         Button plotSAW = getButtons.getExecuteButton(this.getLanguage(), 1, "PLOT");
         Button menuNappiSAW = getButtons.getMenuButton(this.getLanguage(), 1);
         Button closeNappiSAW = getButtons.getCloseButton(getRealScene, getDiffScene, getSAWScene,
@@ -449,7 +449,7 @@ public class RandomWalk extends Application {
          */
         this.getValikkoSAW().getChildren().addAll(
             menuNappiSAW, helpNappiSAW, getSAWScene.getSceneRealTimeSaw(
-                sliderBox, sliderCee, this.getSawPane(), runSAW, runCBMC),
+                sliderBox, sliderCee, this.getSawPane(), runSAW, runMCSAW),
             sawButtonBox, plotSAW, maxBox, closeNappiSAW);
         this.getIsovalikkoSAW().getChildren().addAll(this.getValikkoSAW(), this.getSawPane());
         BorderPane asetteluSAW = new BorderPane();
@@ -558,7 +558,7 @@ public class RandomWalk extends Application {
         ExecSAW execSAW = new ExecSAW(this.getLanguage());
         execSAW.setPlotClick(plotSAW, runSAW, getSAWScene, this.getValikkoSAW(), datapath, datafolder,
            fexec, pyexecsaw2d, pyexecsaw3d, ex, setMax, result);
-        execSAW.setSawClick(datafolder, fexec, runSAW, runCBMC, getSAWScene, this.getIsovalikkoSAW(),
+        execSAW.setSawClick(datafolder, fexec, runSAW, runMCSAW, getSAWScene, this.getIsovalikkoSAW(),
             this.getSawPane(), this.getTextAreaSAW(), plotSAW, closeNappiSAW, menuNappiSAW, helpNappiSAW,
             sliderCee);
 

@@ -93,14 +93,14 @@ class GetButtons extends HelpText {
             case "SAW":
                 button = this.getLanguage().equals("fin") ? new Button("AJA SAW") : new Button("RUN SAW");
                 button.setStyle("-fx-background-color: Red");
-                button.setMinWidth(this.getCbmcButtonWidth());
-                button.setMaxWidth(this.getCbmcButtonWidth());
+                button.setMinWidth(this.getMcsawButtonWidth());
+                button.setMaxWidth(this.getMcsawButtonWidth());
                 break;
-            case "CBMC":
-                button = this.getLanguage().equals("fin") ? new Button("AJA CBMC") : new Button("RUN CBMC");
+            case "MCSAW":
+                button = this.getLanguage().equals("fin") ? new Button("AJA MC-SAW") : new Button("RUN MC-SAW");
                 button.setStyle("-fx-background-color: Red");
-                button.setMinWidth(this.getCbmcButtonWidth());
-                button.setMaxWidth(this.getCbmcButtonWidth());
+                button.setMinWidth(this.getMcsawButtonWidth());
+                button.setMaxWidth(this.getMcsawButtonWidth());
                 break;
             case "ANIM":
                 button = this.getLanguage().equals("fin") ? new Button("ANIMAATIO") : new Button("ANIMATION");
@@ -624,7 +624,7 @@ class GetButtons extends HelpText {
      * @return the buttonWidth
      */
     @Contract(pure = true)
-    private double getCbmcButtonWidth() { return 100.0 / Screen.getMainScreen().getRenderScale(); }
+    private double getMcsawButtonWidth() { return 100.0 / Screen.getMainScreen().getRenderScale(); }
 
     /**
      * @return the stage

@@ -49,7 +49,6 @@ class Execution {
      * @param pyexec1d Python executable "plot1d.py"
      * @param pyexec2d Python executable "plot2d.py"
      * @param pyexec3d Python executable "plot3d.py"
-     * @param frame JFrame for image
      * @param data instance of Data class
      * @param vars user data from GUI
      */
@@ -170,7 +169,6 @@ class Execution {
      * @param pyexecdiff2d Python executable "plotdiff2d.py"
      * @param pyexecdiff3d Python executable "plotdiff3d.py"
      * @param valikkoDiff VBox component in GUI to disable during run
-     * @param frame JFrame for image
      * @param data instance of Data class
      * @param vars user data from GUI
      */
@@ -251,12 +249,10 @@ class Execution {
      * @param path datapath "C:/RWDATA"
      * @param fexec Fortran executable "walk.exe"
      * @param pyexecrms Python executable "plotrms.py"
-     * @param frame JFrame for image
      * @param data instance of Data class
      * @param vars user data from GUI
      */
-    void executeRms(File folder, String path, String fexec,
-                    String pyexecrms, Data data, String[] vars) {
+    void executeRms(File folder, String path, String fexec, String pyexecrms, Data data, String[] vars) {
         /*
         * FROM SCENEREALTIMERMS
         * vars from user:
@@ -329,8 +325,7 @@ class Execution {
      * @param folder datafolder "C:/RWDATA"
      * @param path datapath "C:/RWDATA"
      * @param fexec Fortran executable "walk.exe"
-     * @param pyexecrms Python executable "plotrms.py"
-     * @param frame JFrame for image
+     * @param pyexec1d Python executable "plot1d.py"
      * @param data instance of Data class
      * @param vars user data from GUI via
      */
@@ -403,12 +398,13 @@ class Execution {
      * @param fexec Fortran executable "walk.exe"
      * @param pyexecsaw2d Python executable "plotsaw2d.py"
      * @param pyexecsaw3d Python executable "plotsaw3d.py"
-     * @param frame JFrame for image
+     * @param valikkoSAW VBox component in GUI to disable during run
      * @param data instance of Data class
      * @param vars user data from GUI via
+     * @param ismcsaw whether is mc saw or saw
      */
     boolean executeSAW(File folder, String path, String fexec, String pyexecsaw2d,
-                    String pyexecsaw3d, VBox valikkoSAW, Data data, String[] vars, boolean iscbmc) {
+                    String pyexecsaw3d, VBox valikkoSAW, Data data, String[] vars, boolean ismcsaw) {
         /*
          * FROM SCENEPATHTRACING
          * vars from user:
@@ -430,7 +426,7 @@ class Execution {
 
         Boolean result = false;
         try {
-            result = data.createData(folder, fexec, iscbmc, true);
+            result = data.createData(folder, fexec, ismcsaw, true);
         } catch (Throwable ex) {
             System.out.println(ex.getMessage());
         }
@@ -440,7 +436,7 @@ class Execution {
         int dimension = Integer.parseInt(vars[4]);
 
         String dataPath;
-        if (iscbmc) dataPath = "cbmc_" + dimension + "D_" + steps + "S.xy";
+        if (ismcsaw) dataPath = "mcsaw_" + dimension + "D_" + steps + "S.xy";
         else dataPath = "saw_" + dimension + "D.xy";
 
         File pdfFile = new File(path + "/jpyplotSAW" + dimension + "D.pdf");
@@ -493,6 +489,7 @@ class Execution {
      * @param steps number of steps from vars
      * @param dim dimension from vars
      * @param fac time factor
+     * @param dpi image resolution
      * @return pdf image file
      */
     BufferedImage createPdf(File folder, String[] command, File pdfFile, int particles, int steps, int dim, int fac, int dpi) {
