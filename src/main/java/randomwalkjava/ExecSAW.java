@@ -34,8 +34,6 @@ class ExecSAW extends Data {
     private List <Double> expd_runs;
     private List<Double> rms_runs;
     private List <Double> saw_lengths;
-    private List<Double> mcsaw_mu;
-    private List<Double> mcsaw_mu2;
     private List <Integer> xAxis;
     private List <Integer> xhistAxis;
     private List <Double> yhistAxis;
@@ -77,7 +75,7 @@ class ExecSAW extends Data {
                 if ( !sawScene.isRunning())
                     return;
 
-                sawScene.refresh(folder, executable, getFirst(), getSawLengths(), getMcsawMu(), getMcsawMu2(), getSawExpd(), getSawRms(),
+                sawScene.refresh(folder, executable, getFirst(), getSawLengths(), getSawExpd(), getSawRms(),
                     getExpdRuns(), getRmsRuns(), getXAxis(), getXhistAxis(), isSaw(), ceeSlider);
 
                 if (getFirst()) setFirst(false);
@@ -150,7 +148,7 @@ class ExecSAW extends Data {
                 else for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*10));
 
                 sawScene.getFxplot().setS1Data(this.getXAxis(), this.getExpdRuns(), dim);
-                sawScene.getFxplot().setS2Data(this.getXAxis(), this.getRmsRuns(), false);
+                sawScene.getFxplot().setS2Data(this.getXAxis(), this.getRmsRuns());
                 sawScene.getFxplot().setS3Data(labelMap, this.getXhistAxis(), this.getYhistAxis());
 
                 sawScene.start();
@@ -214,12 +212,6 @@ class ExecSAW extends Data {
                 this.setSawLengths(new ArrayList<>());
                 for (int x = 0; x < 10; x++) this.getSawLengths().add(0.0);
 
-                this.setMcsawMu(new ArrayList<>());
-                for (int x = 0; x < 10; x++) this.getMcsawMu().add(0.0);
-
-                this.setMcsawMu2(new ArrayList<>());
-                for (int x = 0; x < 10; x++) this.getMcsawMu2().add(0.0);
-
                 this.setXAxis(new ArrayList<>());
                 for (int x = 0; x < 10; x++) this.getXAxis().add(x);
 
@@ -245,7 +237,7 @@ class ExecSAW extends Data {
                 }
 
                 sawScene.getFxplot().setS1Data(this.getXAxis(), this.getExpdRuns(), dim);
-                sawScene.getFxplot().setS2Data(this.getXAxis(), this.getRmsRuns(), true);
+                sawScene.getFxplot().setS2Data(this.getXAxis(), this.getRmsRuns());
                 sawScene.getFxplot().setS3Data(labelMap, this.getXhistAxis(), this.getYhistAxis());
 
                 sawScene.start();
@@ -397,28 +389,6 @@ class ExecSAW extends Data {
      * @param saw_lengths the saw_lengths to set
      */
     private void setSawLengths(List<Double> saw_lengths) { this.saw_lengths = saw_lengths; }
-
-    /**
-     * @return the mcsaw_mu
-     */
-    @Contract(pure = true)
-    private List<Double> getMcsawMu() { return this.mcsaw_mu; }
-
-    /**
-     * @param mcsaw_mu the mcsaw_mu to set
-     */
-    private void setMcsawMu(List<Double> mcsaw_mu) { this.mcsaw_mu = mcsaw_mu; }
-
-    /**
-     * @return the mcsaw_mu2
-     */
-    @Contract(pure = true)
-    private List<Double> getMcsawMu2() { return this.mcsaw_mu2; }
-
-    /**
-     * @param mcsaw_mu2 the mcsaw_mu2 to set
-     */
-    private void setMcsawMu2(List<Double> mcsaw_mu2) { this.mcsaw_mu2 = mcsaw_mu2; }
 
     /**
      * @return the saw_expd

@@ -47,11 +47,7 @@ class SceneRealTimeSaw extends Data {
     private long runs;
     private long failed;
     private double bigg_dist;
-    private double mu1;
-    private double mu2;
     private List<Double> saw_lengths;
-    private List<Double> mcsaw_mu;
-    private List<Double> mcsaw_mu2;
     private List<Double> saw_expd;
     private List<Double> saw_rms;
     private List<Double> expd_runs;
@@ -99,7 +95,6 @@ class SceneRealTimeSaw extends Data {
      * @param executable Fortran executable "walk.exe"
      * @param firstdata true if is first run
      * @param saw_lengths data container
-     * @param mcsaw_mu data container
      * @param saw_expd data container
      * @param saw_rms data container
      * @param expd_runs data container
@@ -109,8 +104,8 @@ class SceneRealTimeSaw extends Data {
      * @param issaw saw or mc-saw
      * @param ceeSlider Slider
      */
-    void refresh(File folder, String executable, boolean firstdata, List<Double> saw_lengths, List<Double> mcsaw_mu,
-                 List<Double> mcsaw_mu2, List<Double> saw_expd, List<Double> saw_rms, List<Double> expd_runs, List<Double> rms_runs,
+    void refresh(File folder, String executable, boolean firstdata, List<Double> saw_lengths,
+                 List<Double> saw_expd, List<Double> saw_rms, List<Double> expd_runs, List<Double> rms_runs,
                  List<Integer> xAxis, List<Integer> xHistAxis, boolean issaw, Slider ceeSlider) {
 
         this.setFirstData(firstdata);
@@ -120,10 +115,6 @@ class SceneRealTimeSaw extends Data {
         if (this.isFirstData()) {
             this.setRuns(0);
             this.setFailed(0);
-            if (!issaw) {
-                this.setMu1(0.0);
-                this.setMu2(0.0);
-            }
             this.setCeeSlider(ceeSlider);
             this.setBiggDist(0.0);
             this.setXAxis(xAxis);
@@ -133,8 +124,6 @@ class SceneRealTimeSaw extends Data {
             this.setExpdRuns(expd_runs);
             this.setRmsRuns(rms_runs);
             this.setSawLengths(saw_lengths);
-            this.setMcsawMu(mcsaw_mu);
-            this.setMcsawMu2(mcsaw_mu2);
             this.setGreatestY(new double[10]);
             for (int x = 0; x < 10; x++) this.getGreatestY()[x] = 0.0;
             this.setGreatestY2(0.0);
@@ -229,20 +218,10 @@ class SceneRealTimeSaw extends Data {
                      * CONNECTIVE CONSTANT µ
                      */
                     if (!this.isSaw()) {
-                        this.setMu1(this.getMu1() + 2.0*Math.pow(this.getRuns()+1, 1.0/this.getSteps()));
-                        this.setMu2(this.getMu2() + 2.0*Math.pow((this.getRuns()+1)/(this.getAa()
-                            * Math.pow(this.getSteps(), this.getGam() - 1.0)), 1.0/this.getSteps()));
-
-                        if (this.getRuns() > 9) this.getMcsawMu().add(this.getMu1()/(this.getRuns() + 1));
-                        else this.getMcsawMu().set((int) this.getRuns(), this.getMu1()/(this.getRuns() + 1));
-
-                        if (this.getRuns() > 9) this.getMcsawMu2().add(this.getMu2()/(this.getRuns() + 1));
-                        else this.getMcsawMu2().set((int) this.getRuns(), this.getMu2()/(this.getRuns() + 1));
-
                         // FIRST GRAPH TITLE
                         this.getFxplot().setS1McsawTitle(this.getDim(), 100.0 - ( (double) this.getFailed() / (double) (this.getFailed() + this.getRuns() + 1) * 100.0) );
                         // SECOND GRAPH TITLE
-                        this.getFxplot().setS2SawTitle(expdruns, rmsruns, this.getMu1()/(this.getRuns() + 1), this.getMu2()/(this.getRuns() + 1));
+                        this.getFxplot().setS2SawTitle(expdruns, rmsruns);
                     }
 
                     /*
@@ -296,10 +275,6 @@ class SceneRealTimeSaw extends Data {
                     this.getFxplot().updateS2Data( "<Rexp>",this.getXAxis(), this.getExpdRuns() );
                     this.getFxplot().updateS2Data( "<Rrms>",this.getXAxis(), this.getRmsRuns() );
                     this.getFxplot().updateS2Data( this.getLanguage().equals("fin") ? "etäisyys" : "distance",this.getXAxis(), this.getSawLengths() );
-                    if (!this.isSaw()) {
-                        this.getFxplot().updateS2Data( this.getLanguage().equals("fin") ? "µ" : "µ",this.getXAxis(), this.getMcsawMu() );
-                        this.getFxplot().updateS2Data( this.getLanguage().equals("fin") ? "µ2" : "µ2",this.getXAxis(), this.getMcsawMu2() );
-                    }
 
                     this.getFxplot().updateS3Data( this.getXhistAxis(), calcHistogram(this.getSawLengths(), this.getDim(), this.isSaw(), this.getSteps()) );
 
@@ -749,40 +724,6 @@ class SceneRealTimeSaw extends Data {
     private void setSawLengths(List<Double> saw_lengths) { this.saw_lengths = saw_lengths; }
 
     /**
-     * @return the gamma
-     */
-    @Contract(pure = true)
-    private double getGam() { return this.getDim() == 2 ? 43.0 / 32.0 : 7.0 / 6.0; }
-
-    /**
-     * @return the aa
-     */
-    @Contract(pure = true)
-    private double getAa() { return this.getDim() == 2 ? 1.1771 : 1.205; }
-
-    /**
-     * @return the mcsaw_mu
-     */
-    @Contract(pure = true)
-    private List <Double> getMcsawMu() { return this.mcsaw_mu; }
-
-    /**
-     * @param mcsaw_mu the mcsaw_mu to set
-     */
-    private void setMcsawMu(List<Double> mcsaw_mu) { this.mcsaw_mu = mcsaw_mu; }
-
-    /**
-     * @return the mcsaw_mu2
-     */
-    @Contract(pure = true)
-    private List <Double> getMcsawMu2() { return this.mcsaw_mu2; }
-
-    /**
-     * @param mcsaw_mu2 the mcsaw_mu2 to set
-     */
-    private void setMcsawMu2(List<Double> mcsaw_mu2) { this.mcsaw_mu2 = mcsaw_mu2; }
-
-    /**
      * @return the saw_expd
      */
     @Contract(pure = true)
@@ -924,28 +865,6 @@ class SceneRealTimeSaw extends Data {
      * @param fxplot the fxplot to set
      */
     void setFxplot( FXPlot fxplot ) { this.fxplot = fxplot; }
-
-    /**
-     * @return the mu1
-     */
-    @Contract(pure = true)
-    private double getMu1() { return this.mu1; }
-
-    /**
-     * mu1 to set
-     */
-    private void setMu1(double mu1) { this.mu1 = mu1; }
-
-    /**
-     * @return the mu2
-     */
-    @Contract(pure = true)
-    private double getMu2() { return this.mu2; }
-
-    /**
-     * mu to set
-     */
-    private void setMu2(double mu2) { this.mu2 = mu2; }
 
     /**
      * @return the issaw

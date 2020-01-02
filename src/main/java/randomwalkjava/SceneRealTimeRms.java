@@ -163,8 +163,8 @@ class SceneRealTimeRms extends Data {
                 this.setMincount(-this.getExpected()*2.0);
                 this.setMaxcount(this.getExpected()*2.0);
             } else if ( this.isDiffPlot() ){
-                this.setMincount(-this.getExpected()*10.0);
-                this.setMaxcount(this.getExpected()*10.0);
+                this.setMincount(-this.getExpected());
+                this.setMaxcount(this.getExpected());
             }
 
             if (this.isStandPlot()) standdiff = "stand";
@@ -343,6 +343,7 @@ class SceneRealTimeRms extends Data {
                          */
                         double dataVal;
                         try {
+                            // Fortran input starts with "+", therefore [1] and not [0] which is a plus-sign
                             dataVal = Double.parseDouble(line.split("(\\s+)")[1].trim());
                             this.getPlotData()[j] = dataVal;
                             this.setBiggDist(Math.max(this.getBiggDist(), Math.sqrt(dataVal)));
@@ -378,7 +379,7 @@ class SceneRealTimeRms extends Data {
                             for (int m = 0; m < this.getNumParts(); m++)
                                 this.setSumParts(this.getSumParts() + this.getSum()[m]);
 
-                            double rrms_walk = Math.sqrt(this.getSumParts()/(this.getNumParts()*(this.getRuns())));
+                            double rrms_walk = Math.sqrt(this.getSumParts()/(this.getNumParts()*this.getRuns()));
                             this.setRms_sum(this.getRms_sum() + rrms_walk);
                             double avg = this.getRms_sum()/(this.getRuns());
                             this.setSigSeed(this.getSigSeed() + (rrms_walk - avg));
@@ -412,11 +413,9 @@ class SceneRealTimeRms extends Data {
                                     this.setGreatestDN(ynorm > this.getGreatestDN() ? ynorm : this.getGreatestDN());
                                     this.getFxplot().setNMaxY(this.getGreatestDN());
                                 } else if (this.isDiffPlot()) {
-                                    double diff = Math.pow(rrms_walk, 2.0) / (2.0 * this.getDim());// * this.getSteps());//
-                                    double sigma2 = 2.0 * diff * this.getSteps();
+                                    double sigma2 = this.getRuns()/this.getSteps() * Math.pow(rrms_walk, 2.0);
                                     ynorm = 1.0 / Math.sqrt(2.0 * Math.PI * sigma2)
                                         * Math.exp(-Math.pow(this.getXnormAxis()[h], 2.0) / (2.0 * sigma2));
-
                                     if (ynorm > this.getGreatestDN()) this.setGreatestDN(ynorm);
                                     this.getFxplot().setNMaxY(this.getGreatestDN());
                                 }

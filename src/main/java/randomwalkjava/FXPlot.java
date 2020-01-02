@@ -52,7 +52,6 @@ class FXPlot {
     //private NumberFormat formatter;
     private NumberFormat eformatter;
     private NumberFormat twodecformatter;
-    private NumberFormat threedecformatter;
 
     /**
      * method for creating a plotting element
@@ -69,7 +68,6 @@ class FXPlot {
         //this.eformatter = new DecimalFormat("#.#E0");
         this.eformatter = new DecimalFormat("0.0E0");
         this.twodecformatter = new DecimalFormat("0.00");
-        this.threedecformatter = new DecimalFormat("0.0000");
 
         switch (which) {
             case "Walks&norm":
@@ -512,24 +510,17 @@ class FXPlot {
      * @param x x-axis data
      * @param y y-axis data
      */
-    void setS2Data(List<Integer> x, List<Double> y, boolean ismcsaw) { // u208#=subscript, u00B5=mu
+    void setS2Data(List<Integer> x, List<Double> y) {
         BasicStroke[] BasicStroke = new BasicStroke[]{
             new BasicStroke( 2.5f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f ),
             new BasicStroke( 2.0f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f ),
-            new BasicStroke( 1.5f, CAP_SQUARE, JOIN_MITER, 10.0f, new float[]{5, 5}, 2.0f ),
             new BasicStroke( 1.5f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f )
         };
         this.getCalcChartS2().addSeries("<Rexp>", x, y).setLineStyle(BasicStroke[0]).setLineColor(Color.red);
         this.getCalcChartS2().addSeries("<Rrms>", x, y).setLineStyle(BasicStroke[1]).setLineColor(Color.blue);
-        if (ismcsaw) {
-            this.getCalcChartS2().addSeries(this.getLanguage().equals("fin") ? "\u00B5" :"\u00B5", x, y)
-                .setLineStyle(BasicStroke[2]).setLineColor(Color.magenta);
-            this.getCalcChartS2().addSeries(this.getLanguage().equals("fin") ? "\u00B52" :"\u00B52", x, y)
-                .setLineStyle(BasicStroke[2]).setLineColor(Color.green);
-        }
         this.getFrame().getContentPane().add(this.getChartPanelS2(),1);
         this.getCalcChartS2().addSeries(this.getLanguage().equals("fin") ? "etäisyys" :"distance", x, y)
-            .setLineStyle(BasicStroke[3]).setLineColor(Color.orange);
+            .setLineStyle(BasicStroke[2]).setLineColor(Color.orange);
     }
 
     /**
@@ -728,13 +719,10 @@ class FXPlot {
     /**
      * @param rexpd the expected value
      * @param rrms the root mean squared distance
-     * @param mu1 the growth factor (connective constant)
-     * @param mu2 the growth factor (connective constant)
      */
-    void setS2SawTitle(double rexpd, double rrms, double mu1, double mu2) { // u03BC=mu, u208#=subscript
+    void setS2SawTitle(double rexpd, double rrms) {
         this.getCalcChartS2().setTitle(
-            "<Rexp>="+this.twodecformatter.format(rexpd)+", <Rrms>="+this.twodecformatter.format(rrms)+
-                ", \u03BC\u2081="+this.threedecformatter.format(mu1)+", \u03BC\u2082="+this.threedecformatter.format(mu2));
+            "<Rexp>="+this.twodecformatter.format(rexpd)+", <Rrms>="+this.twodecformatter.format(rrms));
         this.getFrame().revalidate();
         this.getFrame().repaint();
         this.getFrame().pack();
