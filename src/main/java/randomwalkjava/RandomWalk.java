@@ -348,21 +348,21 @@ public class RandomWalk extends Application {
 
         // REAL TIME SAW COMPONENTS
         // SLIDER C
-        final Label labcee = new Label("Korjauskerroin C :");
-        final Label labelcee = new Label();
-        Slider sliderCee = new Slider(1.0, 10.0, 1.0);
-        sliderCee.setOrientation(Orientation.HORIZONTAL);
-        sliderCee.setMaxSize(this.getSawCompWidth(), this.getSawCompHeight());
-        sliderCee.setShowTickLabels(true);
-        sliderCee.setMinorTickCount(9);
-        sliderCee.setMajorTickUnit(1.0);
-        sliderCee.setShowTickMarks(true);
-        sliderCee.setSnapToTicks(true);
-        labelcee.textProperty().bind(
-            Bindings.format( "%.1f", sliderCee.valueProperty() )
+        final Label labaa = new Label("Korjauskerroin C :");
+        final Label labelaa = new Label();
+        Slider sliderAa = new Slider(1.0, 10.0, 1.0);
+        sliderAa.setOrientation(Orientation.HORIZONTAL);
+        sliderAa.setMaxSize(this.getSawCompWidth(), this.getSawCompHeight());
+        sliderAa.setShowTickLabels(true);
+        sliderAa.setMinorTickCount(9);
+        sliderAa.setMajorTickUnit(1.0);
+        sliderAa.setShowTickMarks(true);
+        sliderAa.setSnapToTicks(true);
+        labelaa.textProperty().bind(
+            Bindings.format( "%.1f", sliderAa.valueProperty() )
         );
         VBox sliderBox = new VBox(5);
-        sliderBox.getChildren().addAll(labcee, labelcee, sliderCee);
+        sliderBox.getChildren().addAll(labaa, labelaa, sliderAa);
 
         // MATH CARD
         Image imgSawFI = new Image("/sawFI.png");
@@ -449,7 +449,7 @@ public class RandomWalk extends Application {
          */
         this.getValikkoSAW().getChildren().addAll(
             menuNappiSAW, helpNappiSAW, getSAWScene.getSceneRealTimeSaw(
-                sliderBox, sliderCee, this.getSawPane(), runSAW, runMCSAW),
+                sliderBox, sliderAa, this.getSawPane(), runSAW, runMCSAW),
             sawButtonBox, plotSAW, maxBox, closeNappiSAW);
         this.getIsovalikkoSAW().getChildren().addAll(this.getValikkoSAW(), this.getSawPane());
         BorderPane asetteluSAW = new BorderPane();
@@ -560,7 +560,7 @@ public class RandomWalk extends Application {
            fexec, pyexecsaw2d, pyexecsaw3d, ex, setMax, result);
         execSAW.setSawClick(datafolder, fexec, runSAW, runMCSAW, getSAWScene, this.getIsovalikkoSAW(),
             this.getSawPane(), this.getTextAreaSAW(), plotSAW, closeNappiSAW, menuNappiSAW, helpNappiSAW,
-            sliderCee);
+            sliderAa);
 
         /*
         * CLOSE STAGE

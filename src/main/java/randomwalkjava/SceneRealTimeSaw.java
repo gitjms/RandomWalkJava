@@ -61,7 +61,7 @@ class SceneRealTimeSaw extends Data {
     private ToggleButton setDim2;
     private ToggleButton setDim3;
     private HBox dim_choice;
-    private Slider ceeSlider;
+    private Slider aaSlider;
 
     /**
      * main class gets vars via this
@@ -102,11 +102,11 @@ class SceneRealTimeSaw extends Data {
      * @param xAxis data container
      * @param xHistAxis data container
      * @param issaw saw or mc-saw
-     * @param ceeSlider Slider
+     * @param aaSlider Slider
      */
     void refresh(File folder, String executable, boolean firstdata, List<Double> saw_lengths,
                  List<Double> saw_expd, List<Double> saw_rms, List<Double> expd_runs, List<Double> rms_runs,
-                 List<Integer> xAxis, List<Integer> xHistAxis, boolean issaw, Slider ceeSlider) {
+                 List<Integer> xAxis, List<Integer> xHistAxis, boolean issaw, Slider aaSlider) {
 
         this.setFirstData(firstdata);
         this.dim(Integer.parseInt(this.vars[4]));
@@ -115,11 +115,11 @@ class SceneRealTimeSaw extends Data {
         if (this.isFirstData()) {
             this.setRuns(0);
             this.setFailed(0);
-            this.setCeeSlider(ceeSlider);
             this.setBiggDist(0.0);
             this.setXAxis(xAxis);
             this.setXhistAxis(xHistAxis);
             this.setSawExpd(saw_expd);
+            this.setAaSlider(aaSlider);
             this.setSawRms(saw_rms);
             this.setExpdRuns(expd_runs);
             this.setRmsRuns(rms_runs);
@@ -162,10 +162,10 @@ class SceneRealTimeSaw extends Data {
                         this.setSteps(Integer.parseInt(valStr[0].trim()));
 
                         /*
-                         * RMS EXPECTED SQRT(B)*S^NU (RED LINE)
+                         * RMS EXPECTED SQRT(A)*S^NU (RED LINE)
                          */
                         double rms_expd = Double.parseDouble(valStr[1].trim());
-                        this.getSawExpd().add(this.getCeeSlider().getValue() * Math.sqrt(rms_expd));
+                        this.getSawExpd().add(this.getAaSlider().getValue() * Math.sqrt(rms_expd));
 
                         /*
                          * RMS <R^2> (BLUE LINE)
@@ -329,7 +329,7 @@ class SceneRealTimeSaw extends Data {
                 else if (d <= 18.0) bin18++;
                 else if (d <= 19.0) bin19++;
                 else if (d <= 20.0) bin20++;
-            } else if ((dim == 2 && steps >= 30 && steps < 100) || (dim == 3 && steps >= 30 && steps < 200 && !issaw)) {
+            } else if (dim == 2 && issaw || dim == 2 && steps < 100 || dim == 3 && steps >= 30 && steps < 200 && !issaw) {
                 if (d <= 3.0) bin1++;
                 else if (d <= 6.0) bin2++;
                 else if (d <= 9.0) bin3++;
@@ -421,9 +421,9 @@ class SceneRealTimeSaw extends Data {
      * Create GUI for Real Time Rms
      * @return REAL TIME RMS SCENE
      */
-    Parent getSceneRealTimeSaw(VBox sliderBox, @NotNull Slider ceeSlider, Pane pane, Button runSAW,
+    Parent getSceneRealTimeSaw(VBox sliderBox, @NotNull Slider aaSlider, Pane pane, Button runSAW,
                                @NotNull Button runMCSAW){
-        this.setCeeSlider(ceeSlider);
+        this.setAaSlider(aaSlider);
         GridPane asettelu = new GridPane();
         asettelu.setMaxWidth(getPaneWidth());
         asettelu.setVgap(4);
@@ -463,20 +463,37 @@ class SceneRealTimeSaw extends Data {
                 runSAW.setDisable(true);
                 runMCSAW.setDisable(false);
                 this.setIsSaw(false);
+                this.getAaSlider().setValue(this.getDim() == 2 ?
+                    Math.log(Integer.parseInt(setNumSteps.getText().trim())) :
+                    Math.log(Integer.parseInt(setNumSteps.getText().trim())) - 1.0);
+                getComponents.getPaneView(pane, this.getLanguage().equals("fin")
+                    ? ivSawFI_corr : ivSawEN_corr, this.getSawTextWidth(), this.getTextHeight());
             } else {
                 this.vars[3] = "0";
                 runSAW.setDisable(false);
                 runMCSAW.setDisable(true);
                 this.setIsSaw(true);
+                this.getAaSlider().setValue(1.0);
+                getComponents.getPaneView(pane, this.getLanguage().equals("fin")
+                    ? ivSawFI : ivSawEN, this.getSawTextWidth(), this.getTextHeight());
             }
         });
         runMCSAW.setDisable(true);
 
-        this.getCeeSlider().setOnMouseDragged(e -> {
-            if (this.getCeeSlider().getValue() > 1.0) {
+        this.getAaSlider().setOnMouseDragged(e -> {
+            if (this.getAaSlider().getValue() > 1.0) {
                 getComponents.getPaneView(pane, this.getLanguage().equals("fin")
                     ? ivSawFI_corr : ivSawEN_corr, this.getSawTextWidth(), this.getTextHeight());
-            } else if (this.getCeeSlider().getValue() == 1.0) {
+            } else if (this.getAaSlider().getValue() == 1.0) {
+                getComponents.getPaneView(pane, this.getLanguage().equals("fin")
+                    ? ivSawFI : ivSawEN, this.getSawTextWidth(), this.getTextHeight());
+            }
+        });
+        this.getAaSlider().setOnMouseClicked(e -> {
+            if (this.getAaSlider().getValue() > 1.0) {
+                getComponents.getPaneView(pane, this.getLanguage().equals("fin")
+                    ? ivSawFI_corr : ivSawEN_corr, this.getSawTextWidth(), this.getTextHeight());
+            } else if (this.getAaSlider().getValue() == 1.0) {
                 getComponents.getPaneView(pane, this.getLanguage().equals("fin")
                     ? ivSawFI : ivSawEN, this.getSawTextWidth(), this.getTextHeight());
             }
@@ -503,20 +520,30 @@ class SceneRealTimeSaw extends Data {
         this.setDim2.setOnMouseClicked(f -> {
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.getCeeSlider().setMax(10.0);
-            this.getCeeSlider().setValue(1.0);
-            this.getCeeSlider().setSnapToTicks(true);
+            if (setNumSteps.getText().trim().equals("")) {
+                this.getAaSlider().setValue(1.0);
+                getComponents.getPaneView(pane, this.getLanguage().equals("fin")
+                    ? ivSawFI : ivSawEN, this.getSawTextWidth(), this.getTextHeight());
+            } else {
+                this.getAaSlider().setValue(Math.log(Integer.parseInt(setNumSteps.getText().trim())));
+                getComponents.getPaneView(pane, this.getLanguage().equals("fin")
+                    ? ivSawFI_corr : ivSawEN_corr, this.getSawTextWidth(), this.getTextHeight());
+            }
             this.vars[4] = "2";
             this.dim(2);
         });
         this.setDim3.setOnMouseClicked(f -> {
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.getCeeSlider().setMax(30.0);
-            this.getCeeSlider().setMinorTickCount(2);
-            this.getCeeSlider().setMajorTickUnit(14.0);
-            this.getCeeSlider().setValue(1.0);
-            this.getCeeSlider().setSnapToTicks(false);
+            if (setNumSteps.getText().trim().equals("")) {
+                this.getAaSlider().setValue(1.0);
+                getComponents.getPaneView(pane, this.getLanguage().equals("fin")
+                    ? ivSawFI : ivSawEN, this.getSawTextWidth(), this.getTextHeight());
+            } else {
+                this.getAaSlider().setValue(Math.log(Integer.parseInt(setNumSteps.getText().trim())) - 1.0);
+                getComponents.getPaneView(pane, this.getLanguage().equals("fin")
+                    ? ivSawFI_corr : ivSawEN_corr, this.getSawTextWidth(), this.getTextHeight());
+            }
             this.vars[4] = "3";
             this.dim(3);
         });
@@ -647,15 +674,15 @@ class SceneRealTimeSaw extends Data {
     private List<Integer> getXAxis() { return this.xAxis; }
 
     /**
-     * @param ceeSlider to set
+     * @param aaSlider to set
      */
-    private void setCeeSlider(Slider ceeSlider) { this.ceeSlider = ceeSlider; }
+    private void setAaSlider(Slider aaSlider) { this.aaSlider = aaSlider; }
 
     /**
-     * @return ceeSlider
+     * @return aaSlider
      */
     @Contract(pure = true)
-    private Slider getCeeSlider() { return this.ceeSlider; }
+    private Slider getAaSlider() { return this.aaSlider; }
 
     /**
      * @param xhistAxis x-axis data array for walk plot to set

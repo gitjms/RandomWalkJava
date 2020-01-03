@@ -1,21 +1,18 @@
 package randomwalkjava;
 
-import javafx.animation.AnimationTimer;
+import javafx.animation.*;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
+import javafx.util.Duration;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Jari Sunnari
@@ -37,7 +34,6 @@ class ExecSAW extends Data {
     private List <Integer> xAxis;
     private List <Integer> xhistAxis;
     private List <Double> yhistAxis;
-    private int prevAlign;
 
     /**
      * Initiating class
@@ -50,7 +46,7 @@ class ExecSAW extends Data {
     void setSawClick(File folder, String executable, @NotNull Button execSAW, @NotNull Button execMCSAW,
                      SceneRealTimeSaw sawScene, HBox isovalikkoSaw, Pane sawPane, TextArea sawText,
                      Button plotSAW, Button closeNappiSAW, Button menuNappiSAW, Button helpNappiSAW,
-                     Slider ceeSlider) {
+                     Slider aaSlider) {
 
         new AnimationTimer() {
             private long prevTime = 0;
@@ -76,7 +72,7 @@ class ExecSAW extends Data {
                     return;
 
                 sawScene.refresh(folder, executable, getFirst(), getSawLengths(), getSawExpd(), getSawRms(),
-                    getExpdRuns(), getRmsRuns(), getXAxis(), getXhistAxis(), isSaw(), ceeSlider);
+                    getExpdRuns(), getRmsRuns(), getXAxis(), getXhistAxis(), isSaw(), aaSlider);
 
                 if (getFirst()) setFirst(false);
 
@@ -269,13 +265,27 @@ class ExecSAW extends Data {
 
     void setPlotClick (@NotNull Button plotNappi, @NotNull Button execSAW, SceneRealTimeSaw sawScene, VBox valikkoSAW,
                        String datapath, File datafolder, String fexec, String pyexecsaw2d, String pyexecsaw3d,
-                       Execution ex, TextField setMax, TextFlow result){
+                       Execution ex, TextField setMax, @NotNull TextFlow result){
 
-        final Text noresult = new Text(this.getLanguage().equals("fin") ? "Ei tulosta" : "No result");
-        noresult.setFill(Color.RED);
-        noresult.setStyle("-fx-font-size: 20px;");
+        Label redlabel = new Label(this.getLanguage().equals("fin") ? "Ei tulosta" : "No result");
+        redlabel.setTextFill(Color.RED);
+        redlabel.setStyle("-fx-font-size: 20px;");
+
+        Label greenlabel = new Label();
+        greenlabel.setTextFill(Color.GREEN);
+        greenlabel.setStyle("-fx-font-size: 20px;");
+
+        FadeTransition fadegreen = new FadeTransition(Duration.seconds(0.2), greenlabel);
+        FadeTransition fadered = new FadeTransition(Duration.seconds(0.2), redlabel);
+        fadegreen.setFromValue(0.0);
+        fadegreen.setToValue(1.0);
+        fadegreen.setCycleCount(2);
+        fadered.setFromValue(0.0);
+        fadered.setToValue(1.0);
+        fadered.setCycleCount(2);
         String txt1 = this.getLanguage().equals("fin") ? " ajo" : " run";
         String txt2 = this.getLanguage().equals("fin") ? " ajoa" : " runs";
+        result.setTextAlignment(TextAlignment.CENTER);
 
         plotNappi.setOnMouseClicked((MouseEvent event) -> {
             result.getChildren().clear();
@@ -313,24 +323,14 @@ class ExecSAW extends Data {
             }
 
             if(!ok) {
-                if (this.getPrevAlign() == 1) {
-                    result.setTextAlignment(TextAlignment.CENTER);
-                    this.setPrevAlign(2);
-                } else if (this.getPrevAlign() == 2) {
-                    result.setTextAlignment(TextAlignment.RIGHT);
-                    this.setPrevAlign(3);
-                } else {
-                    result.setTextAlignment(TextAlignment.LEFT);
-                    this.setPrevAlign(1);
-                }
-                result.getChildren().add(noresult);
+                result.setVisible(true);
+                result.getChildren().add(redlabel);
+                fadered.play();
             } else {
-                Text resulttext = new Text(count + (count == 1 ? txt1 : txt2));
-                resulttext.setFill(Color.GREEN);
-                resulttext.setStyle("-fx-font-size: 20px;");
-                result.setTextAlignment(TextAlignment.LEFT);
-                this.setPrevAlign(3);
-                result.getChildren().add(resulttext);
+                result.setVisible(true);
+                greenlabel.setText(count + (count == 1 ? txt1 : txt2));
+                result.getChildren().add(greenlabel);
+                fadegreen.play();
             }
             valikkoSAW.setDisable(false);
         });
@@ -477,15 +477,4 @@ class ExecSAW extends Data {
      *  the first to set
      */
     private void setFirst(boolean first) { this.first = first; }
-
-    /**
-     * @return the prevAlign
-     */
-    @Contract(pure = true)
-    private int getPrevAlign() { return prevAlign; }
-
-    /**
-     *  the prevAlign to set
-     */
-    private void setPrevAlign(int prevAlign) { this.prevAlign = prevAlign; }
 }
