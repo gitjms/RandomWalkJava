@@ -39,8 +39,8 @@ class ExecCalc extends Data {
      * @param pyexecrms pyexec1Ddist
      * @param getDialogs getDialogs
      */
-    void setExecClick(@NotNull Button execNappi, SceneCalculation calcScene, Execution ex, File datafolder, String datapath,
-                      String fexec, String pyexecrms, GetDialogs getDialogs) {
+    void setExecClick(@NotNull Button execNappi, SceneCalculation calcScene, Execution ex, File datafolder,
+                      String datapath, String fexec, String pyexecrms, GetDialogs getDialogs) {
         execNappi.setOnMouseClicked((MouseEvent event) -> {
             calcScene.setSave("s");
             String[] vars = calcScene.getVars();
@@ -64,7 +64,7 @@ class ExecCalc extends Data {
             }
 
             if (Math.log10(steps) < 5) {
-                ex.executeRms(datafolder, datapath, fexec, pyexecrms, data, this.getVars());
+                ex.executeCalc(datafolder, datapath, fexec, pyexecrms, data, this.getVars());
             } else {
                 /*
                  * ALERT DIALOG
@@ -74,7 +74,7 @@ class ExecCalc extends Data {
                 alertRms.showAndWait();
 
                 if ( alertRms.getResult().getButtonData().equals(this.getButtonYES().getButtonData()) ) {
-                    ex.executeRms(datafolder, datapath, fexec, pyexecrms, data, this.getVars());
+                    ex.executeCalc(datafolder, datapath, fexec, pyexecrms, data, this.getVars());
                     alertRms.close();
                 } else alertRms.close();
             }

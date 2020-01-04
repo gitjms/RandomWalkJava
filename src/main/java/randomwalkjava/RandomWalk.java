@@ -481,8 +481,6 @@ public class RandomWalk extends Application {
         diffScene.getStylesheets().add("/Styles.css");
 
         Scene sawScene = new Scene(asetteluSAW, this.getStageWidth(),this.getStageHeight());
-            //this.getStageWidth() + (this.getAnimWidth()-this.getTextWidth()),
-            //this.getStageHeight() + (this.getSawHeight()-this.getTextHeight()));
         sawScene.getStylesheets().add("/Styles.css");
 
         /*

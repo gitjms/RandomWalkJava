@@ -252,7 +252,7 @@ class Execution {
      * @param data instance of Data class
      * @param vars user data from GUI
      */
-    void executeRms(File folder, String path, String fexec, String pyexecrms, Data data, String[] vars) {
+    void executeCalc(File folder, String path, String fexec, String pyexecrms, Data data, String[] vars) {
         /*
         * FROM SCENEREALTIMERMS
         * vars from user:

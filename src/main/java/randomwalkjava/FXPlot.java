@@ -49,7 +49,6 @@ class FXPlot {
     private XChartPanel<XYChart> chartPanelS2;
     private XChartPanel<CategoryChart> chartPanelS3;
     private JFrame frame;
-    //private NumberFormat formatter;
     private NumberFormat eformatter;
     private NumberFormat twodecformatter;
 

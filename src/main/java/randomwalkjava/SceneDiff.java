@@ -739,7 +739,6 @@ class SceneDiff extends Data {
                     this.getPiirturi().fillRoundRect(
                         (double) i + this.getDiffer(), (double) j + this.getDiffer(),
                         1.0, 1.0, 1.0, 1.0);
-                        //this.getDiam(), this.getDiam(), this.getDiam(), this.getDiam());
                 }
             }
         }
