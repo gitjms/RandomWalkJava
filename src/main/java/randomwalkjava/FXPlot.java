@@ -226,7 +226,7 @@ class FXPlot {
                 this.getCalcChartE().getStyler().setToolTipsEnabled(true);
 
                 this.getCalcChartD().getStyler().setLegendVisible(false);
-                this.getCalcChartD().setXAxisTitle(this.getLanguage().equals("fin") ? "Viive, t" : "Lag, t");
+                this.getCalcChartD().setXAxisTitle(this.getLanguage().equals("fin") ? "Viive, t [s]" : "Lag, t [s]");
                 this.getCalcChartD().setYAxisTitle(this.getLanguage().equals("fin")
                     ? "Diffuusiokerroin, D 1E-8 [cm\u00B2/s]" : "Diffusion Coefficient, D 1E-8 [cm\u00B2/s]");
                 this.getCalcChartD().getStyler().setMarkerSize(0);
@@ -245,7 +245,7 @@ class FXPlot {
                 this.getCalcChartD().getStyler().setToolTipsEnabled(true);
 
                 this.getCalcChartV().getStyler().setLegendVisible(false); // \u03B7=eta
-                this.getCalcChartV().setXAxisTitle(this.getLanguage().equals("fin") ? "Viive, t" : "Lag, t");
+                this.getCalcChartV().setXAxisTitle(this.getLanguage().equals("fin") ? "Viive, t [s]" : "Lag, t [s]");
                 this.getCalcChartV().getStyler().setMarkerSize(0);
                 this.getCalcChartV().getStyler().setXAxisDecimalPattern("0");
                 this.getCalcChartV().getStyler().setYAxisDecimalPattern("0.0");

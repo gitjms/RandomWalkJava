@@ -401,7 +401,7 @@ class SceneRealTimeRms extends Data {
                             this.getFxplot().setWMinY(this.getSmallest());
                             this.getFxplot().setWMaxY(this.getGreatest() + 1.0);
                             this.getFxplot().updateWData("Rrms", this.getXAxis(), this.getYAxis(), this.getExpected(), rrms_walk);
-                            this.getFxplot().updateWData(this.getLanguage().equals("fin") ? "\u221Aaskeleet" : "\u221Asteps",
+                            this.getFxplot().updateWData(this.getLanguage().equals("fin") ? "\u221AS" : "\u221AS",
                                 this.getXAxis(), this.getY2Axis(), this.getExpected(), rrms_walk);
 
                             double ynorm = 0.0;
