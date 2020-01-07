@@ -38,6 +38,7 @@ class SceneRealTimeSaw extends Data {
     private VBox dimcomps;
     private HBox comps;
     private boolean issaw;
+    private boolean iseff;
     private boolean running;
     private boolean runtimeRunning;
     private boolean firstdata;
@@ -52,6 +53,8 @@ class SceneRealTimeSaw extends Data {
     private List<Double> saw_rms;
     private List<Double> expd_runs;
     private List<Double> rms_runs;
+    private List<Double> eff_runs;
+    private List<Double> succ_runs;
     private List<Integer> xAxis;
     private List<Integer> xhistAxis;
     private double[] greatestY;
@@ -62,6 +65,7 @@ class SceneRealTimeSaw extends Data {
     private ToggleButton setDim3;
     private HBox dim_choice;
     private Slider aaSlider;
+    private double mc_sumweight;
 
     /**
      * main class gets vars via this
@@ -99,34 +103,45 @@ class SceneRealTimeSaw extends Data {
      * @param saw_rms data container
      * @param expd_runs data container
      * @param rms_runs data container
+     * @param eff_runs data container
+     * @param succ_runs data container
      * @param xAxis data container
      * @param xHistAxis data container
      * @param issaw saw or mc-saw
+     * @param iseff efficiency
      * @param aaSlider Slider
      */
     void refresh(File folder, String executable, boolean firstdata, List<Double> saw_lengths,
                  List<Double> saw_expd, List<Double> saw_rms, List<Double> expd_runs, List<Double> rms_runs,
-                 List<Integer> xAxis, List<Integer> xHistAxis, boolean issaw, Slider aaSlider) {
+                 List<Double> eff_runs, List<Double> succ_runs, List<Integer> xAxis, List<Integer> xHistAxis,
+                 boolean issaw, boolean iseff, Slider aaSlider) {
 
         this.setFirstData(firstdata);
         this.dim(Integer.parseInt(this.vars[4]));
         this.setSteps(0);
         this.setIsSaw(issaw);
+        this.setIsEff(iseff);
         if (this.isFirstData()) {
             this.setRuns(0);
             this.setFailed(0);
-            this.setBiggDist(0.0);
+            if (!this.isEff()) {
+                this.setBiggDist(0.0);
+                this.setXhistAxis(xHistAxis);
+                this.setSawExpd(saw_expd);
+                this.setAaSlider(aaSlider);
+                this.setSawRms(saw_rms);
+                this.setExpdRuns(expd_runs);
+                this.setSawLengths(saw_lengths);
+                this.setRmsRuns(rms_runs);
+                this.setGreatestY(new double[10]);
+                for (int x = 0; x < 10; x++) this.getGreatestY()[x] = 0.0;
+                this.setGreatestY2(0.0);
+            } else {
+                this.setEffRuns(eff_runs);
+                this.setSuccRuns(succ_runs);
+                this.setMCSumWeight(0.0);
+            }
             this.setXAxis(xAxis);
-            this.setXhistAxis(xHistAxis);
-            this.setSawExpd(saw_expd);
-            this.setAaSlider(aaSlider);
-            this.setSawRms(saw_rms);
-            this.setExpdRuns(expd_runs);
-            this.setRmsRuns(rms_runs);
-            this.setSawLengths(saw_lengths);
-            this.setGreatestY(new double[10]);
-            for (int x = 0; x < 10; x++) this.getGreatestY()[x] = 0.0;
-            this.setGreatestY2(0.0);
             this.getFxplot().setFrameVis();
         }
 
@@ -149,134 +164,187 @@ class SceneRealTimeSaw extends Data {
 
                 while ((line = input.readLine()) != null) {
                     if (line.isEmpty()) continue;
-                    if (!line.substring(0,1).matches("([0-9]|-|F)")) continue;
+                    if (!line.substring(0,1).matches("([0-9]|-|F|E)")) continue;
                     if (line.substring(0,1).equals("F")) {
                         this.setFailed(this.getFailed() + 1);
+                        if (this.isEff()) {
+                            if (this.getRuns() > 199) {
+                                this.getEffRuns().add(null);
+                                this.getSuccRuns().add(null);
+                            } else {
+                                this.getEffRuns().set((int) this.getRuns(), null);
+                                this.getSuccRuns().set((int) this.getRuns(), null);
+                            }
+                            this.setRuns(this.getRuns() + 1);
+                            if (this.getRuns() > 199) this.getXAxis().add((int) this.getRuns());
+                        }
                         continue;
                     }
                     String[] valStr = line.split("(\\s+)");
-                    try {
-                        /*
-                         * STEPS
-                         */
-                        this.setSteps(Integer.parseInt(valStr[0].trim()));
+                    if (!this.isEff()) {
+                        try {
+                            /*
+                             * STEPS
+                             */
+                            this.setSteps(Integer.parseInt(valStr[0].trim()));
 
+                            /*
+                             * RMS EXPECTED SQRT(A)*S^NU (RED LINE)
+                             */
+                            double rms_expd = Double.parseDouble(valStr[1].trim());
+                            this.getSawExpd().add(this.getAaSlider().getValue() * Math.sqrt(rms_expd));
+
+                            /*
+                             * RMS <R^2> (BLUE LINE)
+                             */
+                            double rms = Double.parseDouble(valStr[2].trim());
+                            this.getSawRms().add(rms);
+
+                            /*
+                             * LENGTH (YELLOW)
+                             */
+                            double length = Math.sqrt(Double.parseDouble(valStr[2].trim()));
+                            if (this.getRuns() > 9) this.getSawLengths().add(length);
+                            else this.getSawLengths().set((int) this.getRuns(), length);
+
+                            this.setBiggDist(length);
+
+                        } catch (NumberFormatException ignored) {
+                        }
+
+                        if (this.getRuns() > 9) this.getXAxis().add((int) this.getRuns());
+
+                    } else {
+
+                        try {
+                            this.setMCSumWeight( Double.parseDouble(valStr[1].trim()));
+                        } catch (NumberFormatException e) {
+                            continue;
+                        }
+                        if (this.getRuns() > 199) this.getXAxis().add((int) this.getRuns());
+
+                    }
+
+                    if (!this.isEff()) {
                         /*
-                         * RMS EXPECTED SQRT(A)*S^NU (RED LINE)
+                         * RMS EXPECTED A*S^NU (RED LINE)
                          */
-                        double rms_expd = Double.parseDouble(valStr[1].trim());
-                        this.getSawExpd().add(this.getAaSlider().getValue() * Math.sqrt(rms_expd));
+                        double expdsum = 0.0;
+                        for (int i = 0; i < this.getSawExpd().size(); i++) expdsum += this.getSawExpd().get(i);
+                        double expdruns = expdsum / (this.getRuns() + 1);
+                        if (this.getRuns() > 9) {
+                            this.getExpdRuns().add(expdruns);
+                        } else {
+                            this.getExpdRuns().set((int) this.getRuns(), expdruns);
+                        }
 
                         /*
                          * RMS <R^2> (BLUE LINE)
                          */
-                        double rms = Double.parseDouble(valStr[2].trim());
-                        this.getSawRms().add(rms);
+                        double rmssum = 0.0;
+                        for (int i = 0; i < this.getSawRms().size(); i++) rmssum += this.getSawRms().get(i);
+                        double rmsruns = Math.sqrt(rmssum / (this.getRuns() + 1));
+                        if (this.getRuns() > 9) {
+                            this.getRmsRuns().add(rmsruns);
+                        } else {
+                            this.getRmsRuns().set((int) this.getRuns(), rmsruns);
+                        }
+
+                        double bigger = Math.max(expdruns, rmsruns);
+                        double biggest = Math.max(bigger, this.getBiggDist());
 
                         /*
-                         * LENGTH (YELLOW)
+                         * SUCCESSED RUNS AND EFFICIENCY PERCENTAGES
                          */
-                        double length = Math.sqrt(Double.parseDouble(valStr[2].trim()));
-                        if (this.getRuns() > 9) this.getSawLengths().add(length);
-                        else this.getSawLengths().set((int) this.getRuns(), length);
+                        if (!this.isSaw()) {
+                            // FIRST GRAPH TITLE
+                            double succ_pros = 100.0 - ((double) this.getFailed() / (double) (this.getFailed() + this.getRuns() + 1) * 100.0);
+                            this.getFxplot().setS1McsawTitle(this.getDim(), succ_pros);
+                            // SECOND GRAPH TITLE
+                            this.getFxplot().setS2SawTitle(expdruns, rmsruns);
+                        }
 
-                        this.setBiggDist(length);
+                        /*
+                         * MAX VALUES FOR PLOTS
+                         */
+                        double greatest = 0.0;
+                        double fact = this.isSaw() ? 10.0 : 2.0;
+                        if (this.getRuns() <= 9) {
+                            this.getGreatestY()[(int) this.getRuns()] = biggest;
+                            if (biggest > greatest) greatest = biggest + fact;
+                        } else {
+                            System.arraycopy(this.getGreatestY(), 1, this.getGreatestY(), 0, 9);
+                            this.getGreatestY()[9] = biggest;
+                            for (double i : this.getGreatestY())
+                                if (i > greatest) greatest = i > greatest ? i + fact : greatest;
+                        }
 
-                    } catch (NumberFormatException ignored) {
-                    }
+                        this.setGreatestY2(biggest > this.getGreatestY2() ? biggest : this.getGreatestY2());
+                        this.getFxplot().setS1MaxY(greatest);
+                        this.getFxplot().setS2MaxY(this.getGreatestY2());
 
-                    if (this.getRuns() > 9) this.getXAxis().add((int) this.getRuns());
+                        /*
+                         * SET PLOTS
+                         */
+                        if (this.getRuns() > 9) {
+                            this.getFxplot().setS1MinX((int) this.getRuns() - 9);
+                            this.getFxplot().setS1MaxX((int) this.getRuns() - 1);
 
-                    /*
-                     * RMS EXPECTED SQRT(B)*S^NU (RED LINE)
-                     */
-                    double expdsum = 0.0;
-                    for ( int i = 0; i < this.getSawExpd().size(); i++ ) expdsum += this.getSawExpd().get(i);
-                    double expdruns = expdsum/(this.getRuns()+1);
-                    if (this.getRuns() > 9) {
-                        this.getExpdRuns().add(expdruns);
+                            this.getFxplot().updateS1Data("<Rexp>",
+                                this.getXAxis().subList((int) this.getRuns() - 9, (int) this.getRuns()),
+                                this.getExpdRuns().subList((int) this.getRuns() - 9, (int) this.getRuns())
+                            );
+                            this.getFxplot().updateS1Data("<Rrms>",
+                                this.getXAxis().subList((int) this.getRuns() - 9, (int) this.getRuns()),
+                                this.getRmsRuns().subList((int) this.getRuns() - 9, (int) this.getRuns())
+                            );
+                            this.getFxplot().setS2MaxX(this.getRuns());
+
+                            this.getFxplot().updateS1Data(this.getLanguage().equals("fin") ? "etäisyys" : "distance",
+                                this.getXAxis().subList((int) this.getRuns() - 9, (int) this.getRuns()),
+                                this.getSawLengths().subList((int) this.getRuns() - 9, (int) this.getRuns())
+                            );
+
+                        } else {
+                            this.getFxplot().updateS1Data("<Rexp>", this.getXAxis(), this.getExpdRuns());
+                            this.getFxplot().updateS1Data("<Rrms>", this.getXAxis(), this.getRmsRuns());
+                            this.getFxplot().updateS1Data(
+                                this.getLanguage().equals("fin") ? "etäisyys" : "distance", this.getXAxis(), this.getSawLengths());
+                        }
+
+                        this.getFxplot().updateS2Data("<Rexp>", this.getXAxis(), this.getExpdRuns());
+                        this.getFxplot().updateS2Data("<Rrms>", this.getXAxis(), this.getRmsRuns());
+                        this.getFxplot().updateS2Data(this.getLanguage().equals("fin") ? "etäisyys" : "distance", this.getXAxis(), this.getSawLengths());
+
+                        this.getFxplot().updateS3Data(this.getXhistAxis(), calcHistogram(this.getSawLengths(), this.getDim(), this.isSaw(), this.getSteps()));
+
                     } else {
-                        this.getExpdRuns().set((int) this.getRuns(), expdruns);
+
+                        double efficiency = this.getMCSumWeight() / ((double) (this.getRuns() + 1));
+                        double succeeded = 1.0 - (double) this.getFailed() / ((double) (this.getFailed() + this.getRuns() + 1));
+
+                        /*
+                         * EFFICIENCY (RED LINE), SUCCEEDED RUNS (BLUE LINE)
+                         */
+                        if (this.getRuns() > 199) {
+                            this.getEffRuns().add(efficiency);
+                            this.getSuccRuns().add(succeeded);
+                        } else {
+                            this.getEffRuns().set((int) this.getRuns(), efficiency);
+                            this.getSuccRuns().set((int) this.getRuns(), succeeded);
+                        }
+
+                        /*
+                         * SET PLOTS
+                         */
+                        if (this.getRuns() > 199) this.getFxplot().setFMaxX(this.getRuns());
+
+                        this.getFxplot().updateFData(this.getLanguage().equals("fin")
+                            ? "tehokkuus" : "efficiency", this.getXAxis(), this.getEffRuns());
+                        this.getFxplot().updateFData(this.getLanguage().equals("fin")
+                            ? "onnistuneet ajot" : "succeeded runs", this.getXAxis(), this.getSuccRuns());
+
                     }
-
-                    /*
-                     * RMS <R^2> (BLUE LINE)
-                     */
-                    double rmssum = 0.0;
-                    for ( int i = 0; i < this.getSawRms().size(); i++ ) rmssum += this.getSawRms().get(i);
-                    double rmsruns = Math.sqrt(rmssum/(this.getRuns()+1));
-                    if (this.getRuns() > 9) {
-                        this.getRmsRuns().add(rmsruns);
-                    } else {
-                        this.getRmsRuns().set((int) this.getRuns(), rmsruns);
-                    }
-
-                    double bigger = Math.max(expdruns, rmsruns);
-                    double biggest = Math.max(bigger, this.getBiggDist());
-
-                    /*
-                     * CONNECTIVE CONSTANT µ
-                     */
-                    if (!this.isSaw()) {
-                        // FIRST GRAPH TITLE
-                        this.getFxplot().setS1McsawTitle(this.getDim(), 100.0 - ( (double) this.getFailed() / (double) (this.getFailed() + this.getRuns() + 1) * 100.0) );
-                        // SECOND GRAPH TITLE
-                        this.getFxplot().setS2SawTitle(expdruns, rmsruns);
-                    }
-
-                    /*
-                     * MAX VALUES FOR PLOTS
-                     */
-                    double greatest = 0.0;
-                    double fact = this.isSaw() ? 10.0 : 5.0;
-                    if (this.getRuns() <= 9) {
-                        this.getGreatestY()[(int) this.getRuns()] = biggest;
-                        if (biggest > greatest) greatest = biggest + fact;
-                    } else {
-                        System.arraycopy(this.getGreatestY(), 1, this.getGreatestY(), 0, 9);
-                        this.getGreatestY()[9] = biggest;
-                        for (double i : this.getGreatestY())
-                            if (i > greatest) greatest = i > greatest ? i + fact : greatest;
-                    }
-
-                    this.setGreatestY2(biggest > this.getGreatestY2() ? biggest : this.getGreatestY2());
-                    this.getFxplot().setS1MaxY(greatest);
-                    this.getFxplot().setS2MaxY(this.getGreatestY2());
-
-                    /*
-                     * SET PLOTS
-                     */
-                    if (this.getRuns() > 9) {
-                        this.getFxplot().setS1MinX((int) this.getRuns() - 9);
-                        this.getFxplot().setS1MaxX((int) this.getRuns() - 1);
-
-                        this.getFxplot().updateS1Data("<Rexp>",
-                            this.getXAxis().subList((int) this.getRuns() - 9, (int) this.getRuns()),
-                            this.getExpdRuns().subList((int) this.getRuns() - 9, (int) this.getRuns())
-                        );
-                        this.getFxplot().updateS1Data("<Rrms>",
-                            this.getXAxis().subList((int) this.getRuns() - 9, (int) this.getRuns()),
-                            this.getRmsRuns().subList((int) this.getRuns() - 9, (int) this.getRuns())
-                        );
-                        this.getFxplot().setS2MaxX(this.getRuns());
-                    } else {
-                        this.getFxplot().updateS1Data("<Rexp>", this.getXAxis(), this.getExpdRuns() );
-                        this.getFxplot().updateS1Data("<Rrms>", this.getXAxis(), this.getRmsRuns() );
-                    }
-
-                    if (this.getRuns() > 9)
-                        this.getFxplot().updateS1Data(this.getLanguage().equals("fin") ? "etäisyys" : "distance",
-                            this.getXAxis().subList( (int) this.getRuns() - 9, (int) this.getRuns() ),
-                            this.getSawLengths().subList( (int) this.getRuns() - 9, (int) this.getRuns() )
-                        );
-                    else this.getFxplot().updateS1Data(
-                        this.getLanguage().equals("fin") ? "etäisyys" : "distance", this.getXAxis(), this.getSawLengths() );
-
-                    this.getFxplot().updateS2Data( "<Rexp>",this.getXAxis(), this.getExpdRuns() );
-                    this.getFxplot().updateS2Data( "<Rrms>",this.getXAxis(), this.getRmsRuns() );
-                    this.getFxplot().updateS2Data( this.getLanguage().equals("fin") ? "etäisyys" : "distance",this.getXAxis(), this.getSawLengths() );
-
-                    this.getFxplot().updateS3Data( this.getXhistAxis(), calcHistogram(this.getSawLengths(), this.getDim(), this.isSaw(), this.getSteps()) );
 
                     this.setRuns(this.getRuns() + 1);
                 }
@@ -437,16 +505,12 @@ class SceneRealTimeSaw extends Data {
         GetComponents getComponents = new GetComponents();
         Image imgSawFI = new Image("/sawFI.png");
         Image imgSawEN = new Image("/sawEN.png");
-        Image imgSawFI_corr = new Image("/sawFI_corr.png");
-        Image imgSawEN_corr = new Image("/sawEN_corr.png");
         ImageView ivSawFI = new ImageView(imgSawFI);
         ImageView ivSawEN = new ImageView(imgSawEN);
-        ImageView ivSawFI_corr = new ImageView(imgSawFI_corr);
-        ImageView ivSawEN_corr = new ImageView(imgSawEN_corr);
         ivSawFI.setSmooth(true);
         ivSawEN.setSmooth(true);
-        ivSawFI_corr.setSmooth(true);
-        ivSawEN_corr.setSmooth(true);
+        getComponents.getPaneView(pane, this.getLanguage().equals("fin")
+            ? ivSawFI : ivSawEN, this.getSawTextWidth(), this.getTextHeight());
 
         /*
          * COMPONENTS...
@@ -457,47 +521,42 @@ class SceneRealTimeSaw extends Data {
         Label labNumSteps = new Label(this.getLanguage().equals("fin") ? "askeleet:" : "steps:");
         TextField setNumSteps = new TextField("");
         setNumSteps.setMaxWidth(this.getBigCompwidth());
+        this.dim(2);
         setNumSteps.setOnKeyReleased(e -> {
-            if (isNumInteger(setNumSteps.getText().trim())){
+            if (isNumInteger(setNumSteps.getText().trim())) {
                 this.vars[3] = setNumSteps.getText().trim();
                 runSAW.setDisable(true);
                 runMCSAW.setDisable(false);
                 this.setIsSaw(false);
+                double nume = Math.log(Integer.parseInt(setNumSteps.getText().trim()));
                 this.getAaSlider().setValue(this.getDim() == 2 ?
-                    Math.log(Integer.parseInt(setNumSteps.getText().trim())) :
-                    Math.log(Integer.parseInt(setNumSteps.getText().trim())) - 1.0);
-                getComponents.getPaneView(pane, this.getLanguage().equals("fin")
-                    ? ivSawFI_corr : ivSawEN_corr, this.getSawTextWidth(), this.getTextHeight());
+                    nume/Math.sqrt(2.0) : nume/Math.sqrt(3.0));
             } else {
                 this.vars[3] = "0";
                 runSAW.setDisable(false);
                 runMCSAW.setDisable(true);
                 this.setIsSaw(true);
                 this.getAaSlider().setValue(1.0);
-                getComponents.getPaneView(pane, this.getLanguage().equals("fin")
-                    ? ivSawFI : ivSawEN, this.getSawTextWidth(), this.getTextHeight());
+            }
+        });
+        setNumSteps.setOnKeyTyped(e -> {
+            if (isNumInteger(setNumSteps.getText().trim())) {
+                this.vars[3] = setNumSteps.getText().trim();
+                runSAW.setDisable(true);
+                runMCSAW.setDisable(false);
+                this.setIsSaw(false);
+                double nume = Math.log(Integer.parseInt(setNumSteps.getText().trim()));
+                this.getAaSlider().setValue(this.getDim() == 2 ?
+                    nume/Math.sqrt(2.0) : nume/Math.sqrt(3.0));
+            } else {
+                this.vars[3] = "0";
+                runSAW.setDisable(false);
+                runMCSAW.setDisable(true);
+                this.setIsSaw(true);
+                this.getAaSlider().setValue(1.0);
             }
         });
         runMCSAW.setDisable(true);
-
-        this.getAaSlider().setOnMouseDragged(e -> {
-            if (this.getAaSlider().getValue() > 1.0) {
-                getComponents.getPaneView(pane, this.getLanguage().equals("fin")
-                    ? ivSawFI_corr : ivSawEN_corr, this.getSawTextWidth(), this.getTextHeight());
-            } else if (this.getAaSlider().getValue() == 1.0) {
-                getComponents.getPaneView(pane, this.getLanguage().equals("fin")
-                    ? ivSawFI : ivSawEN, this.getSawTextWidth(), this.getTextHeight());
-            }
-        });
-        this.getAaSlider().setOnMouseClicked(e -> {
-            if (this.getAaSlider().getValue() > 1.0) {
-                getComponents.getPaneView(pane, this.getLanguage().equals("fin")
-                    ? ivSawFI_corr : ivSawEN_corr, this.getSawTextWidth(), this.getTextHeight());
-            } else if (this.getAaSlider().getValue() == 1.0) {
-                getComponents.getPaneView(pane, this.getLanguage().equals("fin")
-                    ? ivSawFI : ivSawEN, this.getSawTextWidth(), this.getTextHeight());
-            }
-        });
 
         Label labNumDimensions = new Label(this.getLanguage().equals("fin") ? "ulottuvuus:" : "dimension:");
 
@@ -522,12 +581,9 @@ class SceneRealTimeSaw extends Data {
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             if (setNumSteps.getText().trim().equals("")) {
                 this.getAaSlider().setValue(1.0);
-                getComponents.getPaneView(pane, this.getLanguage().equals("fin")
-                    ? ivSawFI : ivSawEN, this.getSawTextWidth(), this.getTextHeight());
             } else {
-                this.getAaSlider().setValue(Math.log(Integer.parseInt(setNumSteps.getText().trim())));
-                getComponents.getPaneView(pane, this.getLanguage().equals("fin")
-                    ? ivSawFI_corr : ivSawEN_corr, this.getSawTextWidth(), this.getTextHeight());
+                double nume = Math.log(Integer.parseInt(setNumSteps.getText().trim()));
+                this.getAaSlider().setValue(nume/Math.sqrt(2.0));
             }
             this.vars[4] = "2";
             this.dim(2);
@@ -537,12 +593,9 @@ class SceneRealTimeSaw extends Data {
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             if (setNumSteps.getText().trim().equals("")) {
                 this.getAaSlider().setValue(1.0);
-                getComponents.getPaneView(pane, this.getLanguage().equals("fin")
-                    ? ivSawFI : ivSawEN, this.getSawTextWidth(), this.getTextHeight());
             } else {
-                this.getAaSlider().setValue(Math.log(Integer.parseInt(setNumSteps.getText().trim())) - 1.0);
-                getComponents.getPaneView(pane, this.getLanguage().equals("fin")
-                    ? ivSawFI_corr : ivSawEN_corr, this.getSawTextWidth(), this.getTextHeight());
+                double nume = Math.log(Integer.parseInt(setNumSteps.getText().trim()));
+                this.getAaSlider().setValue(nume/Math.sqrt(3.0));
             }
             this.vars[4] = "3";
             this.dim(3);
@@ -795,6 +848,28 @@ class SceneRealTimeSaw extends Data {
     private void setRmsRuns(List<Double> rms_runs) { this.rms_runs = rms_runs; }
 
     /**
+     * @return the eff_runs
+     */
+    @Contract(pure = true)
+    private List <Double> getEffRuns() { return this.eff_runs; }
+
+    /**
+     * @param eff_runs the eff_runs to set
+     */
+    private void setEffRuns(List<Double> eff_runs) { this.eff_runs = eff_runs; }
+
+    /**
+     * @return the succ_runs
+     */
+    @Contract(pure = true)
+    private List <Double> getSuccRuns() { return this.succ_runs; }
+
+    /**
+     * @param succ_runs the succ_runs to set
+     */
+    private void setSuccRuns(List<Double> succ_runs) { this.succ_runs = succ_runs; }
+
+    /**
      * @return the firstdata
      */
     @Contract(pure = true)
@@ -905,6 +980,17 @@ class SceneRealTimeSaw extends Data {
     private void setIsSaw(boolean issaw) { this.issaw = issaw; }
 
     /**
+     * @return the iseff
+     */
+    @Contract(pure = true)
+    private boolean isEff() { return this.iseff; }
+
+    /**
+     * @param iseff the iseff to set
+     */
+    private void setIsEff(boolean iseff) { this.iseff = iseff; }
+
+    /**
      * @return the textwidth
      */
     @Contract(pure = true)
@@ -915,4 +1001,15 @@ class SceneRealTimeSaw extends Data {
      */
     @Contract(pure = true)
     private double getTextHeight() { return 600.0 / Screen.getMainScreen().getRenderScale(); }
+
+    /**
+     * @return the mc_sumweight
+     */
+    @Contract(pure = true)
+    private double getMCSumWeight() { return this.mc_sumweight; }
+
+    /**
+     * mc_sumweight to set
+     */
+    private void setMCSumWeight(double mc_sumweight) { this.mc_sumweight = mc_sumweight; }
 }

@@ -24,12 +24,15 @@ class ExecSAW extends Data {
 
     private String language;
     private boolean issaw;
+    private boolean iseff;
     private boolean ismcsaw;
     private boolean first;
     private List <Double> saw_expd;
     private List <Double> saw_rms;
     private List <Double> expd_runs;
     private List<Double> rms_runs;
+    private List <Double> eff_runs;
+    private List <Double> succ_runs;
     private List <Double> saw_lengths;
     private List <Integer> xAxis;
     private List <Integer> xhistAxis;
@@ -44,9 +47,9 @@ class ExecSAW extends Data {
     }
 
     void setSawClick(File folder, String executable, @NotNull Button execSAW, @NotNull Button execMCSAW,
-                     SceneRealTimeSaw sawScene, HBox isovalikkoSaw, Pane sawPane, TextArea sawText,
-                     Button plotSAW, Button closeNappiSAW, Button menuNappiSAW, Button helpNappiSAW,
-                     Slider aaSlider) {
+                     @NotNull Button runEFF, SceneRealTimeSaw sawScene, HBox isovalikkoSaw, Pane sawPane,
+                     TextArea sawText, Button plotSAW, Button closeNappiSAW, Button menuNappiSAW,
+                     Button helpNappiSAW, Slider aaSlider) {
 
         new AnimationTimer() {
             private long prevTime = 0;
@@ -72,7 +75,7 @@ class ExecSAW extends Data {
                     return;
 
                 sawScene.refresh(folder, executable, getFirst(), getSawLengths(), getSawExpd(), getSawRms(),
-                    getExpdRuns(), getRmsRuns(), getXAxis(), getXhistAxis(), isSaw(), aaSlider);
+                    getExpdRuns(), getRmsRuns(), null, null, getXAxis(), getXhistAxis(), isSaw(), isEff(), aaSlider);
 
                 if (getFirst()) setFirst(false);
 
@@ -89,6 +92,7 @@ class ExecSAW extends Data {
                 closeNappiSAW.setDisable(false);
                 plotSAW.setDisable(false);
                 execSAW.setText(this.getLanguage().equals("fin") ? "AJA SAW" : "RUN SAW");
+                runEFF.setDisable(false);
             } else {
                 sawScene.setSawMc("E");
                 sawScene.setSawPlot("-");
@@ -113,6 +117,7 @@ class ExecSAW extends Data {
                 }
 
                 this.setIsSaw(true);
+                this.setIsEff(false);
 
                 sawScene.setFxplot(new FXPlot());
                 sawScene.getFxplot().setFXPlot(this.getLanguage(), "saw");
@@ -156,6 +161,7 @@ class ExecSAW extends Data {
                 plotSAW.setDisable(true);
                 execMCSAW.setDisable(true);
                 sawScene.getDimension().setDisable(true);
+                runEFF.setDisable(true);
             }
         });
 
@@ -167,7 +173,8 @@ class ExecSAW extends Data {
                 helpNappiSAW.setDisable(false);
                 closeNappiSAW.setDisable(false);
                 plotSAW.setDisable(false);
-                execMCSAW.setText(this.getLanguage().equals("fin") ? "AJA MC-SAW" : "RUN MC-SAW");
+                execMCSAW.setText(this.getLanguage().equals("fin") ? "AJA MC" : "RUN MC");
+                runEFF.setDisable(false);
             } else {
                 sawScene.setSawMc("F");
                 sawScene.setSawPlot("-");
@@ -192,6 +199,7 @@ class ExecSAW extends Data {
                 }
 
                 this.setIsSaw(false);
+                this.setIsEff(false);
 
                 sawScene.setFxplot(new FXPlot());
                 sawScene.getFxplot().setFXPlot(this.getLanguage(), "saw");
@@ -245,6 +253,7 @@ class ExecSAW extends Data {
                 plotSAW.setDisable(true);
                 execSAW.setDisable(true);
                 sawScene.getDimension().setDisable(true);
+                runEFF.setDisable(true);
             }
         });
     }
@@ -298,6 +307,7 @@ class ExecSAW extends Data {
             }
             sawScene.setSawPlot("p");
             sawScene.setSave("s");
+            sawScene.setSawMcEff("-");
             String[] vars = sawScene.getVars();
             this.setVars(vars);
             Data data = new Data(vars);
@@ -308,6 +318,7 @@ class ExecSAW extends Data {
             if ( fail ) return;
 
             valikkoSAW.setDisable(true);
+            this.setIsEff(false);
 
             int count = 0;
             int max = 100;
@@ -332,6 +343,79 @@ class ExecSAW extends Data {
                 result.getChildren().add(greenlabel);
                 fadegreen.play();
             }
+            valikkoSAW.setDisable(false);
+        });
+    }
+
+    void setEffClick (File folder, String executable, @NotNull Button runEFF, @NotNull Button execSAW,
+                      @NotNull Button execMCSAW, @NotNull Button plotNappi, SceneRealTimeSaw sawScene,
+                      VBox valikkoSAW, @NotNull TextField setEff, @NotNull TextFlow resultEff, Slider aaSlider){
+
+        setEff.setOnKeyReleased(e -> {
+            if (isNumInteger(setEff.getText().trim())){
+                execSAW.setDisable(true);
+                execMCSAW.setDisable(true);
+                plotNappi.setDisable(true);
+                this.setIsEff(true);
+            } else {
+                execSAW.setDisable(false);
+                execMCSAW.setDisable(false);
+                plotNappi.setDisable(false);
+                this.setIsEff(false);
+            }
+        });
+
+        runEFF.setOnMouseClicked((MouseEvent event) -> {
+            resultEff.getChildren().clear();
+            sawScene.setSawMc("F");
+            sawScene.setSawPlot("-");
+            sawScene.setSave("-");
+            String[] vars = sawScene.getVars();
+            this.setVars(vars);
+            int dim = Integer.parseInt(getVars()[4]);
+            boolean fail = false;
+
+            if ( dim < 2 || dim > 3 ) fail = true;
+            if (fail) return;
+
+            if (sawScene.getFxplot() != null) {
+                if (sawScene.getFxplot().getFrame().isShowing()
+                    || sawScene.getFxplot().getFrame().isActive()
+                    || sawScene.getFxplot().getFrame().isDisplayable())
+                    sawScene.getFxplot().getFrame().dispose();
+            }
+            sawScene.setFxplot(new FXPlot());
+            sawScene.getFxplot().setFXPlot(this.getLanguage(), "eff");
+
+            this.setIsEff(true);
+            this.setIsSaw(false);
+            valikkoSAW.setDisable(true);
+            this.setFirst(true);
+
+            int max_runs;
+            if (isNumInteger(setEff.getText().trim())) {
+                max_runs = Integer.parseInt(setEff.getText());
+
+                this.setEffRuns(new ArrayList<>());
+                for (int x = 0; x < max_runs; x++) this.getEffRuns().add(null);
+                this.setSuccRuns(new ArrayList<>());
+                for (int x = 0; x < max_runs; x++) this.getSuccRuns().add(null);
+                this.setXAxis(new ArrayList<>());
+                for (int x = 0; x < max_runs; x++) this.getXAxis().add(x);
+
+                sawScene.getFxplot().setFData(this.getXAxis(), this.getEffRuns(), max_runs);
+
+                for (int i = 1; i <= max_runs; i ++) {
+                    sawScene.setSawMcEff(String.valueOf(i));
+
+                    sawScene.refresh(folder, executable, this.getFirst(), null, null, null,
+                        null, null, this.getEffRuns(), this.getSuccRuns(), this.getXAxis(),
+                        null, this.isSaw(), this.isEff(), aaSlider);
+
+                    if (this.getFirst()) this.setFirst(false);
+                }
+            }
+
             valikkoSAW.setDisable(false);
         });
     }
@@ -368,6 +452,17 @@ class ExecSAW extends Data {
      * @param ismcsaw the ismcsaw to set
      */
     private void setIsMcsaw(boolean ismcsaw) { this.ismcsaw = ismcsaw; }
+
+    /**
+     * @return the iseff
+     */
+    @Contract(pure = true)
+    private boolean isEff() { return this.iseff; }
+
+    /**
+     * @param iseff the iseff to set
+     */
+    private void setIsEff(boolean iseff) { this.iseff = iseff; }
 
     /**
      * @return the vars
@@ -433,6 +528,28 @@ class ExecSAW extends Data {
      * @param rms_runs the rms_runs to set
      */
     private void setRmsRuns(List<Double> rms_runs) { this.rms_runs = rms_runs; }
+
+    /**
+     * @return the eff_runs
+     */
+    @Contract(pure = true)
+    private List <Double> getEffRuns() { return this.eff_runs; }
+
+    /**
+     * @param eff_runs the eff_runs to set
+     */
+    private void setEffRuns(List<Double> eff_runs) { this.eff_runs = eff_runs; }
+
+    /**
+     * @return the succ_runs
+     */
+    @Contract(pure = true)
+    private List <Double> getSuccRuns() { return this.succ_runs; }
+
+    /**
+     * @param succ_runs the succ_runs to set
+     */
+    private void setSuccRuns(List<Double> succ_runs) { this.succ_runs = succ_runs; }
 
     /**
      * @return the xAxis

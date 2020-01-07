@@ -341,14 +341,15 @@ public class RandomWalk extends Application {
         Button runMCSAW = getButtons.getExecuteButton(this.getLanguage(), 0, "MCSAW");
         HBox sawButtonBox = new HBox(5);
         sawButtonBox.getChildren().addAll(runSAW, runMCSAW);
+        Button runEFF = getButtons.getExecuteButton(this.getLanguage(), 1, "EFF");
         Button plotSAW = getButtons.getExecuteButton(this.getLanguage(), 1, "PLOT");
         Button menuNappiSAW = getButtons.getMenuButton(this.getLanguage(), 1);
         Button closeNappiSAW = getButtons.getCloseButton(getRealScene, getDiffScene, getSAWScene,
             1, ex, this.getLanguage(), this.getFrame(), this.getButtonYES(), this.getButtonNO());
 
         // REAL TIME SAW COMPONENTS
-        // SLIDER C
-        final Label labaa = new Label("Korjauskerroin C :");
+        // SLIDER A
+        final Label labaa = new Label(this.getLanguage().equals("fin") ? "Amplitudi A :" : "Amplitude A :");
         final Label labelaa = new Label();
         Slider sliderAa = new Slider(1.0, 10.0, 1.0);
         sliderAa.setOrientation(Orientation.HORIZONTAL);
@@ -359,9 +360,10 @@ public class RandomWalk extends Application {
         sliderAa.setShowTickMarks(true);
         sliderAa.setSnapToTicks(true);
         labelaa.textProperty().bind(
-            Bindings.format( "%.1f", sliderAa.valueProperty() )
+            Bindings.format( "%.2f", sliderAa.valueProperty() )
         );
         VBox sliderBox = new VBox(5);
+        sliderBox.setPadding(new Insets(0, 0, -15, 0));
         sliderBox.getChildren().addAll(labaa, labelaa, sliderAa);
 
         // MATH CARD
@@ -378,8 +380,17 @@ public class RandomWalk extends Application {
             this.getLanguage(), this.getTextAreaSAW(), this.getIsovalikkoSAW(),
                 null, null, null, this.getSawPane(), "saw", 1);
 
-        VBox maxBox = new VBox(5);
-        maxBox.setPadding(new Insets(0, 0, 15, 0));
+        VBox effBox = new VBox(0);
+        effBox.setPadding(new Insets(-15, 0, -15, 0));
+        Label labEff = new Label(this.getLanguage().equals("fin") ? "askeleita max: (min 100)" : "efficiency steps max: (min 100)");
+        TextField setEff = new TextField("");
+        TextFlow resultEff = new TextFlow();
+        resultEff.setMinSize(this.getWidth(),10);
+        resultEff.setMaxSize(this.getWidth(),10);
+        effBox.getChildren().addAll(labEff,setEff,resultEff);
+
+        VBox maxBox = new VBox(0);
+        maxBox.setPadding(new Insets(-15, 0, 10, 0));
         Label labMax = new Label(this.getLanguage().equals("fin") ? "kuvaaja-ajoja max: (oletus 100)" : "plot runs max: (default 100)");
         TextField setMax = new TextField("");
         TextFlow result = new TextFlow();
@@ -450,7 +461,7 @@ public class RandomWalk extends Application {
         this.getValikkoSAW().getChildren().addAll(
             menuNappiSAW, helpNappiSAW, getSAWScene.getSceneRealTimeSaw(
                 sliderBox, sliderAa, this.getSawPane(), runSAW, runMCSAW),
-            sawButtonBox, plotSAW, maxBox, closeNappiSAW);
+            sawButtonBox, runEFF, effBox, plotSAW, maxBox, closeNappiSAW);
         this.getIsovalikkoSAW().getChildren().addAll(this.getValikkoSAW(), this.getSawPane());
         BorderPane asetteluSAW = new BorderPane();
         asetteluSAW.setCenter(this.getIsovalikkoSAW());
@@ -556,7 +567,8 @@ public class RandomWalk extends Application {
         ExecSAW execSAW = new ExecSAW(this.getLanguage());
         execSAW.setPlotClick(plotSAW, runSAW, getSAWScene, this.getValikkoSAW(), datapath, datafolder,
            fexec, pyexecsaw2d, pyexecsaw3d, ex, setMax, result);
-        execSAW.setSawClick(datafolder, fexec, runSAW, runMCSAW, getSAWScene, this.getIsovalikkoSAW(),
+        execSAW.setEffClick(datafolder, fexec, runEFF, runSAW, runMCSAW, plotSAW, getSAWScene, this.getValikkoSAW(), setEff, resultEff, sliderAa);
+        execSAW.setSawClick(datafolder, fexec, runSAW, runMCSAW, runEFF, getSAWScene, this.getIsovalikkoSAW(),
             this.getSawPane(), this.getTextAreaSAW(), plotSAW, closeNappiSAW, menuNappiSAW, helpNappiSAW,
             sliderAa);
 

@@ -33,7 +33,6 @@ class SceneCalculation extends Data {
     private Button setFix;
     private boolean fix;
     private Pane pane;
-    private boolean islattice;
 
     /**
      * main class gets vars via this
@@ -95,22 +94,16 @@ class SceneCalculation extends Data {
         GetComponents getComponents = new GetComponents();
         Image imgCalcFI = new Image("/calcFI.png");
         Image imgCalcEN = new Image("/calcEN.png");
-        Image imgCalcFixFreeFI = new Image("/calcFixFreeFI.png");
-        Image imgSalcFixFreeEN = new Image("/calcFixFreeEN.png");
-        Image imgCalcFixLattFI = new Image("/calcFixLattFI.png");
-        Image imgSalcFixLattEN = new Image("/calcFixLattEN.png");
+        Image imgCalcFixFI = new Image("/calcFixFI.png");
+        Image imgSalcFixEN = new Image("/calcFixEN.png");
         ImageView ivCalcFI = new ImageView(imgCalcFI);
         ImageView ivCalcEN = new ImageView(imgCalcEN);
-        ImageView ivCalcFixFreeFI = new ImageView(imgCalcFixFreeFI);
-        ImageView ivCalcFixFreeEN = new ImageView(imgSalcFixFreeEN);
-        ImageView ivCalcFixLattFI = new ImageView(imgCalcFixLattFI);
-        ImageView ivCalcFixLattEN = new ImageView(imgSalcFixLattEN);
+        ImageView ivCalcFixFI = new ImageView(imgCalcFixFI);
+        ImageView ivCalcFixEN = new ImageView(imgSalcFixEN);
         ivCalcFI.setSmooth(true);
         ivCalcEN.setSmooth(true);
-        ivCalcFixFreeFI.setSmooth(true);
-        ivCalcFixFreeEN.setSmooth(true);
-        ivCalcFixLattFI.setSmooth(true);
-        ivCalcFixLattEN.setSmooth(true);
+        ivCalcFixFI.setSmooth(true);
+        ivCalcFixEN.setSmooth(true);
 
         /*
         * COMPONENTS...
@@ -186,15 +179,9 @@ class SceneCalculation extends Data {
                 this.vars[5] = "-";
             } else {
                 this.getPane().getChildren().clear();
-                if (!this.getIsLattice()) {
-                    this.getPane().getChildren().add(this.getLanguage().equals("fin")
-                        ? getComponents.getPane2(ivCalcFixFreeFI, this.getTextWidth(), this.getTextHeight())
-                        : getComponents.getPane2(ivCalcFixFreeEN, this.getTextWidth(), this.getTextHeight()));
-                } else {
-                    this.getPane().getChildren().add(this.getLanguage().equals("fin")
-                        ? getComponents.getPane2(ivCalcFixLattFI, this.getTextWidth(), this.getTextHeight())
-                        : getComponents.getPane2(ivCalcFixLattEN, this.getTextWidth(), this.getTextHeight()));
-                }
+                this.getPane().getChildren().add(this.getLanguage().equals("fin")
+                    ? getComponents.getPane2(ivCalcFixFI, this.getTextWidth(), this.getTextHeight())
+                    : getComponents.getPane2(ivCalcFixEN, this.getTextWidth(), this.getTextHeight()));
                 this.setFix.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.setFix(true);
                 this.vars[5] = "b"; // calcfix (or sawplot)
@@ -217,24 +204,10 @@ class SceneCalculation extends Data {
                 this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
                 this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[7] = "-";
-                this.setIsLattice(false);
-                if (this.isFix()) {
-                    this.getPane().getChildren().clear();
-                    this.getPane().getChildren().add(this.getLanguage().equals("fin")
-                        ? getComponents.getPane2(ivCalcFixFreeFI, this.getTextWidth(), this.getTextHeight())
-                        : getComponents.getPane2(ivCalcFixFreeEN, this.getTextWidth(), this.getTextHeight()));
-                }
             } else if (this.getNappiLattice().getText().equals("FREE") || this.getNappiLattice().getText().equals("VAPAA")){
                 this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "HILA" : "LATTICE");
                 this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
                 this.vars[7] = "l";
-                this.setIsLattice(true);
-                if (this.isFix()) {
-                    this.getPane().getChildren().clear();
-                    this.getPane().getChildren().add(this.getLanguage().equals("fin")
-                        ? getComponents.getPane2(ivCalcFixLattFI, this.getTextWidth(), this.getTextHeight())
-                        : getComponents.getPane2(ivCalcFixLattEN, this.getTextWidth(), this.getTextHeight()));
-                }
             }
         });
         valikko.getChildren().add(this.getNappiLattice());
@@ -340,15 +313,4 @@ class SceneCalculation extends Data {
      * @param pane the pane to set
      */
     private void setPane(Pane pane) { this.pane = pane; }
-
-    /**
-     * @return the islattice
-     */
-    @Contract(pure = true)
-    private boolean getIsLattice() { return this.islattice; }
-
-    /**
-     * @param islattice the islattice to set
-     */
-    private void setIsLattice(boolean islattice) { this.islattice = islattice; }
 }

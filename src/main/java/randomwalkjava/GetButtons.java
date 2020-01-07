@@ -97,10 +97,16 @@ class GetButtons extends HelpText {
                 button.setMaxWidth(this.getMcsawButtonWidth());
                 break;
             case "MCSAW":
-                button = this.getLanguage().equals("fin") ? new Button("AJA MC-SAW") : new Button("RUN MC-SAW");
+                button = this.getLanguage().equals("fin") ? new Button("AJA MC") : new Button("RUN MC");
                 button.setStyle("-fx-background-color: Red");
                 button.setMinWidth(this.getMcsawButtonWidth());
                 button.setMaxWidth(this.getMcsawButtonWidth());
+                break;
+            case "EFF":
+                button = this.getLanguage().equals("fin") ? new Button("TEHOKKUUS") : new Button("EFFICIENCY");
+                button.setStyle("-fx-background-color: Green");
+                button.setMinWidth(width == 0 ? this.getButtonWidth() : this.getSawButtonWidth());
+                button.setMaxWidth(width == 0 ? this.getButtonWidth() : this.getSawButtonWidth());
                 break;
             case "ANIM":
                 button = this.getLanguage().equals("fin") ? new Button("ANIMAATIO") : new Button("ANIMATION");

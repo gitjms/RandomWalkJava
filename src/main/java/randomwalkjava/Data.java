@@ -149,21 +149,27 @@ class Data {
     }
 
     /**
-     * method for setting the save parameter in vars array
-     * @param var the vars array to set
-     */
-    void setSave(String var) { this.vars[8]=var; }
-
-    /**
      * method for setting the parameter for setting saw or mc-saw in vars array
      * @param var the vars array to set
      */
     void setSawMc(String var) { this.vars[0]=var; }
 
     /**
+     * method for setting the parameter for setting mc-saw efficiency runs in vars array
+     * @param var the vars array to set
+     */
+    void setSawMcEff(String var) { this.vars[3]=var; }
+
+    /**
      * method for setting the parameter for plotting in vars array
      * @param var the vars array to set
      */
     void setSawPlot(String var) { this.vars[5]=var; }
+
+    /**
+     * method for setting the save parameter in vars array
+     * @param var the vars array to set
+     */
+    void setSave(String var) { this.vars[8]=var; }
 
 }
