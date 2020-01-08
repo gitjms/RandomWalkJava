@@ -307,7 +307,6 @@ class ExecSAW extends Data {
             }
             sawScene.setSawPlot("p");
             sawScene.setSave("s");
-            sawScene.setSawMcEff("-");
             String[] vars = sawScene.getVars();
             this.setVars(vars);
             Data data = new Data(vars);
