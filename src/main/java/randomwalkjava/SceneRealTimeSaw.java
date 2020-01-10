@@ -66,6 +66,7 @@ class SceneRealTimeSaw extends Data {
     private HBox dim_choice;
     private Slider aaSlider;
     private double mc_sumweight;
+    private int max_runs;
 
     /**
      * main class gets vars via this
@@ -109,12 +110,13 @@ class SceneRealTimeSaw extends Data {
      * @param xHistAxis data container
      * @param issaw saw or mc-saw
      * @param iseff efficiency
-     * @param aaSlider Slider
+     * @param aaSlider Slider for factor A
+     * @param max_runs max runs for efficiency run
      */
     void refresh(File folder, String executable, boolean firstdata, List<Double> saw_lengths,
                  List<Double> saw_expd, List<Double> saw_rms, List<Double> expd_runs, List<Double> rms_runs,
                  List<Double> eff_runs, List<Double> succ_runs, List<Integer> xAxis, List<Integer> xHistAxis,
-                 boolean issaw, boolean iseff, Slider aaSlider) {
+                 boolean issaw, boolean iseff, Slider aaSlider, int max_runs) {
 
         this.setFirstData(firstdata);
         this.dim(Integer.parseInt(this.vars[4]));
@@ -137,6 +139,7 @@ class SceneRealTimeSaw extends Data {
                 for (int x = 0; x < 10; x++) this.getGreatestY()[x] = 0.0;
                 this.setGreatestY2(0.0);
             } else {
+                this.setMaxRuns(max_runs);
                 this.setEffRuns(eff_runs);
                 this.setSuccRuns(succ_runs);
                 this.setMCSumWeight(0.0);
@@ -168,15 +171,15 @@ class SceneRealTimeSaw extends Data {
                     if (line.substring(0,1).equals("F")) {
                         this.setFailed(this.getFailed() + 1);
                         if (this.isEff()) {
-                            if (this.getRuns() > 199) {
+                            if (this.getRuns() >= this.getMaxRuns()) {
                                 this.getEffRuns().add(null);
                                 this.getSuccRuns().add(null);
                             } else {
                                 this.getEffRuns().set((int) this.getRuns(), null);
                                 this.getSuccRuns().set((int) this.getRuns(), null);
                             }
+                            if (this.getRuns() >= this.getMaxRuns()) this.getXAxis().add((int) this.getRuns());
                             this.setRuns(this.getRuns() + 1);
-                            if (this.getRuns() > 199) this.getXAxis().add((int) this.getRuns());
                         }
                         continue;
                     }
@@ -215,14 +218,7 @@ class SceneRealTimeSaw extends Data {
                         if (this.getRuns() > 9) this.getXAxis().add((int) this.getRuns());
 
                     } else {
-
-                        try {
-                            this.setMCSumWeight( Double.parseDouble(valStr[1].trim()));
-                        } catch (NumberFormatException e) {
-                            continue;
-                        }
-                        if (this.getRuns() > 199) this.getXAxis().add((int) this.getRuns());
-
+                        this.setMCSumWeight( Double.parseDouble(valStr[1].trim()));
                     }
 
                     if (!this.isEff()) {
@@ -326,9 +322,10 @@ class SceneRealTimeSaw extends Data {
                         /*
                          * EFFICIENCY (RED LINE), SUCCEEDED RUNS (BLUE LINE)
                          */
-                        if (this.getRuns() > 199) {
+                        if (this.getRuns() >= this.getMaxRuns()) {
                             this.getEffRuns().add(efficiency);
                             this.getSuccRuns().add(succeeded);
+                            this.getXAxis().add((int) this.getRuns());
                         } else {
                             this.getEffRuns().set((int) this.getRuns(), efficiency);
                             this.getSuccRuns().set((int) this.getRuns(), succeeded);
@@ -337,7 +334,7 @@ class SceneRealTimeSaw extends Data {
                         /*
                          * SET PLOTS
                          */
-                        if (this.getRuns() > 199) this.getFxplot().setFMaxX(this.getRuns());
+                        if (this.getRuns() >= this.getMaxRuns()) this.getFxplot().setFMaxX(this.getRuns());
 
                         this.getFxplot().updateFData(this.getLanguage().equals("fin")
                             ? "tehokkuus" : "efficiency", this.getXAxis(), this.getEffRuns());
@@ -397,7 +394,7 @@ class SceneRealTimeSaw extends Data {
                 else if (d <= 18.0) bin18++;
                 else if (d <= 19.0) bin19++;
                 else if (d <= 20.0) bin20++;
-            } else if (dim == 2 && issaw || dim == 2 && steps < 100 || dim == 3 && steps >= 30 && steps < 200 && !issaw) {
+            } else if ((dim == 2 && issaw) || (steps >= 30 && steps < 200 && !issaw)) {
                 if (d <= 3.0) bin1++;
                 else if (d <= 6.0) bin2++;
                 else if (d <= 9.0) bin3++;
@@ -418,7 +415,7 @@ class SceneRealTimeSaw extends Data {
                 else if (d <= 54.0) bin18++;
                 else if (d <= 57.0) bin19++;
                 else if (d <= 60.0) bin20++;
-            } else if (dim == 3 && steps < 400 && !issaw) {
+            } else if ( steps < 400 && !issaw ) {
                 if (d <= 10.0) bin1++;
                 else if (d <= 20.0) bin2++;
                 else if (d <= 30.0) bin3++;
@@ -439,7 +436,7 @@ class SceneRealTimeSaw extends Data {
                 else if (d <= 180.0) bin18++;
                 else if (d <= 190.0) bin19++;
                 else if (d <= 200.0) bin20++;
-            } else if (dim == 3) {
+            } else {
                 if (d <= 20.0) bin1++;
                 else if (d <= 40.0) bin2++;
                 else if (d <= 60.0) bin3++;
@@ -1012,4 +1009,15 @@ class SceneRealTimeSaw extends Data {
      * mc_sumweight to set
      */
     private void setMCSumWeight(double mc_sumweight) { this.mc_sumweight = mc_sumweight; }
+
+    /**
+     * @return the max_runs
+     */
+    @Contract(pure = true)
+    private int getMaxRuns() { return this.max_runs; }
+
+    /**
+     * max_runs to set
+     */
+    private void setMaxRuns(int max_runs) { this.max_runs = max_runs; }
 }

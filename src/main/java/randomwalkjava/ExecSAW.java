@@ -75,7 +75,8 @@ class ExecSAW extends Data {
                     return;
 
                 sawScene.refresh(folder, executable, getFirst(), getSawLengths(), getSawExpd(), getSawRms(),
-                    getExpdRuns(), getRmsRuns(), null, null, getXAxis(), getXhistAxis(), isSaw(), isEff(), aaSlider);
+                    getExpdRuns(), getRmsRuns(), null, null, getXAxis(), getXhistAxis(),
+                    isSaw(), isEff(), aaSlider, 0);
 
                 if (getFirst()) setFirst(false);
 
@@ -409,7 +410,7 @@ class ExecSAW extends Data {
 
                     sawScene.refresh(folder, executable, this.getFirst(), null, null, null,
                         null, null, this.getEffRuns(), this.getSuccRuns(), this.getXAxis(),
-                        null, this.isSaw(), this.isEff(), aaSlider);
+                        null, this.isSaw(), this.isEff(), aaSlider, max_runs);
 
                     if (this.getFirst()) this.setFirst(false);
                 }

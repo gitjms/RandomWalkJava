@@ -569,8 +569,7 @@ public class RandomWalk extends Application {
            fexec, pyexecsaw2d, pyexecsaw3d, ex, setMax, result);
         execSAW.setEffClick(datafolder, fexec, runEFF, runSAW, runMCSAW, plotSAW, getSAWScene, this.getValikkoSAW(), setEff, resultEff, sliderAa);
         execSAW.setSawClick(datafolder, fexec, runSAW, runMCSAW, runEFF, getSAWScene, this.getIsovalikkoSAW(),
-            this.getSawPane(), this.getTextAreaSAW(), plotSAW, closeNappiSAW, menuNappiSAW, helpNappiSAW,
-            sliderAa);
+            this.getSawPane(), this.getTextAreaSAW(), plotSAW, closeNappiSAW, menuNappiSAW, helpNappiSAW, sliderAa);
 
         /*
         * CLOSE STAGE

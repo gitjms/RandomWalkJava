@@ -206,7 +206,7 @@ class FXPlot {
                 this.getChartPanelV().setVisible(true);
 
                 this.getCalcChartE().getStyler().setLegendVisible(false);
-                this.getCalcChartE().setXAxisTitle(this.getLanguage().equals("fin") ? "Askeleet" : "Steps");
+                this.getCalcChartE().setXAxisTitle(this.getLanguage().equals("fin") ? "Askeleet, S" : "Steps, S");
                 this.getCalcChartE().setYAxisTitle(this.getLanguage().equals("fin") ? "Energia, \u0394E [eV]" : "Energy, \u0394E [eV]");
                 this.getCalcChartE().getStyler().setMarkerSize(0);
                 this.getCalcChartE().getStyler().setXAxisDecimalPattern("0");
@@ -249,7 +249,6 @@ class FXPlot {
                 this.getCalcChartV().getStyler().setMarkerSize(0);
                 this.getCalcChartV().getStyler().setXAxisDecimalPattern("0");
                 this.getCalcChartV().getStyler().setYAxisDecimalPattern("0.0");
-                this.getCalcChartV().getStyler().setPlotGridHorizontalLinesVisible(false);
                 this.getCalcChartV().getStyler().setYAxisLogarithmic(false);
                 this.getCalcChartV().getStyler().setToolTipType(Styler.ToolTipType.xAndYLabels);
                 this.getCalcChartV().getStyler().setToolTipFont(new java.awt.Font(null, Font.PLAIN,18));

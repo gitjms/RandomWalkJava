@@ -607,7 +607,7 @@ class SceneRealTimeRms extends Data {
         this.vars[8] = "-"; // save (off)           n/a
 
         Label labPlotChoice = new Label(this.getLanguage().equals("fin") ? "Kuvaaja:" : "Plot type:");
-        this.setStandPlot = new ToggleButton(this.getLanguage().equals("fin") ? "NORM. JAKAUMA" : "NORM. DISTRIB.");
+        this.setStandPlot = new ToggleButton(this.getLanguage().equals("fin") ? "RMS JAKAUMA" : "RMS DISTRIB.");
         this.setStandPlot.setMinWidth(this.getCompwidth());
         this.setStandPlot.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
         this.setStandPlot.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
