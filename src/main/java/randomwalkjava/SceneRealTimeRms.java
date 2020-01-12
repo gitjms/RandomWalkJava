@@ -79,6 +79,7 @@ class SceneRealTimeRms extends Data {
     private ToggleButton setDim3;
     private ToggleButton setStandPlot;
     private ToggleButton setDiffPlot;
+    private ToggleButton setLattice;
     private boolean standPlot;
     private boolean diffPlot;
     private TextField setNumParticles;
@@ -603,7 +604,30 @@ class SceneRealTimeRms extends Data {
 
         this.vars[5] = "-"; // calcfix or sawplot   n/a
         this.vars[6] = "f"; // fixed(/spread)       n/a
-        this.vars[7] = "-"; // (lattice/)free       n/a
+
+        /*
+         * BUTTON: LATTICE
+         */
+        this.setLattice = new ToggleButton(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
+        this.setLattice.setMinWidth(this.getCompwidth());
+        this.setLattice.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
+        this.setLattice.setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setLattice.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.setLattice.setEffect(shadow));
+        this.setLattice.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.setLattice.setEffect(null));
+        this.setLattice.setId("lattice");
+        this.setLattice.setOnMouseClicked((MouseEvent event) -> {
+            if (this.setLattice.getText().equals("LATTICE") || this.setLattice.getText().equals("HILA")){
+                this.setLattice.setText(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
+                this.setLattice.setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.vars[7] = "-";
+            } else if (this.setLattice.getText().equals("FREE") || this.setLattice.getText().equals("VAPAA")){
+                this.setLattice.setText(this.getLanguage().equals("fin") ? "HILA" : "LATTICE");
+                this.setLattice.setBackground(new Background(new BackgroundFill(Color.LIGHTSALMON,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.vars[7] = "l";
+            }
+        });
+        //this.vars[7] = "-"; // (lattice/)free       n/a
+
         this.vars[8] = "-"; // save (off)           n/a
 
         Label labPlotChoice = new Label(this.getLanguage().equals("fin") ? "Kuvaaja:" : "Plot type:");
@@ -676,23 +700,32 @@ class SceneRealTimeRms extends Data {
         GridPane.setHalignment(empty1, HPos.CENTER);
         asettelu.add(empty1, 0, 6, 2, 2);
 
-        GridPane.setHalignment(labPlotChoice, HPos.LEFT);
-        asettelu.add(labPlotChoice, 0, 7);
-        GridPane.setHalignment(this.getPlotChoice(), HPos.CENTER);
-        this.getPlotChoice().setMinWidth(getCompwidth());
-        this.getPlotChoice().setMaxWidth(getCompwidth());
-        asettelu.add(this.getPlotChoice(), 0, 8);
-
         final Pane empty2 = new Pane();
         GridPane.setHalignment(empty2, HPos.CENTER);
-        asettelu.add(empty2, 0, 9, 2, 2);
+        asettelu.add(empty2, 0, 7, 2, 2);
+
+        GridPane.setHalignment(this.setLattice, HPos.CENTER);
+        this.setLattice.setMinWidth(getCompwidth());
+        this.setLattice.setMaxWidth(getCompwidth());
+        asettelu.add(this.setLattice, 0, 8);
 
         final Pane empty3 = new Pane();
         GridPane.setHalignment(empty3, HPos.CENTER);
-        asettelu.add(empty3, 0, 10, 2, 2);
+        asettelu.add(empty3, 0, 9, 2, 2);
+
+        GridPane.setHalignment(labPlotChoice, HPos.LEFT);
+        asettelu.add(labPlotChoice, 0, 10);
+        GridPane.setHalignment(this.getPlotChoice(), HPos.CENTER);
+        this.getPlotChoice().setMinWidth(getCompwidth());
+        this.getPlotChoice().setMaxWidth(getCompwidth());
+        asettelu.add(this.getPlotChoice(), 0, 11);
+
+        final Pane empty4 = new Pane();
+        GridPane.setHalignment(empty4, HPos.CENTER);
+        asettelu.add(empty4, 0, 12, 2, 2);
 
         GridPane.setHalignment(valikko, HPos.LEFT);
-        asettelu.add(valikko, 0, 11, 2, 1);
+        asettelu.add(valikko, 0, 13, 2, 1);
 
         return asettelu;
     }

@@ -21,6 +21,11 @@ def main():
 
 	steps = len(xdata_saw)-1
 
+	f = open(saw_data,'r')
+	facts = f.readline().split(',')
+	f.close()
+	pivots = facts[3].split('=')[1].split(' ')
+
 #!----------------------------------------------------------------------
 #!	PLOT
 #!----------------------------------------------------------------------
@@ -52,6 +57,9 @@ def main():
 	sub.plot3D(xdata_saw,ydata_saw,zdata_saw,'C0-',lw=1,antialiased=True,label=label1+", S=%d"%int(steps),zdir='z')
 	sub.scatter3D(xdata_saw[0],ydata_saw[0],zdata_saw[0],zdir='z',color='red',marker='o',s=150,edgecolors='red',antialiased=True,label=label2)
 	sub.scatter3D(xdata_saw[steps],ydata_saw[steps],zdata_saw[steps],zdir='z',color='red',marker='*',s=250,edgecolors='red',antialiased=True,label=label3)
+	if (len(pivots) > 0 and int(pivots[0]) != -1):
+		for i in range(len(pivots)):
+			sub.scatter3D(xdata_saw[int(pivots[i])],ydata_saw[int(pivots[i])],zdata_saw[int(pivots[i])],zdir='z',color='green',marker='o',s=150,edgecolors='green',antialiased=True)
 	
 	sub.set_xlabel('$X$', fontsize=15)
 	sub.set_ylabel('$Y$', fontsize=15)
@@ -59,9 +67,9 @@ def main():
 	sub.tick_params(axis='both', which='major', labelsize=12)
 
 	if (language == 'fin'):
-		text = "Itseäänvälttelevä satunnaiskulku, %d askelta"%(int(steps))
+		text = "SAW, %d askelta"%(int(steps))
 	else:
-		text = "Self-avoiding Random Walk, %d steps"%(int(steps))
+		text = "SAW, %d steps"%(int(steps))
 
 	plt.title(text,fontsize=20, y=1.055)
 	plt.tight_layout()

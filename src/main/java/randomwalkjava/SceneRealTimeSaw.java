@@ -194,19 +194,18 @@ class SceneRealTimeSaw extends Data {
                             /*
                              * RMS EXPECTED SQRT(A)*S^NU (RED LINE)
                              */
-                            double rms_expd = Double.parseDouble(valStr[1].trim());
-                            this.getSawExpd().add(this.getAaSlider().getValue() * Math.sqrt(rms_expd));
+                            this.getSawExpd().add(this.getAaSlider().getValue() * Math.pow(this.getSteps(), this.getNu()));
 
                             /*
-                             * RMS <R^2> (BLUE LINE)
+                             * RMS <R^2> (BLUE LINE), gets r^2 from Fortran code
                              */
-                            double rms = Double.parseDouble(valStr[2].trim());
+                            double rms = Double.parseDouble(valStr[1].trim());
                             this.getSawRms().add(rms);
 
                             /*
-                             * LENGTH (YELLOW)
+                             * LENGTH (YELLOW), gets r^2 from Fortran code and makes it r
                              */
-                            double length = Math.sqrt(Double.parseDouble(valStr[2].trim()));
+                            double length = Math.sqrt(Double.parseDouble(valStr[1].trim()));
                             if (this.getRuns() > 9) this.getSawLengths().add(length);
                             else this.getSawLengths().set((int) this.getRuns(), length);
 
@@ -218,7 +217,7 @@ class SceneRealTimeSaw extends Data {
                         if (this.getRuns() > 9) this.getXAxis().add((int) this.getRuns());
 
                     } else {
-                        this.setMCSumWeight( Double.parseDouble(valStr[1].trim()));
+                        this.setMCSumWeight(this.getMCSumWeight() + Double.parseDouble(valStr[1].trim()));
                     }
 
                     if (!this.isEff()) {
@@ -394,7 +393,7 @@ class SceneRealTimeSaw extends Data {
                 else if (d <= 18.0) bin18++;
                 else if (d <= 19.0) bin19++;
                 else if (d <= 20.0) bin20++;
-            } else if ((dim == 2 && issaw) || (steps >= 30 && steps < 200 && !issaw)) {
+            } else if ((dim == 2) || (steps >= 30 && steps < 200 && !issaw)) {
                 if (d <= 3.0) bin1++;
                 else if (d <= 6.0) bin2++;
                 else if (d <= 9.0) bin3++;
@@ -415,7 +414,7 @@ class SceneRealTimeSaw extends Data {
                 else if (d <= 54.0) bin18++;
                 else if (d <= 57.0) bin19++;
                 else if (d <= 60.0) bin20++;
-            } else if ( steps < 400 && !issaw ) {
+            } else if ( dim == 3 && !issaw ) {
                 if (d <= 10.0) bin1++;
                 else if (d <= 20.0) bin2++;
                 else if (d <= 30.0) bin3++;
@@ -436,7 +435,7 @@ class SceneRealTimeSaw extends Data {
                 else if (d <= 180.0) bin18++;
                 else if (d <= 190.0) bin19++;
                 else if (d <= 200.0) bin20++;
-            } else {
+            } else if (dim == 3) {
                 if (d <= 20.0) bin1++;
                 else if (d <= 40.0) bin2++;
                 else if (d <= 60.0) bin3++;
@@ -525,16 +524,13 @@ class SceneRealTimeSaw extends Data {
                 runSAW.setDisable(true);
                 runMCSAW.setDisable(false);
                 this.setIsSaw(false);
-                double nume = Math.log(Integer.parseInt(setNumSteps.getText().trim()));
-                this.getAaSlider().setValue(this.getDim() == 2 ?
-                    nume/Math.sqrt(2.0) : nume/Math.sqrt(3.0));
             } else {
                 this.vars[3] = "0";
                 runSAW.setDisable(false);
                 runMCSAW.setDisable(true);
                 this.setIsSaw(true);
-                this.getAaSlider().setValue(1.0);
             }
+            this.getAaSlider().setValue(this.getAmplitude());
         });
         setNumSteps.setOnKeyTyped(e -> {
             if (isNumInteger(setNumSteps.getText().trim())) {
@@ -542,16 +538,13 @@ class SceneRealTimeSaw extends Data {
                 runSAW.setDisable(true);
                 runMCSAW.setDisable(false);
                 this.setIsSaw(false);
-                double nume = Math.log(Integer.parseInt(setNumSteps.getText().trim()));
-                this.getAaSlider().setValue(this.getDim() == 2 ?
-                    nume/Math.sqrt(2.0) : nume/Math.sqrt(3.0));
             } else {
                 this.vars[3] = "0";
                 runSAW.setDisable(false);
                 runMCSAW.setDisable(true);
                 this.setIsSaw(true);
-                this.getAaSlider().setValue(1.0);
             }
+            this.getAaSlider().setValue(this.getAmplitude());
         });
         runMCSAW.setDisable(true);
 
@@ -576,24 +569,28 @@ class SceneRealTimeSaw extends Data {
         this.setDim2.setOnMouseClicked(f -> {
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            if (setNumSteps.getText().trim().equals("")) {
-                this.getAaSlider().setValue(1.0);
-            } else {
-                double nume = Math.log(Integer.parseInt(setNumSteps.getText().trim()));
-                this.getAaSlider().setValue(nume/Math.sqrt(2.0));
-            }
+            this.getAaSlider().setValue(this.getAmplitude());
+            this.vars[4] = "2";
+            this.dim(2);
+        });
+        this.setDim2.setOnMouseReleased(f -> {
+            this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.getAaSlider().setValue(this.getAmplitude());
             this.vars[4] = "2";
             this.dim(2);
         });
         this.setDim3.setOnMouseClicked(f -> {
             this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
             this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
-            if (setNumSteps.getText().trim().equals("")) {
-                this.getAaSlider().setValue(1.0);
-            } else {
-                double nume = Math.log(Integer.parseInt(setNumSteps.getText().trim()));
-                this.getAaSlider().setValue(nume/Math.sqrt(3.0));
-            }
+            this.getAaSlider().setValue(this.getAmplitude());
+            this.vars[4] = "3";
+            this.dim(3);
+        });
+        this.setDim3.setOnMouseReleased(f -> {
+            this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.getAaSlider().setValue(this.getAmplitude());
             this.vars[4] = "3";
             this.dim(3);
         });
@@ -1020,4 +1017,16 @@ class SceneRealTimeSaw extends Data {
      * max_runs to set
      */
     private void setMaxRuns(int max_runs) { this.max_runs = max_runs; }
+
+    /**
+     * @return the nu
+     */
+    @Contract(pure = true)
+    private double getNu() { return this.getDim() == 2 ? 3.0/4.0 : 0.587597; }
+
+    /**
+     * @return the nu
+     */
+    @Contract(pure = true)
+    private double getAmplitude() { return this.getDim() == 2 ? 0.64 : 0.56; }
 }

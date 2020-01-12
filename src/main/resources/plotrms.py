@@ -31,6 +31,13 @@ def main():
 			space = 'hila'
 		else:
 			space = 'vapaa'
+	
+	fixed = facts[3].split('=')[1]
+	if (language == 'fin'):
+		if (fixed == 'T'):
+			fixtxt = r'$\left(\sqrt{d\langle r^2\rangle}\right)$'
+		else:
+			fixtxt = r'$\left(\sqrt{\langle r^2\rangle}\right)$'
 		
 	maxx = np.max(x_data)
 	maxy = np.max(y_data)
@@ -55,13 +62,13 @@ def main():
 		xlab = r"Odotusarvo ($\sqrt{S}$)"
 	else:
 		xlab = r"Expected value ($\sqrt{S}$)"
-	plt.xlabel(xlab, fontsize=14)
-	plt.ylabel(r"$R_{rms}$ $\left(\sqrt{\langle r^2\rangle}\right)$", fontsize=14)
+	plt.xlabel(xlab, fontsize=16)
+	plt.ylabel(r"$R_{rms}$ "+fixtxt, fontsize=16)
 	if (language == 'fin'):
 		text = r"$R_{rms}$ odotusarvon funktiona (%dD, %s), %d askelta"%(int(dimension),space,int(steps))
 	else:
 		text = r"$R_{rms}$ as a Function of Expected Value (%dD, %s), %d steps"%(int(dimension),space,int(steps))
-	plt.title(text,fontsize=16)
+	plt.title(text,fontsize=18)
 	plt.legend(loc='upper left',prop={'size': 18})
 
 	plt.grid()

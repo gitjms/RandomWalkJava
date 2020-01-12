@@ -351,13 +351,13 @@ public class RandomWalk extends Application {
         // SLIDER A
         final Label labaa = new Label(this.getLanguage().equals("fin") ? "Amplitudi A :" : "Amplitude A :");
         final Label labelaa = new Label();
-        Slider sliderAa = new Slider(1.0, 10.0, 1.0);
+        Slider sliderAa = new Slider(0.00, 1.00, 0.00);
         sliderAa.setOrientation(Orientation.HORIZONTAL);
         sliderAa.setMaxSize(this.getSawCompWidth(), this.getSawCompHeight());
         sliderAa.setShowTickLabels(true);
-        sliderAa.setMinorTickCount(9);
-        sliderAa.setMajorTickUnit(1.0);
-        sliderAa.setShowTickMarks(true);
+        sliderAa.setMinorTickCount(18);
+        sliderAa.setMajorTickUnit(0.2);
+        sliderAa.setShowTickMarks(false);
         sliderAa.setSnapToTicks(true);
         labelaa.textProperty().bind(
             Bindings.format( "%.2f", sliderAa.valueProperty() )

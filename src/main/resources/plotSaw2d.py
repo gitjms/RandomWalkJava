@@ -17,10 +17,15 @@ def main():
 
 	steps = len(xdata_saw)-1
 
+	f = open(saw_data,'r')
+	facts = f.readline().split(',')
+	f.close()
+	pivots = facts[3].split('=')[1].split(' ')
+
 	xmin = np.min(xdata_saw) - 1
 	xmax = np.max(xdata_saw) + 1
 	ymin = np.min(ydata_saw) - 1
-	ymax = np.max(ydata_saw) + 1
+	ymax = np.max(ydata_saw) + 1 + np.log10(steps)
 
 	if (np.abs(xmax-xmin) > np.abs(ymax-ymin)):
 		chart_size = np.abs(xmax-xmin)
@@ -61,6 +66,9 @@ def main():
 	plt.plot(xdata_saw,ydata_saw,'C0-',lw=5,antialiased=True,label=label1+", S=%d"%int(steps))
 	plt.plot(xdata_saw[0],ydata_saw[0],'ro',ms=20,antialiased=True,label=label2)
 	plt.plot(xdata_saw[steps],ydata_saw[steps],'r*',ms=30,antialiased=True,label=label3)
+	if (len(pivots) > 0 and int(pivots[0]) != -1):
+		for i in range(len(pivots)):
+			plt.plot(xdata_saw[int(pivots[i])],ydata_saw[int(pivots[i])],'go',ms=15,antialiased=True)
 
 	plt.xlim(xmin - d_size/2, xmax + d_size/2)
 	plt.ylim(ymin - d_size/2, ymax + d_size/2)
@@ -78,9 +86,9 @@ def main():
 	ax.yaxis.set_ticks(np.arange(ymin-1, ymax+3, dytick))
 
 	if (language == 'fin'):
-		text = "Itseäänvälttelevä satunnaiskulku, %d askelta"%(int(steps))
+		text = "SAW, %d askelta"%(int(steps))
 	else:
-		text = "Self-avoiding Random Walk, %d steps"%(int(steps))
+		text = "SAW, %d steps"%(int(steps))
 
 	plt.title(text,fontsize=20)
 	plt.tight_layout()

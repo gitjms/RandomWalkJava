@@ -146,8 +146,11 @@ class ExecSAW extends Data {
                 this.setFirst(true);
 
                 Map<Object, Object> labelMap = new HashMap<>();
-                if (dim == 2) for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*3));
-                else for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*10));
+                if (dim == 2) {
+                    for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*3));
+                } else {
+                    for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*20));
+                }
 
                 sawScene.getFxplot().setS1Data(this.getXAxis(), this.getExpdRuns(), dim);
                 sawScene.getFxplot().setS2Data(this.getXAxis(), this.getRmsRuns());
@@ -228,17 +231,12 @@ class ExecSAW extends Data {
                 this.setFirst(true);
 
                 Map<Object, Object> labelMap = new HashMap<>();
-                if (steps < 30) for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)));
-                else if (steps < 500) for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*3));
-                else for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*10));
                 if (steps < 30) {
                     for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)));
-                } else if (steps < 200) {
+                } else if (dim == 2 || steps < 200) {
                     for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*3));
-                } else if (steps < 400) {
-                    for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*10));
                 } else {
-                    for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*20));
+                    for (int i = 0; i < 20; i++) labelMap.put(i, String.valueOf((i+1)*10));
                 }
 
                 sawScene.getFxplot().setS1Data(this.getXAxis(), this.getExpdRuns(), dim);
@@ -368,7 +366,7 @@ class ExecSAW extends Data {
         runEFF.setOnMouseClicked((MouseEvent event) -> {
             resultEff.getChildren().clear();
             sawScene.setSawMc("F");
-            sawScene.setSawPlot("-");
+            sawScene.setSawPlot("e");
             sawScene.setSave("-");
             String[] vars = sawScene.getVars();
             this.setVars(vars);
