@@ -39,16 +39,20 @@ Asennustyökalu *RandomWalk-1.0.msi* löytyy linkin *release* takaa:
 * Diffuusio -animaatioon 3D-hilarakenne näkyviin
 * Skaalaukset paremmiksi
 * muitakin hilarakenteita
+* lisää sisältöä SAW-osioon
 
 ## Kaavio ohjelmarakenteesta
-
-![Java_kaavio](https://user-images.githubusercontent.com/46410240/72222753-059d6880-3571-11ea-8d54-cd678d4a9be9.png)
+<img src="https://user-images.githubusercontent.com/46410240/72285782-85e4cc00-364c-11ea-82d9-e71c52f0a45f.png" alt="Java_kaavio" width="450" height="882" >
 
 ## Kuvia
 
-<img src="https://user-images.githubusercontent.com/46410240/64206211-843b1880-cea2-11e9-9892-bd7dd466b7f1.png" alt="main_view" width="450" height="318" >
-<img src="https://user-images.githubusercontent.com/46410240/63885078-388af980-c9e0-11e9-8d04-9126a3b30383.png" alt="path_view" width="450" height="227" >
-<img src="https://user-images.githubusercontent.com/46410240/63885091-42acf800-c9e0-11e9-8388-0a421dc705b5.png" alt="1ddist_view" width="450" height="200" >
-<img src="https://user-images.githubusercontent.com/46410240/64206501-2ce97800-cea3-11e9-9149-19ce7ab11b10.png" alt="calc_view" width="450" height="194" >
-<img src="https://user-images.githubusercontent.com/46410240/63885082-3c1e8080-c9e0-11e9-8193-86061f718e98.png" alt="real_view" width="450" height="270" >
-<img src="https://user-images.githubusercontent.com/46410240/63885086-3fb20780-c9e0-11e9-984d-a2a815602d41.png" alt="mmc_view" width="450" height="265" >
+<img src="https://user-images.githubusercontent.com/46410240/72285467-d27bd780-364b-11ea-9476-918a3a30f3c4.png" alt="main_view" width="313" height="222" >
+<img src="https://user-images.githubusercontent.com/46410240/72285507-ede6e280-364b-11ea-853d-164fb869125b.png" alt="path_view" width="580" height="264" >
+<img src="https://user-images.githubusercontent.com/46410240/72285521-f93a0e00-364b-11ea-887a-5425a0862139.png" alt="1ddist_view" width="616" height="238" >
+<img src="https://user-images.githubusercontent.com/46410240/72285538-00f9b280-364c-11ea-8009-091e465768f7.png" alt="calc_view" width="584" height="256" >
+<img src="https://user-images.githubusercontent.com/46410240/72285554-06ef9380-364c-11ea-8c27-1e26c1c4892d.png" alt="real_view" width="546" height="335" >
+<img src="https://user-images.githubusercontent.com/46410240/72285567-0e16a180-364c-11ea-8302-b68ed14034e1.png" alt="diff_view1" width="636" height="336" >
+<img src="https://user-images.githubusercontent.com/46410240/72285585-14a51900-364c-11ea-9407-ef3d4ce6687b.png" alt="diff_view2" width="544" height="336" >
+<img src="https://user-images.githubusercontent.com/46410240/72285604-21297180-364c-11ea-82df-d643872026f9.png" alt="saw_view1" width="540" height="334" >
+<img src="https://user-images.githubusercontent.com/46410240/72285612-2686bc00-364c-11ea-886d-c8ce5d3b845d.png" alt="saw_view2" width="575" height="236" >
+<img src="https://user-images.githubusercontent.com/46410240/72285619-2be40680-364c-11ea-8e9d-ac06a33fcc05.png" alt="saw_view3" width="637" height="344" >
