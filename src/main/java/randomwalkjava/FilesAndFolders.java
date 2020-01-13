@@ -75,34 +75,36 @@ class FilesAndFolders {
                              String pyexec2d, String pyexec3d, String pyexecdiff2d, String pyexecdiff3d,
                              String pyexec1Ddist, String pyexecsaw2d, String pyexecsaw3d) {
 
+        int fail_count = 0;
+
         File sourceFile = new File(datapath + "/" + pyexecrms);
-        if (Files.notExists(sourceFile.toPath())) return createFolder(datapath, pyexecrms, false);
+        if (Files.notExists(sourceFile.toPath())) if (createFolder(datapath, pyexecrms, false)) fail_count += 1;
 
         sourceFile = new File(datapath + "/" + pyexec1d);
-        if (Files.notExists(sourceFile.toPath())) return createFolder(datapath, pyexec1d, false);
+        if (Files.notExists(sourceFile.toPath()))  if (createFolder(datapath, pyexec1d, false)) fail_count += 1;
 
         sourceFile = new File(datapath + "/" + pyexec2d);
-        if (Files.notExists(sourceFile.toPath())) return createFolder(datapath, pyexec2d, false);
+        if (Files.notExists(sourceFile.toPath()))  if (createFolder(datapath, pyexec2d, false)) fail_count += 1;
 
         sourceFile = new File(datapath + "/" + pyexec3d);
-        if (Files.notExists(sourceFile.toPath())) return createFolder(datapath, pyexec3d, false);
+        if (Files.notExists(sourceFile.toPath()))  if (createFolder(datapath, pyexec3d, false)) fail_count += 1;
 
         sourceFile = new File(datapath + "/" + pyexecdiff2d);
-        if (Files.notExists(sourceFile.toPath())) return createFolder(datapath, pyexecdiff2d, false);
+        if (Files.notExists(sourceFile.toPath()))  if (createFolder(datapath, pyexecdiff2d, false)) fail_count += 1;
 
         sourceFile = new File(datapath + "/" + pyexecdiff3d);
-        if (Files.notExists(sourceFile.toPath())) return createFolder(datapath, pyexecdiff3d, false);
+        if (Files.notExists(sourceFile.toPath()))  if (createFolder(datapath, pyexecdiff3d, false)) fail_count += 1;
 
         sourceFile = new File(datapath + "/" + pyexec1Ddist);
-        if (Files.notExists(sourceFile.toPath())) return createFolder(datapath, pyexec1Ddist, false);
+        if (Files.notExists(sourceFile.toPath()))  if (createFolder(datapath, pyexec1Ddist, false)) fail_count += 1;
 
         sourceFile = new File(datapath + "/" + pyexecsaw2d);
-        if (Files.notExists(sourceFile.toPath())) return createFolder(datapath, pyexecsaw2d, false);
+        if (Files.notExists(sourceFile.toPath()))  if (createFolder(datapath, pyexecsaw2d, false)) fail_count += 1;
 
         sourceFile = new File(datapath + "/" + pyexecsaw3d);
-        if (Files.notExists(sourceFile.toPath())) return createFolder(datapath, pyexecsaw3d, false);
+        if (Files.notExists(sourceFile.toPath()))  if (createFolder(datapath, pyexecsaw3d, false)) fail_count += 1;
 
-        return false;
+        return fail_count > 0;
     }
 
     /**

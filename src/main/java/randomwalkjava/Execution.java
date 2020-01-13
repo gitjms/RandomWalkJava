@@ -418,7 +418,6 @@ class Execution {
          * vars[7] = lattice,           n/a
          * vars[8] = save               n/a
          */
-
         pyexecsaw2d = "python ".concat(pyexecsaw2d);
         pyexecsaw3d = "python ".concat(pyexecsaw3d);
         this.setFrame();

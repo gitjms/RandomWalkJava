@@ -1,4 +1,4 @@
-# Random Walk Model of Diffusion - Random walk diffuusiomalli
+# Satunnaiskulun ominaisuuksia ja visualisointeja
 
 ********************************************************************************
 
@@ -36,13 +36,13 @@ Asennustyökalu *RandomWalk-1.0.msi* löytyy linkin *release* takaa:
 
 ## TODO (mahdollisia tulevia kehitysnäkymiä)
 
-* MMC diffuusio -animaatioon 3D-hilarakenne näkyviin
+* Diffuusio -animaatioon 3D-hilarakenne näkyviin
 * Skaalaukset paremmiksi
 * muitakin hilarakenteita
 
 ## Kaavio ohjelmarakenteesta
 
-![Java_kaavio](https://user-images.githubusercontent.com/46410240/67178661-350e6000-f3dc-11e9-9987-7e752aeac723.png)
+![Java_kaavio](https://user-images.githubusercontent.com/46410240/72222753-059d6880-3571-11ea-8d54-cd678d4a9be9.png)
 
 ## Kuvia
 

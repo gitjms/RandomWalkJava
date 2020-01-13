@@ -240,6 +240,7 @@ public class RandomWalk extends Application {
         Button closeNappiPath = getButtons.getCloseButton(getRealScene, getDiffScene, getSAWScene,
             0, ex, this.getLanguage(), this.getFrame(), this.getButtonYES(), this.getButtonNO());
         this.getTextAreaPath().setText(this.getLanguage().equals("fin") ? helpText.pathtracingFI() : helpText.pathtracingEN());
+        System.out.println(this.getTextAreaPath().getFont());
 
         /*
          * OTHER VIEWS BUTTONS: 1D DISTANCE
@@ -382,7 +383,7 @@ public class RandomWalk extends Application {
 
         VBox effBox = new VBox(0);
         effBox.setPadding(new Insets(-15, 0, -15, 0));
-        Label labEff = new Label(this.getLanguage().equals("fin") ? "askeleita max: (min 100)" : "efficiency steps max: (min 100)");
+        Label labEff = new Label(this.getLanguage().equals("fin") ? "askeleita max:" : "efficiency steps max:");
         TextField setEff = new TextField("");
         TextFlow resultEff = new TextFlow();
         resultEff.setMinSize(this.getWidth(),10);

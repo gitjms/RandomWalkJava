@@ -15,8 +15,8 @@ import java.util.Scanner;
  * jari.sunnari@gmail.com
  * 
  * Class for data handling:
- * executes Fortran code for all runs,
- * reads initial particle data for MMC
+ * creates data, reads data,
+ * sets some data values for Fortran
  */
 class Data {
 

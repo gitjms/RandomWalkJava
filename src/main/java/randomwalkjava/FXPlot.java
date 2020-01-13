@@ -67,7 +67,6 @@ class FXPlot {
         this.getFrame().setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.setScreenHeight(Toolkit.getDefaultToolkit().getScreenSize().height);
 
-        //this.eformatter = new DecimalFormat("#.#E0");
         this.eformatter = new DecimalFormat("0.0E0");
         this.twodecformatter = new DecimalFormat("0.00");
 

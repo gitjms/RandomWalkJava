@@ -191,6 +191,7 @@
                         <jnlp.includeDT>true</jnlp.includeDT>
                         <jnlp.outfile>randomwalkjava.Main</jnlp.outfile>
                         <includes>
+                            <include>**/*.png</include>
                             <include>**/*.dll</include>
                             <include>**/*.py</include>
                             <include>**/*.exe</include>
