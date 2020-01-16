@@ -296,6 +296,9 @@ class ExecSAW extends Data {
         result.setTextAlignment(TextAlignment.CENTER);
 
         plotNappi.setOnMouseClicked((MouseEvent event) -> {
+            if (sawScene.isRunning()) {
+                sawScene.stop();
+            }
             result.getChildren().clear();
             if (execSAW.isDisabled()) {
                 sawScene.setSawMc("F");
@@ -364,6 +367,9 @@ class ExecSAW extends Data {
         });
 
         runEFF.setOnMouseClicked((MouseEvent event) -> {
+            if (sawScene.isRunning()) {
+                sawScene.stop();
+            }
             resultEff.getChildren().clear();
             sawScene.setSawMc("F");
             sawScene.setSawPlot("e");
