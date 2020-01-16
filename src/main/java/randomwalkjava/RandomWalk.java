@@ -132,6 +132,10 @@ public class RandomWalk extends Application {
                 Platform.exit();
             }
         }
+        if (filesAndFolders.checkSourceFiles(datapath, pyexecrms, pyexec1d, pyexec2d, pyexec3d,
+            pyexecdiff2d, pyexecdiff3d, pyexec1Ddist, pyexecsaw2d, pyexecsaw3d)) {
+            Platform.exit();
+        }
 
         /*
         * CREATE STAGE
@@ -240,7 +244,6 @@ public class RandomWalk extends Application {
         Button closeNappiPath = getButtons.getCloseButton(getRealScene, getDiffScene, getSAWScene,
             0, ex, this.getLanguage(), this.getFrame(), this.getButtonYES(), this.getButtonNO());
         this.getTextAreaPath().setText(this.getLanguage().equals("fin") ? helpText.pathtracingFI() : helpText.pathtracingEN());
-        System.out.println(this.getTextAreaPath().getFont());
 
         /*
          * OTHER VIEWS BUTTONS: 1D DISTANCE

@@ -180,7 +180,6 @@ class ExecDiff extends Data {
                        File datafolder, String fexec, String pyexecdiff2d, String pyexecdiff3d, Execution ex) {
 
         plotNappi.setOnMouseClicked((MouseEvent event) -> {
-            valikkoDiff.setDisable(true);
             diffScene.setSave("+");
             String[] vars = diffScene.getVars();
             this.setVars(vars);
@@ -198,8 +197,12 @@ class ExecDiff extends Data {
 
             if ( fail ) return;
 
+            valikkoDiff.setDisable(true);
+
             ex.executeDiff(datafolder, datapath, fexec, pyexecdiff2d,
                 pyexecdiff3d, valikkoDiff, data, this.getVars());
+
+            valikkoDiff.setDisable(false);
         });
     }
 
