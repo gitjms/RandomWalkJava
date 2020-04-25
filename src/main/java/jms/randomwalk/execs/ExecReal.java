@@ -1,6 +1,6 @@
-package randomwalkjava;
+package jms.randomwalk.execs;
 
-import com.sun.glass.ui.Screen;
+import enums.DblSizes;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -10,8 +10,10 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
+import jms.randomwalk.datahandling.Data;
+import jms.randomwalk.plots.FXPlot;
+import jms.randomwalk.ui.GetComponents;
+import jms.randomwalk.scenes.SceneRealTimeRms;
 
 import java.io.File;
 
@@ -19,9 +21,9 @@ import java.io.File;
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
  *
- * Class for executing and plotting Real Time RMS
+ * Class for executing and plotting Real Time RMS.
  */
-class ExecReal extends Data {
+public class ExecReal extends Data {
 
     private String language;
     private double realscalefactor;
@@ -35,17 +37,33 @@ class ExecReal extends Data {
     private GraphicsContext piirturi;
 
     /**
-     * Initiating class
+     * Initiating class.
+     * @param language which ui language: finnish or english
      */
-    ExecReal(String language) {
+    public ExecReal(String language) {
         super();
         this.setLanguage(language);
     }
 
-    void setRmsClick(File folder, String executable, @NotNull Button execNappi, SceneRealTimeRms rmsScene,
-                     Button closeNappiReal, Button menuNappiReal, Button helpNappiReal,
-                     HBox isovalikko, TextArea textAreaReal, Pane realPane, Canvas rtrmsAlusta,
-                     GraphicsContext piirturi) {
+    /**
+     * Method for setting execute RMS mouseclicked.
+     * @param folder data folder
+     * @param executable file for execution
+     * @param execNappi execute button
+     * @param rmsScene scene for RMS
+     * @param closeNappiReal close button
+     * @param menuNappiReal menu button
+     * @param helpNappiReal help button
+     * @param isovalikko HBox for components
+     * @param textAreaReal help text
+     * @param realPane Pane object
+     * @param rtrmsAlusta Canvas object
+     * @param piirturi GraphicsContext object
+     */
+    public void setRmsClick(File folder, String executable, Button execNappi, SceneRealTimeRms rmsScene,
+        Button closeNappiReal, Button menuNappiReal, Button helpNappiReal,
+        HBox isovalikko, TextArea textAreaReal, Pane realPane, Canvas rtrmsAlusta,
+        GraphicsContext piirturi) {
 
         this.setIsoValikko(isovalikko);
         this.setTextArea(textAreaReal);
@@ -70,8 +88,9 @@ class ExecReal extends Data {
                     return;
                 }
 
-                if (!rmsScene.isRunning())
+                if (!rmsScene.isRunning()) {
                     return;
+                }
 
                 if (getIsoValikko().getChildren().contains(getTextArea())) {
                     getTextArea().clear();
@@ -98,9 +117,9 @@ class ExecReal extends Data {
                 getPiirturi().setGlobalAlpha(1.0);
                 getPiirturi().setFill(Color.BLACK);
                 if (dim == 1) {
-                    getPiirturi().fillRect(0, 0, 1.0 / getRealScalefactor() * getAnimWidth(), getAnimHeight());
+                    getPiirturi().fillRect(0, 0, 1.0 / getRealScalefactor() * DblSizes.ANIMSIZE.getDblSize(), DblSizes.ANIMSIZE.getDblSize());
                 } else {
-                    getPiirturi().fillRect(0, 0, 1.0 / getRealScalefactor() * getAnimWidth(), 1.0 / getRealScalefactor() * getAnimHeight());
+                    getPiirturi().fillRect(0, 0, 1.0 / getRealScalefactor() * DblSizes.ANIMSIZE.getDblSize(), 1.0 / getRealScalefactor() * DblSizes.ANIMSIZE.getDblSize());
                 }
                 getPiirturi().fill();
 
@@ -108,7 +127,7 @@ class ExecReal extends Data {
                  * DRAW ANIMATION
                  */
                 rmsScene.refresh(folder, executable, getPiirturi(), getRealScalefactor(), getLinewidth(),
-                    isNewdata(), getAnimWidth());
+                    isNewdata(), DblSizes.ANIMSIZE.getDblSize());
                 setNewdata(false);
 
                 this.prevTime = currentNanoTime;
@@ -119,10 +138,11 @@ class ExecReal extends Data {
             if (rmsScene.isRunning()) {
                 rmsScene.stop();
                 if (this.isRealScaled()) {
-                    if (this.getVars()[4].equals("1"))
+                    if (this.getVars()[4].equals("1")) {
                         this.getPiirturi().scale(1.0 / this.getRealScalefactor(), 1.0);
-                    else
+                    } else {
                         this.getPiirturi().scale(1.0 / this.getRealScalefactor(), 1.0 / this.getRealScalefactor());
+                    }
                 }
                 rmsScene.getPlotChoice().setDisable(false);
                 rmsScene.getDimension().setDisable(false);
@@ -140,24 +160,33 @@ class ExecReal extends Data {
                 int steps = Integer.parseInt(this.getVars()[3]);
                 int dim = Integer.parseInt(this.getVars()[4]);
 
-                if (particles < 0) fail = true;
-                if (steps < 1) fail = true;
-                if (dim < 1 || dim > 3) fail = true;
+                if (particles < 0) {
+                    fail = true;
+                }
+                if (steps < 1) {
+                    fail = true;
+                }
+                if (dim < 1 || dim > 3) {
+                    fail = true;
+                }
 
-                if (fail) return;
+                if (fail) {
+                    return;
+                }
 
                 if (rmsScene.getFxplot() != null) {
                     if (rmsScene.getFxplot().getFrame().isShowing()
                         || rmsScene.getFxplot().getFrame().isActive()
-                        || rmsScene.getFxplot().getFrame().isDisplayable())
+                        || rmsScene.getFxplot().getFrame().isDisplayable()) {
                         rmsScene.getFxplot().getFrame().dispose();
+                    }
                 }
 
                 GetComponents getComponents = new GetComponents();
 
                 if (this.getIsoValikko().getChildren().size() > 1) {
                     this.getIsoValikko().getChildren().remove(1);
-                    this.setPane(getComponents.getPane(this.getAlusta(), this.getAnimWidth(), this.getAnimHeight()));
+                    this.setPane(getComponents.getPane(this.getAlusta(), DblSizes.ANIMSIZE.getDblSize(), DblSizes.ANIMSIZE.getDblSize()));
                     this.getIsoValikko().getChildren().add(this.getPane());
                     helpNappiReal.setText(this.getLanguage().equals("fin") ? "OHJE" : "HELP");
                 }
@@ -167,7 +196,7 @@ class ExecReal extends Data {
 
                 double expected = Math.sqrt(steps);
                 this.setRealScalefactor(
-                    10.0 * Math.sqrt(this.getAnimWidth() * expected) / (Math.pow(Math.log(steps), 3.0)));
+                    10.0 * Math.sqrt(DblSizes.ANIMSIZE.getDblSize() * expected) / (Math.pow(Math.log(steps), 3.0)));
 
                 if (dim == 1) {
                     this.setLinewidth(1.0 / Math.log10(steps));
@@ -195,132 +224,154 @@ class ExecReal extends Data {
     /**
      * @return the textarea
      */
-    @Contract(pure = true)
-    private TextArea getTextArea() { return this.textarea; }
+    private TextArea getTextArea() {
+        return this.textarea;
+    }
 
     /**
      * @param textarea the textarea to set
      */
-    private void setTextArea(TextArea textarea) { this.textarea = textarea; }
+    private void setTextArea(TextArea textarea) {
+        this.textarea = textarea;
+    }
 
     /**
      * @return the alusta
      */
-    @Contract(pure = true)
-    private Canvas getAlusta() { return this.alusta; }
+    private Canvas getAlusta() {
+        return this.alusta;
+    }
 
     /**
      * @param alusta the alusta to set
      */
-    private void setAlusta(Canvas alusta) { this.alusta = alusta; }
+    private void setAlusta(Canvas alusta) {
+        this.alusta = alusta;
+    }
 
     /**
      * @return the isovalikko
      */
-    @Contract(pure = true)
-    private HBox getIsoValikko() { return this.isovalikko; }
+    private HBox getIsoValikko() {
+        return this.isovalikko;
+    }
 
     /**
      * @param isovalikko the isovalikko to set
      */
-    private void setIsoValikko(HBox isovalikko) { this.isovalikko = isovalikko; }
+    private void setIsoValikko(HBox isovalikko) {
+        this.isovalikko = isovalikko;
+    }
 
     /**
      * @return the pane
      */
-    @Contract(pure = true)
-    private Pane getPane() { return this.pane; }
+    private Pane getPane() {
+        return this.pane;
+    }
 
     /**
      * @param pane the pane to set
      */
-    private void setPane(Pane pane) { this.pane = pane; }
+    private void setPane(Pane pane) {
+        this.pane = pane;
+    }
 
     /**
      * @return the piirturi
      */
-    @Contract(pure = true)
-    private GraphicsContext getPiirturi() { return this.piirturi; }
+    private GraphicsContext getPiirturi() {
+        return this.piirturi;
+    }
 
     /**
      * @param piirturi the piirturi to set
      */
-    private void setPiirturi(GraphicsContext piirturi) { this.piirturi = piirturi; }
+    private void setPiirturi(GraphicsContext piirturi) {
+        this.piirturi = piirturi;
+    }
 
     /**
      * @return the language
      */
-    @Contract(pure = true)
-    private String getLanguage() { return this.language; }
+    private String getLanguage() {
+        return this.language;
+    }
 
     /**
      * @param language the language to set
      */
-    private void setLanguage(String language) { this.language = language; }
+    private void setLanguage(String language) {
+        this.language = language;
+    }
 
     /**
      * @return the vars
      */
-    private String[] getVars() { return vars.clone(); }
+    private String[] getVars() {
+        return vars.clone();
+    }
 
     /**
      * @param vars the vars to set
      */
-    private void setVars(@NotNull String[] vars) { this.vars = vars.clone(); }
+    private void setVars(String[] vars) {
+        this.vars = vars.clone();
+    }
 
     /**
      * @return the realscalefactor
      */
-    @Contract(pure = true)
-    private double getRealScalefactor() { return realscalefactor; }
+    private double getRealScalefactor() {
+        return realscalefactor;
+    }
 
     /**
      * @param realscalefactor the realscalefactor to set
      */
-    private void setRealScalefactor(double realscalefactor) { this.realscalefactor = realscalefactor; }
-
-    /**
-     * @return the animwidth
-     */
-    @Contract(pure = true)
-    private double getAnimWidth() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the animheight
-     */
-    @Contract(pure = true)
-    private double getAnimHeight() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
+    private void setRealScalefactor(double realscalefactor) {
+        this.realscalefactor = realscalefactor;
+    }
 
     /**
      * @return the linewidth
      */
-    @Contract(pure = true)
-    private double getLinewidth() { return linewidth; }
+    private double getLinewidth() {
+        return linewidth;
+    }
 
     /**
      * @param linewidth the linewidth to set
      */
-    private void setLinewidth(double linewidth) { this.linewidth = linewidth; }
+    private void setLinewidth(double linewidth) {
+        this.linewidth = linewidth;
+    }
 
     /**
      * @return the isrealscaled
      */
-    @Contract(pure = true)
-    private boolean isRealScaled() { return isrealscaled; }
+    private boolean isRealScaled() {
+        return isrealscaled;
+    }
 
     /**
      */
-    private void setRealScaled() { this.isrealscaled = true; }
+    private void setRealScaled() {
+        this.isrealscaled = true;
+    }
 
     /**
      * @return the newdata
      */
-    @Contract(pure = true)
-    private boolean isNewdata() { return newdata; }
+    private boolean isNewdata() {
+        return newdata;
+    }
 
     /**
      * @param newdata the newdata to set
      */
-    private void setNewdata(boolean newdata) { this.newdata = newdata; }
+    private void setNewdata(boolean newdata) {
+        this.newdata = newdata;
+    }
 
 }

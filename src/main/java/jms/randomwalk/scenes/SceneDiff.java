@@ -1,7 +1,6 @@
+package jms.randomwalk.scenes;
 
-package randomwalkjava;
-
-import com.sun.glass.ui.Screen;
+import enums.DblSizes;
 import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -16,7 +15,9 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import org.jetbrains.annotations.Contract;
+import jms.randomwalk.datahandling.Data;
+import jms.randomwalk.plots.FXPlot;
+import jms.randomwalk.ui.GetDialogs;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -25,17 +26,19 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+import org.apache.maven.surefire.shade.booter.org.apache.commons.lang3.SystemUtils;
 
 /**
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
  * 
- * Class for DIFFUSION
+ * Class for DIFFUSION.
  */
-@SuppressWarnings("SameReturnValue")
-class SceneDiff extends Data {
+public class SceneDiff extends Data {
 
     private String language;
+    private final boolean isWin;
     private ToggleButton setDim2;
     private ToggleButton setDim3;
     private final Button nappiLattice;
@@ -86,34 +89,38 @@ class SceneDiff extends Data {
     private Image grayP;
     private BufferedWriter output;
     private double walktime;
-    private NumberFormat formatter;
+    private final NumberFormat formatter;
 
-    private int num_part;
+    private int numPart;
     private double diam;
     private int dim;
-    private List<Double> energy_x;
-    private List<Double> energy_y;
-    private List<Double> diffusion_x;
-    private List<Double> diffusion_y;
-    private List<Double> visc_x;
-    private List<Double> visc_y;
+    private List<Double> energyX;
+    private List<Double> energyY;
+    private List<Double> diffusionX;
+    private List<Double> diffusionY;
+    private List<Double> viscX;
+    private List<Double> viscY;
     private double measure;
     private double differ;
     private boolean iscancel;
     private boolean ismobility;
 
     /**
-     * main class gets vars via this
+     * Main class gets vars via this.
      * @return clone of vars array
      */
-    String[] getVars() { return this.vars.clone(); }
+    public String[] getVars() { 
+        return this.vars.clone();
+    }
 
     /**
-     * initiating scene button and user variable array
+     * Initiating scene button and user variable array.
+     * @param language which ui language: finnish or english
      */
-    SceneDiff(String language){
+    public SceneDiff(String language) {
         super();
         this.setLanguage(language);
+        this.isWin = SystemUtils.IS_OS_WINDOWS;
         this.nappiLattice = new Button(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
         this.nappiBalls3D = new Button(this.getLanguage().equals("fin") ? "PALLOT" : "BALLS");
         this.nappiMobilVisc = new Button(this.getLanguage().equals("fin") ? "VISKOSITEETTI" : "VISCOSITY");
@@ -133,7 +140,7 @@ class SceneDiff extends Data {
     }
 
     /**
-     * Diffusion execution, uses Timer
+     * Diffusion execution, uses Timer.
      * @param folder datafolder "C:/RWDATA"
      * @param initialDataFile initial particle data
      * @param executable Fortran executable "walk.exe"
@@ -149,22 +156,22 @@ class SceneDiff extends Data {
      * @param closeNappiDiff close button must be disabled during run
      * @param menuNappiDiff menu button must be disabled during run
      * @param helpNappiDiff help button must be disabled during run
-     * @param energy_x fxplot energy graph x-axis container
-     * @param energy_y fxplot energy graph y-axis container
-     * @param diffusion_x fxplot diffusion graph x-axis container
-     * @param diffusion_y fxplot diffusion graph y-axis container
-     * @param visc_x fxplot visosity or mobility graph x-axis container
-     * @param visc_y fxplot visosity or mobility graph y-axis container
+     * @param energyX fxplot energy graph x-axis container
+     * @param energyY fxplot energy graph y-axis container
+     * @param diffusionX fxplot diffusion graph x-axis container
+     * @param diffusionY fxplot diffusion graph y-axis container
+     * @param viscX fxplot visosity or mobility graph x-axis container
+     * @param viscY fxplot visosity or mobility graph y-axis container
      * @param newdata if is a new run with new data
      * @param measure area/volume size
      * @param differ difference in between the lattice structure
      */
-    void refresh(File folder, File initialDataFile, String executable,
-                 GraphicsContext piirturi, double scalefactor, double animwidth, double linewidth,
-                 Button remBarNappiDiff, Button cancelNappiDiff, Button runDiff, VBox valikkoDiff, Button plotDiff,
-                 Button closeNappiDiff, Button menuNappiDiff, Button helpNappiDiff, List<Double> energy_x,
-                 List<Double> energy_y, List<Double> diffusion_x, List<Double> diffusion_y, List<Double> visc_x,
-                 List<Double> visc_y, boolean newdata, double measure, double differ) {
+    public void refresh(File folder, File initialDataFile, String executable,
+        GraphicsContext piirturi, double scalefactor, double animwidth, double linewidth,
+        Button remBarNappiDiff, Button cancelNappiDiff, Button runDiff, VBox valikkoDiff, Button plotDiff,
+        Button closeNappiDiff, Button menuNappiDiff, Button helpNappiDiff, List<Double> energyX,
+        List<Double> energyY, List<Double> diffusionX, List<Double> diffusionY, List<Double> viscX,
+        List<Double> viscY, boolean newdata, double measure, double differ) {
 
         this.setYellowP(new Image("/Pyellow.png"));
         this.setGrayP(new Image("/Pgray.png"));
@@ -180,7 +187,7 @@ class SceneDiff extends Data {
         this.setCloseNappiDiff(closeNappiDiff);
         this.setMenuNappiDiff(menuNappiDiff);
         this.setHelpNappiDiff(helpNappiDiff);
-        this.setCenter(this.getAnimwidth()/2.0);
+        this.setCenter(this.getAnimwidth() / 2.0);
         this.setMeasure(measure);
         this.setDiffer(differ);
         barrierOn();
@@ -198,18 +205,18 @@ class SceneDiff extends Data {
             this.setFirstDiffus(false);
             this.setFirstVisc(false);
             this.setScalefactor(scalefactor);
-            this.setEnergyX(energy_x);
-            this.setEnergyY(energy_y);
-            this.setDiffusionX(diffusion_x);
-            this.setDiffusionY(diffusion_y);
-            this.setViscX(visc_x);
-            this.setViscY(visc_y);
-            this.energy_x.clear();
-            this.energy_y.clear();
-            this.diffusion_x.clear();
-            this.diffusion_y.clear();
-            this.visc_x.clear();
-            this.visc_y.clear();
+            this.setEnergyX(energyX);
+            this.setEnergyY(energyY);
+            this.setDiffusionX(diffusionX);
+            this.setDiffusionY(diffusionY);
+            this.setViscX(viscX);
+            this.setViscY(viscY);
+            this.energyX.clear();
+            this.energyY.clear();
+            this.diffusionX.clear();
+            this.diffusionY.clear();
+            this.viscX.clear();
+            this.viscY.clear();
             this.setValues(new double[this.getDim() + 1][this.getNumPart()]);
             clearDots();
             this.setWalkTime(0.0);
@@ -254,139 +261,145 @@ class SceneDiff extends Data {
         piirturi.setLineWidth(linewidth);
 
         String[] command;
-
-        try
-        {
-        command = new String[]{"cmd","/c",executable,
-            this.vars[0], this.vars[1], this.vars[2], this.vars[3], this.vars[4],
-            this.vars[5], this.vars[6], this.vars[7], this.vars[8]};
-
-        this.setRuntime(Runtime.getRuntime());
-        runtimeStart();
-
-        this.setProcess(this.getRuntime().exec(command, null, folder));
-        walkStart();
-
-        /*
-        * DRAW INITIAL PARTICLES
-        */
-        while (true) {
-            if (Files.notExists(initialDataFile.toPath())) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    System.out.println(ex.getMessage());
-                }
-            } else if (Files.exists(initialDataFile.toPath())) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    System.out.println(ex.getMessage());
-                }
-                clearDots();
-                drawInitials( initialDataFile );
-                break;
+        
+        try {
+            if (this.isWin) {
+                command = new String[]{"cmd", "/c", executable,
+                    this.vars[0], this.vars[1], this.vars[2], this.vars[3], this.vars[4],
+                    this.vars[5], this.vars[6], this.vars[7], this.vars[8]};
+            } else {
+                command = new String[]{"./" + executable,
+                    this.vars[0], this.vars[1], this.vars[2], this.vars[3], this.vars[4],
+                    this.vars[5], this.vars[6], this.vars[7], this.vars[8]};
             }
-        }
+            
+            this.setRuntime(Runtime.getRuntime());
+            runtimeStart();
 
-        timerStart();
-        this.setTimer(new Timer());
-        this.getTimer().scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                int i = 0;
+            this.setProcess(this.getRuntime().exec(command, null, folder));
+            walkStart();
 
-                if ( !timerIsRunning()) return;
-
-                // WAIT FOR BARRIER REMOVAL
-                while ( barrierIsOn() ) {
+            /*
+            * DRAW INITIAL PARTICLES
+            */
+            while (true) {
+                if (Files.notExists(initialDataFile.toPath())) {
                     try {
-                        Thread.sleep(500);
+                        TimeUnit.SECONDS.sleep(1);
                     } catch (InterruptedException ex) {
                         System.out.println(ex.getMessage());
                     }
-                }
-                // CONTINUE
-                if ( !barrierIsOn() ) {
-                    setOutput(new BufferedWriter(new OutputStreamWriter(getProcess().getOutputStream())));
-                    PrintWriter pw = null;
-                    if (getOutput() != null) pw = new PrintWriter(getOutput());
-                    if (pw != null) {
-                        if (isCancel()) pw.println("-");
-                        else pw.println("x");
-                        pw.flush();
-                        pw.close();
-                    }
+                } else if (Files.exists(initialDataFile.toPath())) {
                     try {
-                        assert getOutput() != null;
-                        getOutput().close();
-                    } catch (IOException ex) {
+                        TimeUnit.SECONDS.sleep(1);
+                    } catch (InterruptedException ex) {
                         System.out.println(ex.getMessage());
                     }
+                    clearDots();
+                    drawInitials(initialDataFile);
+                    break;
                 }
+            }
 
-                if (!isCancel()) {
-                    try (BufferedReader input = new BufferedReader(new InputStreamReader(
-                        getProcess().getInputStream()))) {
-                        String line;
+            timerStart();
+            this.setTimer(new Timer());
+            this.getTimer().scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    int i = 0;
 
-                        while ((line = input.readLine()) != null) {
-                            if (line.trim().startsWith("S") || line.isEmpty()) {
-                                continue;
-                            }
-                            if (!line.substring(0, 1).matches("([0-9]|-)|E|D|V|T"))
-                                continue;
-                            if (!(line.trim().split("(\\s+)")[0].trim().equals("E")
-                                || line.trim().split("(\\s+)")[0].trim().equals("D")
-                                || line.trim().split("(\\s+)")[0].trim().equals("V")
-                                || line.trim().split("(\\s+)")[0].trim().equals("T"))) {
-                                if (getDim() == 2) {
-                                    String[] valStr = line.split("(\\s+)");
-                                    try {
-                                        getValues()[0][i] = Double.parseDouble(valStr[0].trim()) + getCenter() / (getScalefactor()
-                                            * (int) Screen.getMainScreen().getRenderScale());
-                                        getValues()[1][i] = Double.parseDouble(valStr[1].trim()) + getCenter() / (getScalefactor()
-                                            * (int) Screen.getMainScreen().getRenderScale());
-                                     } catch (NumberFormatException e) {
-                                        continue;
-                                    }
-                                } else if (getDim() == 3) {
-                                    String[] valStr = line.split("(\\s+)");
-                                    try {
-                                        getValues()[0][i] = Double.parseDouble(valStr[0].trim()) + getCenter() / (getScalefactor()
-                                            * (int) Screen.getMainScreen().getRenderScale());
-                                        getValues()[1][i] = Double.parseDouble(valStr[1].trim()) + getCenter() / (getScalefactor()
-                                            * (int) Screen.getMainScreen().getRenderScale());
-                                        getValues()[2][i] = Double.parseDouble(valStr[2].trim()) + getCenter() / getScalefactor();
-                                    } catch (NumberFormatException e) {
-                                        continue;
-                                    }
-                                }
+                    if (!timerIsRunning()) {
+                        return;
+                    }
 
-                                platfStart();
-                                javafx.application.Platform.runLater(() -> {
-                                    if (platfNotRunning()) return;
-
-                                    // DRAW
-                                    clearDots();
-                                    if (getDim() == 2 && isLattice()) drawLattice();
-                                    for (int k = 0; k < getNumPart(); k++) {
-                                        if (getDim() == 2) {
-                                            draw2Dots(getValues()[0][k], getValues()[1][k]);
-                                        } else if (getDim() == 3) {
-                                            draw3Dots(getValues()[0][k], getValues()[1][k], getValues()[2][k]);
-                                        }
-                                    }
-                                });
-
-                                i++;
-
-                                if (i == getNumPart()) i = 0;
-
+                    // WAIT FOR BARRIER REMOVAL
+                    while (barrierIsOn()) {
+                        try {
+                            TimeUnit.MILLISECONDS.sleep(500);
+                        } catch (InterruptedException ex) {
+                            System.out.println(ex.getMessage());
+                        }
+                    }
+                    // CONTINUE
+                    if (!barrierIsOn()) {
+                        setOutput(new BufferedWriter(new OutputStreamWriter(getProcess().getOutputStream())));
+                        PrintWriter pw = null;
+                        if (getOutput() != null) {
+                            pw = new PrintWriter(getOutput());
+                        }
+                        if (pw != null) {
+                            if (isCancel()) {
+                                pw.println("-");
                             } else {
-                                String firstLetter = line.trim().split("(\\s+)")[0].trim();
-                                boolean nanFound = false;
-                                try {
+                                pw.println("x");
+                            }
+                            pw.flush();
+                            pw.close();
+                        }
+                        try {
+                            assert getOutput() != null;
+                            getOutput().close();
+                        } catch (IOException ex) {
+                            System.out.println(ex.getMessage());
+                        }
+                    }
+
+                    if (!isCancel()) {
+                        try (BufferedReader input = new BufferedReader(new InputStreamReader(
+                            getProcess().getInputStream()))) {
+                            String line;
+
+                            while ((line = input.readLine()) != null) {
+                                if (line.trim().startsWith("S") || line.isEmpty()) {
+                                    continue;
+                                }
+                                if (!line.substring(0, 1).matches("([0-9]|-)|E|D|V|T")) {
+                                    continue;
+                                }
+                                if (!(line.trim().split("(\\s+)")[0].trim().equals("E")
+                                    || line.trim().split("(\\s+)")[0].trim().equals("D")
+                                    || line.trim().split("(\\s+)")[0].trim().equals("V")
+                                    || line.trim().split("(\\s+)")[0].trim().equals("T"))) {
+                                    if (getDim() == 2) {
+                                        String[] valStr = line.split("(\\s+)");
+                                        getValues()[0][i] = Double.parseDouble(valStr[0].trim()) + getCenter() / (getScalefactor());
+                                        getValues()[1][i] = Double.parseDouble(valStr[1].trim()) + getCenter() / (getScalefactor());
+                                    } else if (getDim() == 3) {
+                                        String[] valStr = line.split("(\\s+)");
+                                        getValues()[0][i] = Double.parseDouble(valStr[0].trim()) + getCenter() / (getScalefactor());
+                                        getValues()[1][i] = Double.parseDouble(valStr[1].trim()) + getCenter() / (getScalefactor());
+                                        getValues()[2][i] = Double.parseDouble(valStr[2].trim()) + getCenter() / getScalefactor();
+                                    }
+
+                                    platfStart();
+                                    javafx.application.Platform.runLater(() -> {
+                                        if (platfNotRunning()) {
+                                            return;
+                                        }
+
+                                        // DRAW
+                                        clearDots();
+                                        if (getDim() == 2 && isLattice()) {
+                                            drawLattice();
+                                        }
+                                        for (int k = 0; k < getNumPart(); k++) {
+                                            if (getDim() == 2) {
+                                                draw2Dots(getValues()[0][k], getValues()[1][k]);
+                                            } else if (getDim() == 3) {
+                                                draw3Dots(getValues()[0][k], getValues()[1][k], getValues()[2][k]);
+                                            }
+                                        }
+                                    });
+
+                                    i++;
+
+                                    if (i == getNumPart()) {
+                                        i = 0;
+                                    }
+
+                                } else {
+                                    String firstLetter = line.trim().split("(\\s+)")[0].trim();
+                                    boolean nanFound = false;
                                     if (firstLetter.equals("E") && !isFirstEnergy()) {
                                         double firstNum = Double.parseDouble(line.split("(\\s+)")[1].trim());
                                         setFirstEnergy(true);
@@ -397,8 +410,9 @@ class SceneDiff extends Data {
                                                 getEnergyY().add(firstNum);
                                                 getEnergyX().add((double) getPhaseEnergy());
                                                 setInitE(firstNum);
-                                            } else
+                                            } else {
                                                 nanFound = true;
+                                            }
                                             if (!nanFound) {
                                                 setPhaseEnergy(getPhaseEnergy() + 1);
                                                 setGreatest(getEnergyY().get(0));
@@ -411,10 +425,12 @@ class SceneDiff extends Data {
                                             && !Double.isNaN(getPhaseEnergy()) && !Double.isInfinite(getPhaseEnergy())) {
                                             getEnergyY().add(number);
                                             getEnergyX().add((double) getPhaseEnergy());
-                                        } else
+                                        } else {
                                             nanFound = true;
-                                        if (!nanFound)
+                                        }
+                                        if (!nanFound) {
                                             setPhaseEnergy(getPhaseEnergy() + 1);
+                                        }
                                     } else if (firstLetter.equals("D") && !isFirstDiffus()) {
                                         // 1e8 is scaling for the graph
                                         double firstNum = 1e8 * Double.parseDouble(line.split("(\\s+)")[1].trim());
@@ -425,8 +441,9 @@ class SceneDiff extends Data {
                                                 && !Double.isNaN(getPhaseDiffus()) && !Double.isInfinite(getPhaseDiffus())) {
                                                 getDiffusionY().add(firstNum);
                                                 getDiffusionX().add((double) getPhaseDiffus());
-                                            } else
+                                            } else {
                                                 nanFound = true;
+                                            }
 
                                             if (!nanFound) {
                                                 setPhaseDiffus(getPhaseDiffus() + 1);
@@ -441,13 +458,15 @@ class SceneDiff extends Data {
                                             && !Double.isNaN(getPhaseDiffus()) && !Double.isInfinite(getPhaseDiffus())) {
                                             getDiffusionY().add(number);
                                             getDiffusionX().add((double) getPhaseDiffus());
-                                        } else
+                                        } else {
                                             nanFound = true;
-                                        if (!nanFound)
+                                        }
+                                        if (!nanFound) {
                                             setPhaseDiffus(getPhaseDiffus() + 1);
+                                        }
                                     } else if (firstLetter.equals("V") && !isFirstVisc()) {
                                         double firstNum = 0.0;
-                                        if (getDiffusionY().get((int) getPhaseDiffus() - 1) != 0.0)
+                                        if (getDiffusionY().get((int) getPhaseDiffus() - 1) != 0.0) {
                                             if (isMobility()) {
                                                 // electrical mobility eta = 3qD/(2E) [cm^2/(Vs)]
                                                 // mu = 3/2 * D[cm^2/s] * q/E[eV] = 3/2 * D[cm^2/s]/E[V] = [cm^2/(Vs)]
@@ -461,6 +480,7 @@ class SceneDiff extends Data {
                                                 firstNum = Double.parseDouble(line.split("(\\s+)")[1].trim()) /
                                                     (1e-12 * getDiffusionY().get((int) getPhaseDiffus() - 1));
                                             }
+                                        }
                                         setFirstVisc(true);
 
                                         if (isFirstVisc()) {
@@ -468,21 +488,23 @@ class SceneDiff extends Data {
                                                 && !Double.isNaN(getPhaseVisc()) && !Double.isInfinite(getPhaseVisc())) {
                                                 getViscY().add(firstNum);
                                                 getViscX().add((double) getPhaseVisc());
-                                            } else
+                                            } else {
                                                 nanFound = true;
+                                            }
 
                                             if (!nanFound) {
                                                 setPhaseVisc(getPhaseVisc() + 1);
                                                 setGreatestVisc(getViscY().get(0));
-                                                if (isMobility())
-                                                    getFxplot().setVData(getViscX(), getViscY(),"mobil");
-                                                else
-                                                    getFxplot().setVData(getViscX(), getViscY(),"visc");
+                                                if (isMobility()) {
+                                                    getFxplot().setVData(getViscX(), getViscY(), "mobil");
+                                                } else {
+                                                    getFxplot().setVData(getViscX(), getViscY(), "visc");
+                                                }
                                             }
                                         }
                                     } else if (firstLetter.equals("V")) {
                                         double number = 0.0;
-                                        if (getDiffusionY().get((int) getPhaseDiffus() - 1) != 0.0)
+                                        if (getDiffusionY().get((int) getPhaseDiffus() - 1) != 0.0) {
                                             if (isMobility()) {
                                                 // electrical mobility eta = 3qD/(2E) [cm^2/(Vs)]
                                                 // mu = 3/2 * D[cm^2/s] * q/E[eV] = 3/2 * D[cm^2/s]/E[V] = [cm^2/(Vs)]
@@ -496,67 +518,87 @@ class SceneDiff extends Data {
                                                 number = Double.parseDouble(line.split("(\\s+)")[1].trim()) /
                                                     (1e-12 * getDiffusionY().get((int) getPhaseDiffus() - 1));
                                             }
+                                        }
                                         if (!Double.isNaN(number) && !Double.isInfinite(number) && number > 0.0
                                             && !Double.isNaN(getPhaseVisc()) && !Double.isInfinite(getPhaseVisc())) {
                                             getViscY().add(number);
                                             getViscX().add((double) getPhaseVisc());
-                                        } else
+                                        } else {
                                             nanFound = true;
-                                        if (!nanFound)
+                                        }
+                                        if (!nanFound) {
                                             setPhaseVisc(getPhaseVisc() + 1);
+                                        }
                                     } else if (firstLetter.equals("T")) {
                                         setWalkTime(Double.parseDouble(line.split("(\\s+)")[1].trim()));
                                     }
-                                } catch (NumberFormatException e) {
-                                    continue;
-                                }
 
-                                if (!nanFound) {
-                                    Thread.sleep(50);
-                                    if (firstLetter.equals("E") && isFirstEnergy()) {
-                                        if (getEnergyY().get((int) getPhaseEnergy() - 1) > getGreatest()) {
-                                            setGreatest(getEnergyY().get((int) getPhaseEnergy() - 1));
-                                            getFxplot().setEMaxY(getGreatest());
-                                        }
-                                        getFxplot().updateEData(getEnergyX(), getEnergyY());
-                                    } else if (firstLetter.equals("D") && isFirstDiffus()) {
-                                        if (getDiffusionY().get((int) getPhaseDiffus() - 1) > getGreatestDiff()) {
-                                            setGreatestDiff(getDiffusionY().get((int) getPhaseDiffus() - 1));
-                                            getFxplot().setDMaxY(getGreatestDiff());
-                                        }
+                                    if (!nanFound) {
+                                        TimeUnit.MILLISECONDS.sleep(50);
+                                        if (firstLetter.equals("E") && isFirstEnergy()) {
+                                            if (getEnergyY().get((int) getPhaseEnergy() - 1) > getGreatest()) {
+                                                setGreatest(getEnergyY().get((int) getPhaseEnergy() - 1));
+                                                getFxplot().setEMaxY(getGreatest());
+                                            }
+                                            getFxplot().updateEData(getEnergyX(), getEnergyY());
+                                        } else if (firstLetter.equals("D") && isFirstDiffus()) {
+                                            if (getDiffusionY().get((int) getPhaseDiffus() - 1) > getGreatestDiff()) {
+                                                setGreatestDiff(getDiffusionY().get((int) getPhaseDiffus() - 1));
+                                                getFxplot().setDMaxY(getGreatestDiff());
+                                            }
+                                            getFxplot().updateDData(getDiffusionX(), getDiffusionY());
+                                        } else if (firstLetter.equals("V") && isFirstVisc()) {
+                                            if (getViscY().get((int) getPhaseVisc() - 1) > getGreatestVisc()) {
+                                                setGreatestVisc(getViscY().get((int) getPhaseVisc() - 1));
+                                                getFxplot().setVMaxY(getGreatestVisc());
+                                            }
 
-                                        getFxplot().updateDData(getDiffusionX(), getDiffusionY());
-                                    } else if (firstLetter.equals("V") && isFirstVisc()) {
-                                        if (getViscY().get((int) getPhaseVisc() - 1) > getGreatestVisc()) {
-                                            setGreatestVisc(getViscY().get((int) getPhaseVisc() - 1));
-                                            getFxplot().setVMaxY(getGreatestVisc());
+                                            if (isMobility()) {
+                                                getFxplot().updateVData(getViscX(), getViscY(), "mobil");
+                                            } else {
+                                                getFxplot().updateVData(getViscX(), getViscY(), "visc");
+                                            }
                                         }
-
-                                        if (isMobility())
-                                            getFxplot().updateVData(getViscX(), getViscY(),"mobil");
-                                        else
-                                            getFxplot().updateVData(getViscX(), getViscY(),"visc");
                                     }
                                 }
                             }
-                        }
 
-                        if (getViscY().size() > 0)
-                            if (isMobility())
-                                getFxplot().setVTitle(getViscY().get(getViscY().size() - 1), "mobil");
-                            else
-                                getFxplot().setVTitle(getViscY().get(getViscY().size() - 1), "visc");
-                        if (getDiffusionY().size() > 0)
-                            // 1e-8 is scaling back to normal
-                            getFxplot().setDTitle(1e-8 * getDiffusionY().get(getDiffusionY().size() - 1));
-                        if (getEnergyY().size() > 0)
-                            setFinE(getEnergyY().get((int) getPhaseEnergy() - 1));
-                        double deltaE = getFinE() - getInitE();
-                        getFxplot().setDeltaE(deltaE);
+                            if (getViscY().size() > 0) {
+                                if (isMobility()) {
+                                    getFxplot().setVTitle(getViscY().get(getViscY().size() - 1), "mobil");
+                                } else {
+                                    getFxplot().setVTitle(getViscY().get(getViscY().size() - 1), "visc");
+                                }
+                            }
+                            if (getDiffusionY().size() > 0) {
+                                // 1e-8 is scaling back to normal
+                                getFxplot().setDTitle(1e-8 * getDiffusionY().get(getDiffusionY().size() - 1));
+                            }
+                            if (getEnergyY().size() > 0) {
+                                setFinE(getEnergyY().get((int) getPhaseEnergy() - 1));
+                            }
+                            double deltaE = getFinE() - getInitE();
+                            getFxplot().setDeltaE(deltaE);
 
-                        setExitVal(getProcess().waitFor());
-                        if (getExitVal() != 0) {
-                            walkStop();
+                            setExitVal(getProcess().waitFor());
+                            if (getExitVal() != 0) {
+                                walkStop();
+                                platfStop();
+                                timerStop();
+                                getMenuNappiDiff().setDisable(false);
+                                getHelpNappiDiff().setDisable(false);
+                                getRunDiff().setDisable(false);
+                                getPlotDiff().setVisible(true);
+                                getDim2().setDisable(false);
+                                getDim3().setDisable(false);
+                                getNappiLattice().setDisable(false);
+                                getNappiMobilVisc().setDisable(false);
+                                getNappiBalls3D().setDisable(false);
+                                getCloseNappiDiff().setDisable(false);
+                                getRuntime().gc();
+                                getRuntime().exit(getExitVal());
+                            }
+                        } catch (IOException | InterruptedException e) {
                             platfStop();
                             timerStop();
                             getMenuNappiDiff().setDisable(false);
@@ -570,9 +612,21 @@ class SceneDiff extends Data {
                             getNappiBalls3D().setDisable(false);
                             getCloseNappiDiff().setDisable(false);
                             getRuntime().gc();
-                            getRuntime().exit(getExitVal());
+                            Platform.runLater(() -> {
+                                getValikkoDiff().getChildren().set(4, getPlotDiff());
+                                getPlotDiff().setVisible(true);
+                                /*
+                                 * INFO DIALOG
+                                 */
+                                GetDialogs getDialogs = new GetDialogs();
+                                Alert alert = getDialogs.getInfo(getLanguage().equals("fin")
+                                    ? "Ajo on päättynyt.\nKulkukesto: " + formatter.format(getWalkTime()) + "s"
+                                    : "Run is finished.\nWalk Time: " + formatter.format(getWalkTime()) + "s");
+                                walkStop();
+                                alert.show();
+                            });
                         }
-                    } catch (IOException | InterruptedException e) {
+                    } else {
                         platfStop();
                         timerStop();
                         getMenuNappiDiff().setDisable(false);
@@ -586,43 +640,15 @@ class SceneDiff extends Data {
                         getNappiBalls3D().setDisable(false);
                         getCloseNappiDiff().setDisable(false);
                         getRuntime().gc();
-                        Platform.runLater(() -> {
-                            getValikkoDiff().getChildren().set(4, getPlotDiff());
-                            getPlotDiff().setVisible(true);
-                            /*
-                             * INFO DIALOG
-                             */
-                            GetDialogs getDialogs = new GetDialogs();
-                            Alert alert = getDialogs.getInfo(getLanguage().equals("fin")
-                                ? "Ajo on päättynyt.\nKulkukesto: " + formatter.format(getWalkTime()) + "s"
-                                : "Run is finished.\nWalk Time: " + formatter.format(getWalkTime()) + "s");
-                            walkStop();
-                            alert.show();
-                        });
                     }
-                } else {
-                    platfStop();
-                    timerStop();
-                    getMenuNappiDiff().setDisable(false);
-                    getHelpNappiDiff().setDisable(false);
-                    getRunDiff().setDisable(false);
-                    getPlotDiff().setVisible(true);
-                    getDim2().setDisable(false);
-                    getDim3().setDisable(false);
-                    getNappiLattice().setDisable(false);
-                    getNappiMobilVisc().setDisable(false);
-                    getNappiBalls3D().setDisable(false);
-                    getCloseNappiDiff().setDisable(false);
-                    getRuntime().gc();
+                /*
+                * timer run ends
+                */
                 }
             /*
-            * timer run ends
+            * timer ends
             */
-            }
-        /*
-        * timer ends
-        */
-        }, 0, 50);
+            }, 0, 50);
 
         } catch (IOException e) {
             System.out.println(e.getMessage());
@@ -630,19 +656,24 @@ class SceneDiff extends Data {
 
     }
 
-     /**
-      * method for drawing the initial particles
-      * @param initialDataFile data from "C:/RWDATA"
-      */
-     private void drawInitials(File initialDataFile) {
+    /**
+     * Method for drawing the initial particles.
+     * @param initialDataFile data from "C:/RWDATA"
+     */
+    private void drawInitials(File initialDataFile) {
 
-        if ( this.getDim() == 2 && isLattice() ) drawLattice();
+        if (this.getDim() == 2 && isLattice()) {
+            drawLattice();
+        }
         this.getPiirturi().setLineWidth(this.getLinewidth());
         List<double[]> initialData = readDataDiff(initialDataFile, this.getDim());
 
         this.getPiirturi().setGlobalAlpha(1.0);
-        if ( this.getNumPart() < 25 ) this.getPiirturi().setLineWidth(5.0 / (Math.log(this.getNumPart())*this.getScalefactor()));
-        else this.getPiirturi().setLineWidth(10.0 / (Math.log(this.getNumPart())*this.getScalefactor()));
+        if (this.getNumPart() < 25) {
+            this.getPiirturi().setLineWidth(5.0 / (Math.log(this.getNumPart()) * this.getScalefactor()));
+        } else {
+            this.getPiirturi().setLineWidth(10.0 / (Math.log(this.getNumPart()) * this.getScalefactor()));
+        }
         /*
          * Draw barrier line
          */
@@ -654,14 +685,14 @@ class SceneDiff extends Data {
         /*
         * Draw initial data spots
         */
-        for (int k = 0; k < this.getNumPart(); k++){
-            this.getValues()[0][k] = this.getDiffer()/10.0 + initialData.get(k)[0] + this.getCenter()
-                / (this.getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
-            this.getValues()[1][k] = this.getDiffer()/10.0 + initialData.get(k)[1] + this.getCenter()
-                / (this.getScalefactor() * (int) Screen.getMainScreen().getRenderScale());
-            if ( this.getDim() == 2 ) {
+        for (int k = 0; k < this.getNumPart(); k++) {
+            this.getValues()[0][k] = this.getDiffer() / 10.0 + initialData.get(k)[0] + this.getCenter()
+                / (this.getScalefactor());
+            this.getValues()[1][k] = this.getDiffer() / 10.0 + initialData.get(k)[1] + this.getCenter()
+                / (this.getScalefactor());
+            if (this.getDim() == 2) {
                 draw2Dots(this.getValues()[0][k], this.getValues()[1][k]);
-            } else if ( this.getDim() == 3 ) {
+            } else if (this.getDim() == 3) {
                 this.getValues()[2][k] = initialData.get(k)[2] + this.getCenter() / this.getScalefactor();
                 draw3Dots(this.getValues()[0][k], this.getValues()[1][k], this.getValues()[2][k]);
             }
@@ -669,42 +700,41 @@ class SceneDiff extends Data {
     }
 
     /**
-     * method for clearing the animation area
+     * Method for clearing the animation area.
      */
-    private void clearDots(){
+    private void clearDots() {
         this.getPiirturi().setGlobalAlpha(1.0);
         this.getPiirturi().setGlobalBlendMode(BlendMode.SRC_OVER);
         this.getPiirturi().setFill(Color.BLACK);
-        if ( this.getDim() == 2 )
-            this.getPiirturi().fillRect(0, 0,
-                this.getAnimwidth()/this.getScalefactor(), this.getAnimwidth()/this.getScalefactor());
-        else if ( this.getDim() == 3 )
-            this.getPiirturi().fillRect(0, 0,
-                1.0/this.getScalefactor()*this.getAnimwidth(), 1.0/this.getScalefactor()*this.getAnimwidth());
+        if (this.getDim() == 2) {
+            this.getPiirturi().fillRect(0, 0, this.getAnimwidth() / this.getScalefactor(), this.getAnimwidth() / this.getScalefactor());
+        } else if (this.getDim() == 3) {
+            this.getPiirturi().fillRect(0, 0, 1.0 / this.getScalefactor() * this.getAnimwidth(), 1.0 / this.getScalefactor() * this.getAnimwidth());
+        }
         this.getPiirturi().fill();
     }
 
     /**
-     * method for drawing the 2D particles
+     * Mmethod for drawing the 2D particles.
      * @param x x-coordinate of a particle
      * @param y y-coordinate of a particle
      */
-    private void draw2Dots(double x, double y){
+    private void draw2Dots(double x, double y) {
         if (isBalls3D()) {
             this.getPiirturi().drawImage(this.getYellowP(),
-                x - this.getDiam()/2.0,y - this.getDiam()/2.0,
+                x - this.getDiam() / 2.0, y - this.getDiam() / 2.0,
                 this.getDiam(), this.getDiam());
         } else {
-            this.getPiirturi().setFill(Color.rgb(255,255,50,1)); // yellow
+            this.getPiirturi().setFill(Color.rgb(255, 255, 50, 1)); // yellow
             this.getPiirturi().setLineWidth(this.getLinewidth());
             this.getPiirturi().fillRoundRect(
-                x - this.getDiam()/2.0, y - this.getDiam()/2.0,
+                x - this.getDiam() / 2.0, y - this.getDiam() / 2.0,
                 this.getDiam(), this.getDiam(), this.getDiam(), this.getDiam());
         }
     }
 
     /**
-     * method for drawing the 3D particles
+     * Method for drawing the 3D particles.
      * @param x x-coordinate of a particle
      * @param y y-coordinate of a particle
      * @param z z-coordinate of a particle
@@ -713,10 +743,10 @@ class SceneDiff extends Data {
         final double xypos = this.getDiam() / Math.log(2.0 * z);
         final double widthheight = 2.75 * xypos;
         if (isBalls3D()) {
-            this.getPiirturi().drawImage(this.getYellowP(),x - xypos, y - xypos, widthheight, widthheight);
+            this.getPiirturi().drawImage(this.getYellowP(), x - xypos, y - xypos, widthheight, widthheight);
         } else {
-            this.getPiirturi().setFill(Color.rgb(255,255,50,1.0-z/(20.0*this.getNumPart()*this.getScalefactor()))); // yellow
-            this.getPiirturi().setGlobalAlpha(1.0-z/(this.getScalefactor()));
+            this.getPiirturi().setFill(Color.rgb(255, 255, 50, 1.0 - z / (20.0 * this.getNumPart() * this.getScalefactor()))); // yellow
+            this.getPiirturi().setGlobalAlpha(1.0 - z / (this.getScalefactor()));
             this.getPiirturi().setLineWidth(this.getLinewidth());
             this.getPiirturi().setGlobalBlendMode(BlendMode.DIFFERENCE);
             this.getPiirturi().fillRoundRect(x - xypos, y - xypos, widthheight, widthheight, widthheight, widthheight
@@ -725,11 +755,11 @@ class SceneDiff extends Data {
     }
  
     /**
-     * method for drawing the lattice structue (only in 2D)
+     * Method for drawing the lattice structue (only in 2D).
      */
     private void drawLattice() {
         // SC = simple cubic
-        for ( int i = 0; i < (int) this.getMeasure() + 2; i+=2 ) {
+        for (int i = 0; i < (int) this.getMeasure() + 2; i += 2) {
             for (int j = 0; j < (int) this.getMeasure() + 2; j += 2) {
                 if (isBalls3D()) {
                     this.getPiirturi().drawImage(this.getGrayP(),
@@ -745,7 +775,7 @@ class SceneDiff extends Data {
     }
 
     /**
-     * method for checking if user input in GUI is a double
+     * Method for checking if user input in GUI is a double.
      * @param str GUI input string
      * @return true if input is a double, false otherwise
      */
@@ -753,13 +783,13 @@ class SceneDiff extends Data {
         try {
             Double.parseDouble(str);
             return true;
-        } catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             return false;
         }
     }
 
     /**
-     * method for checking if user input in GUI is an integer
+     * Method for checking if user input in GUI is an integer.
      * @param str GUI input string
      * @return true if input is an integer, false otherwise
      */
@@ -767,18 +797,18 @@ class SceneDiff extends Data {
         try {
             Integer.parseInt(str);
             return true;
-        } catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             return false;
         }
     }
 
     /**
-     * Create GUI for Diffusion
+     * Create GUI for Diffusion.
      * @return DIFFUSION SCENE
      */
-    Parent getSceneDiff(){
+    public Parent getSceneDiff() {
         GridPane asettelu = new GridPane();
-        asettelu.setMaxWidth(getPaneWidth());
+        asettelu.setMaxWidth(DblSizes.PANEW.getDblSize());
         asettelu.setVgap(5);
         asettelu.setHgap(10);
         asettelu.setPadding(new Insets(0, 0, 0, 0));
@@ -794,53 +824,57 @@ class SceneDiff extends Data {
         Label labNumParticles = new Label(this.getLanguage().equals("fin") ? "hiukkasten lukumäärä:" : "number of particles:");
         this.setNumParticles = new TextField("");
         this.setNumParticles.setOnKeyReleased(e -> {
-            if (isNumInteger(this.setNumParticles.getText().trim())){
-                if (this.setNumParticles.getText().trim().equals("0")){
+            if (isNumInteger(this.setNumParticles.getText().trim())) {
+                if (this.setNumParticles.getText().trim().equals("0")) {
                     this.setNumParticles.setText("1");
                     this.vars[1] = "1";
                 } else {
                     this.vars[1] = this.setNumParticles.getText().trim();
                 }
-            } else
+            } else {
                 this.vars[1] = "0";
+            }
         });
 
         Label labSizeParticles = new Label(this.getLanguage().equals("fin") ? "hiukkasten halkaisija:" : "diameter of particle:");
         this.setSizeParticles = new TextField("");
         this.setSizeParticles.setOnKeyReleased(e -> {
-            if (isNumDouble(this.setSizeParticles.getText().trim())){
+            if (isNumDouble(this.setSizeParticles.getText().trim())) {
                 this.vars[2] = this.setSizeParticles.getText().trim();
-            } else
+            } else {
                 this.vars[2] = "0.0";
+            }
         });
 
         this.vars[3] = "0"; // steps
 
         Label labNumDimensions = new Label(this.getLanguage().equals("fin") ? "ulottuvuus:" : "dimension:");
         this.setDim2 = new ToggleButton("2");
-        this.setDim2.setMinWidth(55);
-        this.setDim2.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setDim2.setMinWidth(DblSizes.BIGBUTW.getDblSize());
+        this.setDim2.setMaxWidth(DblSizes.BIGBUTW.getDblSize());
+        this.setDim2.setFont(Font.font("System Regular", FontWeight.EXTRA_BOLD, this.setDim2.getFont().getSize()));
+        this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
         this.setDim2.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.setDim2.setEffect(shadow));
         this.setDim2.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.setDim2.setEffect(null));
 
         this.setDim3 = new ToggleButton("3");
-        this.setDim3.setMinWidth(55);
-        this.setDim3.setFont(Font.font("System Regular",FontWeight.BOLD, 15));
-        this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+        this.setDim3.setMinWidth(DblSizes.BIGBUTW.getDblSize());
+        this.setDim3.setMaxWidth(DblSizes.BIGBUTW.getDblSize());
+        this.setDim3.setFont(Font.font("System Regular", FontWeight.EXTRA_BOLD, this.setDim3.getFont().getSize()));
+        this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
         this.setDim3.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.setDim3.setEffect(shadow));
         this.setDim3.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.setDim3.setEffect(null));
 
         HBox setDimension = new HBox(this.setDim2, this.setDim3);
         setDimension.setSpacing(40);
         this.setDim2.setOnMouseClicked(f -> {
-            this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK, CornerRadii.EMPTY, Insets.EMPTY)));
+            this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
             this.vars[4] = "2";
         });
         this.setDim3.setOnMouseClicked(f -> {
-            this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,CornerRadii.EMPTY,Insets.EMPTY)));
-            this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK,CornerRadii.EMPTY,Insets.EMPTY)));
+            this.setDim2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
+            this.setDim3.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK, CornerRadii.EMPTY, Insets.EMPTY)));
             this.vars[4] = "3";
         });
 
@@ -850,20 +884,20 @@ class SceneDiff extends Data {
         /*
          * BUTTON: BALLS3D
          */
-        this.getNappiBalls3D().setMinWidth(this.getCompwidth());
-        this.getNappiBalls3D().setMaxWidth(this.getCompwidth());
-        this.getNappiBalls3D().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.getNappiBalls3D().setId("balls3D");
+        this.getNappiBalls3D().setMinWidth(DblSizes.BUTW.getDblSize());
+        this.getNappiBalls3D().setMaxWidth(DblSizes.BUTW.getDblSize());
+        this.getNappiBalls3D().setFont(Font.font("System Regular", FontWeight.EXTRA_BOLD, this.getNappiBalls3D().getFont().getSize()));
+        this.getNappiBalls3D().setBackground(new Background(new BackgroundFill(Color.GOLD, CornerRadii.EMPTY, Insets.EMPTY)));
         this.getNappiBalls3D().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getNappiBalls3D().setEffect(shadow));
         this.getNappiBalls3D().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getNappiBalls3D().setEffect(null));
         this.getNappiBalls3D().setOnMouseClicked((MouseEvent event) -> {
-            if (this.getNappiBalls3D().getText().equals("CIRCLES") || this.getNappiBalls3D().getText().equals("YMPYRÄT")){
+            if (this.getNappiBalls3D().getText().equals("CIRCLES") || this.getNappiBalls3D().getText().equals("YMPYRÄT")) {
                 this.getNappiBalls3D().setText(this.getLanguage().equals("fin") ? "PALLOT" : "BALLS");
-                this.getNappiBalls3D().setBackground(new Background(new BackgroundFill(Color.GOLD,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.getNappiBalls3D().setBackground(new Background(new BackgroundFill(Color.GOLD, CornerRadii.EMPTY, Insets.EMPTY)));
                 this.balls3D = true;
-            } else if (this.getNappiBalls3D().getText().equals("BALLS") || this.getNappiBalls3D().getText().equals("PALLOT")){
+            } else if (this.getNappiBalls3D().getText().equals("BALLS") || this.getNappiBalls3D().getText().equals("PALLOT")) {
                 this.getNappiBalls3D().setText(this.getLanguage().equals("fin") ? "YMPYRÄT" : "CIRCLES");
-                this.getNappiBalls3D().setBackground(new Background(new BackgroundFill(Color.PINK,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.getNappiBalls3D().setBackground(new Background(new BackgroundFill(Color.PINK, CornerRadii.EMPTY, Insets.EMPTY)));
                 this.balls3D = false;
             }
         });
@@ -872,20 +906,20 @@ class SceneDiff extends Data {
         /*
         * BUTTON: LATTICE
         */
-        this.getNappiLattice().setMinWidth(this.getCompwidth());
-        this.getNappiLattice().setMaxWidth(this.getCompwidth());
-        this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.getNappiLattice().setId("lattice");
+        this.getNappiLattice().setMinWidth(DblSizes.BUTW.getDblSize());
+        this.getNappiLattice().setMaxWidth(DblSizes.BUTW.getDblSize());
+        this.getNappiLattice().setFont(Font.font("System Regular", FontWeight.EXTRA_BOLD, this.getNappiLattice().getFont().getSize()));
+        this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME, CornerRadii.EMPTY, Insets.EMPTY)));
         this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getNappiLattice().setEffect(shadow));
         this.getNappiLattice().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getNappiLattice().setEffect(null));
         this.getNappiLattice().setOnMouseClicked((MouseEvent event) -> {
-            if (this.getNappiLattice().getText().equals("LATTICE") || this.getNappiLattice().getText().equals("HILA")){
+            if (this.getNappiLattice().getText().equals("LATTICE") || this.getNappiLattice().getText().equals("HILA")) {
                 this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
-                this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIME, CornerRadii.EMPTY, Insets.EMPTY)));
                 this.vars[7] = "-";
-            } else if (this.getNappiLattice().getText().equals("FREE") || this.getNappiLattice().getText().equals("VAPAA")){
+            } else if (this.getNappiLattice().getText().equals("FREE") || this.getNappiLattice().getText().equals("VAPAA")) {
                 this.getNappiLattice().setText(this.getLanguage().equals("fin") ? "HILA" : "LATTICE");
-                this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIGHTSALMON,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.getNappiLattice().setBackground(new Background(new BackgroundFill(Color.LIGHTSALMON, CornerRadii.EMPTY, Insets.EMPTY)));
                 this.vars[7] = "l";
             }
         });
@@ -894,20 +928,20 @@ class SceneDiff extends Data {
         /*
          * BUTTON: MOBILVISC
          */
-        this.getNappiMobilVisc().setMinWidth(this.getCompwidth());
-        this.getNappiMobilVisc().setMaxWidth(this.getCompwidth());
-        this.getNappiMobilVisc().setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
-        this.getNappiMobilVisc().setId("mobilvisc");
+        this.getNappiMobilVisc().setMinWidth(DblSizes.BUTW.getDblSize());
+        this.getNappiMobilVisc().setMaxWidth(DblSizes.BUTW.getDblSize());
+        this.getNappiMobilVisc().setFont(Font.font("System Regular", FontWeight.EXTRA_BOLD, this.getNappiMobilVisc().getFont().getSize()));
+        this.getNappiMobilVisc().setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
         this.getNappiMobilVisc().addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.getNappiMobilVisc().setEffect(shadow));
         this.getNappiMobilVisc().addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.getNappiMobilVisc().setEffect(null));
         this.getNappiMobilVisc().setOnMouseClicked((MouseEvent event) -> {
-            if (this.getNappiMobilVisc().getText().equals("LIIKKUVUUS") || this.getNappiMobilVisc().getText().equals("MOBILITY")){
+            if (this.getNappiMobilVisc().getText().equals("LIIKKUVUUS") || this.getNappiMobilVisc().getText().equals("MOBILITY")) {
                 this.getNappiMobilVisc().setText(this.getLanguage().equals("fin") ? "VISKOSITEETTI" : "VISCOSITY");
-                this.getNappiMobilVisc().setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.getNappiMobilVisc().setBackground(new Background(new BackgroundFill(Color.LIGHTSKYBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
                 this.setIsMobility(false);
-            } else if (this.getNappiMobilVisc().getText().equals("VISKOSITEETTI") || this.getNappiMobilVisc().getText().equals("VISCOSITY")){
+            } else if (this.getNappiMobilVisc().getText().equals("VISKOSITEETTI") || this.getNappiMobilVisc().getText().equals("VISCOSITY")) {
                 this.getNappiMobilVisc().setText(this.getLanguage().equals("fin") ? "LIIKKUVUUS" : "MOBILITY");
-                this.getNappiMobilVisc().setBackground(new Background(new BackgroundFill(Color.THISTLE,CornerRadii.EMPTY,Insets.EMPTY)));
+                this.getNappiMobilVisc().setBackground(new Background(new BackgroundFill(Color.THISTLE, CornerRadii.EMPTY, Insets.EMPTY)));
                 this.setIsMobility(true);
             }
         });
@@ -921,207 +955,255 @@ class SceneDiff extends Data {
         GridPane.setHalignment(labNumParticles, HPos.LEFT);
         asettelu.add(labNumParticles, 0, 0);
         GridPane.setHalignment(this.setNumParticles, HPos.CENTER);
-        this.setNumParticles.setMinWidth(this.getCompwidth());
-        this.setNumParticles.setMaxWidth(this.getCompwidth());
+        this.setNumParticles.setMinWidth(DblSizes.BUTW.getDblSize());
+        this.setNumParticles.setMaxWidth(DblSizes.BUTW.getDblSize());
         asettelu.add(this.setNumParticles, 0, 1);
 
         GridPane.setHalignment(labSizeParticles, HPos.LEFT);
         asettelu.add(labSizeParticles, 0, 2);
         GridPane.setHalignment(this.setSizeParticles, HPos.CENTER);
-        this.setSizeParticles.setMinWidth(this.getCompwidth());
-        this.setSizeParticles.setMaxWidth(this.getCompwidth());
+        this.setSizeParticles.setMinWidth(DblSizes.BUTW.getDblSize());
+        this.setSizeParticles.setMaxWidth(DblSizes.BUTW.getDblSize());
         asettelu.add(this.setSizeParticles, 0, 3);
 
         GridPane.setHalignment(labNumDimensions, HPos.LEFT);
         asettelu.add(labNumDimensions, 0, 4);
         GridPane.setHalignment(setDimension, HPos.CENTER);
-        setDimension.setMinWidth(this.getCompwidth());
-        setDimension.setMaxWidth(this.getCompwidth());
+        setDimension.setMinWidth(DblSizes.BUTW.getDblSize());
+        setDimension.setMaxWidth(DblSizes.BUTW.getDblSize());
         asettelu.add(setDimension, 0, 5);
 
         GridPane.setHalignment(valikko, HPos.LEFT);
         asettelu.add(valikko, 0, 6, 2, 1);
 
-       return asettelu;
+        return asettelu;
     }
 
     /**
      *
-     * @param num_part the num_part to set
+     * @param numPart the num_part to set
      */
-    private void setNumPart( int num_part ) { this.num_part = num_part; }
+    private void setNumPart(int numPart) {
+        this.numPart = numPart;
+    }
 
     /**
      * @return the num_part
      */
-    @Contract(pure = true)
-    private int getNumPart() { return num_part; }
+    private int getNumPart() {
+        return numPart;
+    }
 
     /**
      *
      * @param diam the diam to set
      */
-    private void setDiam( double diam ) { this.diam = diam; }
+    private void setDiam(double diam) {
+        this.diam = diam;
+    }
 
     /**
      * @return the diam
      */
-    @Contract(pure = true)
-    private double getDiam() { return diam; }
+    private double getDiam() {
+        return diam;
+    }
 
     /**
      *
      * @param dim the dim to set
      */
-    private void setDim( int dim ) { this.dim = dim; }
+    private void setDim(int dim) {
+        this.dim = dim;
+    }
 
     /**
      * @return the dim
      */
-    @Contract(pure = true)
-    private int getDim() { return dim; }
+    private int getDim() {
+        return dim;
+    }
 
     /**
      *
-     * @param energy_x the energy_x to set
+     * @param energyX the energy_x to set
      */
-    private void setEnergyX( List<Double> energy_x ) { this.energy_x = energy_x; }
+    private void setEnergyX(List<Double> energyX) {
+        this.energyX = energyX;
+    }
 
     /**
      * @return the energy_x
      */
-    @Contract(pure = true)
-    private List<Double> getEnergyX() { return energy_x; }
+    private List<Double> getEnergyX() {
+        return energyX;
+    }
 
     /**
      *
-     * @param energy_y the energy_y to set
+     * @param energyY the energy_y to set
      */
-    private void setEnergyY( List<Double> energy_y ) { this.energy_y = energy_y; }
+    private void setEnergyY(List<Double> energyY) {
+        this.energyY = energyY;
+    }
 
     /**
      * @return the energy_y
      */
-    @Contract(pure = true)
-    private List<Double> getEnergyY() { return energy_y; }
+    private List<Double> getEnergyY() {
+        return energyY;
+    }
 
     /**
      *
-     * @param diffusion_x the diffusion_x to set
+     * @param diffusionX the diffusion_x to set
      */
-    private void setDiffusionX( List<Double> diffusion_x ) { this.diffusion_x = diffusion_x; }
+    private void setDiffusionX(List<Double> diffusionX) {
+        this.diffusionX = diffusionX;
+    }
 
     /**
      * @return the diffusion_x
      */
-    @Contract(pure = true)
-    private List<Double> getDiffusionX() { return diffusion_x; }
+    private List<Double> getDiffusionX() {
+        return diffusionX;
+    }
 
     /**
      *
-     * @param diffusion_y the diffusion_y to set
+     * @param diffusionY the diffusion_y to set
      */
-    private void setDiffusionY( List<Double> diffusion_y ) { this.diffusion_y = diffusion_y; }
+    private void setDiffusionY(List<Double> diffusionY) {
+        this.diffusionY = diffusionY;
+    }
 
     /**
      * @return the diffusion_y
      */
-    @Contract(pure = true)
-    private List<Double> getDiffusionY() { return diffusion_y; }
+    private List<Double> getDiffusionY() {
+        return diffusionY;
+    }
 
     /**
      *
-     * @param visc_x the visc_x to set
+     * @param viscX the visc_x to set
      */
-    private void setViscX( List<Double> visc_x ) { this.visc_x = visc_x; }
+    private void setViscX(List<Double> viscX) {
+        this.viscX = viscX;
+    }
 
     /**
      * @return the visc_x
      */
-    @Contract(pure = true)
-    private List<Double> getViscX() { return visc_x; }
+    private List<Double> getViscX() {
+        return viscX;
+    }
 
     /**
      *
-     * @param visc_y the visc_y to set
+     * @param viscY the visc_y to set
      */
-    private void setViscY( List<Double> visc_y ) { this.visc_y = visc_y; }
+    private void setViscY(List<Double> viscY) {
+        this.viscY = viscY;
+    }
 
     /**
      * @return the visc_y
      */
-    @Contract(pure = true)
-    private List<Double> getViscY() { return visc_y; }
+    private List<Double> getViscY() {
+        return viscY;
+    }
 
     /**
      *
      * @param measure the measure to set
      */
-    private void setMeasure( double measure ) { this.measure = measure; }
+    private void setMeasure(double measure) {
+        this.measure = measure;
+    }
 
     /**
      * @return the measure
      */
-    @Contract(pure = true)
-    private double getMeasure() { return measure; }
+    private double getMeasure() {
+        return measure;
+    }
 
     /**
      *
      * @param differ the differ to set
      */
-    private void setDiffer( double differ ) { this.differ = differ; }
+    private void setDiffer(double differ) {
+        this.differ = differ;
+    }
 
     /**
      * @return the differ
      */
-    @Contract(pure = true)
-    private double getDiffer() { return differ; }
+    private double getDiffer() {
+        return differ;
+    }
 
     /**
      * sets setBarrier to true
      */
-    private void barrierOn() { this.setBarrier(true); }
+    private void barrierOn() {
+        this.setBarrier(true);
+    }
 
     /**
      * sets barrierOn to false
      */
-    private void barrierOff() { this.setBarrier(false); }
+    private void barrierOff() {
+        this.setBarrier(false);
+    }
 
     /**
      * @return isBarrier
      */
-    boolean barrierIsOn() { return isBarrier(); }
+    public boolean barrierIsOn() {
+        return isBarrier();
+    }
 
     /**
      * sets setWalk to true
      */
-    private void walkStart() { this.setWalk(true); }
+    private void walkStart() {
+        this.setWalk(true);
+    }
 
     /**
      * sets setWalk to false
      */
-    private void walkStop() { this.setWalk(false); }
+    private void walkStop() {
+        this.setWalk(false);
+    }
 
     /**
      * @return isWalk
      */
-    boolean walkState() { return isWalk(); }
+    public boolean walkState() {
+        return isWalk();
+    }
 
     /**
      * sets setRunning to true
      */
-    private void runtimeStart() { this.setRunning(true); }
+    private void runtimeStart() {
+        this.setRunning(true);
+    }
 
     /**
      * @return isRunning
      */
-    boolean runtimeIsRunning() { return isRunning(); }
+    public boolean runtimeIsRunning() {
+        return isRunning();
+    }
 
     /**
-     * sets setRunning to false,
-     * exits runtime
+     * sets setRunning to false, exits runtime
      */
-    void stopRuntime() {
+    public void stopRuntime() {
         this.setRunning(false);
         this.getRuntime().exit(this.getExitVal());
     }
@@ -1129,12 +1211,12 @@ class SceneDiff extends Data {
     /**
      * sets setTimerRunning to true
      */
-    private void timerStart() { this.setTimerRunning(true); }
+    private void timerStart() {
+        this.setTimerRunning(true);
+    }
 
     /**
-     * cancels Timer,
-     * purges Timer,
-     * sets setTimerRunning to false
+     * cancels Timer, purges Timer, sets setTimerRunning to false
      */
     private void timerStop() {
         this.getTimer().cancel();
@@ -1145,21 +1227,26 @@ class SceneDiff extends Data {
     /**
      * @return isTimerRunning
      */
-    boolean timerIsRunning() { return isTimerRunning(); }
+    public boolean timerIsRunning() {
+        return isTimerRunning();
+    }
 
     /**
      * @return getOutput
      */
-    BufferedWriter getProcOut() { return getOutput(); }
+    public BufferedWriter getProcOut() {
+        return getOutput();
+    }
 
     /**
      * sets platfNotRunning to false
      */
-    private void platfStart() { this.platfNotRunning(false); }
+    private void platfStart() {
+        this.platfNotRunning(false);
+    }
 
     /**
-     * destroys process
-     * sets platfNotRunning to true
+     * destroys process, sets platfNotRunning to true
      */
     private void platfStop() {
         this.getProcess().destroyForcibly();
@@ -1167,525 +1254,651 @@ class SceneDiff extends Data {
     }
 
     /**
-     * @return the compwidth
-     */
-    @Contract(pure = true)
-    private double getCompwidth() { return 150.0 / Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the paneWidth
-     */
-    @Contract(pure = true)
-    private double getPaneWidth() { return 200.0 / Screen.getMainScreen().getRenderScale(); }
-
-    /**
      * @return the Dim2
      */
-    @Contract(pure = true)
-    private ToggleButton getDim2() { return setDim2; }
+    private ToggleButton getDim2() {
+        return setDim2;
+    }
 
     /**
      * @return the Dim3
      */
-    @Contract(pure = true)
-    private ToggleButton getDim3() { return setDim3; }
+    private ToggleButton getDim3() {
+        return setDim3;
+    }
 
     /**
      * @return the nappiLattice
      */
-    @Contract(pure = true)
-    private Button getNappiLattice() { return nappiLattice; }
+    private Button getNappiLattice() {
+        return nappiLattice;
+    }
 
     /**
      * @return the nappiMobilVisc
      */
-    @Contract(pure = true)
-    private Button getNappiMobilVisc() { return nappiMobilVisc; }
+    private Button getNappiMobilVisc() {
+        return nappiMobilVisc;
+    }
 
     /**
      * @return the nappiBalls3D
      */
-    @Contract(pure = true)
-    private Button getNappiBalls3D() { return nappiBalls3D; }
+    private Button getNappiBalls3D() {
+        return nappiBalls3D;
+    }
 
     /**
      * @return the fxplot
      */
-    @Contract(pure = true)
-    FXPlot getFxplot() { return fxplot; }
+    public FXPlot getFxplot() {
+        return fxplot;
+    }
 
     /**
      * @param fxplot the fxplot to set
      */
-    void setFxplot( FXPlot fxplot ) { this.fxplot = fxplot; }
+    public void setFxplot(FXPlot fxplot) {
+        this.fxplot = fxplot;
+    }
 
     /**
      * @return the remBarNappiDiff
      */
-    @Contract(pure = true)
-    private Button getRemBarNappiDiff() { return remBarNappiDiff; }
+    private Button getRemBarNappiDiff() {
+        return remBarNappiDiff;
+    }
 
     /**
      * @param remBarNappiDiff the remBarNappiDiff to set
      */
-    private void setRemBarNappiDiff(Button remBarNappiDiff ) { this.remBarNappiDiff = remBarNappiDiff; }
+    private void setRemBarNappiDiff(Button remBarNappiDiff) {
+        this.remBarNappiDiff = remBarNappiDiff;
+    }
 
     /**
      * @return the cancelNappiDiff
      */
-    @Contract(pure = true)
-    private Button getCancelNappiDiff() { return cancelNappiDiff; }
+    private Button getCancelNappiDiff() {
+        return cancelNappiDiff;
+    }
 
     /**
      * @param cancelNappiDiff the cancelNappiDiff to set
      */
-    private void setCancelNappiDiff(Button cancelNappiDiff ) { this.cancelNappiDiff = cancelNappiDiff; }
+    private void setCancelNappiDiff(Button cancelNappiDiff) {
+        this.cancelNappiDiff = cancelNappiDiff;
+    }
 
     /**
      * @return the runDiff
      */
-    @Contract(pure = true)
-    private Button getRunDiff() { return runDiff; }
+    private Button getRunDiff() {
+        return runDiff;
+    }
 
     /**
      * @param runDiff the runDiff to set
      */
-    private void setRunDiff(Button runDiff ) { this.runDiff = runDiff; }
+    private void setRunDiff(Button runDiff) {
+        this.runDiff = runDiff;
+    }
 
     /**
      * @return the valikkoDiff
      */
-    @Contract(pure = true)
-    private VBox getValikkoDiff() { return valikkoDiff; }
+    private VBox getValikkoDiff() {
+        return valikkoDiff;
+    }
 
     /**
      * @param valikkoDiff the valikkoDiff to set
      */
-    private void setValikkoDiff(VBox valikkoDiff ) { this.valikkoDiff = valikkoDiff; }
+    private void setValikkoDiff(VBox valikkoDiff) {
+        this.valikkoDiff = valikkoDiff;
+    }
 
     /**
      * @return the plotDiff
      */
-    @Contract(pure = true)
-    private Button getPlotDiff() { return plotDiff; }
+    private Button getPlotDiff() { 
+        return plotDiff; 
+    }
 
     /**
      * @param plotDiff the plotDiff to set
      */
-    private void setPlotDiff(Button plotDiff ) { this.plotDiff = plotDiff; }
+    private void setPlotDiff(Button plotDiff) {
+        this.plotDiff = plotDiff;
+    }
 
     /**
      * @return the closeNappiDiff
      */
-    @Contract(pure = true)
-    private Button getCloseNappiDiff() { return closeNappiDiff; }
+    private Button getCloseNappiDiff() {
+        return closeNappiDiff;
+    }
 
     /**
      * @param closeNappiDiff the closeNappiDiff to set
      */
-    private void setCloseNappiDiff(Button closeNappiDiff ) { this.closeNappiDiff = closeNappiDiff; }
+    private void setCloseNappiDiff(Button closeNappiDiff) {
+        this.closeNappiDiff = closeNappiDiff;
+    }
 
     /**
      * @return the menuNappiDiff
      */
-    @Contract(pure = true)
-    private Button getMenuNappiDiff() { return menuNappiDiff; }
+    private Button getMenuNappiDiff() {
+        return menuNappiDiff;
+    }
 
     /**
      * @param menuNappiDiff the menuNappiDiff to set
      */
-    private void setMenuNappiDiff(Button menuNappiDiff ) { this.menuNappiDiff = menuNappiDiff; }
+    private void setMenuNappiDiff(Button menuNappiDiff) {
+        this.menuNappiDiff = menuNappiDiff;
+    }
 
     /**
      * @return the helpNappiDiff
      */
-    @Contract(pure = true)
-    private Button getHelpNappiDiff() { return helpNappiDiff; }
+    private Button getHelpNappiDiff() {
+        return helpNappiDiff;
+    }
 
     /**
      * @param helpNappiDiff the helpNappiDiff to set
      */
-    private void setHelpNappiDiff(Button helpNappiDiff ) { this.helpNappiDiff = helpNappiDiff; }
+    private void setHelpNappiDiff(Button helpNappiDiff) {
+        this.helpNappiDiff = helpNappiDiff;
+    }
 
     /**
      * @return the phaseDiffus
      */
-    @Contract(pure = true)
-    private long getPhaseDiffus() { return phaseDiffus; }
+    private long getPhaseDiffus() {
+        return phaseDiffus;
+    }
 
     /**
      * @param phaseDiffus the phaseDiffus to set
      */
-    private void setPhaseDiffus( long phaseDiffus ) { this.phaseDiffus = phaseDiffus; }
+    private void setPhaseDiffus(long phaseDiffus) {
+        this.phaseDiffus = phaseDiffus;
+    }
 
     /**
      * @return the phaseEnergy
      */
-    @Contract(pure = true)
-    private long getPhaseEnergy() { return phaseEnergy; }
+    private long getPhaseEnergy() {
+        return phaseEnergy;
+    }
 
     /**
      * @param phaseEnergy the phaseEnergy to set
      */
-    private void setPhaseEnergy( long phaseEnergy ) { this.phaseEnergy = phaseEnergy; }
+    private void setPhaseEnergy(long phaseEnergy) {
+        this.phaseEnergy = phaseEnergy;
+    }
 
     /**
      * @return the phaseVisc
      */
-    @Contract(pure = true)
-    private long getPhaseVisc() { return phaseVisc; }
+    private long getPhaseVisc() {
+        return phaseVisc;
+    }
 
     /**
      * @param phaseVisc the phaseVisc to set
      */
-    private void setPhaseVisc( long phaseVisc ) { this.phaseVisc = phaseVisc; }
+    private void setPhaseVisc(long phaseVisc) {
+        this.phaseVisc = phaseVisc;
+    }
 
     /**
      * @param greatest the greatest to set
      */
-    private void setGreatest( double greatest ) { this.greatest = greatest; }
+    private void setGreatest(double greatest) {
+        this.greatest = greatest;
+    }
 
     /**
      * @return the greatest
      */
-    @Contract(pure = true)
-    private double getGreatest() { return greatest; }
+    private double getGreatest() {
+        return greatest;
+    }
 
     /**
      * @param greatestDiff the greatestDiff to set
      */
-    private void setGreatestDiff( double greatestDiff ) { this.greatestDiff = greatestDiff; }
+    private void setGreatestDiff(double greatestDiff) {
+        this.greatestDiff = greatestDiff;
+    }
 
     /**
      * @return the greatestDiff
      */
-    @Contract(pure = true)
-    private double getGreatestDiff() { return greatestDiff; }
+    private double getGreatestDiff() {
+        return greatestDiff;
+    }
 
     /**
      * @param greatestVisc the greatestVisc to set
      */
-    private void setGreatestVisc( double greatestVisc ) { this.greatestVisc = greatestVisc; }
+    private void setGreatestVisc(double greatestVisc) {
+        this.greatestVisc = greatestVisc;
+    }
 
     /**
      * @return the greatestVisc
      */
-    @Contract(pure = true)
-    private double getGreatestVisc() { return greatestVisc; }
+    private double getGreatestVisc() {
+        return greatestVisc;
+    }
 
     /**
      * @return the firstEnergy
      */
-    @Contract(pure = true)
-    private boolean isFirstEnergy() { return firstEnergy; }
+    private boolean isFirstEnergy() {
+        return firstEnergy;
+    }
 
     /**
      * @param firstEnergy the firstEnergy to set
      */
-    private void setFirstEnergy( boolean firstEnergy ) { this.firstEnergy = firstEnergy; }
+    private void setFirstEnergy(boolean firstEnergy) {
+        this.firstEnergy = firstEnergy;
+    }
 
     /**
      * @return the firstDiffus
      */
-    @Contract(pure = true)
-    private boolean isFirstDiffus() { return firstDiffus; }
+    private boolean isFirstDiffus() {
+        return firstDiffus;
+    }
 
     /**
      */
-    private void setFirstDiffus(boolean firstDiffus) { this.firstDiffus = firstDiffus; }
+    private void setFirstDiffus(boolean firstDiffus) {
+        this.firstDiffus = firstDiffus;
+    }
 
     /**
      * @return the firstVisc
      */
-    @Contract(pure = true)
-    private boolean isFirstVisc() { return firstVisc; }
+    private boolean isFirstVisc() {
+        return firstVisc;
+    }
 
     /**
      */
-    private void setFirstVisc(boolean firstVisc) { this.firstVisc = firstVisc; }
+    private void setFirstVisc(boolean firstVisc) {
+        this.firstVisc = firstVisc;
+    }
 
     /**
      * @return the linewidth
      */
-    @Contract(pure = true)
-    private double getLinewidth() { return linewidth; }
+    private double getLinewidth() {
+        return linewidth;
+    }
 
     /**
      * @param linewidth the linewidth to set
      */
-    private void setLinewidth( double linewidth ) { this.linewidth = linewidth; }
+    private void setLinewidth(double linewidth) {
+        this.linewidth = linewidth;
+    }
 
     /**
      * @return the scalefactor
      */
-    @Contract(pure = true)
-    private double getScalefactor() { return scalefactor; }
+    private double getScalefactor() {
+        return scalefactor;
+    }
 
     /**
      * @param scalefactor the scalefactor to set
      */
-    private void setScalefactor( double scalefactor ) { this.scalefactor = scalefactor; }
+    private void setScalefactor(double scalefactor) {
+        this.scalefactor = scalefactor;
+    }
 
     /**
      * @return the timerRunning
      */
-    @Contract(pure = true)
-    private boolean isTimerRunning() { return timerRunning; }
+    private boolean isTimerRunning() {
+        return timerRunning;
+    }
 
     /**
      * @param timerRunning the timerRunning to set
      */
-    private void setTimerRunning( boolean timerRunning ) { this.timerRunning = timerRunning; }
+    private void setTimerRunning(boolean timerRunning) {
+        this.timerRunning = timerRunning;
+    }
 
     /**
      * @return the animwidth
      */
-    @Contract(pure = true)
-    private double getAnimwidth() { return animwidth; }
+    private double getAnimwidth() {
+        return animwidth;
+    }
 
     /**
      * @param animwidth the animwidth to set
      */
-    private void setAnimwidth( double animwidth ) { this.animwidth = animwidth; }
+    private void setAnimwidth(double animwidth) {
+        this.animwidth = animwidth;
+    }
 
     /**
      * @return the center
      */
-    @Contract(pure = true)
-    private double getCenter() { return center; }
+    private double getCenter() {
+        return center;
+    }
 
     /**
      * @param center the center to set
      */
-    private void setCenter( double center ) { this.center = center; }
+    private void setCenter(double center) {
+        this.center = center;
+    }
 
     /**
      * @return the piirturi
      */
-    @Contract(pure = true)
-    private GraphicsContext getPiirturi() { return piirturi; }
+    private GraphicsContext getPiirturi() {
+        return piirturi;
+    }
 
     /**
      * @param piirturi the piirturi to set
      */
-    private void setPiirturi( GraphicsContext piirturi ) { this.piirturi = piirturi; }
+    private void setPiirturi(GraphicsContext piirturi) {
+        this.piirturi = piirturi;
+    }
 
     /**
      * @return the platfNotRunning
      */
-    @Contract(pure = true)
-    private boolean platfNotRunning() { return platfNotRunning; }
+    private boolean platfNotRunning() {
+        return platfNotRunning;
+    }
 
     /**
      * @param platfNotRunning the platfNotRunning to set
      */
-    private void platfNotRunning( boolean platfNotRunning ) { this.platfNotRunning = platfNotRunning; }
+    private void platfNotRunning(boolean platfNotRunning) {
+        this.platfNotRunning = platfNotRunning;
+    }
 
     /**
      * @return the process
      */
-    @Contract(pure = true)
-    private Process getProcess() { return process; }
+    private Process getProcess() {
+        return process;
+    }
 
     /**
      * @param process the process to set
      */
-    private void setProcess( Process process ) { this.process = process; }
+    private void setProcess(Process process) {
+        this.process = process;
+    }
 
     /**
      * @return the runtime
      */
-    @Contract(pure = true)
-    private Runtime getRuntime() { return runtime; }
+    private Runtime getRuntime() {
+        return runtime;
+    }
 
     /**
      * @param runtime the runtime to set
      */
-    private void setRuntime( Runtime runtime ) { this.runtime = runtime; }
+    private void setRuntime(Runtime runtime) {
+        this.runtime = runtime;
+    }
 
     /**
      * @return the exitVal
      */
-    @Contract(pure = true)
-    private int getExitVal() { return exitVal; }
+    private int getExitVal() {
+        return exitVal;
+    }
 
     /**
      * @param exitVal the exitVal to set
      */
-    private void setExitVal( int exitVal ) { this.exitVal = exitVal; }
+    private void setExitVal(int exitVal) {
+        this.exitVal = exitVal;
+    }
 
     /**
      * @return the timer
      */
-    @Contract(pure = true)
-    private Timer getTimer() { return timer; }
+    private Timer getTimer() {
+        return timer;
+    }
 
     /**
      * @param timer the timer to set
      */
-    private void setTimer( Timer timer ) { this.timer = timer; }
+    private void setTimer(Timer timer) {
+        this.timer = timer;
+    }
 
     /**
      * @return the values
      */
-    @Contract(pure = true)
-    private double[][] getValues() { return values; }
+    private double[][] getValues() {
+        return values;
+    }
 
     /**
      * @param values the values to set
      */
-    private void setValues( double[][] values ) { this.values = values; }
+    private void setValues(double[][] values) {
+        this.values = values;
+    }
 
     /**
      * @return the running
      */
-    @Contract(pure = true)
-    private boolean isRunning() { return running; }
+    private boolean isRunning() {
+        return running;
+    }
 
     /**
      * @param running the running to set
      */
-    private void setRunning( boolean running ) { this.running = running; }
+    private void setRunning(boolean running) {
+        this.running = running;
+    }
 
     /**
      * @return the barrier
      */
-    @Contract(pure = true)
-    private boolean isBarrier() { return barrier; }
+    private boolean isBarrier() {
+        return barrier;
+    }
 
     /**
      * @param barrier the barrier to set
      */
-    private void setBarrier( boolean barrier ) { this.barrier = barrier; }
+    private void setBarrier(boolean barrier) {
+        this.barrier = barrier;
+    }
 
     /**
      * @return the walk
      */
-    @Contract(pure = true)
-    private boolean isWalk() { return walk; }
+    private boolean isWalk() {
+        return walk;
+    }
 
     /**
      * @param walk the walk to set
      */
-    private void setWalk( boolean walk ) { this.walk = walk; }
+    private void setWalk(boolean walk) {
+        this.walk = walk;
+    }
 
     /**
      * @return the lattice
      */
-    @Contract(pure = true)
-    private boolean isLattice() { return lattice; }
+    private boolean isLattice() {
+        return lattice;
+    }
 
     /**
      * @param lattice the lattice to set
      */
-    private void setLattice( boolean lattice ) { this.lattice = lattice; }
+    private void setLattice(boolean lattice) {
+        this.lattice = lattice;
+    }
 
     /**
      * @return the Balls3D
      */
-    @Contract(pure = true)
-    private boolean isBalls3D() { return balls3D; }
+    private boolean isBalls3D() {
+        return balls3D;
+    }
 
     /**
      * @param balls3D the Balls3D to set
      */
-    private void setBalls3D( boolean balls3D ) { this.balls3D = balls3D; }
+    private void setBalls3D(boolean balls3D) {
+        this.balls3D = balls3D;
+    }
 
     /**
      * @return the yellowP
      */
-    @Contract(pure = true)
-    private Image getYellowP() { return yellowP; }
+    private Image getYellowP() {
+        return yellowP;
+    }
 
     /**
      * @param yellowP the yellowP to set
      */
-    private void setYellowP( Image yellowP ) { this.yellowP = yellowP; }
+    private void setYellowP(Image yellowP) {
+        this.yellowP = yellowP;
+    }
 
     /**
      * @return the grayP
      */
-    @Contract(pure = true) private Image getGrayP() { return grayP; }
+    private Image getGrayP() {
+        return grayP;
+    }
 
     /**
      * @param grayP the grayP to set
      */
-    private void setGrayP( Image grayP ) { this.grayP = grayP; }
+    private void setGrayP(Image grayP) {
+        this.grayP = grayP;
+    }
 
     /**
      * @return the output
      */
-    @Contract(pure = true)
-    private BufferedWriter getOutput() { return output; }
+    private BufferedWriter getOutput() {
+        return output;
+    }
 
     /**
      * @param output the output to set
      */
-    private void setOutput( BufferedWriter output ) { this.output = output; }
+    private void setOutput(BufferedWriter output) {
+        this.output = output;
+    }
 
     /**
      * @return the language
      */
-    @Contract(pure = true)
-    private String getLanguage() { return this.language; }
+    private String getLanguage() {
+        return this.language;
+    }
 
     /**
      * @param language the language to set
      */
-    private void setLanguage(String language) { this.language = language; }
+    private void setLanguage(String language) {
+        this.language = language;
+    }
 
     /**
      * @return the initE
      */
-    @Contract(pure = true)
-    private double getInitE() { return this.initE; }
+    private double getInitE() {
+        return this.initE;
+    }
 
     /**
      * @param initE the initE to set
      */
-    private void setInitE(double initE) { this.initE = initE; }
+    private void setInitE(double initE) {
+        this.initE = initE;
+    }
 
     /**
      * @return the finE
      */
-    @Contract(pure = true)
-    private double getFinE() { return this.finE; }
+    private double getFinE() {
+        return this.finE;
+    }
 
     /**
      * @param finE the finE to set
      */
-    private void setFinE(double finE) { this.finE = finE; }
+    private void setFinE(double finE) {
+        this.finE = finE;
+    }
 
     /**
      * @return the walktime
      */
-    @Contract(pure = true)
-    private double getWalkTime() { return this.walktime; }
+    private double getWalkTime() {
+        return this.walktime;
+    }
 
     /**
      * @param walktime the walktime to set
      */
-    private void setWalkTime(double walktime) { this.walktime = walktime; }
+    private void setWalkTime(double walktime) {
+        this.walktime = walktime;
+    }
 
     /**
      * @return the iscancel
      */
-    @Contract(pure = true)
-    private boolean isCancel() { return this.iscancel; }
+    private boolean isCancel() {
+        return this.iscancel;
+    }
 
     /**
      * @param iscancel the iscancel to set
      */
-    private void setIsCancel(boolean iscancel) { this.iscancel = iscancel; }
+    private void setIsCancel(boolean iscancel) {
+        this.iscancel = iscancel;
+    }
 
     /**
      * @return the ismobility
      */
-    @Contract(pure = true)
-    private boolean isMobility() { return this.ismobility; }
+    private boolean isMobility() {
+        return this.ismobility;
+    }
 
     /**
      * @param ismobility the ismobility to set
      */
-    private void setIsMobility(boolean ismobility) { this.ismobility = ismobility; }
+    private void setIsMobility(boolean ismobility) {
+        this.ismobility = ismobility;
+    }
 }

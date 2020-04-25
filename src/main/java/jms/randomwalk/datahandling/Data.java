@@ -1,51 +1,46 @@
-
-package randomwalkjava;
-
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
+package jms.randomwalk.datahandling;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import org.apache.maven.surefire.shade.booter.org.apache.commons.lang3.SystemUtils;
 
 /**
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
  * 
- * Class for data handling:
- * creates data, reads data,
- * sets some data values for Fortran
+ * Class for data handling: creates data, reads data, sets some data values for Fortran.
  */
-class Data {
+public class Data {
 
+    private final boolean isWin = SystemUtils.IS_OS_WINDOWS;
+    
     /**
-     * user variables from GUI
+     * user variables from GUI.
      */
-    String[] vars;
+    public String[] vars;
 
     /*
       initiating vars array
      */
-    Data(@NotNull String[] vars) {
+    public Data(String[] vars) {
         this.vars = vars.clone();
     }
 
-    @Contract(pure = true)
-    Data() {
-
+    public Data() {
     }
 
     /**
-     * method executes Fortan code to get data
-     * @param folderPath datafolder "c:/RWDATA"
-     * @param executable Fortran executable "walk.exe"
+     * Method executes Fortan code to get data.
+     * @param folderPath datafolder "c:/RWDATA" or "home/user/RWDATA"
+     * @param executable Fortran executable "walk.exe" or "walk"
      * @param ismcsaw mc-saw or saw
      * @param issaw saw or not
      * @return true if fortran execution succeeded, false otherwise
      */
-    Boolean createData(File folderPath, String executable, boolean ismcsaw, boolean issaw) {
+    public Boolean createData(File folderPath, String executable, boolean ismcsaw, boolean issaw) {
         StringBuilder teksti = new StringBuilder();
         boolean ok = true;
         String msg = "";
@@ -61,17 +56,26 @@ class Data {
         * vars[7] = lattice,
         * vars[8] = save
         */
-        String[] command = new String[]{"cmd","/c",executable,
+        String[] command;
+        if (this.isWin) {
+            command = new String[]{"cmd", "/c", executable, this.vars[0],
+                this.vars[1], this.vars[2], this.vars[3], this.vars[4],
+                this.vars[5], this.vars[6], this.vars[7], this.vars[8]};
+        } else {
+            command = new String[]{"./" + executable,
             this.vars[0], this.vars[1], this.vars[2], this.vars[3], this.vars[4],
             this.vars[5], this.vars[6], this.vars[7], this.vars[8]};
-
+        }
+        
         Runtime runtime = Runtime.getRuntime();
 
         try {
             /*
             * print the state of the program
             */
-            if (!issaw) System.out.println(" Fortran execution begins...");
+            if (!issaw) {
+                System.out.println(" Fortran execution begins...");
+            }
             Process process = runtime.exec(command, null, folderPath);
             
             int exitVal;
@@ -82,19 +86,24 @@ class Data {
                 errorGobbler.start();
                 String line;
 
-                while ((line = input.readLine()) != null){
+                while ((line = input.readLine()) != null) {
                     System.out.println(line);
-                    if (teksti.length() == 0)
+                    if (teksti.length() == 0) {
                         teksti = new StringBuilder(line);
-                    else
+                    } else {
                         teksti.append(line).append("\n");
+                    }
 
-                    if (ismcsaw && line.startsWith("F")) ok = false;
+                    if (ismcsaw && line.startsWith("F")) {
+                        ok = false;
+                    }
                 }
 
                 exitVal = process.waitFor();
                 if (exitVal == 0) {
-                    if (!issaw) msg = " Fortran execution ended.";
+                    if (!issaw) {
+                        msg = " Fortran execution ended.";
+                    }
                     System.out.println(msg);
                 } else {
                     msg = " Fortran execution ended with error code " + exitVal + ".";
@@ -117,30 +126,28 @@ class Data {
     }
 
     /**
-     * method reads the initial data from file for MMC
+     * Method reads the initial data from file for MMC.
      * @param filePath datafolder "c:/RWDATA"
      * @param dim particle field dimension, user choice
      * @return list of initial particle configuration data
      */
-    @NotNull
-    static List<double[]> readDataDiff(File filePath, Integer dim) {
+    public static List<double[]> readDataDiff(File filePath, Integer dim) {
     
         double[] values;
         List<double[]> dataList = new ArrayList<>();
 
-        try ( Scanner sc = new Scanner(filePath) ) {
+        try (Scanner sc = new Scanner(filePath)) {
             while (sc.hasNextLine()) {
                 values = new double[dim];
                 String data = sc.nextLine();
-                String[] osat;
-                osat = data.trim().split("(\\s+)");
+                String[] osat = data.trim().split("(\\s+)");
                 if (!osat[0].equals("Start")) {
                     for (int i = 0; i < osat.length; i++) {
                         values[i] = Double.parseDouble(osat[i]);
                     }
-                     dataList.add(values);
+                    dataList.add(values);
                 }
-             }
+            }
         } catch (FileNotFoundException ex) {
             System.out.println(ex.getMessage());
         }
@@ -149,27 +156,35 @@ class Data {
     }
 
     /**
-     * method for setting the parameter for setting saw or mc-saw in vars array
+     * Method for setting the parameter for setting saw or mc-saw in vars array.
      * @param var the vars array to set
      */
-    void setSawMc(String var) { this.vars[0]=var; }
+    public void setSawMc(String var) {
+        this.vars[0] = var;
+    }
 
     /**
-     * method for setting the parameter for setting mc-saw efficiency runs in vars array
+     * Method for setting the parameter for setting mc-saw efficiency runs in vars array.
      * @param var the vars array to set
      */
-    void setSawMcEff(String var) { this.vars[3]=var; }
+    public void setSawMcEff(String var) {
+        this.vars[3] = var;
+    }
 
     /**
-     * method for setting the parameter for plotting in vars array
+     * Method for setting the parameter for plotting in vars array.
      * @param var the vars array to set
      */
-    void setSawPlot(String var) { this.vars[5]=var; }
+    public void setSawPlot(String var) {
+        this.vars[5] = var;
+    }
 
     /**
-     * method for setting the save parameter in vars array
+     * Method for setting the save parameter in vars array.
      * @param var the vars array to set
      */
-    void setSave(String var) { this.vars[8]=var; }
+    public void setSave(String var) {
+        this.vars[8] = var;
+    }
 
 }

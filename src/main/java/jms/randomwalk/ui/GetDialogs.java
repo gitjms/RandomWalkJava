@@ -1,4 +1,4 @@
-package randomwalkjava;
+package jms.randomwalk.ui;
 
 import javafx.geometry.Orientation;
 import javafx.geometry.VPos;
@@ -9,24 +9,23 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.StageStyle;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
  *
- * Class for creating alerts and dialogs
+ * Class for creating alerts and dialogs.
  */
-class GetDialogs {
+public class GetDialogs {
 
     /**
-     * method for creating a dialog for language choice
+     * Method for creating a dialog for language choice.
      * @param buttonFI button for finnish
      * @param buttonEX button for exit
      * @param buttonEN button for english
      * @return dialog
      */
-    Dialog getLangChoice(ButtonType buttonFI, ButtonType buttonEX, ButtonType buttonEN) {
+    public Dialog<?> getLangChoice(ButtonType buttonFI, ButtonType buttonEX, ButtonType buttonEN) {
 
         GetComponents getComponents = new GetComponents();
 
@@ -35,7 +34,7 @@ class GetDialogs {
          */
         Dialog<String> dialog = new Dialog<>();
         dialog.initStyle(StageStyle.UTILITY);
-        dialog.getDialogPane().getStylesheets().add("/Styles.css");
+        dialog.getDialogPane().getStylesheets().add("/styles.css");
         dialog.setTitle("Kielivalinta - Language Choice");
         dialog.setHeaderText(null);
         dialog.getDialogPane().getButtonTypes().addAll(buttonFI, buttonEN, buttonEX);
@@ -110,18 +109,18 @@ class GetDialogs {
     }
 
     /**
-     * method for creating an alert dialog
+     * Method for creating an alert dialog.
      * @param language which language selected
      * @param buttonYES button for rejecting warning
      * @param buttonNO button for accepting warning
      * @param text warning text
      * @return alert dialog
      */
-    Alert getAlert(@NotNull String language, ButtonType buttonYES, ButtonType buttonNO, String text) {
+    public Alert getAlert(String language, ButtonType buttonYES, ButtonType buttonNO, String text) {
 
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.initStyle(StageStyle.UTILITY);
-        alert.getDialogPane().getStylesheets().add("/Styles.css");
+        alert.getDialogPane().getStylesheets().add("/styles.css");
         alert.setTitle(language.equals("fin") ? "Varoitus" : "Warning");
         alert.setHeaderText(text);
         alert.setContentText(null);
@@ -131,15 +130,15 @@ class GetDialogs {
     }
 
     /**
-     * method for creating an info dialog
+     * Method for creating an info dialog.
      * @param text info text
      * @return info dialog
      */
-    Alert getInfo(String text) {
+    public Alert getInfo(String text) {
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.initStyle(StageStyle.UTILITY);
-        alert.getDialogPane().getStylesheets().add("/Styles.css");
+        alert.getDialogPane().getStylesheets().add("/styles.css");
         alert.setTitle("Info");
         alert.setHeaderText(text);
         alert.setContentText(null);
@@ -148,17 +147,17 @@ class GetDialogs {
     }
 
     /**
-     * method for creating a confirmation dialog
+     * Method for creating a confirmation dialog.
      * @param language which language selected
      * @param buttonYES button for accepting confirmation
      * @param buttonNO button for rejecting confirmation
      * @return confirmation dialog
      */
-    Dialog getConfirmation(@NotNull String language, ButtonType buttonYES, ButtonType buttonNO) {
+    Dialog<?> getConfirmation(String language, ButtonType buttonYES, ButtonType buttonNO) {
 
         Dialog<String> dialog = new Dialog<>();
         dialog.initStyle(StageStyle.UTILITY);
-        dialog.getDialogPane().getStylesheets().add("/Styles.css");
+        dialog.getDialogPane().getStylesheets().add("/styles.css");
         dialog.setTitle(language.equals("fin") ? "Vahvistus" : "Confirmation");
         dialog.setHeaderText(language.equals("fin") ? "Suljetaanko sovellus?" : "Close application?");
         dialog.setContentText(null);

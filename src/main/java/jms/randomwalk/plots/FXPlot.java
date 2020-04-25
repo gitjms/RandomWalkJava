@@ -1,9 +1,6 @@
+package jms.randomwalk.plots;
 
-package randomwalkjava;
-
-import com.sun.glass.ui.Screen;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
+import enums.IntSizes;
 import org.knowm.xchart.*;
 import org.knowm.xchart.XYSeries.XYSeriesRenderStyle;
 import org.knowm.xchart.style.Styler;
@@ -25,9 +22,9 @@ import static java.awt.BasicStroke.JOIN_MITER;
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
  * 
- * Class for ORG.KNOWM XCHART creation and handling
+ * Class for ORG.KNOWM XCHART creation and handling.
  */
-class FXPlot {
+public class FXPlot {
 
     private String language;
     private int screenHeight;
@@ -56,11 +53,11 @@ class FXPlot {
     private NumberFormat twodecformatter;
 
     /**
-     * method for creating a plotting element
+     * Method for creating a plotting element.
      * @param language GUI language
      * @param which which graph
      */
-    void setFXPlot(String language, @NotNull String which) {
+    public void setFXPlot(String language, String which) {
         this.setLanguage(language);
         this.setFrame(new JFrame());
         this.getFrame().setBackground(Color.white);
@@ -72,26 +69,26 @@ class FXPlot {
 
         switch (which) {
             case "Walks&norm":
-                this.getFrame().setLocation(0, (int) ((this.getScreenHeight()-this.getHeight())/2.0) );
-                this.getFrame().setPreferredSize(new Dimension(this.getWidth(), this.getHeight()));
+                this.getFrame().setLocation(0, (int) ((this.getScreenHeight() - IntSizes.HEIGHT.getIntSize()) / 2.0));
+                this.getFrame().setPreferredSize(new Dimension(IntSizes.SIZE.getIntSize(), IntSizes.HEIGHT.getIntSize()));
                 this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Reaaliaika-RMS" : "Real Time RMS");
                 this.getFrame().getContentPane().setLayout(new GridLayout(3, 1));
                 break;
             case "energy&diffusion":
-                this.getFrame().setLocation(0, (int) ((this.getScreenHeight()-this.getHeight())/2.0) );
-                this.getFrame().setPreferredSize(new Dimension(this.getWidth(), this.getHeight()));
+                this.getFrame().setLocation(0, (int) ((this.getScreenHeight() - IntSizes.HEIGHT.getIntSize()) / 2.0));
+                this.getFrame().setPreferredSize(new Dimension(IntSizes.SIZE.getIntSize(), IntSizes.HEIGHT.getIntSize()));
                 this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Reaaliaika-diffuusio" : "Real Time Diffusion");
                 this.getFrame().getContentPane().setLayout(new GridLayout(3, 1));
                 break;
             case "saw":
-                this.getFrame().setLocation(0, (int) ((this.getScreenHeight()-this.getHeight())/2.0) );
-                this.getFrame().setPreferredSize(new Dimension(this.getWidth(), this.getHeight()));
+                this.getFrame().setLocation(0, (int) ((this.getScreenHeight() - IntSizes.HEIGHT.getIntSize()) / 4.0));
+                this.getFrame().setPreferredSize(new Dimension(IntSizes.SIZE.getIntSize(), IntSizes.HEIGHT.getIntSize()));
                 this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Reaaliaika-SAW" : "Real Time SAW");
                 this.getFrame().getContentPane().setLayout(new GridLayout(3, 1));
                 break;
             case "eff":
-                this.getFrame().setLocation(0, (int) ((this.getScreenHeight()-this.getEffHeight())/2.0) );
-                this.getFrame().setPreferredSize(new Dimension(this.getEffWidth(), this.getEffHeight()));
+                this.getFrame().setLocation(0, (int) ((this.getScreenHeight() - IntSizes.SIZE.getIntSize()) / 2.0));
+                this.getFrame().setPreferredSize(new Dimension(IntSizes.SIZE.getIntSize(), IntSizes.SIZE.getIntSize()));
                 this.getFrame().setTitle(this.getLanguage().equals("fin") ? "Reaaliaika-SAW" : "Real Time SAW");
                 this.getFrame().getContentPane().setLayout(new GridLayout(1, 1));
                 break;
@@ -124,8 +121,8 @@ class FXPlot {
         this.chartPanelS1 = new XChartPanel<>(this.getCalcChartS1());
         this.chartPanelS2 = new XChartPanel<>(this.getCalcChartS2());
         this.chartPanelS3 = new XChartPanel<>(this.getCalcChartS3());
-        BasicStroke[] BasicStroke = new BasicStroke[]{
-            new BasicStroke( 1.5f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f )
+        BasicStroke[] basicStroke = new BasicStroke[]{
+            new BasicStroke(1.5f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f)
         };
 
         switch (which) {
@@ -133,11 +130,11 @@ class FXPlot {
                 /*
                  * XYCharst: ChartPanel(W,N,H) & calcChart(W,N,H)
                  */
-                this.getChartPanelW().setBounds(this.getMarginSmall(), this.getMarginTiny(), this.getWidth(), this.getHeight()/3);
+                this.getChartPanelW().setBounds(IntSizes.MDMMRGN.getIntSize(), IntSizes.SMLMRGN.getIntSize(), IntSizes.SIZE.getIntSize(), IntSizes.HEIGHT.getIntSize() / 3);
                 this.getChartPanelW().setVisible(true);
-                this.getChartPanelN().setBounds(this.getMarginSmall(), this.getMarginTiny(), this.getWidth(), this.getHeight()/3);
+                this.getChartPanelN().setBounds(IntSizes.MDMMRGN.getIntSize(), IntSizes.SMLMRGN.getIntSize(), IntSizes.SIZE.getIntSize(), IntSizes.HEIGHT.getIntSize() / 3);
                 this.getChartPanelN().setVisible(true);
-                this.getChartPanelH().setBounds(this.getMarginSmall(), this.getMarginTiny(), this.getWidth(), this.getHeight()/3);
+                this.getChartPanelH().setBounds(IntSizes.MDMMRGN.getIntSize(), IntSizes.SMLMRGN.getIntSize(), IntSizes.SIZE.getIntSize(), IntSizes.HEIGHT.getIntSize() / 3);
                 this.getChartPanelH().setVisible(true);
 
                 this.getCalcChartW().getStyler().setXAxisTitleVisible(true);
@@ -163,7 +160,7 @@ class FXPlot {
                 this.getCalcChartN().getStyler().setXAxisDecimalPattern("0.0");
                 this.getCalcChartN().getStyler().setYAxisDecimalPattern("0.00");
                 this.getCalcChartN().getStyler().setToolTipType(Styler.ToolTipType.xAndYLabels);
-                this.getCalcChartN().getStyler().setToolTipFont(new java.awt.Font(null, Font.PLAIN,18));
+                this.getCalcChartN().getStyler().setToolTipFont(new java.awt.Font(null, Font.PLAIN, 18));
                 this.getCalcChartN().getStyler().setAxisTickLabelsFont(new Font(null, Font.PLAIN, 15));
                 this.getCalcChartN().getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
                 this.getCalcChartN().getStyler().setChartTitleFont(new Font(null, Font.PLAIN, 20));
@@ -181,12 +178,12 @@ class FXPlot {
                 this.getCalcChartH().getStyler().setYAxisDecimalPattern("0");
                 this.getCalcChartH().getStyler().setYAxisLogarithmic(false);
                 this.getCalcChartH().getStyler().setToolTipType(Styler.ToolTipType.xAndYLabels);
-                this.getCalcChartH().getStyler().setToolTipFont(new java.awt.Font(null, Font.PLAIN,18));
+                this.getCalcChartH().getStyler().setToolTipFont(new java.awt.Font(null, Font.PLAIN, 18));
                 this.getCalcChartH().getStyler().setAxisTickLabelsFont(new Font(null, Font.PLAIN, 15));
                 this.getCalcChartH().getStyler().setChartTitleFont(new Font(null, Font.PLAIN, 20));
                 this.getCalcChartH().getStyler().setAxisTitleFont(new Font(null, Font.PLAIN, 18));
                 this.getCalcChartH().getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.StepArea);
-                this.getCalcChartH().getStyler().setSeriesLines(BasicStroke);
+                this.getCalcChartH().getStyler().setSeriesLines(basicStroke);
                 this.getCalcChartH().getStyler().setChartTitlePadding(15);
                 this.getCalcChartH().getStyler().setYAxisMin(0.0);
                 this.getCalcChartH().getStyler().setLegendVisible(false);
@@ -197,11 +194,11 @@ class FXPlot {
                 /*
                  * XYCharts: ChartPanel(E,D,V) &  calcChart(E,D,V)
                  */
-                this.getChartPanelE().setBounds(this.getMarginSmall(), this.getMarginTiny(), this.getWidth(), this.getHeight()/3);
+                this.getChartPanelE().setBounds(IntSizes.MDMMRGN.getIntSize(), IntSizes.SMLMRGN.getIntSize(), IntSizes.SIZE.getIntSize(), IntSizes.HEIGHT.getIntSize() / 3);
                 this.getChartPanelE().setVisible(true);
-                this.getChartPanelD().setBounds(this.getMarginSmall(), this.getMarginTiny(), this.getWidth(), this.getHeight()/3);
+                this.getChartPanelD().setBounds(IntSizes.MDMMRGN.getIntSize(), IntSizes.SMLMRGN.getIntSize(), IntSizes.SIZE.getIntSize(), IntSizes.HEIGHT.getIntSize() / 3);
                 this.getChartPanelD().setVisible(true);
-                this.getChartPanelV().setBounds(this.getMarginSmall(), this.getMarginTiny(), this.getWidth(), this.getHeight()/3);
+                this.getChartPanelV().setBounds(IntSizes.MDMMRGN.getIntSize(), IntSizes.SMLMRGN.getIntSize(), IntSizes.SIZE.getIntSize(), IntSizes.HEIGHT.getIntSize() / 3);
                 this.getChartPanelV().setVisible(true);
 
                 this.getCalcChartE().getStyler().setLegendVisible(false);
@@ -212,7 +209,7 @@ class FXPlot {
                 this.getCalcChartE().getStyler().setYAxisDecimalPattern("0.0");
                 this.getCalcChartE().getStyler().setYAxisLogarithmic(false);
                 this.getCalcChartE().getStyler().setToolTipType(Styler.ToolTipType.xAndYLabels);
-                this.getCalcChartE().getStyler().setToolTipFont(new java.awt.Font(null, Font.PLAIN,18));
+                this.getCalcChartE().getStyler().setToolTipFont(new java.awt.Font(null, Font.PLAIN, 18));
                 this.getCalcChartE().getStyler().setAxisTickLabelsFont(new Font(null, Font.PLAIN, 15));
                 this.getCalcChartE().getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
                 this.getCalcChartE().getStyler().setChartTitleFont(new Font(null, Font.PLAIN, 20));
@@ -232,7 +229,7 @@ class FXPlot {
                 this.getCalcChartD().getStyler().setXAxisDecimalPattern("0");
                 this.getCalcChartD().getStyler().setYAxisDecimalPattern("0.0");
                 this.getCalcChartD().getStyler().setToolTipType(Styler.ToolTipType.xAndYLabels);
-                this.getCalcChartD().getStyler().setToolTipFont(new java.awt.Font(null, Font.PLAIN,18));
+                this.getCalcChartD().getStyler().setToolTipFont(new java.awt.Font(null, Font.PLAIN, 18));
                 this.getCalcChartD().getStyler().setAxisTickLabelsFont(new Font(null, Font.PLAIN, 15));
                 this.getCalcChartD().getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
                 this.getCalcChartD().getStyler().setChartTitleFont(new Font(null, Font.PLAIN, 20));
@@ -250,7 +247,7 @@ class FXPlot {
                 this.getCalcChartV().getStyler().setYAxisDecimalPattern("0.0");
                 this.getCalcChartV().getStyler().setYAxisLogarithmic(false);
                 this.getCalcChartV().getStyler().setToolTipType(Styler.ToolTipType.xAndYLabels);
-                this.getCalcChartV().getStyler().setToolTipFont(new java.awt.Font(null, Font.PLAIN,18));
+                this.getCalcChartV().getStyler().setToolTipFont(new java.awt.Font(null, Font.PLAIN, 18));
                 this.getCalcChartV().getStyler().setAxisTickLabelsFont(new Font(null, Font.PLAIN, 15));
                 this.getCalcChartV().getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
                 this.getCalcChartV().getStyler().setChartTitleFont(new Font(null, Font.PLAIN, 20));
@@ -265,11 +262,11 @@ class FXPlot {
                 /*
                  * XYCharts: ChartPanelS(1,2,3) & ChartPanelF & calcChartS(1,2,3) & calcChartF
                  */
-                this.getChartPanelS1().setBounds(this.getMarginSmall(), 0, this.getWidth(), this.getHeight()/3);
+                this.getChartPanelS1().setBounds(IntSizes.MDMMRGN.getIntSize(), 0, IntSizes.SIZE.getIntSize(), IntSizes.HEIGHT.getIntSize() / 3);
                 this.getChartPanelS1().setVisible(true);
-                this.getChartPanelS2().setBounds(this.getMarginSmall(), 0, this.getWidth(), this.getHeight()/3);
+                this.getChartPanelS2().setBounds(IntSizes.MDMMRGN.getIntSize(), 0, IntSizes.SIZE.getIntSize(), IntSizes.HEIGHT.getIntSize() / 3);
                 this.getChartPanelS2().setVisible(true);
-                this.getChartPanelS3().setBounds(this.getMarginSmall(), 0, this.getWidth(), this.getHeight()/3);
+                this.getChartPanelS3().setBounds(IntSizes.MDMMRGN.getIntSize(), 0, IntSizes.SIZE.getIntSize(), IntSizes.HEIGHT.getIntSize() / 3);
                 this.getChartPanelS3().setVisible(true);
 
                 this.getCalcChartS1().getStyler().setLegendVisible(true);
@@ -280,7 +277,7 @@ class FXPlot {
                 this.getCalcChartS1().getStyler().setYAxisDecimalPattern("0.0");
                 this.getCalcChartS1().getStyler().setYAxisLogarithmic(false);
                 this.getCalcChartS1().getStyler().setToolTipType(Styler.ToolTipType.xAndYLabels);
-                this.getCalcChartS1().getStyler().setToolTipFont(new java.awt.Font(null, Font.PLAIN,18));
+                this.getCalcChartS1().getStyler().setToolTipFont(new java.awt.Font(null, Font.PLAIN, 18));
                 this.getCalcChartS1().getStyler().setAxisTickLabelsFont(new Font(null, Font.PLAIN, 15));
                 this.getCalcChartS1().getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
                 this.getCalcChartS1().getStyler().setChartTitleFont(new Font(null, Font.PLAIN, 20));
@@ -307,7 +304,7 @@ class FXPlot {
                 this.getCalcChartS2().getStyler().setYAxisDecimalPattern("0.0");
                 this.getCalcChartS2().getStyler().setYAxisLogarithmic(false);
                 this.getCalcChartS2().getStyler().setToolTipType(Styler.ToolTipType.xAndYLabels);
-                this.getCalcChartS2().getStyler().setToolTipFont(new java.awt.Font(null, Font.PLAIN,18));
+                this.getCalcChartS2().getStyler().setToolTipFont(new java.awt.Font(null, Font.PLAIN, 18));
                 this.getCalcChartS2().getStyler().setAxisTickLabelsFont(new Font(null, Font.PLAIN, 15));
                 this.getCalcChartS2().getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
                 this.getCalcChartS2().getStyler().setChartTitleFont(new Font(null, Font.PLAIN, 20));
@@ -331,7 +328,7 @@ class FXPlot {
                 this.getCalcChartS3().getStyler().setChartTitleFont(new Font(null, Font.PLAIN, 20));
                 this.getCalcChartS3().getStyler().setAxisTitleFont(new Font(null, Font.PLAIN, 18));
                 this.getCalcChartS3().getStyler().setDefaultSeriesRenderStyle(CategorySeries.CategorySeriesRenderStyle.Bar);
-                this.getCalcChartS3().getStyler().setSeriesLines(BasicStroke);
+                this.getCalcChartS3().getStyler().setSeriesLines(basicStroke);
                 this.getCalcChartS3().getStyler().setPlotGridHorizontalLinesVisible(true);
                 this.getCalcChartS3().getStyler().setPlotGridVerticalLinesVisible(false);
                 this.getCalcChartS3().getStyler().setChartTitlePadding(15);
@@ -344,7 +341,7 @@ class FXPlot {
                 /*
                  * XYCharts: ChartPanelF & calcChartF
                  */
-                this.getChartPanelF().setBounds(this.getMarginBig(), 0, this.getEffWidth(), this.getEffHeight());
+                this.getChartPanelF().setBounds(IntSizes.BIGMRGN.getIntSize(), 0, IntSizes.SIZE.getIntSize(), IntSizes.SIZE.getIntSize());
                 this.getChartPanelF().setVisible(true);
 
                 this.getCalcChartF().getStyler().setLegendVisible(true);
@@ -355,7 +352,7 @@ class FXPlot {
                 this.getCalcChartF().getStyler().setYAxisDecimalPattern("0.0");
                 this.getCalcChartF().getStyler().setYAxisLogarithmic(false);
                 this.getCalcChartF().getStyler().setToolTipType(Styler.ToolTipType.xAndYLabels);
-                this.getCalcChartF().getStyler().setToolTipFont(new java.awt.Font(null, Font.PLAIN,18));
+                this.getCalcChartF().getStyler().setToolTipFont(new java.awt.Font(null, Font.PLAIN, 18));
                 this.getCalcChartF().getStyler().setAxisTickLabelsFont(new Font(null, Font.PLAIN, 20));
                 this.getCalcChartF().getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Scatter);
                 this.getCalcChartF().getStyler().setChartTitleFont(new Font(null, Font.PLAIN, 26));
@@ -376,54 +373,56 @@ class FXPlot {
     }
 
     /**
-     * method for plotting R_rms and sqrt(steps) vs. walks in Real Time Rms
-     * plot has two data lines: "R_rms" and "sqrt(steps)"
+     * Method for plotting R_rms and sqrt(steps) vs. walks in Real Time Rms.
+     * <p>
+     *      plot has two data lines: "R_rms" and "sqrt(steps)"
+     * </p>
      * @param x x-axis data (rms_runs)
      * @param y y-axis data (rms_runs)
      * @param expected value of Math.sqrt((double) steps)
      */
-    void setWData(double[] x, double[] y, double expected) {
+    public void setWData(double[] x, double[] y, double expected) {
         this.getCalcChartW().getSeriesMap().clear();
         this.getChartPanelW().removeAll();
         this.getFrame().getContentPane().remove(this.getChartPanelW());
-        BasicStroke[] BasicStroke = new BasicStroke[]{
-                new BasicStroke( 1.5f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f ),
-                new BasicStroke( 1.5f, CAP_SQUARE, JOIN_MITER, 10.0f, new float[]{5, 5}, 2.0f )
+        BasicStroke[] basicStroke = new BasicStroke[]{
+            new BasicStroke(1.5f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f),
+            new BasicStroke(1.5f, CAP_SQUARE, JOIN_MITER, 10.0f, new float[]{5, 5}, 2.0f)
         };
-        this.getCalcChartW().addSeries("Rrms", x, y).setLineStyle(BasicStroke[0]).setLineColor(Color.red);
+        this.getCalcChartW().addSeries("Rrms", x, y).setLineStyle(basicStroke[0]).setLineColor(Color.red);
         this.getCalcChartW().addSeries(this.getLanguage().equals("fin")
-            ? "\u221AS" : "\u221AS", x, y).setLineStyle(BasicStroke[1]).setLineColor(Color.blue);
+            ? "\u221AS" : "\u221AS", x, y).setLineStyle(basicStroke[1]).setLineColor(Color.blue);
 
         this.getCalcChartW().setTitle(this.getLanguage().equals("fin")
-            ? "R_rms ja odotusarvo (" + String.format("%.2f",expected) + ") ajojen funktiona"
-            : "R_rms and Expected Value (" + String.format("%.2f",expected) + ") as Functions of Walks");
-        this.getFrame().getContentPane().add(this.getChartPanelW(),0);
+            ? "R_rms ja odotusarvo (" + String.format("%.2f", expected) + ") ajojen funktiona"
+            : "R_rms and Expected Value (" + String.format("%.2f", expected) + ") as Functions of Walks");
+        this.getFrame().getContentPane().add(this.getChartPanelW(), 0);
     }
 
     /**
-     * method for plotting normal distribution in Real Time Rms
+     * Method for plotting normal distribution in Real Time Rms.
      * @param x x-axis data (rms_norm)
      * @param y y-axis data (rms_norm)
      * @param minx x-axis min for normal distribution plot
      * @param maxx x-axis max for normal distribution plot
      * @param standdiff "stand" if standard normal distribution, "diff" if diffusion normal distribution
      */
-    void setNData(double[] x, double[] y, double minx, double maxx, @NotNull String standdiff) {
+    public void setNData(double[] x, double[] y, double minx, double maxx, String standdiff) {
         this.getCalcChartN().getSeriesMap().clear();
         this.getChartPanelN().removeAll();
         this.getFrame().getContentPane().remove(this.getChartPanelN());
-        BasicStroke[] BasicStroke = new BasicStroke[]{
-            new BasicStroke( 1.0f, CAP_ROUND, JOIN_MITER, 10.0f, null, 0.0f ),
-            new BasicStroke( 1.5f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f )
+        BasicStroke[] basicStroke = new BasicStroke[]{
+            new BasicStroke(1.0f, CAP_ROUND, JOIN_MITER, 10.0f, null, 0.0f),
+            new BasicStroke(1.5f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f)
         };
         this.getCalcChartN().addSeries("\u03C1(r,t\u2081)", x, y)
-            .setLineStyle(BasicStroke[0]).setLineColor(Color.getHSBColor(150.0f / 256.0f, 1f, 1f));
-                this.getCalcChartN().addSeries("\u03C1(r,t\u2082)", x, y)
-            .setLineStyle(BasicStroke[0]).setLineColor(Color.getHSBColor(190.0f / 256.0f, 1f, 1f));
-                this.getCalcChartN().addSeries("\u03C1(r,t\u2083)", x, y)
-            .setLineStyle(BasicStroke[0]).setLineColor(Color.getHSBColor(230.0f / 256.0f, 1f, 1f));
+            .setLineStyle(basicStroke[0]).setLineColor(Color.getHSBColor(150.0f / 256.0f, 1f, 1f));
+        this.getCalcChartN().addSeries("\u03C1(r,t\u2082)", x, y)
+            .setLineStyle(basicStroke[0]).setLineColor(Color.getHSBColor(190.0f / 256.0f, 1f, 1f));
+        this.getCalcChartN().addSeries("\u03C1(r,t\u2083)", x, y)
+            .setLineStyle(basicStroke[0]).setLineColor(Color.getHSBColor(230.0f / 256.0f, 1f, 1f));
         this.getCalcChartN().addSeries("\u03C1(r,t)", x, y)
-            .setLineStyle(BasicStroke[1]).setLineColor(Color.orange);
+            .setLineStyle(basicStroke[1]).setLineColor(Color.orange);
         switch (standdiff) {
             case "stand":
                 this.getCalcChartN().setTitle(this.getLanguage().equals("fin")
@@ -443,72 +442,71 @@ class FXPlot {
         }
         this.getCalcChartN().getStyler().setXAxisMin(minx);
         this.getCalcChartN().getStyler().setXAxisMax(maxx);
-        this.getFrame().getContentPane().add(this.getChartPanelN(),1);
+        this.getFrame().getContentPane().add(this.getChartPanelN(), 1);
     }
 
     /**
-     * method for plotting SAW3
+     * Method for plotting SAW3.
      * @param x x-axis data
      * @param y y-axis data
      */
-    void setHData(double[] x, double[] y) {
+    public void setHData(double[] x, double[] y) {
         this.getCalcChartH().getSeriesMap().clear();
         this.getChartPanelH().removeAll();
         this.getFrame().getContentPane().remove(this.getChartPanelH());
         this.getCalcChartH().addSeries("hist", x, y).setFillColor(Color.orange);
         this.getCalcChartH().setTitle(this.getLanguage().equals("fin")
             ? "Etäisyys-histogrammi" : "Distance Histogram");
-        this.getFrame().getContentPane().add(this.getChartPanelH(),2);
+        this.getFrame().getContentPane().add(this.getChartPanelH(), 2);
     }
 
     /**
-     * method for plotting energy minimization in Diffusion
+     * Method for plotting energy minimization in Diffusion.
      * @param x x-axis data (energy_x)
      * @param y y-axis data (energy_y)
      */
-    void setEData(List<Double> x, List<Double> y) {
-        BasicStroke[] BasicStroke = new BasicStroke[]{
-            new BasicStroke( 1.5f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f )
+    public void setEData(List<Double> x, List<Double> y) {
+        BasicStroke[] basicStroke = new BasicStroke[]{
+            new BasicStroke(1.5f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f)
         };
-        this.getCalcChartE().addSeries(this.getLanguage().equals("fin") ? "energia" :"energy", x, y)
-            .setLineStyle(BasicStroke[0]).setLineColor(Color.MAGENTA);
+        this.getCalcChartE().addSeries(this.getLanguage().equals("fin") ? "energia" : "energy", x, y)
+            .setLineStyle(basicStroke[0]).setLineColor(Color.MAGENTA);
         this.getCalcChartE().setTitle(this.getLanguage().equals("fin")
             ? "Energian minimointi" : "Energy Minimizing");
         this.getFrame().getContentPane().add(this.getChartPanelE());
     }
 
     /**
-     * method for plotting diffusion in Diffusion (normal y-axis)
+     * Method for plotting diffusion in Diffusion (normal y-axis).
      * @param x x-axis data
      * @param y y-axis data
      */
-    void setDData(List<Double> x, List<Double> y) {
-        BasicStroke[] BasicStroke = new BasicStroke[]{
-            new BasicStroke( 1.5f, CAP_SQUARE,
-                JOIN_MITER, 10.0f, null, 0.0f )
+    public void setDData(List<Double> x, List<Double> y) {
+        BasicStroke[] basicStroke = new BasicStroke[]{
+            new BasicStroke(1.5f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f)
         };
         this.getCalcChartD().addSeries(this.getLanguage().equals("fin") ? "diffuusio" : "diffusion", x, y)
-            .setLineStyle(BasicStroke[0]).setLineColor(Color.red);
+            .setLineStyle(basicStroke[0]).setLineColor(Color.red);
         this.getCalcChartD().setTitle(this.getLanguage().equals("fin")
             ? "Diffuusiokerroin" : "Diffusion Coefficient");
         this.getFrame().getContentPane().add(this.getChartPanelD());
     }
 
     /**
-     * method for plotting viscosity calculation in Diffusion
+     * Method for plotting viscosity calculation in Diffusion.
      * @param x x-axis data (visc_x)
      * @param y y-axis data (visc_y)
+     * @param which viscosity or mobility
      */
-    void setVData(List<Double> x, List<Double> y, @NotNull String which) { // u03B7=eta, u00B5=micro, u22c5=dot
-        BasicStroke[] BasicStroke = new BasicStroke[]{
-            new BasicStroke( 1.5f, CAP_SQUARE,
-                JOIN_MITER, 10.0f, null, 0.0f )
+    public void setVData(List<Double> x, List<Double> y, String which) { // u03B7=eta, u00B5=micro, u22c5=dot
+        BasicStroke[] basicStroke = new BasicStroke[]{
+            new BasicStroke(1.5f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f)
         };
         if (which.equals("visc")) {
             this.getCalcChartV().setYAxisTitle(this.getLanguage().equals("fin") ?
                 "Dynaaminen viskositeetti, \u03B7 [Pa\u22c5s]" : "Dynamic Viscosity, \u03B7 [Pa\u22c5s]");
             this.getCalcChartV().addSeries(this.getLanguage().equals("fin") ? "viskositeetti" : "viscosity", x, y)
-                .setLineStyle(BasicStroke[0]).setLineColor(Color.orange);
+                .setLineStyle(basicStroke[0]).setLineColor(Color.orange);
             this.getCalcChartV().setTitle(this.getLanguage().equals("fin")
                 ? "Dynaaminen viskositeetti" : "Dynamic Viscosity");
             this.getFrame().getContentPane().add(this.getChartPanelV());
@@ -516,7 +514,7 @@ class FXPlot {
             this.getCalcChartV().setYAxisTitle(this.getLanguage().equals("fin") ?
                 "Liikkuvuus, \u00B5 [cm\u00B2/Vs]" : "Electrical mobility, \u00B5 [cm\u00B2/Vs]");
             this.getCalcChartV().addSeries(this.getLanguage().equals("fin") ? "liikkuvuus" : "mobility", x, y)
-                .setLineStyle(BasicStroke[0]).setLineColor(Color.orange);
+                .setLineStyle(basicStroke[0]).setLineColor(Color.orange);
             this.getCalcChartV().setTitle(this.getLanguage().equals("fin")
                 ? "Liikkuvuus" : "Electrical mobility");
             this.getFrame().getContentPane().add(this.getChartPanelV());
@@ -524,11 +522,12 @@ class FXPlot {
     }
 
     /**
-     * method for plotting SAW efficiency
+     * Method for plotting SAW efficiency.
      * @param x x-axis data
      * @param y y-axis data
+     * @param maxX x-axis max value
      */
-    void setFData(List<Integer> x, List<Double> y, double maxX) {
+    public void setFData(List<Integer> x, List<Double> y, double maxX) {
         this.getCalcChartF().addSeries(this.getLanguage().equals("fin")
             ? "tehokkuus" : "efficiency", x, y)
             .setMarker(SeriesMarkers.CIRCLE).setMarkerColor(Color.red);
@@ -541,84 +540,84 @@ class FXPlot {
     }
 
     /**
-     * method for plotting SAW1
+     * Method for plotting SAW1.
      * @param x x-axis data
      * @param y y-axis data
      * @param dim dimension
      */
-    void setS1Data(List<Integer> x, List<Double> y, int dim) { //u208# subscript
-        BasicStroke[] BasicStroke = new BasicStroke[]{
-            new BasicStroke( 2.0f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f ),
-            new BasicStroke( 2.0f, CAP_SQUARE, JOIN_MITER, 10.0f,null, 0.0f ),
-            new BasicStroke( 1.5f, CAP_SQUARE, JOIN_MITER, 10.0f, new float[]{5, 5}, 2.0f ),
-            new BasicStroke( 2.0f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f )
+    public void setS1Data(List<Integer> x, List<Double> y, int dim) { //u208# subscript
+        BasicStroke[] basicStroke = new BasicStroke[]{
+            new BasicStroke(2.0f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f),
+            new BasicStroke(2.0f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f),
+            new BasicStroke(1.5f, CAP_SQUARE, JOIN_MITER, 10.0f, new float[]{5, 5}, 2.0f),
+            new BasicStroke(2.0f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f)
         };
-        this.getCalcChartS1().addSeries("<Rexp>", x, y).setLineStyle(BasicStroke[0]).setLineColor(Color.red);
-        this.getCalcChartS1().addSeries("<Rrms>", x, y).setLineStyle(BasicStroke[1]).setLineColor(Color.blue);
+        this.getCalcChartS1().addSeries("<Rexp>", x, y).setLineStyle(basicStroke[0]).setLineColor(Color.red);
+        this.getCalcChartS1().addSeries("<Rrms>", x, y).setLineStyle(basicStroke[1]).setLineColor(Color.blue);
         this.getCalcChartS1().addSeries(this.getLanguage().equals("fin") ? "etäisyys" : "distance", x, y)
-            .setLineStyle(BasicStroke[3]).setLineColor(Color.orange);
+            .setLineStyle(basicStroke[3]).setLineColor(Color.orange);
         this.getCalcChartS1().setTitle(this.getLanguage().equals("fin")
-            ? "SAW ("+dim+"D)" : "SAW ("+dim+"D)");
-        this.getFrame().getContentPane().add(this.getChartPanelS1(),0);
+            ? "SAW (" + dim + "D)" : "SAW (" + dim + "D)");
+        this.getFrame().getContentPane().add(this.getChartPanelS1(), 0);
     }
 
     /**
-     * method for plotting SAW2
+     * Method for plotting SAW2.
      * @param x x-axis data
      * @param y y-axis data
      */
-    void setS2Data(List<Integer> x, List<Double> y) {
-        BasicStroke[] BasicStroke = new BasicStroke[]{
-            new BasicStroke( 2.5f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f ),
-            new BasicStroke( 2.0f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f ),
-            new BasicStroke( 1.5f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f )
+    public void setS2Data(List<Integer> x, List<Double> y) {
+        BasicStroke[] basicStroke = new BasicStroke[]{
+            new BasicStroke(2.5f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f),
+            new BasicStroke(2.0f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f),
+            new BasicStroke(1.5f, CAP_SQUARE, JOIN_MITER, 10.0f, null, 0.0f)
         };
-        this.getCalcChartS2().addSeries("<Rexp>", x, y).setLineStyle(BasicStroke[0]).setLineColor(Color.red);
-        this.getCalcChartS2().addSeries("<Rrms>", x, y).setLineStyle(BasicStroke[1]).setLineColor(Color.blue);
-        this.getCalcChartS2().addSeries(this.getLanguage().equals("fin") ? "etäisyys" :"distance", x, y)
-            .setLineStyle(BasicStroke[2]).setLineColor(Color.orange);
-        this.getFrame().getContentPane().add(this.getChartPanelS2(),1);
+        this.getCalcChartS2().addSeries("<Rexp>", x, y).setLineStyle(basicStroke[0]).setLineColor(Color.red);
+        this.getCalcChartS2().addSeries("<Rrms>", x, y).setLineStyle(basicStroke[1]).setLineColor(Color.blue);
+        this.getCalcChartS2().addSeries(this.getLanguage().equals("fin") ? "etäisyys" : "distance", x, y)
+            .setLineStyle(basicStroke[2]).setLineColor(Color.orange);
+        this.getFrame().getContentPane().add(this.getChartPanelS2(), 1);
     }
 
     /**
-     * method for plotting SAW3
+     * Method for plotting SAW3.
      * @param labelMap x-axis labels
      * @param x x-axis data
      * @param y y-axis data
      */
-    void setS3Data(Map<Object,Object> labelMap, List<Integer> x, List<Double> y) {
+    public void setS3Data(Map<Object, Object> labelMap, List<Integer> x, List<Double> y) {
         this.getCalcChartS3().addSeries("hist", x, y).setFillColor(Color.orange);
         this.getCalcChartS3().setTitle(this.getLanguage().equals("fin") ?
             "Etäisyys-histogrammi" : "Distance Histogram");
         this.getCalcChartS3().setCustomCategoryLabels(labelMap);
-        this.getFrame().getContentPane().add(this.getChartPanelS3(),2);
+        this.getFrame().getContentPane().add(this.getChartPanelS3(), 2);
     }
 
     /**
-     * method for updating R_rms and sqrt(steps) vs. walks in Real Time Rms
+     * Method for updating R_rms and sqrt(steps) vs. walks in Real Time Rms.
      * @param name name for "R_rms" or "sqrt(steps)"
      * @param x x-axis data (xAxis)
      * @param y y-axis data (yAxis or y2Axis)
      * @param expected real time expected value
      * @param peak real time rms value
      */
-    void updateWData(String name, double[] x, double[] y, double expected, double peak) {
+    public void updateWData(String name, double[] x, double[] y, double expected, double peak) {
         this.getCalcChartW().updateXYSeries(name, x, y, null);
         this.getCalcChartW().setTitle(this.getLanguage().equals("fin")
-            ? "Rrms (" + String.format("%.2f",peak) + ") ja odotusarvo (" + String.format("%.2f",expected) + ") ajojen funktiona"
-            : "Rrms (" + String.format("%.2f",peak) + ") and Expected Value (" + String.format("%.2f",expected) + ") as Functions of Walks");
+            ? "Rrms (" + String.format("%.2f", peak) + ") ja odotusarvo (" + String.format("%.2f", expected) + ") ajojen funktiona"
+            : "Rrms (" + String.format("%.2f", peak) + ") and Expected Value (" + String.format("%.2f", expected) + ") as Functions of Walks");
         this.getFrame().revalidate();
         this.getFrame().repaint();
         this.getFrame().pack();
     }
 
     /**
-     * method for updating normal distribution in Real Time Rms
+     * Method for updating normal distribution in Real Time Rms.
      * @param name name for plot series
      * @param x x-axis data (xnormAxis)
      * @param y y-axis data (ynormAxis)
      */
-    void updateNData(String name, double[] x, double[] y) {
+    public void updateNData(String name, double[] x, double[] y) {
         this.getCalcChartN().updateXYSeries(name, x, y, null);
         this.getFrame().revalidate();
         this.getFrame().repaint();
@@ -626,11 +625,11 @@ class FXPlot {
     }
 
     /**
-     * method for updating histogram plot in Real Time Rms
+     * Method for updating histogram plot in Real Time Rms.
      * @param x x-axis data
      * @param y y-axis data
      */
-    void updateHData(double[] x, double[] y) {
+    public void updateHData(double[] x, double[] y) {
         this.getCalcChartH().updateXYSeries("hist", x, y, null);
         this.getFrame().revalidate();
         this.getFrame().repaint();
@@ -638,11 +637,11 @@ class FXPlot {
     }
 
     /**
-     * method for updating energy minimization in Diffusion
+     * Method for updating energy minimization in Diffusion.
      * @param x x-axis data
      * @param y y-axis data
      */
-    void updateEData(List<Double> x, List<Double> y) {
+    public void updateEData(List<Double> x, List<Double> y) {
         this.getCalcChartE().updateXYSeries(this.getLanguage().equals("fin") ?
             "energia" : "energy", x, y, null);
         this.getFrame().revalidate();
@@ -651,11 +650,11 @@ class FXPlot {
     }
 
     /**
-     * method for updating diffusion in Real Time Rms (normal y-axis)
+     * Method for updating diffusion in Real Time Rms (normal y-axis).
      * @param x x-axis data
      * @param y y-axis data
      */
-    void updateDData(List<Double> x, List<Double> y) {
+    public void updateDData(List<Double> x, List<Double> y) {
         this.getCalcChartD().updateXYSeries(this.getLanguage().equals("fin") ?
             "diffuusio" : "diffusion", x, y, null);
         this.getFrame().revalidate();
@@ -664,29 +663,31 @@ class FXPlot {
     }
 
     /**
-     * method for updating viscosity calculation in Diffusion
+     * Method for updating viscosity calculation in Diffusion.
      * @param x x-axis data
      * @param y y-axis data
+     * @param which viscosity or mobility
      */
-    void updateVData(List<Double> x, List<Double> y, @NotNull String which) {
-        if (which.equals("visc"))
+    public void updateVData(List<Double> x, List<Double> y, String which) {
+        if (which.equals("visc")) {
             this.getCalcChartV().updateXYSeries(this.getLanguage().equals("fin") ?
                 "viskositeetti" : "viscosity", x, y, null);
-        else if (which.equals("mobil"))
+        } else if (which.equals("mobil")) {
             this.getCalcChartV().updateXYSeries(this.getLanguage().equals("fin") ?
                 "liikkuvuus" : "mobility", x, y, null);
+        }
         this.getFrame().revalidate();
         this.getFrame().repaint();
         this.getFrame().pack();
     }
 
     /**
-     * method for updating increasing x-axis plot in SAW efficiency
+     * Method for updating increasing x-axis plot in SAW efficiency.
      * @param name name for plot series
      * @param x x-axis data
      * @param y y-axis data
      */
-    void updateFData(String name, List<Integer> x, List<Double> y) {
+    public void updateFData(String name, List<Integer> x, List<Double> y) {
         this.getCalcChartF().updateXYSeries(name, x, y, null);
         this.getFrame().revalidate();
         this.getFrame().repaint();
@@ -694,12 +695,12 @@ class FXPlot {
     }
 
     /**
-     * method for updating comoving x-axis plot in SAW
+     * Method for updating comoving x-axis plot in SAW.
      * @param name name for plot series
      * @param x x-axis data
      * @param y y-axis data
      */
-    void updateS1Data(String name, List<Integer> x, List<Double> y) {
+    public void updateS1Data(String name, List<Integer> x, List<Double> y) {
         this.getCalcChartS1().updateXYSeries(name, x, y, null);
         this.getFrame().revalidate();
         this.getFrame().repaint();
@@ -707,12 +708,12 @@ class FXPlot {
     }
 
     /**
-     * method for updating increasing x-axis plot in SAW
+     * Method for updating increasing x-axis plot in SAW.
      * @param name name for plot series
      * @param x x-axis data
      * @param y y-axis data
      */
-    void updateS2Data(String name, List<Integer> x, List<Double> y) {
+    public void updateS2Data(String name, List<Integer> x, List<Double> y) {
         this.getCalcChartS2().updateXYSeries(name, x, y, null);
         this.getFrame().revalidate();
         this.getFrame().repaint();
@@ -720,11 +721,11 @@ class FXPlot {
     }
 
     /**
-     * method for updating histogram plot in SAW
+     * Method for updating histogram plot in SAW.
      * @param x x-axis data
      * @param y y-axis data
      */
-    void updateS3Data(List<Integer> x, List<Double> y) {
+    public void updateS3Data(List<Integer> x, List<Double> y) {
         this.getCalcChartS3().updateCategorySeries("hist", x, y, null);
         this.getFrame().revalidate();
         this.getFrame().repaint();
@@ -732,67 +733,73 @@ class FXPlot {
     }
 
     /**
-     * method for printing final energy difference
+     * Method for printing final energy difference.
      * @param evalue value
      */
-    void setDeltaE(double evalue) { // \u0394=delta d
+    public void setDeltaE(double evalue) { // \u0394=delta d
         this.getCalcChartE().setTitle(this.getLanguage().equals("fin")
-            ? this.getCalcChartE().getTitle()+", \u0394E = "+this.eformatter.format(evalue)+" eV"
-            : this.getCalcChartE().getTitle()+", \u0394E = "+this.eformatter.format(evalue)+" eV");
+            ? this.getCalcChartE().getTitle() + ", \u0394E = " + this.eformatter.format(evalue) + " eV"
+            : this.getCalcChartE().getTitle() + ", \u0394E = " + this.eformatter.format(evalue) + " eV");
         this.getFrame().revalidate();
         this.getFrame().repaint();
         this.getFrame().pack();
     }
 
     /**
+     * Method for setting viscosity or mobility titles and values.
      * @param coeff the max viscosity value to set to chart title
+     * @param which viscosity or mobility
      */
-    void setVTitle(double coeff, @NotNull String which) { // 03B7=eta, u00B5=micro, u22c5=dot
-        if (which.equals("visc"))
+    public void setVTitle(double coeff, String which) { // 03B7=eta, u00B5=micro, u22c5=dot
+        if (which.equals("visc")) {
             this.getCalcChartV().setTitle(this.getLanguage().equals("fin")
-                ? "Dynaaminen viskositeetti, \u03B7 = "+this.twodecformatter.format(coeff)+" Pa\u22c5s"
-                : "Dynamic viscosity, \u03B7 = "+this.twodecformatter.format(coeff)+" Pa\u22c5s");
-        else if (which.equals("mobil"))
+                ? "Dynaaminen viskositeetti, \u03B7 = " + this.twodecformatter.format(coeff) + " Pa\u22c5s"
+                : "Dynamic viscosity, \u03B7 = " + this.twodecformatter.format(coeff) + " Pa\u22c5s");
+        } else if (which.equals("mobil")) {
             this.getCalcChartV().setTitle(this.getLanguage().equals("fin")
-                ? "Liikkuvuus, \u03BC = "+this.eformatter.format(coeff)+" cm\u00B2/Vs"
-                : "Electrical mobility, \u03BC = "+this.eformatter.format(coeff)+" cm\u00B2/Vs");
+                ? "Liikkuvuus, \u03BC = " + this.eformatter.format(coeff) + " cm\u00B2/Vs"
+                : "Electrical mobility, \u03BC = " + this.eformatter.format(coeff) + " cm\u00B2/Vs");
+        }
         this.getFrame().revalidate();
         this.getFrame().repaint();
         this.getFrame().pack();
     }
 
     /**
+     * Method for setting diffusion title and value.
      * @param coeff the max diffusion coefficient value to set to chart title
      */
-    void setDTitle(double coeff) { // ^2 = \u00B2
+    public void setDTitle(double coeff) { // ^2 = \u00B2
         this.getCalcChartD().setTitle(this.getLanguage().equals("fin")
-            ? "Diffuusiokerroin, D = "+this.eformatter.format(coeff)+" cm\u00B2/s"
-            : "Diffusion Coefficient, D = "+this.eformatter.format(coeff)+" cm\u00B2/s");
+            ? "Diffuusiokerroin, D = " + this.eformatter.format(coeff) + " cm\u00B2/s"
+            : "Diffusion Coefficient, D = " + this.eformatter.format(coeff) + " cm\u00B2/s");
         this.getFrame().revalidate();
         this.getFrame().repaint();
         this.getFrame().pack();
     }
 
     /**
+     * Method for setting mc saw title and values.
      * @param dim the dimension
-     * @param succ_pros the percent of successed runs
+     * @param succPros the percent of successed runs
      */
-    void setS1McsawTitle(int dim, double succ_pros) {
+    public void setS1McsawTitle(int dim, double succPros) {
         this.getCalcChartS1().setTitle(this.getLanguage().equals("fin")
-            ? "MC SAW ("+dim+"D), onnistuneita ajoja: "+this.twodecformatter.format(succ_pros)+"%"
-            : "MC SAW ("+dim+"D), successed runs: "+this.twodecformatter.format(succ_pros)+"%");
+            ? "MC SAW (" + dim + "D), onnistuneita ajoja: " + this.twodecformatter.format(succPros) + "%"
+            : "MC SAW (" + dim + "D), successed runs: " + this.twodecformatter.format(succPros) + "%");
         this.getFrame().revalidate();
         this.getFrame().repaint();
         this.getFrame().pack();
     }
 
     /**
+     * Method for setting saw title and values.
      * @param rexpd the expected value
      * @param rrms the root mean squared distance
      */
-    void setS2SawTitle(double rexpd, double rrms) {
+    public void setS2SawTitle(double rexpd, double rrms) {
         this.getCalcChartS2().setTitle(
-            "<Rexp>="+this.twodecformatter.format(rexpd)+", <Rrms>="+this.twodecformatter.format(rrms));
+            "<Rexp>=" + this.twodecformatter.format(rexpd) + ", <Rrms>=" + this.twodecformatter.format(rrms));
         this.getFrame().revalidate();
         this.getFrame().repaint();
         this.getFrame().pack();
@@ -800,7 +807,9 @@ class FXPlot {
 
     /**
      */
-    void setFrameVis() { this.getFrame().setVisible(true); }
+    public void setFrameVis() {
+        this.getFrame().setVisible(true);
+    }
 
     /**
      * @param frame the frame to set
@@ -813,272 +822,260 @@ class FXPlot {
     /**
      * @return the frame
      */
-    JFrame getFrame() { return frame; }
+    public JFrame getFrame() {
+        return frame;
+    }
 
     /**
      * @param minY the y-axis min value to set
      */
-    void setWMinY(double minY) {
+    public void setWMinY(double minY) {
         this.getCalcChartW().getStyler().setYAxisMin(minY);
     }
 
     /**
      * @param maxY the y-axis max value to set
      */
-    void setWMaxY(double maxY) {
+    public void setWMaxY(double maxY) {
         this.getCalcChartW().getStyler().setYAxisMax(maxY);
     }
 
     /**
      * @param maxY the y-axis max value to set
      */
-    void setNMaxY(double maxY) {
+    public void setNMaxY(double maxY) {
         this.getCalcChartN().getStyler().setYAxisMax(maxY);
     }
 
     /**
      * @param maxY the y-axis max value to set
      */
-    void setEMaxY(double maxY) { this.getCalcChartE().getStyler().setYAxisMax(maxY); }
+    public void setEMaxY(double maxY) {
+        this.getCalcChartE().getStyler().setYAxisMax(maxY);
+    }
 
     /**
      * @param maxY the y-axis max value to set
      */
-    void setVMaxY(double maxY) {
+    public void setVMaxY(double maxY) {
         this.getCalcChartV().getStyler().setYAxisMax(maxY);
     }
 
     /**
      * @param maxY the y-axis max value to set
      */
-    void setDMaxY(double maxY) {
+    public void setDMaxY(double maxY) {
         this.getCalcChartD().getStyler().setYAxisMax(maxY);
     }
 
     /**
      * @param maxX the x-axis max value to set
      */
-    void setFMaxX(double maxX) {
+    public void setFMaxX(double maxX) {
         this.getCalcChartF().getStyler().setXAxisMax(maxX);
     }
 
     /**
      * @param minX the x-axis min value to set
      */
-    void setS1MinX(double minX) {
+    public void setS1MinX(double minX) {
         this.getCalcChartS1().getStyler().setXAxisMin(minX);
     }
 
     /**
      * @param maxX the x-axis max value to set
      */
-    void setS1MaxX(double maxX) {
+    public void setS1MaxX(double maxX) {
         this.getCalcChartS1().getStyler().setXAxisMax(maxX);
     }
 
     /**
      * @param maxX the x-axis max value to set
      */
-    void setS2MaxX(double maxX) {
+    public void setS2MaxX(double maxX) {
         this.getCalcChartS2().getStyler().setXAxisMax(maxX);
     }
 
     /**
      * @param maxY the y-axis max value to set
      */
-    void setS1MaxY(double maxY) {
+    public void setS1MaxY(double maxY) {
         this.getCalcChartS1().getStyler().setYAxisMax(maxY);
     }
 
     /**
      * @param maxY the y-axis max value to set
      */
-    void setS2MaxY(double maxY) {
+    public void setS2MaxY(double maxY) {
         this.getCalcChartS2().getStyler().setYAxisMax(maxY);
     }
 
     /**
-     * @return the Width
-     */
-    @Contract(pure = true)
-    private int getWidth() { return 700 / (int) Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the Height
-     */
-    @Contract(pure = true)
-    private int getHeight() { return 1000 / (int) Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the Width
-     */
-    @Contract(pure = true)
-    private int getEffWidth() { return 800 / (int) Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the Height
-     */
-    @Contract(pure = true)
-    private int getEffHeight() { return 700 / (int) Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the YMarginTiny
-     */
-    @Contract(pure = true)
-    private int getMarginTiny() { return 10 / (int) Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the YMarginSmall
-     */
-    @Contract(pure = true)
-    private int getMarginSmall() { return 50 / (int) Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the YMarginTiny
-     */
-    @Contract(pure = true)
-    private int getMarginBig() { return 100 / (int) Screen.getMainScreen().getRenderScale(); }
-
-    /**
      * @return the screenHeight
      */
-    @Contract(pure = true)
-    private int getScreenHeight() { return screenHeight; }
+    private int getScreenHeight() {
+        return screenHeight;
+    }
 
     /**
      * @param screenHeight the screenHeight to set
      */
-    private void setScreenHeight(int screenHeight) { this.screenHeight = screenHeight; }
+    private void setScreenHeight(int screenHeight) {
+        this.screenHeight = screenHeight;
+    }
 
     /**
      * @return the calcChartW
      */
-    @Contract(pure = true)
-    private XYChart getCalcChartW() { return calcChartW; }
+    private XYChart getCalcChartW() {
+        return calcChartW;
+    }
 
     /**
      * @return the calcChartN
      */
-    @Contract(pure = true)
-    private XYChart getCalcChartN() { return calcChartN; }
+    private XYChart getCalcChartN() {
+        return calcChartN;
+    }
 
     /**
      * @return the calcChartH
      */
-    @Contract(pure = true)
-    private XYChart getCalcChartH() { return calcChartH; }
+    private XYChart getCalcChartH() {
+        return calcChartH;
+    }
 
     /**
      * @return the calcChartD
      */
-    @Contract(pure = true)
-    private XYChart getCalcChartD() { return calcChartD; }
+    private XYChart getCalcChartD() {
+        return calcChartD;
+    }
 
     /**
      * @return the calcChartE
      */
-    @Contract(pure = true)
-    private XYChart getCalcChartE() { return calcChartE; }
+    private XYChart getCalcChartE() {
+        return calcChartE;
+    }
 
     /**
      * @return the calcChartV
      */
-    @Contract(pure = true)
-    private XYChart getCalcChartV() { return calcChartV; }
+    private XYChart getCalcChartV() {
+        return calcChartV;
+    }
 
     /**
      * @return the calcChartF
      */
-    @Contract(pure = true)
-    private XYChart getCalcChartF() { return calcChartF; }
+    private XYChart getCalcChartF() {
+        return calcChartF;
+    }
 
     /**
      * @return the calcChartS1
      */
-    @Contract(pure = true)
-    private XYChart getCalcChartS1() { return calcChartS1; }
+    private XYChart getCalcChartS1() {
+        return calcChartS1;
+    }
 
     /**
      * @return the calcChartS2
      */
-    @Contract(pure = true)
-    private XYChart getCalcChartS2() { return calcChartS2; }
+    private XYChart getCalcChartS2() {
+        return calcChartS2;
+    }
 
     /**
      * @return the calcChartS3
      */
-    @Contract(pure = true)
-    private CategoryChart getCalcChartS3() { return calcChartS3; }
+    private CategoryChart getCalcChartS3() {
+        return calcChartS3;
+    }
 
     /**
      * @return the chartPanelW
      */
-    @Contract(pure = true)
-    private XChartPanel<XYChart> getChartPanelW() { return chartPanelW; }
+    private XChartPanel<XYChart> getChartPanelW() {
+        return chartPanelW;
+    }
 
     /**
      * @return the chartPanelN
      */
-    @Contract(pure = true)
-    private XChartPanel<XYChart> getChartPanelN() { return chartPanelN; }
+    private XChartPanel<XYChart> getChartPanelN() {
+        return chartPanelN;
+    }
 
     /**
      * @return the chartPanelH
      */
-    @Contract(pure = true)
-    private XChartPanel<XYChart> getChartPanelH() { return chartPanelH; }
+    private XChartPanel<XYChart> getChartPanelH() {
+        return chartPanelH;
+    }
 
     /**
      * @return the chartPanelD
      */
-    @Contract(pure = true)
-    private XChartPanel<XYChart> getChartPanelD() { return chartPanelD; }
+    private XChartPanel<XYChart> getChartPanelD() {
+        return chartPanelD;
+    }
 
     /**
      * @return the chartPanelV
      */
-    @Contract(pure = true)
-    private XChartPanel<XYChart> getChartPanelV() { return chartPanelV; }
+    private XChartPanel<XYChart> getChartPanelV() {
+        return chartPanelV;
+    }
 
     /**
      * @return the chartPanelF
      */
-    @Contract(pure = true)
-    private XChartPanel<XYChart> getChartPanelF() { return chartPanelF; }
+    private XChartPanel<XYChart> getChartPanelF() {
+        return chartPanelF;
+    }
 
     /**
      * @return the chartPanelE
      */
-    @Contract(pure = true)
-    private XChartPanel<XYChart> getChartPanelE() { return chartPanelE; }
+    private XChartPanel<XYChart> getChartPanelE() {
+        return chartPanelE;
+    }
 
     /**
      * @return the chartPanelS1
      */
-    @Contract(pure = true)
-    private XChartPanel<XYChart> getChartPanelS1() { return chartPanelS1; }
+    private XChartPanel<XYChart> getChartPanelS1() {
+        return chartPanelS1;
+    }
 
     /**
      * @return the chartPanelS2
      */
-    @Contract(pure = true)
-    private XChartPanel<XYChart> getChartPanelS2() { return chartPanelS2; }
+    private XChartPanel<XYChart> getChartPanelS2() {
+        return chartPanelS2;
+    }
 
     /**
      * @return the chartPanelS3
      */
-    @Contract(pure = true)
-    private XChartPanel<CategoryChart> getChartPanelS3() { return chartPanelS3; }
+    private XChartPanel<CategoryChart> getChartPanelS3() {
+        return chartPanelS3;
+    }
 
     /**
      * @return the language
      */
-    @Contract(pure = true)
-    private String getLanguage() { return this.language; }
+    private String getLanguage() {
+        return this.language;
+    }
 
     /**
      * @param language the language to set
      */
-    private void setLanguage(String language) { this.language = language; }
+    private void setLanguage(String language) {
+        this.language = language;
+    }
 
 }

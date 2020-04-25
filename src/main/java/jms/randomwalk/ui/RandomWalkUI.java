@@ -1,6 +1,6 @@
-package randomwalkjava;
+package jms.randomwalk.ui;
 
-import com.sun.glass.ui.Screen;
+import enums.DblSizes;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -23,20 +23,21 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
+import jms.randomwalk.execs.*;
+import jms.randomwalk.plots.Execution;
+import jms.randomwalk.scenes.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
+import org.apache.maven.surefire.shade.booter.org.apache.commons.lang3.SystemUtils;
 
 /**
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
  */
-@SuppressWarnings("SameReturnValue")
-public class RandomWalk extends Application {
+public class RandomWalkUI extends Application {
 
     private double screenWidth;
     private double screenHeight;
@@ -82,29 +83,38 @@ public class RandomWalk extends Application {
         ButtonType buttonFI = new ButtonType("FI", ButtonBar.ButtonData.OK_DONE);
         ButtonType buttonEN = new ButtonType("EN", ButtonBar.ButtonData.OK_DONE);
         ButtonType buttonEX = new ButtonType("EXIT", ButtonBar.ButtonData.OK_DONE);
-        Dialog langDialog = getDialogs.getLangChoice(buttonFI, buttonEX, buttonEN);
+        Dialog<?> langDialog = getDialogs.getLangChoice(buttonFI, buttonEX, buttonEN);
+
         langDialog.showAndWait();
-        if ( langDialog.getResult() == buttonFI ) { this.setLanguage("fin"); langDialog.close(); }
-        else if ( langDialog.getResult() == buttonEN ) { this.setLanguage("eng"); langDialog.close(); }
-        else if ( langDialog.getResult() == buttonEX ) { langDialog.close(); return; }
+        if (langDialog.getResult() == buttonFI) { 
+            this.setLanguage("fin");
+            langDialog.close();
+        } else if (langDialog.getResult() == buttonEN) { 
+            this.setLanguage("eng");
+            langDialog.close();
+        } else if (langDialog.getResult() == buttonEX) {
+            langDialog.close();
+            return; 
+        }
 
         /*
          * INITIATE PARAMETERS
          */
-        this.setScreenWidth(Toolkit.getDefaultToolkit().getScreenSize().width / Screen.getMainScreen().getRenderScale());
-        this.setScreenHeight(Toolkit.getDefaultToolkit().getScreenSize().height / Screen.getMainScreen().getRenderScale());
+        this.setScreenWidth(Toolkit.getDefaultToolkit().getScreenSize().width);
+        this.setScreenHeight(Toolkit.getDefaultToolkit().getScreenSize().height);
         this.setDiffScalefactor();
         this.setNewdata();
 
         /*
         * FILE AND FOLDER CHECK
-        * creates a folder "C:/RWDATA" if not exist
+        * creates a folder "C:/RWDATA" or "home/user/RWDATA" if not exist
         * copies Fortran and Python executables from resources/ folder
         * to "RWDATA" folder if not in there already
         * Uses instance of FilesAndFolders.java class
          */
-        String datapath = "C:/RWDATA";
-        String fexec = "walk.exe";
+        boolean isWin = SystemUtils.IS_OS_WINDOWS;
+        String datapath = isWin == true ? "C:/RWDATA" : System.getProperty("user.home") + "/RWDATA";
+        String fexec = isWin == true ? "walk.exe" : "walkLx";
         String pyexecrms = "plotrms.py";
         String pyexec1d = "plot1d.py";
         String pyexec2d = "plot2d.py";
@@ -119,10 +129,11 @@ public class RandomWalk extends Application {
 
         FilesAndFolders filesAndFolders = new FilesAndFolders(this.getLanguage());
 
-        if (Files.notExists(datafolder.toPath())){
+        if (Files.notExists(datafolder.toPath())) {
             if (filesAndFolders.checkCreateFolders(datapath, fexec, pyexecrms, pyexec1d, pyexec2d, pyexec3d,
-                pyexecdiff2d, pyexecdiff3d, pyexec1Ddist, pyexecsaw2d, pyexecsaw3d))
+                pyexecdiff2d, pyexecdiff3d, pyexec1Ddist, pyexecsaw2d, pyexecsaw3d)) {
                 Platform.exit();
+            }
         } else if (Files.notExists(sourceFile.toPath())) {
             if (filesAndFolders.createFolder(datapath, fexec, false)) {
                 Platform.exit();
@@ -141,11 +152,11 @@ public class RandomWalk extends Application {
         * CREATE STAGE
         */
         stage.setTitle(this.getLanguage().equals("fin") ? "Satunnaiskulku" : "Random Walk");
-        stage.setWidth(this.getStageWidth());
-        stage.setHeight(this.getStageHeight());
+        stage.setWidth(DblSizes.STGW.getDblSize());
+        stage.setHeight(DblSizes.STGH.getDblSize());
         stage.setResizable(false);
-        stage.setX(this.getScreenWidth()-this.getStageWidth()-10.0);
-        stage.setY((this.getScreenHeight()-this.getStageHeight()) / 2.0);
+        stage.setX(this.getScreenWidth() - DblSizes.STGW.getDblSize() - 10.0);
+        stage.setY((this.getScreenHeight() - DblSizes.STGH.getDblSize()) / 2.0);
 
         /*
         * GET BUTTONS AND OTHER COMPONENTS
@@ -166,7 +177,7 @@ public class RandomWalk extends Application {
         /*
         * PUT ALL BUTTONS TO GRIDPANE
         */
-        this.setAsettelu(GetComponents.GetAsettelu(nappiScene1, nappiScene2, nappiScene3, nappiScene4, nappiScene5, nappiScene6));
+        this.setAsettelu(GetComponents.getAsettelu(nappiScene1, nappiScene2, nappiScene3, nappiScene4, nappiScene5, nappiScene6));
 
         /*
         * GET SCENES
@@ -203,13 +214,13 @@ public class RandomWalk extends Application {
         /*
         * TEXTAREAS
         */
-        this.setTextAreaMenu(getComponents.GetTextArea(this.getTextWidth(), this.getTextHeight()));
-        this.setTextAreaPath(getComponents.GetTextArea(this.getTextWidth(), this.getTextHeight()));
-        this.setTextArea1Ddist(getComponents.GetTextArea(this.getTextWidth(), this.getTextHeight()));
-        this.setTextAreaCalc(getComponents.GetTextArea(this.getTextWidth(), this.getTextHeight()));
-        this.setTextAreaReal(getComponents.GetTextArea(this.getAnimWidth(), this.getAnimHeight()));
-        this.setTextAreaDiff(getComponents.GetTextArea(this.getAnimWidth(), this.getAnimHeight()));
-        this.setTextAreaSAW(getComponents.GetTextArea(this.getSawTextWidth(), this.getTextHeight()));
+        this.setTextAreaMenu(getComponents.getTextArea(DblSizes.TXTW.getDblSize(), DblSizes.TXTH.getDblSize()));
+        this.setTextAreaPath(getComponents.getTextArea(DblSizes.TXTW.getDblSize(), DblSizes.TXTH.getDblSize()));
+        this.setTextArea1Ddist(getComponents.getTextArea(DblSizes.TXTW.getDblSize(), DblSizes.TXTH.getDblSize()));
+        this.setTextAreaCalc(getComponents.getTextArea(DblSizes.TXTW.getDblSize(), DblSizes.TXTH.getDblSize()));
+        this.setTextAreaReal(getComponents.getTextArea(DblSizes.ANIMSIZE.getDblSize(), DblSizes.ANIMSIZE.getDblSize()));
+        this.setTextAreaDiff(getComponents.getTextArea(DblSizes.ANIMSIZE.getDblSize(), DblSizes.ANIMSIZE.getDblSize()));
+        this.setTextAreaSAW(getComponents.getTextArea(DblSizes.SAWTXTW.getDblSize(), DblSizes.TXTH.getDblSize()));
 
         /*
          * CREATE A FRAME FOR CALCULATION AND PATH TRACING PLOTS
@@ -230,8 +241,7 @@ public class RandomWalk extends Application {
          * FIRST VIEW BUTTONS: HELP & CLOSE
          */
         Button nappiMenuHelp = getButtons.getHelpButton(
-            this.getLanguage(), this.getTextAreaMenu(), null, null, null,
-                null, null,"menu", 0);
+            this.getLanguage(), this.getTextAreaMenu(), null, null, null, null, null, "menu", 0);
         this.getAsettelu().add(nappiMenuHelp, 0, 14, 2, 1);
         Button closeNappiMenu = getButtons.getCloseButton(getRealScene, getDiffScene, getSAWScene,
             0, ex, this.getLanguage(), this.getFrame(), this.getButtonYES(), this.getButtonNO());
@@ -270,8 +280,8 @@ public class RandomWalk extends Application {
         ivCalcFI.setSmooth(true);
         ivCalcEN.setSmooth(true);
         this.setCalcPane(this.getLanguage().equals("fin")
-            ? getComponents.getPane2(ivCalcFI, this.getTextWidth(), this.getTextHeight())
-            : getComponents.getPane2(ivCalcEN, this.getTextWidth(), this.getTextHeight()));
+            ? getComponents.getPane2(ivCalcFI, DblSizes.TXTW.getDblSize(), DblSizes.TXTH.getDblSize())
+            : getComponents.getPane2(ivCalcEN, DblSizes.TXTW.getDblSize(), DblSizes.TXTH.getDblSize()));
         Button helpNappiCalc = getButtons.getHelpButton(
             this.getLanguage(), this.getTextAreaCalc(), this.getIsovalikkoCalc(),
                 this.getCalcPane(), null, null, null, "calc", 0);
@@ -285,12 +295,12 @@ public class RandomWalk extends Application {
             0, ex, this.getLanguage(), this.getFrame(), this.getButtonYES(), this.getButtonNO());
 
         // REAL TIME RMS COMPONENTS
-        Canvas rtrmsAlusta = new Canvas(this.getAnimWidth(), this.getAnimHeight());
+        Canvas rtrmsAlusta = new Canvas(DblSizes.ANIMSIZE.getDblSize(), DblSizes.ANIMSIZE.getDblSize());
         rtrmsAlusta.setVisible(true);
         GraphicsContext piirturi = rtrmsAlusta.getGraphicsContext2D();
         piirturi.setFill(Color.BLACK);
-        piirturi.fillRect(0, 0, this.getAnimWidth(), this.getAnimHeight());
-        this.setRealPane(getComponents.getPane(rtrmsAlusta, this.getAnimWidth(), this.getAnimHeight()));
+        piirturi.fillRect(0, 0, DblSizes.ANIMSIZE.getDblSize(), DblSizes.ANIMSIZE.getDblSize());
+        this.setRealPane(getComponents.getPane(rtrmsAlusta, DblSizes.ANIMSIZE.getDblSize(), DblSizes.ANIMSIZE.getDblSize()));
         Image imgRms1FI = new Image("/rms1FI.png");
         Image imgRms1EN = new Image("/rms1EN.png");
         Image imgRms2FI = new Image("/rms2FI.png");
@@ -318,11 +328,11 @@ public class RandomWalk extends Application {
         Button closeNappiDiff = getButtons.getCloseDiffButton(this.getLanguage(), getDiffScene, this.getFrame());
 
         // DIFFUSION COMPONENTS
-        Canvas diffAlusta = new Canvas(this.getAnimWidth(), this.getAnimHeight());
+        Canvas diffAlusta = new Canvas(DblSizes.ANIMSIZE.getDblSize(), DblSizes.ANIMSIZE.getDblSize());
         diffAlusta.setVisible(true);
         GraphicsContext diffpiirturi = diffAlusta.getGraphicsContext2D();
         diffpiirturi.setFill(Color.BLACK);
-        diffpiirturi.fillRect(0, 0, this.getAnimWidth(), this.getAnimHeight());
+        diffpiirturi.fillRect(0, 0, DblSizes.ANIMSIZE.getDblSize(), DblSizes.ANIMSIZE.getDblSize());
         // MATH CARD
         Image imgDiffFI = new Image("/diffFI.png");
         Image imgDiffEN = new Image("/diffEN.png");
@@ -331,8 +341,8 @@ public class RandomWalk extends Application {
         ivDiffFI.setSmooth(true);
         ivDiffEN.setSmooth(true);
         this.setDiffPane(this.getLanguage().equals("fin")
-            ? getComponents.getPane2(ivDiffFI, this.getAnimWidth(), this.getAnimHeight())
-            : getComponents.getPane2(ivDiffEN, this.getAnimWidth(), this.getAnimHeight()));
+            ? getComponents.getPane2(ivDiffFI, DblSizes.ANIMSIZE.getDblSize(), DblSizes.ANIMSIZE.getDblSize())
+            : getComponents.getPane2(ivDiffEN, DblSizes.ANIMSIZE.getDblSize(), DblSizes.ANIMSIZE.getDblSize()));
         this.getDiffPane().setId("image");
         Button helpNappiDiff = getButtons.getHelpButton(
             this.getLanguage(), this.getTextAreaDiff(), this.getIsovalikkoDiff(),
@@ -353,22 +363,20 @@ public class RandomWalk extends Application {
 
         // REAL TIME SAW COMPONENTS
         // SLIDER A
-        final Label labaa = new Label(this.getLanguage().equals("fin") ? "Amplitudi A :" : "Amplitude A :");
+        String labaStr = this.getLanguage().equals("fin") ? "Amplitudi A :  " : "Amplitude A :  ";
         final Label labelaa = new Label();
         Slider sliderAa = new Slider(0.00, 1.00, 0.00);
         sliderAa.setOrientation(Orientation.HORIZONTAL);
-        sliderAa.setMaxSize(this.getSawCompWidth(), this.getSawCompHeight());
+        sliderAa.setMaxSize(DblSizes.SAWCOMPW.getDblSize(), DblSizes.SAWCOMPH.getDblSize());
         sliderAa.setShowTickLabels(true);
         sliderAa.setMinorTickCount(18);
         sliderAa.setMajorTickUnit(0.2);
         sliderAa.setShowTickMarks(false);
         sliderAa.setSnapToTicks(true);
-        labelaa.textProperty().bind(
-            Bindings.format( "%.2f", sliderAa.valueProperty() )
-        );
+        labelaa.textProperty().bind(Bindings.format(labaStr + "%.2f", sliderAa.valueProperty()));
         VBox sliderBox = new VBox(5);
         sliderBox.setPadding(new Insets(0, 0, -15, 0));
-        sliderBox.getChildren().addAll(labaa, labelaa, sliderAa);
+        sliderBox.getChildren().addAll(labelaa, sliderAa);
 
         // MATH CARD
         Image imgSawFI = new Image("/sawFI.png");
@@ -378,8 +386,8 @@ public class RandomWalk extends Application {
         ivSawFI.setSmooth(true);
         ivSawEN.setSmooth(true);
         this.setSawPane(this.getLanguage().equals("fin")
-            ? getComponents.getPane2(ivSawFI, this.getSawTextWidth(), this.getTextHeight())
-            : getComponents.getPane2(ivSawEN, this.getSawTextWidth(), this.getTextHeight()));
+            ? getComponents.getPane2(ivSawFI, DblSizes.SAWTXTW.getDblSize(), DblSizes.TXTH.getDblSize())
+            : getComponents.getPane2(ivSawEN, DblSizes.SAWTXTW.getDblSize(), DblSizes.TXTH.getDblSize()));
         Button helpNappiSAW = getButtons.getHelpButton(
             this.getLanguage(), this.getTextAreaSAW(), this.getIsovalikkoSAW(),
                 null, null, null, this.getSawPane(), "saw", 1);
@@ -389,18 +397,18 @@ public class RandomWalk extends Application {
         Label labEff = new Label(this.getLanguage().equals("fin") ? "askeleita max:" : "efficiency steps max:");
         TextField setEff = new TextField("");
         TextFlow resultEff = new TextFlow();
-        resultEff.setMinSize(this.getWidth(),10);
-        resultEff.setMaxSize(this.getWidth(),10);
-        effBox.getChildren().addAll(labEff,setEff,resultEff);
+        resultEff.setMinSize(DblSizes.PANEW.getDblSize(), 10);
+        resultEff.setMaxSize(DblSizes.PANEW.getDblSize(), 10);
+        effBox.getChildren().addAll(labEff, setEff, resultEff);
 
         VBox maxBox = new VBox(0);
         maxBox.setPadding(new Insets(-15, 0, 10, 0));
         Label labMax = new Label(this.getLanguage().equals("fin") ? "kuvaaja-ajoja max: (oletus 100)" : "plot runs max: (default 100)");
         TextField setMax = new TextField("");
         TextFlow result = new TextFlow();
-        result.setMinSize(this.getWidth(),10);
-        result.setMaxSize(this.getWidth(),10);
-        maxBox.getChildren().addAll(labMax,setMax,result);
+        result.setMinSize(DblSizes.PANEW.getDblSize(), 10);
+        result.setMaxSize(DblSizes.PANEW.getDblSize(), 10);
+        maxBox.getChildren().addAll(labMax, setMax, result);
 
         /*
         * SET FIRST VIEW BORDERPANE
@@ -473,30 +481,23 @@ public class RandomWalk extends Application {
         /*
         * SET SCENES
         */
-        Scene firstScene = new Scene(asetteluMenu, this.getStageWidth(), this.getStageHeight());
-        firstScene.getStylesheets().add("/Styles.css");
+        Scene firstScene = new Scene(asetteluMenu, DblSizes.STGW.getDblSize(), DblSizes.STGH.getDblSize());
 
-        Scene pathScene = new Scene(asetteluPath, this.getStageWidth(),this.getStageHeight());
-        pathScene.getStylesheets().add("/Styles.css");
+        Scene pathScene = new Scene(asetteluPath, DblSizes.STGW.getDblSize(), DblSizes.STGH.getDblSize());
 
-        Scene dist1DScene = new Scene(asettelu1Ddist, this.getStageWidth(), this.getStageHeight());
-        dist1DScene.getStylesheets().add("/Styles.css");
+        Scene dist1DScene = new Scene(asettelu1Ddist, DblSizes.STGW.getDblSize(), DblSizes.STGH.getDblSize());
 
-        Scene calcScene = new Scene(asetteluCalc, this.getStageWidth(), this.getStageHeight());
-        calcScene.getStylesheets().add("/Styles.css");
+        Scene calcScene = new Scene(asetteluCalc, DblSizes.STGW.getDblSize(), DblSizes.STGH.getDblSize());
 
         Scene realScene = new Scene(asetteluReal,
-            this.getStageWidth() + (this.getAnimWidth()-this.getTextWidth()),
-            this.getStageHeight() + (this.getAnimHeight()-this.getTextHeight()));
-        realScene.getStylesheets().add("/Styles.css");
+            DblSizes.STGW.getDblSize() + (DblSizes.ANIMSIZE.getDblSize() - DblSizes.TXTW.getDblSize()),
+            DblSizes.STGH.getDblSize() + (DblSizes.ANIMSIZE.getDblSize() - DblSizes.TXTH.getDblSize()));
 
         Scene diffScene = new Scene(asetteluDiff,
-            this.getStageWidth() + (this.getAnimWidth()-this.getTextWidth()),
-            this.getStageHeight() + (this.getAnimHeight()-this.getTextHeight()));
-        diffScene.getStylesheets().add("/Styles.css");
+            DblSizes.STGW.getDblSize() + (DblSizes.ANIMSIZE.getDblSize() - DblSizes.TXTW.getDblSize()),
+            DblSizes.STGH.getDblSize() + (DblSizes.ANIMSIZE.getDblSize() - DblSizes.TXTH.getDblSize()));
 
-        Scene sawScene = new Scene(asetteluSAW, this.getStageWidth(),this.getStageHeight());
-        sawScene.getStylesheets().add("/Styles.css");
+        Scene sawScene = new Scene(asetteluSAW, DblSizes.STGW.getDblSize(), DblSizes.STGH.getDblSize());
 
         /*
          * SET SCENE CHOICE BUTTONS EFFECTS (WINDOW RESIZE ETC.)
@@ -507,11 +508,11 @@ public class RandomWalk extends Application {
         setChoices.setMenuEffects(this.getLanguage(), menuNappiPath, "path",
             this.getTextAreaPath(), this.getTextAreaMenu(), firstScene, 1);
 
-        setChoices.setSceneEffects(this.getLanguage(), nappiScene2, dist1DScene,"1D-etäisyys", "1D Distance");
+        setChoices.setSceneEffects(this.getLanguage(), nappiScene2, dist1DScene, "1D-etäisyys", "1D Distance");
         setChoices.setMenuEffects(this.getLanguage(), menuNappi1Ddist, "1Ddist",
             this.getTextArea1Ddist(), this.getTextAreaMenu(), firstScene, 0);
 
-        setChoices.setSceneEffects(this.getLanguage(), nappiScene3, calcScene,"Rms-laskenta","Rms calculation");
+        setChoices.setSceneEffects(this.getLanguage(), nappiScene3, calcScene, "Rms-laskenta", "Rms calculation");
         setChoices.setMenuEffects(this.getLanguage(), menuNappiCalc, "calc",
             this.getTextAreaCalc(), this.getTextAreaMenu(), firstScene, 0);
 
@@ -523,7 +524,7 @@ public class RandomWalk extends Application {
         setChoices.setMenuEffects(this.getLanguage(), menuNappiDiff, "diff",
             this.getTextAreaDiff(), this.getTextAreaMenu(), firstScene, 2);
 
-        setChoices.setSceneEffects(this.getLanguage(), nappiScene6, sawScene,"Reaaliaika-saw", "Real Time saw");
+        setChoices.setSceneEffects(this.getLanguage(), nappiScene6, sawScene, "Reaaliaika-saw", "Real Time saw");
         setChoices.setMenuEffects(this.getLanguage(), menuNappiSAW, "saw",
             this.getTextAreaSAW(), this.getTextAreaMenu(), firstScene, 1);
 
@@ -561,7 +562,7 @@ public class RandomWalk extends Application {
         execDIFF.setPlotClick(plotDiff, getDiffScene, this.valikkoDiff, datapath, datafolder,
             fexec, pyexecdiff2d, pyexecdiff3d, ex);
         execDIFF.setExecClick(runDiff, getDiffScene, diffpiirturi,
-            this.getDiffScalefactor(), this.getAnimWidth(), this.getAnimHeight(),
+            this.getDiffScalefactor(), DblSizes.ANIMSIZE.getDblSize(), DblSizes.ANIMSIZE.getDblSize(),
             this.newdata, this.isovalikkoDiff, this.valikkoDiff, this.diffpane, datapath, datafolder,
             fexec, remBarNappiDiff, cancelNappiDiff, plotDiff, closeNappiDiff, menuNappiDiff, helpNappiDiff, diffAlusta);
 
@@ -570,19 +571,20 @@ public class RandomWalk extends Application {
          */
         ExecSAW execSAW = new ExecSAW(this.getLanguage());
         execSAW.setPlotClick(plotSAW, runSAW, getSAWScene, this.getValikkoSAW(), datapath, datafolder,
-           fexec, pyexecsaw2d, pyexecsaw3d, ex, setMax, result);
+                fexec, pyexecsaw2d, pyexecsaw3d, ex, setMax, result);
         execSAW.setEffClick(datafolder, fexec, runEFF, runSAW, runMCSAW, plotSAW, getSAWScene, this.getValikkoSAW(), setEff, resultEff, sliderAa);
         execSAW.setSawClick(datafolder, fexec, runSAW, runMCSAW, runEFF, getSAWScene, this.getIsovalikkoSAW(),
-            this.getSawPane(), this.getTextAreaSAW(), plotSAW, closeNappiSAW, menuNappiSAW, helpNappiSAW, sliderAa);
+                this.getSawPane(), this.getTextAreaSAW(), plotSAW, closeNappiSAW, menuNappiSAW, helpNappiSAW, sliderAa);
 
         /*
         * CLOSE STAGE
         */
         stage.setOnCloseRequest((WindowEvent e) -> {
-            if (this.getFrame() != null)
-                if (this.getFrame().isShowing() || this.getFrame().isActive() || this.getFrame().isDisplayable())
+            if (this.getFrame() != null) {
+                if (this.getFrame().isShowing() || this.getFrame().isActive() || this.getFrame().isDisplayable()) {
                     this.getFrame().dispose();
-
+                }
+            }
             if (getDiffScene.runtimeIsRunning()) {
                 Runtime.getRuntime().gc();
                 getDiffScene.stopRuntime();
@@ -611,428 +613,466 @@ public class RandomWalk extends Application {
         Image icn48 = new Image("icon48.png");
         Image icn32 = new Image("icon32.png");
         Image icn24 = new Image("icon24.png");
-        stage.getIcons().addAll(icn64,icn48,icn32,icn24,icn16);
+        stage.getIcons().addAll(icn64, icn48, icn32, icn24, icn16);
         stage.toFront();
         stage.show();
     }
 
-    public static void main(String[] args) { launch(args); }
-
-    /**
-     * @return the stageWidth
-     */
-    @Contract(pure = true)
-    private double getStageWidth() { return 940.0 / Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the stageHeight
-     */
-    @Contract(pure = true)
-    private double getStageHeight() { return 660.0 / Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the textwidth
-     */
-    @Contract(pure = true)
-    private double getTextWidth() { return 740.0 / Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the textheight
-     */
-    @Contract(pure = true)
-    private double getTextHeight() { return 600.0 / Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the textwidth
-     */
-    @Contract(pure = true)
-    private double getSawTextWidth() { return 675.0 / Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the animwidth
-     */
-    @Contract(pure = true)
-    private double getAnimWidth() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the animheight
-     */
-    @Contract(pure = true)
-    private double getAnimHeight() { return 750.0 / Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the buttonWidth
-     */
-    @Contract(pure = true)
-    private double getSawCompWidth() { return 205.0 / Screen.getMainScreen().getRenderScale(); }
-
-    /**
-     * @return the buttonWidth
-     */
-    @Contract(pure = true)
-    private double getSawCompHeight() { return 50.0 / Screen.getMainScreen().getRenderScale(); }
+    public static void main(String[] args) {
+        launch(args);
+    }
 
     /**
      * @return the screenWidth
      */
-    @Contract(pure = true)
-    private double getScreenWidth() { return screenWidth; }
+    private double getScreenWidth() {
+        return screenWidth;
+    }
 
     /**
      * @param screenWidth the screenWidth to set
      */
-    private void setScreenWidth(double screenWidth) { this.screenWidth = screenWidth; }
+    private void setScreenWidth(double screenWidth) {
+        this.screenWidth = screenWidth;
+    }
 
     /**
      * @return the screenHeight
      */
-    @Contract(pure = true)
-    private double getScreenHeight() { return screenHeight; }
+    private double getScreenHeight() {
+        return screenHeight;
+    }
 
     /**
      * @param screenHeight the screenHeight to set
      */
-    private void setScreenHeight(double screenHeight) { this.screenHeight = screenHeight; }
+    private void setScreenHeight(double screenHeight) {
+        this.screenHeight = screenHeight;
+    }
 
     /**
      * @return the frame
      */
-    @Contract(pure = true)
-    private JFrame getFrame() { return frame; }
+    private JFrame getFrame() {
+        return frame;
+    }
 
     /**
      * @param frame the frame to set
      */
-    private void setFrame(JFrame frame) { this.frame = frame; }
+    private void setFrame(JFrame frame) {
+        this.frame = frame;
+    }
 
     /**
      * @return the diffscalefactor
      */
-    @Contract(pure = true)
-    private double getDiffScalefactor() { return diffscalefactor; }
+    private double getDiffScalefactor() {
+        return diffscalefactor;
+    }
 
     /**
      */
-    private void setDiffScalefactor() { this.diffscalefactor = 1.0; }
+    private void setDiffScalefactor() {
+        this.diffscalefactor = 1.0;
+    }
 
     /**
      */
-    private void setNewdata() { this.newdata = false; }
+    private void setNewdata() {
+        this.newdata = false;
+    }
 
     /**
      * @return the language
      */
-    @Contract(pure = true)
-    private String getLanguage() { return this.language; }
+    private String getLanguage() {
+        return this.language;
+    }
 
     /**
      * @param language the language to set
      */
-    private void setLanguage(String language) { this.language = language; }
+    private void setLanguage(String language) {
+        this.language = language;
+    }
 
     /**
      * @return the textAreaPath
      */
-    @Contract(pure = true)
-    private TextArea getTextAreaPath() { return this.textAreaPath; }
+    private TextArea getTextAreaPath() {
+        return this.textAreaPath;
+    }
 
     /**
      * @param textarea the textAreaPath to set
      */
-    private void setTextAreaPath(TextArea textarea) { this.textAreaPath = textarea; }
+    private void setTextAreaPath(TextArea textarea) {
+        this.textAreaPath = textarea;
+    }
 
     /**
      * @return the textArea1Ddist
      */
-    @Contract(pure = true)
-    private TextArea getTextArea1Ddist() { return this.textArea1Ddist; }
+    private TextArea getTextArea1Ddist() {
+        return this.textArea1Ddist;
+    }
 
     /**
      * @param textarea the textArea1Ddist to set
      */
-    private void setTextArea1Ddist(TextArea textarea) { this.textArea1Ddist = textarea; }
+    private void setTextArea1Ddist(TextArea textarea) {
+        this.textArea1Ddist = textarea;
+    }
 
     /**
      * @return the textAreaCalc
      */
-    @Contract(pure = true)
-    private TextArea getTextAreaCalc() { return this.textAreaCalc; }
+    private TextArea getTextAreaCalc() {
+        return this.textAreaCalc;
+    }
 
     /**
      * @param textarea the textAreaCalc to set
      */
-    private void setTextAreaCalc(TextArea textarea) { this.textAreaCalc = textarea; }
+    private void setTextAreaCalc(TextArea textarea) {
+        this.textAreaCalc = textarea;
+    }
 
     /**
      * @return the textAreaReal
      */
-    @Contract(pure = true)
-    private TextArea getTextAreaReal() { return this.textAreaReal; }
+    private TextArea getTextAreaReal() {
+        return this.textAreaReal;
+    }
 
     /**
      * @param textarea the textAreaReal to set
      */
-    private void setTextAreaReal(TextArea textarea) { this.textAreaReal = textarea; }
+    private void setTextAreaReal(TextArea textarea) {
+        this.textAreaReal = textarea;
+    }
 
     /**
      * @return the textAreaDiff
      */
-    @Contract(pure = true)
-    private TextArea getTextAreaDiff() { return this.textAreaDiff; }
+    private TextArea getTextAreaDiff() {
+        return this.textAreaDiff;
+    }
 
     /**
      * @param textarea the textAreaDiff to set
      */
-    private void setTextAreaDiff(TextArea textarea) { this.textAreaDiff = textarea; }
+    private void setTextAreaDiff(TextArea textarea) {
+        this.textAreaDiff = textarea;
+    }
 
     /**
      * @return the textAreaSAW
      */
-    @Contract(pure = true)
-    private TextArea getTextAreaSAW() { return this.textAreaSAW; }
+    private TextArea getTextAreaSAW() {
+        return this.textAreaSAW;
+    }
 
     /**
      * @param textarea the textAreaSAW to set
      */
-    private void setTextAreaSAW(TextArea textarea) { this.textAreaSAW = textarea; }
+    private void setTextAreaSAW(TextArea textarea) {
+        this.textAreaSAW = textarea;
+    }
 
     /**
      * @return the textAreaMenu
      */
-    @Contract(pure = true)
-    private TextArea getTextAreaMenu() { return this.textAreaMenu; }
+    private TextArea getTextAreaMenu() {
+        return this.textAreaMenu;
+    }
 
     /**
      * @param textarea the textAreaMenu to set
      */
-    private void setTextAreaMenu(TextArea textarea) { this.textAreaMenu = textarea; }
+    private void setTextAreaMenu(TextArea textarea) {
+        this.textAreaMenu = textarea;
+    }
 
     /**
      * @return the isovalikkoMenu
      */
-    @Contract(pure = true)
-    private HBox getIsovalikkoMenu() { return this.isovalikkoMenu; }
+    private HBox getIsovalikkoMenu() {
+        return this.isovalikkoMenu;
+    }
 
     /**
      * @param hbox the isovalikkoMenu to set
      */
-    private void setIsovalikkoMenu(HBox hbox) { this.isovalikkoMenu = hbox; }
+    private void setIsovalikkoMenu(HBox hbox) {
+        this.isovalikkoMenu = hbox;
+    }
 
     /**
      * @return the isovalikkoPath
      */
-    @Contract(pure = true)
-    private HBox getIsovalikkoPath() { return this.isovalikkoPath; }
+    private HBox getIsovalikkoPath() {
+        return this.isovalikkoPath;
+    }
 
     /**
      * @param hbox the isovalikkoPath to set
      */
-    private void setIsovalikkoPath(HBox hbox) { this.isovalikkoPath = hbox; }
+    private void setIsovalikkoPath(HBox hbox) {
+        this.isovalikkoPath = hbox;
+    }
 
     /**
      * @return the isovalikkoCalc
      */
-    @Contract(pure = true)
-    private HBox getIsovalikkoCalc() { return this.isovalikkoCalc; }
+    private HBox getIsovalikkoCalc() {
+        return this.isovalikkoCalc;
+    }
 
     /**
      * @param hbox the isovalikkoCalc to set
      */
-    private void setIsovalikkoCalc(HBox hbox) { this.isovalikkoCalc = hbox; }
+    private void setIsovalikkoCalc(HBox hbox) {
+        this.isovalikkoCalc = hbox;
+    }
 
     /**
      * @return the isovalikko1Ddist
      */
-    @Contract(pure = true)
-    private HBox getIsovalikko1Ddist() { return this.isovalikko1Ddist; }
+    private HBox getIsovalikko1Ddist() {
+        return this.isovalikko1Ddist;
+    }
 
     /**
      * @param hbox the isovalikko1Ddist to set
      */
-    private void setIsovalikko1Ddist(HBox hbox) { this.isovalikko1Ddist = hbox; }
+    private void setIsovalikko1Ddist(HBox hbox) {
+        this.isovalikko1Ddist = hbox;
+    }
 
     /**
      * @return the isovalikkoReal
      */
-    @Contract(pure = true)
-    private HBox getIsovalikkoReal() { return this.isovalikkoReal; }
+    private HBox getIsovalikkoReal() {
+        return this.isovalikkoReal;
+    }
 
     /**
      * @param hbox the isovalikkoReal to set
      */
-    private void setIsovalikkoReal(HBox hbox) { this.isovalikkoReal = hbox; }
+    private void setIsovalikkoReal(HBox hbox) {
+        this.isovalikkoReal = hbox;
+    }
 
     /**
      * @return the isovalikkoDiff
      */
-    @Contract(pure = true)
-    private HBox getIsovalikkoDiff() { return this.isovalikkoDiff; }
+    private HBox getIsovalikkoDiff() {
+        return this.isovalikkoDiff;
+    }
 
     /**
      * @param hbox the isovalikkoDiff to set
      */
-    private void setIsovalikkoDiff(HBox hbox) { this.isovalikkoDiff = hbox; }
+    private void setIsovalikkoDiff(HBox hbox) {
+        this.isovalikkoDiff = hbox;
+    }
 
     /**
      * @return the isovalikkoSAW
      */
-    @Contract(pure = true)
-    private HBox getIsovalikkoSAW() { return this.isovalikkoSAW; }
+    private HBox getIsovalikkoSAW() {
+        return this.isovalikkoSAW;
+    }
 
     /**
      * @param hbox the isovalikkoSAW to set
      */
-    private void setIsovalikkoSAW(HBox hbox) { this.isovalikkoSAW = hbox; }
+    private void setIsovalikkoSAW(HBox hbox) {
+        this.isovalikkoSAW = hbox;
+    }
 
     /**
      * @return the valikkoMenu
      */
-    @Contract(pure = true)
-    private VBox getValikkoMenu() { return this.valikkoMenu; }
+    private VBox getValikkoMenu() {
+        return this.valikkoMenu;
+    }
 
     /**
      * @param vbox the valikkoMenu to set
      */
-    private void setValikkoMenu(VBox vbox) { this.valikkoMenu = vbox; }
+    private void setValikkoMenu(VBox vbox) {
+        this.valikkoMenu = vbox;
+    }
 
     /**
      * @return the valikkoPath
      */
-    @Contract(pure = true)
-    private VBox getValikkoPath() { return this.valikkoPath; }
+    private VBox getValikkoPath() {
+        return this.valikkoPath;
+    }
 
     /**
      * @param vbox the valikkoPath to set
      */
-    private void setValikkoPath(VBox vbox) { this.valikkoPath = vbox; }
+    private void setValikkoPath(VBox vbox) {
+        this.valikkoPath = vbox;
+    }
 
     /**
      * @return the valikkoCalc
      */
-    @Contract(pure = true)
-    private VBox getValikkoCalc() { return this.valikkoCalc; }
+    private VBox getValikkoCalc() {
+        return this.valikkoCalc;
+    }
 
     /**
      * @param vbox the valikkoCalc to set
      */
-    private void setValikkoCalc(VBox vbox) { this.valikkoCalc = vbox; }
+    private void setValikkoCalc(VBox vbox) {
+        this.valikkoCalc = vbox;
+    }
 
     /**
      * @return the valikko1Ddist
      */
-    @Contract(pure = true)
-    private VBox getValikko1Ddist() { return this.valikko1Ddist; }
+    private VBox getValikko1Ddist() {
+        return this.valikko1Ddist;
+    }
 
     /**
      * @param vbox the valikko1Ddist to set
      */
-    private void setValikko1Ddist(VBox vbox) { this.valikko1Ddist = vbox; }
+    private void setValikko1Ddist(VBox vbox) {
+        this.valikko1Ddist = vbox;
+    }
 
     /**
      * @return the valikkoReal
      */
-    @Contract(pure = true)
-    private VBox getValikkoReal() { return this.valikkoReal; }
+    private VBox getValikkoReal() {
+        return this.valikkoReal;
+    }
 
     /**
      * @param vbox the valikkoReal to set
      */
-    private void setValikkoReal(VBox vbox) { this.valikkoReal = vbox; }
+    private void setValikkoReal(VBox vbox) {
+        this.valikkoReal = vbox;
+    }
 
     /**
      * @return the valikkoDiff
      */
-    @Contract(pure = true)
-    private VBox getValikkoDiff() { return this.valikkoDiff; }
+    private VBox getValikkoDiff() {
+        return this.valikkoDiff;
+    }
 
     /**
      * @param vbox the valikkoDiff to set
      */
-    private void setValikkoDiff(VBox vbox) { this.valikkoDiff = vbox; }
+    private void setValikkoDiff(VBox vbox) {
+        this.valikkoDiff = vbox;
+    }
 
     /**
      * @return the valikkoSAW
      */
-    @Contract(pure = true)
-    private VBox getValikkoSAW() { return this.valikkoSAW; }
+    private VBox getValikkoSAW() {
+        return this.valikkoSAW;
+    }
 
     /**
      * @param vbox the valikkoSAW to set
      */
-    private void setValikkoSAW(VBox vbox) { this.valikkoSAW = vbox; }
+    private void setValikkoSAW(VBox vbox) {
+        this.valikkoSAW = vbox;
+    }
 
     /**
      * @return the calcpane
      */
-    @Contract(pure = true)
-    private Pane getCalcPane() { return this.calcpane; }
+    private Pane getCalcPane() {
+        return this.calcpane;
+    }
 
     /**
      * @param pane the calcpane to set
      */
-    private void setCalcPane(Pane pane) { this.calcpane = pane; }
+    private void setCalcPane(Pane pane) {
+        this.calcpane = pane;
+    }
 
     /**
      * @return the realpane
      */
-    @Contract(pure = true)
-    private Pane getRealPane() { return this.realpane; }
+    private Pane getRealPane() {
+        return this.realpane;
+    }
 
     /**
      * @param pane the realpane to set
      */
-    private void setRealPane(Pane pane) { this.realpane = pane; }
+    private void setRealPane(Pane pane) {
+        this.realpane = pane;
+    }
 
     /**
      * @return the diffpane
      */
-    @Contract(pure = true)
-    private Pane getDiffPane() { return this.diffpane; }
+    private Pane getDiffPane() {
+        return this.diffpane;
+    }
 
     /**
      * @param pane the diffpane to set
      */
-    private void setDiffPane(Pane pane) { this.diffpane = pane; }
+    private void setDiffPane(Pane pane) {
+        this.diffpane = pane;
+    }
 
     /**
      * @return the sawpane
      */
-    @Contract(pure = true)
-    private Pane getSawPane() { return this.sawpane; }
+    private Pane getSawPane() {
+        return this.sawpane;
+    }
 
     /**
      * @param pane the sawpane to set
      */
-    private void setSawPane(Pane pane) { this.sawpane = pane; }
+    private void setSawPane(Pane pane) {
+        this.sawpane = pane;
+    }
 
     /**
      * @return the asettelu
      */
-    @Contract(pure = true)
-    private GridPane getAsettelu() { return this.asettelu; }
+    private GridPane getAsettelu() {
+        return this.asettelu;
+    }
 
     /**
      * @param asettelu the asettelu to set
      */
-    private void setAsettelu(GridPane asettelu) { this.asettelu = asettelu; }
+    private void setAsettelu(GridPane asettelu) {
+        this.asettelu = asettelu;
+    }
 
     /**
      * @return the buttonYES
      */
-    @NotNull
-    @Contract(pure = true)
-    private ButtonType getButtonYES() { return new ButtonType(this.getLanguage().equals("fin") ? "KYLLÄ" : "YES", ButtonBar.ButtonData.YES); }
+    private ButtonType getButtonYES() {
+        return new ButtonType(this.getLanguage().equals("fin") ? "KYLLÄ" : "YES", ButtonBar.ButtonData.YES);
+    }
 
     /**
      * @return the buttonNO
      */
-    @NotNull
-    @Contract(pure = true)
-    private ButtonType getButtonNO() { return new ButtonType( this.getLanguage().equals("fin") ? "EI" : "NO", ButtonBar.ButtonData.NO); }
+    private ButtonType getButtonNO() {
+        return new ButtonType(this.getLanguage().equals("fin") ? "EI" : "NO", ButtonBar.ButtonData.NO);
+    }
 
-    /**
-     * @return the Width
-     */
-    @Contract(pure = true)
-    private double getWidth() { return 200.0 / Screen.getMainScreen().getRenderScale(); }
 }

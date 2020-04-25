@@ -1,6 +1,5 @@
-package randomwalkjava;
+package jms.randomwalk.ui;
 
-import com.sun.glass.ui.Screen;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
@@ -12,22 +11,25 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import org.jetbrains.annotations.NotNull;
+import org.apache.maven.surefire.shade.booter.org.apache.commons.lang3.SystemUtils;
 
 /**
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
  *
- * Class for creating HBoxes, VBoxes, GridPanes, Panes, and TextAreas
+ * Class for creating HBoxes, VBoxes, GridPanes, Panes, and TextAreas.
  */
-class GetComponents {
+public class GetComponents {
 
+    private final boolean isWin = SystemUtils.IS_OS_WINDOWS;
+    
     /**
      * method for setting HBoxes
+     * @param ins insets values
      * @param spc spacing value
      * @return hbox
      */
-    HBox getHBox(int ins, int spc) {
+    public HBox getHBox(int ins, int spc) {
         HBox hbox = new HBox();
         hbox.setPadding(new Insets(ins, ins, ins, ins));
         hbox.setSpacing(spc);
@@ -35,11 +37,11 @@ class GetComponents {
     }
 
     /**
-     * method for setting VBoxes
+     * Method for setting VBoxes.
      * @param spc spacing value
      * @return vbox
      */
-    VBox getVBox(int spc) {
+    public VBox getVBox(int spc) {
         VBox vbox = new VBox();
         vbox.setPadding(new Insets(10, 10, 10, 10));
         vbox.setSpacing(spc);
@@ -49,12 +51,16 @@ class GetComponents {
     /**
      * method for setting Panes for Real Time Rms and Diffusion
      * @param alusta javafx Canvas
+     * @param width pane width
+     * @param height pane height
      * @return pane
      */
-    Pane getPane(Canvas alusta, double width, double height) {
+    public Pane getPane(Canvas alusta, double width, double height) {
         Pane pane = new Pane();
         pane.setPrefSize(width, height);
-        if (alusta != null) pane.getChildren().add(alusta);
+        if (alusta != null) {
+            pane.getChildren().add(alusta);
+        }
         pane.setVisible(true);
         return pane;
     }
@@ -62,9 +68,11 @@ class GetComponents {
     /**
      * method for setting Panes for Rms Calculation and Real Time Saw
      * @param image javafx ImageView
+     * @param width pane width
+     * @param height pane height
      * @return pane
      */
-    Pane getPane2(@NotNull ImageView image, double width, double height) {
+    public Pane getPane2(ImageView image, double width, double height) {
         Pane pane = new Pane();
         pane.setMaxSize(width, height);
         image.setFitWidth(width);
@@ -76,9 +84,12 @@ class GetComponents {
 
     /**
      * method for setting ImageView to Pane for Real Time Saw
+     * @param pane pane object
      * @param image javafx ImageView
+     * @param width pane width
+     * @param height pane height
      */
-    void getPaneView(@NotNull Pane pane, @NotNull ImageView image, double width, double height) {
+    public void getPaneView(Pane pane, ImageView image, double width, double height) {
         pane.getChildren().remove(0);
         pane.setMaxSize(width, height);
         image.setFitWidth(width);
@@ -87,7 +98,7 @@ class GetComponents {
     }
 
     /**
-     * method for setting buttons to GridPane
+     * Method for setting buttons to GridPane.
      * @param nappi1 button for 'Path Tracing'
      * @param nappi2 button for '1D Distance'
      * @param nappi3 button for 'RMS vs SQRT(S)'
@@ -96,10 +107,9 @@ class GetComponents {
      * @param nappi6 button for 'Real Time SAW'
      * @return asettelu
      */
-    @NotNull
-    static GridPane GetAsettelu(Button nappi1, Button nappi2, Button nappi3, Button nappi4, Button nappi5, Button nappi6) {
+    public static GridPane getAsettelu(Button nappi1, Button nappi2, Button nappi3, Button nappi4, Button nappi5, Button nappi6) {
         GridPane asettelu = new GridPane();
-        asettelu.setMaxWidth(200.0 / Screen.getMainScreen().getRenderScale());
+        asettelu.setMaxWidth(200.0);
         asettelu.setVgap(5);
         asettelu.setHgap(10);
         asettelu.setPadding(new Insets(0, 0, 0, 0));
@@ -139,24 +149,22 @@ class GetComponents {
     }
 
     /**
-     * method for creating textareas
+     * Method for creating textareas.
      * @param width textarea width
      * @param height textarea height
      * @return textArea
      */
-    TextArea GetTextArea(double width, double height) {
+    public TextArea getTextArea(double width, double height) {
         TextArea textArea = new TextArea();
         textArea.setMinWidth(width);
         textArea.setMaxWidth(width);
         textArea.setMinHeight(height);
         textArea.setMaxHeight(height);
-        textArea.setFont(Font.font("Consolas", FontWeight.NORMAL, 18));
-        textArea.setBorder(null);
+        textArea.setFont(this.isWin == true ? Font.font("Consolas", FontWeight.EXTRA_BOLD, 15) : Font.font("System Regular", FontWeight.EXTRA_BOLD, 15));
         textArea.setEditable(false);
         textArea.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
         textArea.setBlendMode(BlendMode.DIFFERENCE);
 
         return textArea;
     }
-
 }

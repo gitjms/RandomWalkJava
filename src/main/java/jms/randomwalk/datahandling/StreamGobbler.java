@@ -1,4 +1,4 @@
-package randomwalkjava;
+package jms.randomwalk.datahandling;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
  * 
- * Class for Fortan code error stream and input stream reading in Data class
+ * Class for Fortan code error stream and input stream reading in Data class.
  */
 class StreamGobbler extends Thread {
 
@@ -25,19 +25,22 @@ class StreamGobbler extends Thread {
     public void run() {
         try {
             PrintWriter pw = null;
-            if (os != null)
+            if (os != null) {
                 pw = new PrintWriter(os);
+            }
 
             InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
             BufferedReader br = new BufferedReader(isr);
             String line;
-            while ( (line = br.readLine()) != null){
-                if (pw != null)
+            while ((line = br.readLine()) != null) {
+                if (pw != null) {
                     pw.println(line);
+                }
                 System.out.println(type + line);
             }
-            if (pw != null)
+            if (pw != null) {
                 pw.flush();
+            }
         } catch (IOException ioe) {
             System.out.println(ioe.getMessage());
         }

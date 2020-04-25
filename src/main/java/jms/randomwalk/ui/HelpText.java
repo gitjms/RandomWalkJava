@@ -1,13 +1,13 @@
 
-package randomwalkjava;
+package jms.randomwalk.ui;
 
 /**
  * @author Jari Sunnari
  * jari.sunnari@gmail.com
  * 
- * Class for GUI main view logo and helptexts
+ * Class for GUI main view logo and helptexts.
  */
-class HelpText {
+public class HelpText {
 
     /**
     * @return MAIN STAGE HELP TEXT
@@ -159,10 +159,10 @@ class HelpText {
     /**
      * @return PATH TRACING HELP TEXT
      */
-    String pathtracingFI() {
+    public String pathtracingFI() {
 
         return "\n Liikeradat\n"
-            + " ----------\n\n"
+            + " ---------------------------------------------------------------------\n\n"
             + " Kulkijoiden lukumäärä on positiivinen kokonaisluku, vähintään 1.\n\n"
             + " Askelten lukumäärä on positiivinen kokonaisluku. Se tarkoittaa\n"
             + " kulkijoiden liikkuessa ottamien satunnaisten askelten määrää.\n\n"
@@ -180,10 +180,10 @@ class HelpText {
     /**
      * @return PATH TRACING HELP TEXT
      */
-    String pathtracingEN() {
+    public String pathtracingEN() {
 
         return "\n Path Tracing\n"
-            + " ------------\n\n"
+            + " ---------------------------------------------------------------------\n\n"
             + " Number of walkers is a positive integer, at least 1.\n\n"
             + " Number of steps is a positive integer. It means the random steps the\n"
             + " walkers take while moving.\n\n"
@@ -203,10 +203,10 @@ class HelpText {
     /**
      * @return 1D DISTANCE HELP TEXT
      */
-    String distance1DFI() {
+    public String distance1DFI() {
 
         return "\n 1D etäisyys\n"
-            + " -----------\n\n"
+            + " ----------------------------------------------------------------------\n\n"
             + " Kulkijoiden lukumäärä on positiivinen kokonaisluku, vähintään 1.\n\n"
             + " Askelten lukumäärä on positiivinen kokonaisluku. Se tarkoittaa\n"
             + " kulkijoiden liikkuessa ottamien satunnaisten askelten määrää.\n\n"
@@ -219,10 +219,10 @@ class HelpText {
     /**
      * @return 1D DISTANCE HELP TEXT
      */
-    String distance1DEN() {
+    public String distance1DEN() {
 
         return "\n 1D Distance\n"
-            + " -----------\n\n"
+            + " ----------------------------------------------------------------------\n\n"
             + " Number of walkers is a positive integer, at least 1.\n\n"
             + " Number of steps is a positive integer. It means the number of\n"
             + " random steps the walkers take while moving.\n\n"
@@ -239,7 +239,7 @@ class HelpText {
     String calculationFI() {
 
         return "\n Rrms-laskenta eli neliösummaetäisyys vs. odotusarvo\n"
-            + " ---------------------------------\n\n"
+            + " ---------------------------------------------------------------------\n\n"
             + " Askelten lukumäärä on positiivinen kokonaisluku.\n\n"
             + " 'Ulottuvuus on 1, 2 tai 3. Yksi on kulkua x-akselilla, kaksi on\n"
             + " kulkua xy-tasossa, kolme on kulkua kuutiossa akseleilla x, y, ja z.\n\n"
@@ -258,7 +258,7 @@ class HelpText {
     String calculationEN() {
 
         return "\n Root Mean Squared Distance vs Expected Value\n"
-            + " --------------------------------------------\n\n"
+            + " ---------------------------------------------------------------------\n\n"
             + " Number of Steps is a positive integer.\n\n"
             + " Dimension is either 1, 2, or 3. One means moving along x-axis, two\n"
             + " means moving on a plane with axes x and y, three means moving in a\n"
@@ -279,7 +279,7 @@ class HelpText {
     String realtimermsFI() {
 
         return "\n Reaaliaikainen neliösummaetäisyys\n"
-            + " ---------------------------------\n\n"
+            + " ---------------------------------------------------------------------\n\n"
             + " Kulkijoiden lukumäärä on positiivinen kokonaisluku, vähintään 1.\n\n"
             + " Askelten lukumäärä on positiivinen kokonaisluku. Se tarkoittaa\n"
             + " kulkijoiden liikkuessa ottamien satunnaisten askelten määrää.\n\n"
@@ -307,7 +307,7 @@ class HelpText {
     String realtimermsEN() {
 
         return "\n Real Time Root Mean Squared Distance\n"
-            + " ------------------------------------\n\n"
+            + " ---------------------------------------------------------------------\n\n"
             + " Number of walkers is a positive integer, at least 1.\n\n"
             + " Number of steps is a positive integer. It means the repeated random\n"
             + " steps the walkers take while moving.\n\n"
@@ -337,7 +337,7 @@ class HelpText {
     String diffFI() {
 
         return "\n Diffuusio\n"
-            + " -------------\n\n"
+            + " ---------------------------------------------------------------------\n\n"
             + " Kulkijoiden lukumäärä on positiivinen kokonaisluku, vähintään 1.\n\n"
             + " Kulkijoiden halkaisija on positiivinen reaaliluku väliltä ]0.0, 1.0[.\n\n"
             + " Ulottuvuus on 2 tai 3. Kaksi on kulkua xy-tasossa, kolme on kulkua\n"
@@ -370,7 +370,7 @@ class HelpText {
     String diffEN() {
 
         return "\n Diffusion\n"
-            + " -------------\n\n"
+            + " ---------------------------------------------------------------------\n\n"
             + " Number of walkers is a positive integer, at least 1.\n\n"
             + " Diameter is a positive real number on the interval ]0.0, 1.0[.\n\n"
             + " Dimension is either 2 or 3. Two means moving on a plane with axes x\n"
@@ -401,7 +401,7 @@ class HelpText {
     String realtimesawFI() {
 
         return "\n Reaaliaikainen itseään välttelevä kulku\n"
-            + " ---------------------------------------\n\n"
+            + " ----------------------------------------------------------------\n\n"
             + " Askelten lukumäärä on positiivinen kokonaisluku. Se tarkoittaa\n"
             + " kulkijoiden liikkuessa ottamien satunnaisten askelten määrää.\n\n"
             + " Ulottuvuus on 2 tai 3. Kaksi on kulkua xy-tasossa, kolme on\n"
@@ -445,7 +445,7 @@ class HelpText {
     String realtimesawEN() {
 
         return "\n Real Time Self Avoiding Walk\n"
-            + " ----------------------------\n\n"
+            + " -----------------------------------------------------------------\n\n"
             + " Steps is a positive integer. It means the repeated random\n"
             + " steps the walkers take while moving.\n\n"
             + " Dimension is either 2 or 3. Two means moving on a plane with axes\n"
@@ -478,7 +478,7 @@ class HelpText {
     /**
     * @return LOGO
     */
-    String welcomeFI() {
+    public String welcomeFI() {
 
         return "\n\n"
             + "        /////       ///       //    // ///        /////       //   //\n"
@@ -505,7 +505,7 @@ class HelpText {
     /**
      * @return LOGO
      */
-    String welcomeEN() {
+    public String welcomeEN() {
 
         return "\n\n"
             + "        /////       ///       //    // ///        /////       //   //\n"
