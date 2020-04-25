@@ -30,11 +30,11 @@ Ohjelmaa käynnistettäessä ilmestyy aluksi pieni kielivalintaikkuna, jonka vai
  
 ## Asennustyökalu
 
-Vanha Java 1.8 -version asennustyökalu *RandomWalk-1.0.msi* löytyy linkin [release](https://github.com/gitjms/RandomWalkJava/releases) takaa:
+Vanha Java 1.8 -version asennustyökalu *RandomWalk-1.0.msi* löytyy linkin *release* takaa:
 
 <img src="https://user-images.githubusercontent.com/46410240/63167309-952e0200-c039-11e9-9d65-571ce3170085.png" alt="release" width="612" height="180" >
 
-Uudempi [versio](https://github.com/gitjms/RandomWalkJava/releases/tag/v1.1) on päivitetty versioon Java 11. Sille ei ole olemassa erillistä asennustyökalua, vaan kyse on ns. "fat jar" -tiedostosta, jonka voi ajaa komentoikkunassa komennolla
+Uudempi versio on päivitetty versioon Java 11. Sille ei ole olemassa erillistä asennustyökalua, vaan kyse on ns. "fat jar" -tiedostosta, jonka voi ajaa komentoikkunassa komennolla
 
 ```
 java -jar randomwalk.jar
