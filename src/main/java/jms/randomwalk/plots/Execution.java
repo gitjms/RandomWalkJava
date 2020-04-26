@@ -509,21 +509,13 @@ public class Execution {
             pdfFile.delete();
         }
 
-        /*
-         * 2D DATA
-         */
         if (dimension == 2 && this.isWin) {
             command = new String[]{"cmd", "/c", pyexecsaw2d, dataPath, this.getLanguage()};
         } else if (dimension == 2) {
             command = new String[]{"python", pyexecsaw2d, dataPath, this.getLanguage()};
-        }
-
-        /*
-         * 3D DATA
-         */
-        if (dimension == 3 && this.isWin) {
+        } else if (dimension == 3 && this.isWin) {
             command = new String[]{"cmd", "/c", pyexecsaw3d, dataPath, this.getLanguage()};
-        } else if (dimension == 2) {
+        } else if (dimension == 3) {
             command = new String[]{"python", pyexecsaw3d, dataPath, this.getLanguage()};
         }
 
