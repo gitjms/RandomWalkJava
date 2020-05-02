@@ -113,8 +113,8 @@ public class RandomWalkUI extends Application {
         * Uses instance of FilesAndFolders.java class
          */
         boolean isWin = SystemUtils.IS_OS_WINDOWS;
-        String datapath = isWin == true ? "C:/RWDATA" : System.getProperty("user.home") + "/RWDATA";
-        String fexec = isWin == true ? "walk.exe" : "walkLx";
+        String datapath = isWin ? "C:/RWDATA" : System.getProperty("user.home") + "/RWDATA";
+        String fexec = isWin ? "walk.exe" : "walkLx";
         String pyexecrms = "plotrms.py";
         String pyexec1d = "plot1d.py";
         String pyexec2d = "plot2d.py";
@@ -394,7 +394,7 @@ public class RandomWalkUI extends Application {
 
         VBox effBox = new VBox(0);
         effBox.setPadding(new Insets(-15, 0, -15, 0));
-        Label labEff = new Label(this.getLanguage().equals("fin") ? "askeleita max:" : "efficiency steps max:");
+        Label labEff = new Label(this.getLanguage().equals("fin") ? "tehokkuusaskeleita max:" : "efficiency steps max:");
         TextField setEff = new TextField("");
         TextFlow resultEff = new TextFlow();
         resultEff.setMinSize(DblSizes.PANEW.getDblSize(), 10);
@@ -441,7 +441,7 @@ public class RandomWalkUI extends Application {
         * SET CALCULATION BORDERPANE
         */
         this.getValikkoCalc().getChildren().addAll(
-            menuNappiCalc, helpNappiCalc, getCalcScene.getSceneCalc(this.getCalcPane()), executeNappiCalc, closeNappiCalc);
+            menuNappiCalc, helpNappiCalc, getCalcScene.getSceneCalc(), executeNappiCalc, closeNappiCalc);
         this.getIsovalikkoCalc().getChildren().addAll(this.getValikkoCalc(), this.getCalcPane());
         BorderPane asetteluCalc = new BorderPane();
         asetteluCalc.setCenter(this.getIsovalikkoCalc());

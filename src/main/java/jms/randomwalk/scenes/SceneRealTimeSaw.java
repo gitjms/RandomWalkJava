@@ -86,15 +86,15 @@ public class SceneRealTimeSaw extends Data {
         this.setLanguage(language);
         this.isWin = SystemUtils.IS_OS_WINDOWS;
         this.vars = new String[]{
-            "E",    // vars[0] which simulation     n/a
-            "0",    // vars[1] particles            n/a
-            "0",    // vars[2] diameter             n/a
-            "0",    // vars[3] steps                USER
-            "0",    // vars[4] dimension            USER
-            "-",    // vars[5] calcfix or sawplot   n/a
-            "-",    // vars[6] fixed(/spread)       n/a
-            "-",    // vars[7] lattice/(free)       n/a
-            "-"};   // vars[8] save (off)           n/a
+            "E",    // vars[0] which simulation         n/a
+            "0",    // vars[1] particles                n/a
+            "0",    // vars[2] diameter                 n/a
+            "0",    // vars[3] steps                    USER
+            "0",    // vars[4] dimension                USER
+            "-",    // vars[5] efficiency or sawplot    n/a
+            "-",    // vars[6] fixed(/spread)           n/a
+            "-",    // vars[7] lattice/(free)           n/a
+            "-"};   // vars[8] save (off)               n/a
         this.running = false;
         this.setIsSaw(true);
     }
@@ -754,10 +754,10 @@ public class SceneRealTimeSaw extends Data {
         this.setComps(new HBox(this.getStepComps(), this.getDimComps()));
         this.getComps().setSpacing(10);
 
-        this.vars[5] = "-"; // calcfix or sawplot   n/a
-        this.vars[6] = "-"; // fixed(/spread)       n/a
-        this.vars[7] = "-"; // lattice/(free)       n/a
-        this.vars[8] = "-"; // save (off)           n/a
+        this.vars[5] = "-"; // efficiency or sawplot    n/a
+        this.vars[6] = "-"; // fixed(/spread)           n/a
+        this.vars[7] = "-"; // lattice/(free)           n/a
+        this.vars[8] = "-"; // save (off)               n/a
 
         /*
          * ...THEIR PLACEMENTS

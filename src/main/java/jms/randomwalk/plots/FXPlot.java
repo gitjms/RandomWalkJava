@@ -148,7 +148,7 @@ public class FXPlot {
                 this.getCalcChartW().getStyler().setAxisTickLabelsFont(new Font(null, Font.PLAIN, 15));
                 this.getCalcChartW().getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
                 this.getCalcChartW().getStyler().setChartTitleFont(new Font(null, Font.PLAIN, 20));
-                this.getCalcChartW().getStyler().setAxisTitleFont(new Font(null, Font.PLAIN, 18));
+                this.getCalcChartW().getStyler().setAxisTitleFont(new Font(null, Font.PLAIN, 16));
                 this.getCalcChartW().getStyler().setLegendFont(new Font(null, Font.PLAIN, 18));
                 this.getCalcChartW().getStyler().setLegendPosition(Styler.LegendPosition.InsideSE);
                 this.getCalcChartW().getStyler().setChartTitlePadding(15);
@@ -164,7 +164,7 @@ public class FXPlot {
                 this.getCalcChartN().getStyler().setAxisTickLabelsFont(new Font(null, Font.PLAIN, 15));
                 this.getCalcChartN().getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
                 this.getCalcChartN().getStyler().setChartTitleFont(new Font(null, Font.PLAIN, 20));
-                this.getCalcChartN().getStyler().setAxisTitleFont(new Font(null, Font.PLAIN, 18));
+                this.getCalcChartN().getStyler().setAxisTitleFont(new Font(null, Font.PLAIN, 16));
                 this.getCalcChartN().getStyler().setLegendFont(new Font(null, Font.PLAIN, 18));
                 this.getCalcChartN().getStyler().setLegendPosition(Styler.LegendPosition.InsideNE);
                 this.getCalcChartN().getStyler().setChartTitlePadding(15);
@@ -181,7 +181,7 @@ public class FXPlot {
                 this.getCalcChartH().getStyler().setToolTipFont(new java.awt.Font(null, Font.PLAIN, 18));
                 this.getCalcChartH().getStyler().setAxisTickLabelsFont(new Font(null, Font.PLAIN, 15));
                 this.getCalcChartH().getStyler().setChartTitleFont(new Font(null, Font.PLAIN, 20));
-                this.getCalcChartH().getStyler().setAxisTitleFont(new Font(null, Font.PLAIN, 18));
+                this.getCalcChartH().getStyler().setAxisTitleFont(new Font(null, Font.PLAIN, 16));
                 this.getCalcChartH().getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.StepArea);
                 this.getCalcChartH().getStyler().setSeriesLines(basicStroke);
                 this.getCalcChartH().getStyler().setChartTitlePadding(15);
@@ -213,7 +213,7 @@ public class FXPlot {
                 this.getCalcChartE().getStyler().setAxisTickLabelsFont(new Font(null, Font.PLAIN, 15));
                 this.getCalcChartE().getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
                 this.getCalcChartE().getStyler().setChartTitleFont(new Font(null, Font.PLAIN, 20));
-                this.getCalcChartE().getStyler().setAxisTitleFont(new Font(null, Font.PLAIN, 18));
+                this.getCalcChartE().getStyler().setAxisTitleFont(new Font(null, Font.PLAIN, 16));
                 this.getCalcChartE().getStyler().setLegendFont(new Font(null, Font.PLAIN, 18));
                 this.getCalcChartE().getStyler().setChartTitlePadding(15);
                 this.getCalcChartE().getStyler().setAntiAlias(true);
@@ -224,7 +224,7 @@ public class FXPlot {
                 this.getCalcChartD().getStyler().setLegendVisible(false);
                 this.getCalcChartD().setXAxisTitle(this.getLanguage().equals("fin") ? "Viive, t [s]" : "Lag, t [s]");
                 this.getCalcChartD().setYAxisTitle(this.getLanguage().equals("fin")
-                    ? "Diffuusiokerroin, D 1E-8 [cm\u00B2/s]" : "Diffusion Coefficient, D 1E-8 [cm\u00B2/s]");
+                    ? "Diff.kerroin, D 1E-8 [cm\u00B2/s]" : "Diff. Coefficient, D 1E-8 [cm\u00B2/s]");
                 this.getCalcChartD().getStyler().setMarkerSize(0);
                 this.getCalcChartD().getStyler().setXAxisDecimalPattern("0");
                 this.getCalcChartD().getStyler().setYAxisDecimalPattern("0.0");
@@ -233,7 +233,7 @@ public class FXPlot {
                 this.getCalcChartD().getStyler().setAxisTickLabelsFont(new Font(null, Font.PLAIN, 15));
                 this.getCalcChartD().getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
                 this.getCalcChartD().getStyler().setChartTitleFont(new Font(null, Font.PLAIN, 20));
-                this.getCalcChartD().getStyler().setAxisTitleFont(new Font(null, Font.PLAIN, 18));
+                this.getCalcChartD().getStyler().setAxisTitleFont(new Font(null, Font.PLAIN, 16));
                 this.getCalcChartD().getStyler().setLegendFont(new Font(null, Font.PLAIN, 18));
                 this.getCalcChartD().getStyler().setChartTitlePadding(15);
                 this.getCalcChartD().getStyler().setAntiAlias(true);
@@ -251,7 +251,7 @@ public class FXPlot {
                 this.getCalcChartV().getStyler().setAxisTickLabelsFont(new Font(null, Font.PLAIN, 15));
                 this.getCalcChartV().getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
                 this.getCalcChartV().getStyler().setChartTitleFont(new Font(null, Font.PLAIN, 20));
-                this.getCalcChartV().getStyler().setAxisTitleFont(new Font(null, Font.PLAIN, 18));
+                this.getCalcChartV().getStyler().setAxisTitleFont(new Font(null, Font.PLAIN, 16));
                 this.getCalcChartV().getStyler().setLegendFont(new Font(null, Font.PLAIN, 18));
                 this.getCalcChartV().getStyler().setChartTitlePadding(15);
                 this.getCalcChartV().getStyler().setAntiAlias(true);
@@ -281,9 +281,8 @@ public class FXPlot {
                 this.getCalcChartS1().getStyler().setAxisTickLabelsFont(new Font(null, Font.PLAIN, 15));
                 this.getCalcChartS1().getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
                 this.getCalcChartS1().getStyler().setChartTitleFont(new Font(null, Font.PLAIN, 20));
-                this.getCalcChartS1().getStyler().setAxisTitleFont(new Font(null, Font.PLAIN, 18));
+                this.getCalcChartS1().getStyler().setAxisTitleFont(new Font(null, Font.PLAIN, 16));
                 this.getCalcChartS1().getStyler().setLegendFont(new Font(null, Font.PLAIN, 18));
-                this.getCalcChartS1().getStyler().setAxisTitleFont(new Font(null, Font.PLAIN, 18));
                 this.getCalcChartS1().getStyler().setLegendPosition(Styler.LegendPosition.OutsideS);
                 this.getCalcChartS1().getStyler().setLegendLayout(Styler.LegendLayout.Horizontal);
                 this.getCalcChartS1().getStyler().setLegendPadding(10);
@@ -308,7 +307,7 @@ public class FXPlot {
                 this.getCalcChartS2().getStyler().setAxisTickLabelsFont(new Font(null, Font.PLAIN, 15));
                 this.getCalcChartS2().getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Line);
                 this.getCalcChartS2().getStyler().setChartTitleFont(new Font(null, Font.PLAIN, 20));
-                this.getCalcChartS2().getStyler().setAxisTitleFont(new Font(null, Font.PLAIN, 18));
+                this.getCalcChartS2().getStyler().setAxisTitleFont(new Font(null, Font.PLAIN, 16));
                 this.getCalcChartS2().getStyler().setLegendFont(new Font(null, Font.PLAIN, 18));
                 this.getCalcChartS2().getStyler().setChartTitlePadding(15);
                 this.getCalcChartS2().getStyler().setAntiAlias(true);
@@ -326,7 +325,7 @@ public class FXPlot {
                 this.getCalcChartS3().getStyler().setYAxisLogarithmic(false);
                 this.getCalcChartS3().getStyler().setAxisTickLabelsFont(new Font(null, Font.PLAIN, 15));
                 this.getCalcChartS3().getStyler().setChartTitleFont(new Font(null, Font.PLAIN, 20));
-                this.getCalcChartS3().getStyler().setAxisTitleFont(new Font(null, Font.PLAIN, 18));
+                this.getCalcChartS3().getStyler().setAxisTitleFont(new Font(null, Font.PLAIN, 16));
                 this.getCalcChartS3().getStyler().setDefaultSeriesRenderStyle(CategorySeries.CategorySeriesRenderStyle.Bar);
                 this.getCalcChartS3().getStyler().setSeriesLines(basicStroke);
                 this.getCalcChartS3().getStyler().setPlotGridHorizontalLinesVisible(true);
@@ -504,7 +503,7 @@ public class FXPlot {
         };
         if (which.equals("visc")) {
             this.getCalcChartV().setYAxisTitle(this.getLanguage().equals("fin") ?
-                "Dynaaminen viskositeetti, \u03B7 [Pa\u22c5s]" : "Dynamic Viscosity, \u03B7 [Pa\u22c5s]");
+                "Dyn. viskositeetti, \u03B7 [Pa\u22c5s]" : "Dyn. Viscosity, \u03B7 [Pa\u22c5s]");
             this.getCalcChartV().addSeries(this.getLanguage().equals("fin") ? "viskositeetti" : "viscosity", x, y)
                 .setLineStyle(basicStroke[0]).setLineColor(Color.orange);
             this.getCalcChartV().setTitle(this.getLanguage().equals("fin")
@@ -512,7 +511,7 @@ public class FXPlot {
             this.getFrame().getContentPane().add(this.getChartPanelV());
         } else if (which.equals("mobil")) {
             this.getCalcChartV().setYAxisTitle(this.getLanguage().equals("fin") ?
-                "Liikkuvuus, \u00B5 [cm\u00B2/Vs]" : "Electrical mobility, \u00B5 [cm\u00B2/Vs]");
+                "Liikkuvuus, \u00B5 [cm\u00B2/Vs]" : "Mobility, \u00B5 [cm\u00B2/Vs]");
             this.getCalcChartV().addSeries(this.getLanguage().equals("fin") ? "liikkuvuus" : "mobility", x, y)
                 .setLineStyle(basicStroke[0]).setLineColor(Color.orange);
             this.getCalcChartV().setTitle(this.getLanguage().equals("fin")

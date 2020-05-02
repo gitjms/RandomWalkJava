@@ -133,7 +133,7 @@ public class SceneDiff extends Data {
             "0.0",  // vars[2] diameter                         USER
             "0",    // vars[3] steps                            n/a
             "0",    // vars[4] dimension                        USER
-            "-",    // vars[5] calcfix, fcclattice, or sawplot  n/a
+            "-",    // vars[5] efficiency or sawplot            n/a
             "-",    // vars[6] (fixed/)spread                   n/a
             "-",    // vars[7] (lattice/)free                   USER
             "-"};   // vars[8] save (off)                       n/a
@@ -878,7 +878,7 @@ public class SceneDiff extends Data {
             this.vars[4] = "3";
         });
 
-        this.vars[5] = "-"; // calcfix, or sawplot
+        this.vars[5] = "-"; // efficiency or sawplot
         this.vars[6] = "-"; // spread out
 
         /*

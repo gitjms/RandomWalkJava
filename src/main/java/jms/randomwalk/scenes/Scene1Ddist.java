@@ -44,15 +44,15 @@ public class Scene1Ddist extends Data {
         this.setLanguage(language);
         this.nappiLattice = new Button(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
         this.vars = new String[]{
-            "B",    // vars[0] which simulation     USER
-            "0",    // vars[1] particles            USER
-            "0.1",  // vars[2] diameter             n/a
-            "0",    // vars[3] steps                USER
-            "1",    // vars[4] dimension (1D)       n/a
-            "-",    // vars[5] calcfix or sawplot   n/a
-            "f",    // vars[6] fixed                n/a
-            "-",    // vars[7] lattice/free         USER
-            "s"};   // vars[8] save (on)            n/a
+            "B",    // vars[0] which simulation         USER
+            "0",    // vars[1] particles                USER
+            "0.1",  // vars[2] diameter                 n/a
+            "0",    // vars[3] steps                    USER
+            "1",    // vars[4] dimension (1D)           n/a
+            "-",    // vars[5] efficiency or sawplot    n/a
+            "f",    // vars[6] fixed                    n/a
+            "-",    // vars[7] lattice/free             USER
+            "s"};   // vars[8] save (on)                n/a
     }
 
     /**
@@ -115,7 +115,7 @@ public class Scene1Ddist extends Data {
         });
 
         this.vars[4] = "1"; // dimension
-        this.vars[5] = "-"; // calcfix or sawplot
+        this.vars[5] = "-"; // efficiency or sawplot
         this.vars[6] = "f"; // fixed
 
         /*

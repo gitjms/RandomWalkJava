@@ -58,15 +58,15 @@ public class Execution {
         /*
         * FROM SCENEPATHTRACING
         * vars from user:
-        * vars[0] = which simulation,   USER
-        * vars[1] = particles,          USER
-        * vars[2] = diameter,           n/a
-        * vars[3] = steps,              USER
-        * vars[4] = dimension,          USER
-        * vars[5] = calcfix or sawplot, USER
-        * vars[6] = fixed,              USER
-        * vars[7] = lattice,            USER
-        * vars[8] = save                n/a
+        * vars[0] = which simulation,       USER
+        * vars[1] = particles,              USER
+        * vars[2] = diameter,               n/a
+        * vars[3] = steps,                  USER
+        * vars[4] = dimension,              USER
+        * vars[5] = efficiency or sawplot   USER
+        * vars[6] = fixed,                  USER
+        * vars[7] = lattice,                USER
+        * vars[8] = save                    n/a
         */
         if (this.isWin) {        
             pyexec1d = "python ".concat(pyexec1d);
@@ -194,15 +194,15 @@ public class Execution {
         /*
         * FROM SCENEDIFFUSION
         * vars from user:
-        * vars[0] = which simulation,   USER
-        * vars[1] = particles,          USER
-        * vars[2] = diameter,           USER
-        * vars[3] = steps,              n/a
-        * vars[4] = dimension,          USER
-        * vars[5] = calcfix or sawplot, n/a
-        * vars[6] = fixed,              n/a
-        * vars[7] = lattice,            USER
-        * vars[8] = save                n/a
+        * vars[0] = which simulation,       USER
+        * vars[1] = particles,              USER
+        * vars[2] = diameter,               USER
+        * vars[3] = steps,                  n/a
+        * vars[4] = dimension,              USER
+        * vars[5] = efficiency or sawplot   n/a
+        * vars[6] = fixed,                  n/a
+        * vars[7] = lattice,                USER
+        * vars[8] = save                    n/a
         */
         if (this.isWin) {
             pyexecdiff2d = "python ".concat(pyexecdiff2d);
@@ -292,15 +292,15 @@ public class Execution {
         /*
         * FROM SCENEREALTIMERMS
         * vars from user:
-        * vars[0] = which simulation,   n/a
-        * vars[1] = particles,          n/a
-        * vars[2] = diameter,           n/a
-        * vars[3] = steps,              USER
-        * vars[4] = dimension,          n/a
-        * vars[5] = calcfix or sawplot, n/a
-        * vars[6] = fixed,              USER
-        * vars[7] = lattice             n/a
-        * vars[8] = save                n/a
+        * vars[0] = which simulation,       n/a
+        * vars[1] = particles,              USER
+        * vars[2] = diameter,               n/a
+        * vars[3] = steps,                  USER
+        * vars[4] = dimension,              n/a
+        * vars[5] = efficiency or sawplot   n/a
+        * vars[6] = fixed,                  USER
+        * vars[7] = lattice                 n/a
+        * vars[8] = save                    n/a
         */
         if (this.isWin) {
             pyexecrms = "python ".concat(pyexecrms);
@@ -334,9 +334,9 @@ public class Execution {
             titletext = this.getLanguage().equals("fin") ? "Hajautetut vapaat hiukkaset" : "Spread out free particles";
         }
 
-        String rmsDataPath = "rms_" + dimension + "D_" + steps + "S.xy";
+        String rmsDataPath = "rms_" + dimension + "D_" + particles + "N_" + steps + "S.xy";
 
-        File pdfFile = new File(path + "/jpyplotRMS" + dimension + "D_" + steps + "S.pdf");
+        File pdfFile = new File(path + "/jpyplotRMS" + dimension + "D_" + particles + "N_" + steps + "S.pdf");
         if (Files.exists(pdfFile.toPath())) {
             pdfFile.delete();
         }
@@ -380,15 +380,15 @@ public class Execution {
         /*
          * FROM SCENE1Ddist
          * vars from user:
-         * vars[0] = which simulation,  USER
-         * vars[1] = particles,         USER
-         * vars[2] = diameter,          n/a
-         * vars[3] = steps,             USER
-         * vars[4] = dimension,         n/a
-         * vars[5] = calcfix or sawplot,n/a
-         * vars[6] = fixed,             n/a
-         * vars[7] = lattice,           USER
-         * vars[8] = save               n/a
+         * vars[0] = which simulation,      USER
+         * vars[1] = particles,             USER
+         * vars[2] = diameter,              n/a
+         * vars[3] = steps,                 USER
+         * vars[4] = dimension,             n/a
+         * vars[5] = efficiency or sawplot  n/a
+         * vars[6] = fixed,                 n/a
+         * vars[7] = lattice,               USER
+         * vars[8] = save                   n/a
          */
         if (this.isWin) {
             pyexec1d = "python ".concat(pyexec1d);
@@ -467,15 +467,15 @@ public class Execution {
         /*
          * FROM SCENEPATHTRACING
          * vars from user:
-         * vars[0] = which simulation,  n/a
-         * vars[1] = particles,         n/a
-         * vars[2] = diameter,          n/a
-         * vars[3] = steps,             USER
-         * vars[4] = dimension,         USER
-         * vars[5] = calcfix or sawplot,n/a
-         * vars[6] = fixed,             n/a
-         * vars[7] = lattice,           n/a
-         * vars[8] = save               n/a
+         * vars[0] = which simulation,      n/a
+         * vars[1] = particles,             n/a
+         * vars[2] = diameter,              n/a
+         * vars[3] = steps,                 USER
+         * vars[4] = dimension,             USER
+         * vars[5] = efficiency or sawplot  n/a
+         * vars[6] = fixed,                 n/a
+         * vars[7] = lattice,               n/a
+         * vars[8] = save                   n/a
          */
         if (this.isWin) {
             pyexecsaw2d = "python ".concat(pyexecsaw2d);
@@ -617,7 +617,6 @@ public class Execution {
 
     /**
      *
-     * @param frame the JFrame to set
      */
     private void setFrame() {
         this.frame = new JFrame();

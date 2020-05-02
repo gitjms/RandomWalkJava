@@ -51,15 +51,15 @@ public class ScenePathTracing extends Data {
         this.nappiFixed = new Button(this.getLanguage().equals("fin") ? "KESKITETTY" : "FIXED");
         this.nappiLattice = new Button(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
         this.vars = new String[]{
-            "A",    // vars[0] which simulation     USER
-            "0",    // vars[1] particles            USER
-            "0.0",  // vars[2] diameter             n/a
-            "0",    // vars[3] steps                USER
-            "0",    // vars[4] dimension            USER
-            "-",    // vars[5] calcfix or sawplot   n/a
-            "f",    // vars[6] fixed(/spread)       USER
-            "-",    // vars[7] (lattice/)free       USER
-            "s"};   // vars[8] save (on)            n/a
+            "A",    // vars[0] which simulation         USER
+            "0",    // vars[1] particles                USER
+            "0.0",  // vars[2] diameter                 n/a
+            "0",    // vars[3] steps                    USER
+            "0",    // vars[4] dimension                USER
+            "-",    // vars[5] efficiency or sawplot    n/a
+            "f",    // vars[6] fixed(/spread)           USER
+            "-",    // vars[7] (lattice/)free           USER
+            "s"};   // vars[8] save (on)                n/a
     }
 
     /**
@@ -168,7 +168,7 @@ public class ScenePathTracing extends Data {
             this.vars[4] = "3";
         });
 
-        this.vars[5] = "-"; // calcfix or sawplot        n/a
+        this.vars[5] = "-"; // efficiency or sawplot        n/a
 
         /*
         * ...THEIR PLACEMENTS

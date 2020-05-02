@@ -101,15 +101,15 @@ public class ExecReal extends Data {
                 /*
                  * FROM SCENEREALTIMERMS
                  * vars from user:
-                 * vars[0] = which simulation,  USER
-                 * vars[1] = particles,         USER
-                 * vars[2] = diameter,          n/a
-                 * vars[3] = steps,             USER
-                 * vars[4] = dimension,         USER
-                 * vars[5] = calcfix or sawplot,n/a
-                 * vars[6] = fixed,             n/a
-                 * vars[7] = lattice,           n/a
-                 * vars[8] = save               n/a
+                 * vars[0] = which simulation,      USER
+                 * vars[1] = particles,             USER
+                 * vars[2] = diameter,              n/a
+                 * vars[3] = steps,                 USER
+                 * vars[4] = dimension,             USER
+                 * vars[5] = efficiency or sawplot, n/a
+                 * vars[6] = fixed,                 n/a
+                 * vars[7] = lattice,               n/a
+                 * vars[8] = save                   n/a
                  */
 
                 int dim = Integer.parseInt(vars[4]);

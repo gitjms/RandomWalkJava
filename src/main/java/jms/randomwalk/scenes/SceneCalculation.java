@@ -9,15 +9,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import jms.randomwalk.datahandling.Data;
-import jms.randomwalk.ui.GetComponents;
 
 /**
  * @author Jari Sunnari
@@ -29,9 +26,6 @@ public class SceneCalculation extends Data {
 
     private String language;
     private final Button nappiLattice;
-    private Button setFix;
-    private boolean fix;
-    private Pane pane;
 
     /**
      * Main class gets vars via this.
@@ -50,15 +44,15 @@ public class SceneCalculation extends Data {
         this.setLanguage(language);
         this.nappiLattice = new Button(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
         this.vars = new String[]{
-            "C",    // vars[0] which simulation     n/a
-            "0",    // vars[1] particles            n/a
-            "0",    // vars[2] diameter             n/a
-            "0",    // vars[3] steps                USER
-            "0",    // vars[4] dimension            USER
-            "-",    // vars[5] calcfix or sawplot   n/a
-            "f",    // vars[6] fixed(/spread)       n/a
-            "-",    // vars[7] (lattice/)free       USER
-            "s"};   // vars[8] save (on)            n/a
+            "C",    // vars[0] which simulation         n/a
+            "0",    // vars[1] particles                USER
+            "0",    // vars[2] diameter                 n/a
+            "0",    // vars[3] steps                    USER
+            "0",    // vars[4] dimension                USER
+            "-",    // vars[5] efficiency or sawplot    n/a
+            "f",    // vars[6] fixed(/spread)           n/a
+            "-",    // vars[7] (lattice/)free           USER
+            "s"};   // vars[8] save (on)                n/a
     }
 
     /**
@@ -77,11 +71,9 @@ public class SceneCalculation extends Data {
 
     /**
      * Create GUI for R_rms calculation.
-     * @param pane pane object
      * @return CALCULATION SCENE
      */
-    public Parent getSceneCalc(Pane pane) {
-        this.setPane(pane);
+    public Parent getSceneCalc() {
         GridPane asettelu = new GridPane();
         asettelu.setMaxWidth(DblSizes.PANEW.getDblSize());
         asettelu.setVgap(5);
@@ -90,27 +82,22 @@ public class SceneCalculation extends Data {
         VBox valikko = new VBox();
         valikko.setPadding(new Insets(20, 10, 0, 0));
         valikko.setSpacing(10);
-
         DropShadow shadow = new DropShadow();
-        GetComponents getComponents = new GetComponents();
-        Image imgCalcFI = new Image("/calcFI.png");
-        Image imgCalcEN = new Image("/calcEN.png");
-        Image imgCalcFixFI = new Image("/calcFixFI.png");
-        Image imgSalcFixEN = new Image("/calcFixEN.png");
-        ImageView ivCalcFI = new ImageView(imgCalcFI);
-        ImageView ivCalcEN = new ImageView(imgCalcEN);
-        ImageView ivCalcFixFI = new ImageView(imgCalcFixFI);
-        ImageView ivCalcFixEN = new ImageView(imgSalcFixEN);
-        ivCalcFI.setSmooth(true);
-        ivCalcEN.setSmooth(true);
-        ivCalcFixFI.setSmooth(true);
-        ivCalcFixEN.setSmooth(true);
 
         /*
         * COMPONENTS...
         */
-        this.vars[1] = "0"; // (amount of particles)
-        this.vars[2] = "0"; // (diameter of particl)
+
+        Label labNumPart = new Label(this.getLanguage().equals("fin") ? "ajojen / hiukkasten\nlukumäärä:" : "number of runs/particles:");
+        TextField setNumPart = new TextField("");
+        setNumPart.setOnKeyReleased(e -> {
+            if (isNumInteger(setNumPart.getText().trim())) {
+                this.vars[1] = setNumPart.getText().trim();
+            } else {
+                this.vars[1] = "1";
+            }
+        });
+        this.vars[2] = "0"; // (diameter of particle)
 
         Label labNumSteps = new Label(this.getLanguage().equals("fin") ? "askelten lukumäärä:" : "number of steps:");
         TextField setNumSteps = new TextField("");
@@ -165,34 +152,7 @@ public class SceneCalculation extends Data {
             this.vars[4] = "3";
         });
 
-        this.setFix = new Button(this.getLanguage().equals("fin") ? "KORJAUS" : "FIX");
-        this.setFix.setMinWidth(DblSizes.BUTW.getDblSize());
-        this.setFix.setMaxWidth(DblSizes.BUTW.getDblSize());
-        this.setFix.setFont(Font.font("System Regular", FontWeight.EXTRA_BOLD, this.setFix.getFont().getSize()));
-        this.setFix.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
-        this.setFix.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent e) -> this.setFix.setEffect(shadow));
-        this.setFix.addEventHandler(MouseEvent.MOUSE_EXITED, (MouseEvent e) -> this.setFix.setEffect(null));
-        this.setFix(false);
-        this.setFix.setOnMouseClicked(f -> {
-            if (this.isFix()) {
-                this.getPane().getChildren().clear();
-                this.getPane().getChildren().add(this.getLanguage().equals("fin")
-                    ? getComponents.getPane2(ivCalcFI, DblSizes.TXTW.getDblSize(), DblSizes.TXTH.getDblSize())
-                    : getComponents.getPane2(ivCalcEN, DblSizes.TXTW.getDblSize(), DblSizes.TXTH.getDblSize()));
-                this.setFix.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
-                this.setFix(false);
-                this.vars[5] = "-";
-            } else {
-                this.getPane().getChildren().clear();
-                this.getPane().getChildren().add(this.getLanguage().equals("fin")
-                    ? getComponents.getPane2(ivCalcFixFI, DblSizes.TXTW.getDblSize(), DblSizes.TXTH.getDblSize())
-                    : getComponents.getPane2(ivCalcFixEN, DblSizes.TXTW.getDblSize(), DblSizes.TXTH.getDblSize()));
-                this.setFix.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK, CornerRadii.EMPTY, Insets.EMPTY)));
-                this.setFix(true);
-                this.vars[5] = "b"; // calcfix (or sawplot)
-            }
-        });
-
+        this.vars[5] = "-"; // efficiency or sawplot    n/a
         this.vars[6] = "f"; // fixed(/spread)
 
         /*
@@ -215,29 +175,36 @@ public class SceneCalculation extends Data {
                 this.vars[7] = "l";
             }
         });
-        valikko.getChildren().addAll(this.getNappiLattice(), this.setFix);
+        valikko.getChildren().add(this.getNappiLattice());
 
         this.vars[8] = "s"; // save on
 
         /*
         * ...THEIR PLACEMENTS
         */
+        GridPane.setHalignment(labNumPart, HPos.LEFT);
+        asettelu.add(labNumPart, 0, 0);
+        GridPane.setHalignment(setNumPart, HPos.CENTER);
+        setNumPart.setMinWidth(DblSizes.BUTW.getDblSize());
+        setNumPart.setMaxWidth(DblSizes.BUTW.getDblSize());
+        asettelu.add(setNumPart, 0, 1);
+
         GridPane.setHalignment(labNumSteps, HPos.LEFT);
-        asettelu.add(labNumSteps, 0, 0);
+        asettelu.add(labNumSteps, 0, 2);
         GridPane.setHalignment(setNumSteps, HPos.CENTER);
         setNumSteps.setMinWidth(DblSizes.BUTW.getDblSize());
         setNumSteps.setMaxWidth(DblSizes.BUTW.getDblSize());
-        asettelu.add(setNumSteps, 0, 1);
+        asettelu.add(setNumSteps, 0, 3);
         
         GridPane.setHalignment(labNumDimensions, HPos.LEFT);
-        asettelu.add(labNumDimensions, 0, 2);
+        asettelu.add(labNumDimensions, 0, 4);
         GridPane.setHalignment(setDimension, HPos.CENTER);
         setDimension.setMinWidth(DblSizes.BUTW.getDblSize());
         setDimension.setMaxWidth(DblSizes.BUTW.getDblSize());
-        asettelu.add(setDimension, 0, 3);
+        asettelu.add(setDimension, 0, 5);
 
         GridPane.setHalignment(valikko, HPos.LEFT);
-        asettelu.add(valikko, 0, 4, 2, 1);
+        asettelu.add(valikko, 0, 6, 2, 1);
 
         return asettelu;
     }
@@ -261,34 +228,6 @@ public class SceneCalculation extends Data {
      */
     private void setLanguage(String language) {
         this.language = language;
-    }
-
-    /**
-     * @return fix
-     */
-    private boolean isFix() {
-        return this.fix;
-    }
-
-    /**
-     * fix to set
-     */
-    private void setFix(boolean fix) {
-        this.fix = fix;
-    }
-
-    /**
-     * @return the pane
-     */
-    private Pane getPane() {
-        return this.pane;
-    }
-
-    /**
-     * @param pane the pane to set
-     */
-    private void setPane(Pane pane) {
-        this.pane = pane;
     }
 
 }

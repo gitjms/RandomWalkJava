@@ -240,6 +240,7 @@ public class HelpText {
 
         return "\n Rrms-laskenta eli neliösummaetäisyys vs. odotusarvo\n"
             + " ---------------------------------------------------------------------\n\n"
+            + " Kulkijoiden/ajojen lukumäärä on positiivinen kokonaisluku, vähintään 1.\n\n"
             + " Askelten lukumäärä on positiivinen kokonaisluku.\n\n"
             + " 'Ulottuvuus on 1, 2 tai 3. Yksi on kulkua x-akselilla, kaksi on\n"
             + " kulkua xy-tasossa, kolme on kulkua kuutiossa akseleilla x, y, ja z.\n\n"
@@ -259,6 +260,7 @@ public class HelpText {
 
         return "\n Root Mean Squared Distance vs Expected Value\n"
             + " ---------------------------------------------------------------------\n\n"
+            + " Number of walkers/runs is a positive integer, at least 1.\n\n"
             + " Number of Steps is a positive integer.\n\n"
             + " Dimension is either 1, 2, or 3. One means moving along x-axis, two\n"
             + " means moving on a plane with axes x and y, three means moving in a\n"

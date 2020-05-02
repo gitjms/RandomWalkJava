@@ -110,15 +110,15 @@ public class SceneRealTimeRms extends Data {
         this.setLanguage(language);
         this.isWin = SystemUtils.IS_OS_WINDOWS;
         this.vars = new String[]{
-            "-",    // vars[0] which simulation     USER
-            "0",    // vars[1] particles            USER
-            "0.1",  // vars[2] diameter             n/a
-            "0",    // vars[3] steps                USER
-            "0",    // vars[4] dimension            USER
-            "-",    // vars[5] calcfix or sawplot   n/a
-            "f",    // vars[6] fixed(/spread)       n/a
-            "-",    // vars[7] (lattice/)free       n/a
-            "-"};   // vars[8] save (off)           n/a
+            "-",    // vars[0] which simulation         USER
+            "0",    // vars[1] particles                USER
+            "0.1",  // vars[2] diameter                 n/a
+            "0",    // vars[3] steps                    USER
+            "0",    // vars[4] dimension                USER
+            "-",    // vars[5] efficiency or sawplot    n/a
+            "f",    // vars[6] fixed(/spread)           n/a
+            "-",    // vars[7] (lattice/)free           n/a
+            "-"};   // vars[8] save (off)               n/a
         this.running = false;
     }
 
@@ -648,8 +648,8 @@ public class SceneRealTimeRms extends Data {
             this.vars[4] = "3";
         });
 
-        this.vars[5] = "-"; // calcfix or sawplot   n/a
-        this.vars[6] = "f"; // fixed(/spread)       n/a
+        this.vars[5] = "-"; // efficiency or sawplot    n/a
+        this.vars[6] = "f"; // fixed(/spread)           n/a
 
         /*
          * BUTTON: LATTICE

@@ -24,21 +24,20 @@ def main():
 	f.close()
 
 	dimension = facts[0].split('=')[1].replace(',','')
-	steps = facts[1].split('=')[1].replace(',','')
-	space = facts[2]
+	runs = facts[1].split('=')[1].replace(',','')
+	steps = facts[2].split('=')[1].replace(',','')
+	space = facts[3]
 	if (language == 'fin'):
 		if (space == 'lattice'):
 			space = 'hila'
 		else:
 			space = 'vapaa'
-	
-	fixed = facts[3].split('=')[1]
-	if (language == 'fin'):
-		if (fixed == 'T'):
-			fixtxt = r'$\left(\sqrt{d\langle r^2\rangle}\right)$'
+	else:
+		if (space == 'lattice'):
+			space = 'lattice'
 		else:
-			fixtxt = r'$\left(\sqrt{\langle r^2\rangle}\right)$'
-		
+			space = 'free'
+	
 	maxx = np.max(x_data)
 	maxy = np.max(y_data)
 	maxval = np.max([maxx,maxy])
@@ -63,17 +62,25 @@ def main():
 	else:
 		xlab = r"Expected value ($\sqrt{S}$)"
 	plt.xlabel(xlab, fontsize=16)
-	plt.ylabel(r"$R_{rms}$ "+fixtxt, fontsize=16)
+	plt.ylabel(r"$R_{rms}$ $\left(\sqrt{\langle r^2\rangle}\right)$", fontsize=16)
 	if (language == 'fin'):
-		text = r"$R_{rms}$ odotusarvon funktiona (%dD, %s), %d askelta"%(int(dimension),space,int(steps))
+		if (int(runs) == 1):
+			runtxt = " ajo"
+		else:
+			runtxt = " ajoa"
+		text = r"$R_{rms}$ vs. $\sqrt{S}$  (%dD, %s), %d%s, %d askelta"%(int(dimension),space,int(runs),runtxt,int(steps))
 	else:
-		text = r"$R_{rms}$ as a Function of Expected Value (%dD, %s), %d steps"%(int(dimension),space,int(steps))
+		if (int(runs) == 1):
+			runtxt = " run"
+		else:
+			runtxt = " runs"
+		text = r"$R_{rms}$ vs. $\sqrt{S}$  (%dD, %s), %d%s, %d steps"%(int(dimension),space,int(runs),runtxt,int(steps))
 	plt.title(text,fontsize=18)
 	plt.legend(loc='upper left',prop={'size': 18})
 
 	plt.grid()
 	plt.tight_layout()
-	savename = "jpyplotRMS" + dimension + "D_" + steps + "S.pdf"
+	savename = "jpyplotRMS" + dimension + "D_" + runs + "N_" + steps + "S.pdf"
 	plt.savefig(savename)
 
 if __name__=="__main__":

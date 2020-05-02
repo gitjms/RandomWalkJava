@@ -51,7 +51,7 @@ public class Data {
         * vars[2] = diameter,
         * vars[3] = steps,
         * vars[4] = dimension,
-        * vars[5] = calcfix or sawplot,
+        * vars[5] = efficiency or sawplot,
         * vars[6] = fixed,
         * vars[7] = lattice,
         * vars[8] = save
