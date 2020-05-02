@@ -45,7 +45,7 @@ public class SceneCalculation extends Data {
         this.nappiLattice = new Button(this.getLanguage().equals("fin") ? "VAPAA" : "FREE");
         this.vars = new String[]{
             "C",    // vars[0] which simulation         n/a
-            "0",    // vars[1] particles                USER
+            "1",    // vars[1] particles                USER
             "0",    // vars[2] diameter                 n/a
             "0",    // vars[3] steps                    USER
             "0",    // vars[4] dimension                USER
