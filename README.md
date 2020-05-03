@@ -50,7 +50,7 @@ tai Windowsissa tuplaklikkaamalla tiedostoa. Linux-versiota ei vieläkään ole.
 * lisää sisältöä SAW-osioon
 
 ## Kaavio ohjelmarakenteesta
-<img src="https://user-images.githubusercontent.com/46410240/80922396-7ae1b300-8d85-11ea-9302-97a5cfeba868.png" alt="Java_kaavio" width="450" height="882" >
+<img src="https://user-images.githubusercontent.com/46410240/80922396-7ae1b300-8d85-11ea-9302-97a5cfeba868.png" alt="Java_kaavio" width="450" >
 
 ## Kuvia
 
