@@ -101,7 +101,7 @@ public class SceneRealTimeSaw extends Data {
 
     /**
      * Real Time Rms.
-     * @param folder datafolder "C:/RWDATA"
+     * @param folder datafolder "C:/RWDATA" or "home/user/RWDATA"
      * @param executable Fortran executable "walk.exe" or "walkLx"
      * @param firstdata true if is first run
      * @param sawLengths data container
@@ -262,7 +262,7 @@ public class SceneRealTimeSaw extends Data {
                         for (int i = 0; i < this.getSawRms().size(); i++) {
                             rmssum += this.getSawRms().get(i);
                         }
-                        double rmsruns = Math.sqrt(rmssum / (this.getRuns() + 1));
+                        double rmsruns = Math.sqrt(2.0 * rmssum / (this.getRuns() + 1));
                         if (this.getRuns() > 9) {
                             this.getRmsRuns().add(rmsruns);
                         } else {
@@ -279,9 +279,9 @@ public class SceneRealTimeSaw extends Data {
                             // FIRST GRAPH TITLE
                             double succPros = 100.0 - ((double) this.getFailed() / (double) (this.getFailed() + this.getRuns() + 1) * 100.0);
                             this.getFxplot().setS1McsawTitle(this.getDim(), succPros);
-                            // SECOND GRAPH TITLE
-                            this.getFxplot().setS2SawTitle(expdruns, rmsruns);
                         }
+                        // SECOND GRAPH TITLE
+                        this.getFxplot().setS2SawTitle(expdruns, rmsruns);
 
                         /*
                          * MAX VALUES FOR PLOTS
@@ -1263,7 +1263,7 @@ public class SceneRealTimeSaw extends Data {
      * @return the nu
      */
     private double getAmplitude() {
-        return this.getDim() == 2 ? 0.64 : 0.56;
+        return 0.878;
     }
 
 }

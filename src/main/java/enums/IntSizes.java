@@ -13,6 +13,7 @@ public enum IntSizes {
     SMLSIZE (553),
     DIFFW (450),
     DIFFH (808),
+    SAWSIZE (650),
     SIZE (595),
     HEIGHT (800);
     

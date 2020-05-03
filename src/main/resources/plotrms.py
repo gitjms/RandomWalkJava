@@ -54,7 +54,7 @@ def main():
 
 	plt.xlim(0,maxval)
 	plt.ylim(0,maxval)
-	plt.plot(x_data,y_data,'-',color='C3',lw=1,antialiased=True,label=r"$R_{rms}$")
+	plt.plot(x_data,y_data,'-',color='C3',lw=1,antialiased=True,label=r"$\langle R_{rms}\rangle$")
 	plt.plot(x_regr,y_regr,'-',color='C8',lw=1,antialiased=True,label=r"Sovite: y=%.2fx"%model.coef_)
 
 	if (language == 'fin'):
@@ -62,19 +62,19 @@ def main():
 	else:
 		xlab = r"Expected value ($\sqrt{S}$)"
 	plt.xlabel(xlab, fontsize=16)
-	plt.ylabel(r"$R_{rms}$ $\left(\sqrt{\langle r^2\rangle}\right)$", fontsize=16)
+	plt.ylabel(r"$\langle R_{rms}\rangle$ $\left(\sqrt{\langle r^2\rangle}\right)$", fontsize=16)
 	if (language == 'fin'):
 		if (int(runs) == 1):
 			runtxt = " ajo"
 		else:
 			runtxt = " ajoa"
-		text = r"$R_{rms}$ vs. $\sqrt{S}$  (%dD, %s), %d%s, %d askelta"%(int(dimension),space,int(runs),runtxt,int(steps))
+		text = r"$\langle R_{rms}\rangle$ vs. $\sqrt{S}$  (%dD, %s), %d%s, %d askelta"%(int(dimension),space,int(runs),runtxt,int(steps))
 	else:
 		if (int(runs) == 1):
 			runtxt = " run"
 		else:
 			runtxt = " runs"
-		text = r"$R_{rms}$ vs. $\sqrt{S}$  (%dD, %s), %d%s, %d steps"%(int(dimension),space,int(runs),runtxt,int(steps))
+		text = r"$\langle R_{rms}\rangle$ vs. $\sqrt{S}$  (%dD, %s), %d%s, %d steps"%(int(dimension),space,int(runs),runtxt,int(steps))
 	plt.title(text,fontsize=18)
 	plt.legend(loc='upper left',prop={'size': 18})
 

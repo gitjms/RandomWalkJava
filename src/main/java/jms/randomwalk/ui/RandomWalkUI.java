@@ -365,7 +365,7 @@ public class RandomWalkUI extends Application {
         // SLIDER A
         String labaStr = this.getLanguage().equals("fin") ? "Amplitudi A :  " : "Amplitude A :  ";
         final Label labelaa = new Label();
-        Slider sliderAa = new Slider(0.00, 1.00, 0.00);
+        Slider sliderAa = new Slider(0.00, 1.20, 0.00);
         sliderAa.setOrientation(Orientation.HORIZONTAL);
         sliderAa.setMaxSize(DblSizes.SAWCOMPW.getDblSize(), DblSizes.SAWCOMPH.getDblSize());
         sliderAa.setShowTickLabels(true);
